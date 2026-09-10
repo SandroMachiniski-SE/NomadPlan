@@ -1,5 +1,6 @@
 import { Router, Request, Response } from "express";
 import { z } from "zod";
+import { Prisma } from "@prisma/client";
 import prisma from "../lib/prisma";
 import { StatusPonto, StatusSolicitacao, TipoConta } from "@prisma/client";
 import { autenticar, autenticarOpcional, autorizar } from "../middleware/auth";
@@ -18,6 +19,28 @@ const TIPOS_CADASTRADORES = [
 const TIPOS_MODERADORES = [TipoConta.MODERADOR, TipoConta.ADMIN] as const;
 
 const DISTANCIA_DUPLICIDADE_METROS = 150;
+const RAIO_BUSCA_KM_PADRAO = 10;
+const RAIO_BUSCA_KM_MAXIMO = 200;
+
+interface PontoComDistancia {
+  id: number;
+  nome: string;
+  descricao: string | null;
+  categoria: string;
+  cidade: string;
+  endereco: string | null;
+  latitude: number | null;
+  longitude: number | null;
+  faixaPreco: string | null;
+  acessibilidade: string | null;
+  siteOficial: string | null;
+  telefoneContato: string | null;
+  horarioFuncionamento: string | null;
+  imagemUrl: string | null;
+  status: StatusPonto;
+  seloVerificado: boolean;
+  distanciaMetros: number;
+}
 
 function ehModerador(tipoConta: TipoConta): boolean {
   return tipoConta === TipoConta.MODERADOR || tipoConta === TipoConta.ADMIN;
@@ -168,15 +191,20 @@ function camposObrigatoriosFaltantes(ponto: {
   return faltantes;
 }
 
+const buscaSchema = z.object({
+  cidade: z.string().trim().min(1).optional(),
+  categoria: z.string().trim().min(1).optional(),
+  busca: z.string().trim().min(1).optional(),
+  acessibilidade: z.string().trim().min(1).optional(),
+  faixaPreco: z.string().trim().min(1).optional(),
+  lat: z.coerce.number().min(-90).max(90).optional(),
+  lng: z.coerce.number().min(-180).max(180).optional(),
+  raioKm: z.coerce.number().positive().max(RAIO_BUSCA_KM_MAXIMO).default(RAIO_BUSCA_KM_PADRAO),
+  limite: z.coerce.number().int().min(1).max(100).default(20),
+});
+
 pontosRouter.get("/", async (req: Request, res: Response) => {
   try {
-    const buscaSchema = z.object({
-      cidade: z.string().trim().min(1).optional(),
-      categoria: z.string().trim().min(1).optional(),
-      busca: z.string().trim().min(1).optional(),
-      limite: z.coerce.number().int().min(1).max(100).default(20),
-    });
-
     const resultado = buscaSchema.safeParse(req.query);
 
     if (!resultado.success) {
@@ -186,13 +214,53 @@ pontosRouter.get("/", async (req: Request, res: Response) => {
       });
     }
 
-    const { cidade, categoria, busca, limite } = resultado.data;
+    const { cidade, categoria, busca, acessibilidade, faixaPreco, lat, lng, raioKm, limite } =
+      resultado.data;
+
+    // Com coordenadas informadas, buscamos por proximidade usando a coluna geográfica
+    // (PostGIS) — ordenando pela distância real, não pelo nome.
+    if (lat !== undefined && lng !== undefined) {
+      const condicoes: Prisma.Sql[] = [
+        Prisma.sql`status = 'PUBLICADO'`,
+        Prisma.sql`geom IS NOT NULL`,
+        Prisma.sql`ST_DWithin(geom, ST_SetSRID(ST_MakePoint(${lng}, ${lat}), 4326)::geography, ${raioKm * 1000})`,
+      ];
+
+      if (cidade) condicoes.push(Prisma.sql`cidade ILIKE ${`%${cidade}%`}`);
+      if (categoria) condicoes.push(Prisma.sql`categoria ILIKE ${`%${categoria}%`}`);
+      if (acessibilidade) condicoes.push(Prisma.sql`acessibilidade ILIKE ${`%${acessibilidade}%`}`);
+      if (faixaPreco) condicoes.push(Prisma.sql`faixa_preco ILIKE ${`%${faixaPreco}%`}`);
+      if (busca) {
+        condicoes.push(
+          Prisma.sql`(nome ILIKE ${`%${busca}%`} OR descricao ILIKE ${`%${busca}%`})`,
+        );
+      }
+
+      const pontos = await prisma.$queryRaw<PontoComDistancia[]>`
+        SELECT
+          id, nome, descricao, categoria, cidade, endereco, latitude, longitude,
+          faixa_preco AS "faixaPreco", acessibilidade, site_oficial AS "siteOficial",
+          telefone_contato AS "telefoneContato", horario_funcionamento AS "horarioFuncionamento",
+          imagem_url AS "imagemUrl", status, selo_verificado AS "seloVerificado",
+          ST_Distance(geom, ST_SetSRID(ST_MakePoint(${lng}, ${lat}), 4326)::geography) AS "distanciaMetros"
+        FROM ponto_turistico
+        WHERE ${Prisma.join(condicoes, " AND ")}
+        ORDER BY "distanciaMetros" ASC
+        LIMIT ${limite}
+      `;
+
+      return res.json({ total: pontos.length, dados: pontos });
+    }
 
     const pontos = await prisma.pontoTuristico.findMany({
       where: {
         status: StatusPonto.PUBLICADO,
         ...(cidade ? { cidade: { contains: cidade, mode: "insensitive" } } : {}),
         ...(categoria ? { categoria: { contains: categoria, mode: "insensitive" } } : {}),
+        ...(acessibilidade
+          ? { acessibilidade: { contains: acessibilidade, mode: "insensitive" } }
+          : {}),
+        ...(faixaPreco ? { faixaPreco: { contains: faixaPreco, mode: "insensitive" } } : {}),
         ...(busca
           ? {
               OR: [

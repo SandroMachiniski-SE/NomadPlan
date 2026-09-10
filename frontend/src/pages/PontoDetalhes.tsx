@@ -2,8 +2,10 @@ import { useCallback, useEffect, useState, type FormEvent } from "react";
 import { Link, useParams } from "react-router-dom";
 import api from "../services/api";
 import type { Ponto } from "../types/ponto";
+import type { RespostaRoteiros } from "../types/roteiro";
 import { useAuth } from "../context/useAuth";
 import { extrairMensagemErro } from "../utils/erro";
+import MapaPontos from "../components/MapaPontos";
 
 const ROTULO_STATUS: Record<string, string> = {
   RASCUNHO: "Rascunho — ainda não publicado",
@@ -29,6 +31,11 @@ function PontoDetalhes() {
   const [solicitandoSelo, setSolicitandoSelo] = useState(false);
   const [seloSolicitado, setSeloSolicitado] = useState(false);
 
+  const [roteiros, setRoteiros] = useState<{ id: number; nome: string }[] | null>(null);
+  const [roteiroSelecionado, setRoteiroSelecionado] = useState("");
+  const [adicionandoRoteiro, setAdicionandoRoteiro] = useState(false);
+  const [adicionadoRoteiro, setAdicionadoRoteiro] = useState(false);
+
   const buscarPonto = useCallback(async () => {
     if (!id) {
       setErro("Ponto turístico inválido.");
@@ -51,6 +58,38 @@ function PontoDetalhes() {
     // eslint-disable-next-line react-hooks/set-state-in-effect -- fetch inicial ao montar o componente
     buscarPonto();
   }, [buscarPonto]);
+
+  useEffect(() => {
+    if (!autenticado || !ponto || ponto.status !== "PUBLICADO") {
+      return;
+    }
+
+    async function buscarRoteiros() {
+      try {
+        const resposta = await api.get<RespostaRoteiros>("/roteiros");
+        setRoteiros(resposta.data.dados.map((r) => ({ id: r.id, nome: r.nome })));
+      } catch (err) {
+        console.error(err);
+      }
+    }
+
+    buscarRoteiros();
+  }, [autenticado, ponto]);
+
+  async function aoAdicionarAoRoteiro() {
+    if (!roteiroSelecionado || !id) return;
+
+    try {
+      setAdicionandoRoteiro(true);
+      await api.post(`/roteiros/${roteiroSelecionado}/itens`, { idPonto: Number(id) });
+      setAdicionadoRoteiro(true);
+    } catch (err) {
+      console.error(err);
+      alert(extrairMensagemErro(err, "Não foi possível adicionar este ponto ao roteiro."));
+    } finally {
+      setAdicionandoRoteiro(false);
+    }
+  }
 
   async function aoEnviarSugestao(evento: FormEvent) {
     evento.preventDefault();
@@ -180,6 +219,58 @@ function PontoDetalhes() {
 
             {ponto.seloVerificado && <p style={{ color: "green" }}>✔ Local verificado</p>}
           </div>
+
+          {ponto.latitude !== null && ponto.longitude !== null && (
+            <div style={{ marginTop: "1.5rem" }}>
+              <MapaPontos pontos={[ponto]} altura={280} />
+              <a
+                href={`https://www.google.com/maps/dir/?api=1&destination=${ponto.latitude},${ponto.longitude}`}
+                target="_blank"
+                rel="noreferrer"
+                style={{ display: "inline-block", marginTop: "0.5rem", color: "#2563eb" }}
+              >
+                Como chegar
+              </a>
+            </div>
+          )}
+
+          {autenticado && ponto.status === "PUBLICADO" && (
+            <div style={{ marginTop: "1.5rem" }}>
+              {adicionadoRoteiro ? (
+                <p style={{ color: "#166534" }}>Ponto adicionado ao roteiro.</p>
+              ) : roteiros && roteiros.length > 0 ? (
+                <div style={{ display: "flex", gap: "0.5rem", flexWrap: "wrap" }}>
+                  <select
+                    value={roteiroSelecionado}
+                    onChange={(e) => setRoteiroSelecionado(e.target.value)}
+                    style={{ padding: "0.5rem", borderRadius: 6, border: "1px solid #ccc" }}
+                  >
+                    <option value="">Selecione um roteiro</option>
+                    {roteiros.map((roteiro) => (
+                      <option key={roteiro.id} value={roteiro.id}>
+                        {roteiro.nome}
+                      </option>
+                    ))}
+                  </select>
+                  <button
+                    type="button"
+                    onClick={aoAdicionarAoRoteiro}
+                    disabled={!roteiroSelecionado || adicionandoRoteiro}
+                    style={{ padding: "0.5rem 1rem", borderRadius: 6, border: "none", backgroundColor: "#2563eb", color: "#fff" }}
+                  >
+                    {adicionandoRoteiro ? "Adicionando..." : "Adicionar ao roteiro"}
+                  </button>
+                </div>
+              ) : roteiros && roteiros.length === 0 ? (
+                <p>
+                  Você ainda não tem roteiros.{" "}
+                  <Link to="/roteiros/novo" style={{ color: "#2563eb" }}>
+                    Criar um roteiro
+                  </Link>
+                </p>
+              ) : null}
+            </div>
+          )}
 
           {ehResponsavel && ponto.status === "PUBLICADO" && !ponto.seloVerificado && (
             <button
