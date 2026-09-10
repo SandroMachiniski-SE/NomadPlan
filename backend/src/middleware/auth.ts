@@ -40,6 +40,29 @@ export function autenticar(req: Request, res: Response, next: NextFunction) {
   }
 }
 
+export function autenticarOpcional(req: Request, _res: Response, next: NextFunction) {
+  const cabecalho = req.headers.authorization;
+
+  if (!cabecalho || !cabecalho.startsWith("Bearer ")) {
+    return next();
+  }
+
+  const token = cabecalho.slice("Bearer ".length);
+
+  try {
+    const payload = verificarToken(token);
+
+    req.usuario = {
+      id: payload.sub,
+      tipoConta: payload.tipoConta,
+    };
+  } catch {
+    // Token inválido em rota de autenticação opcional: segue como visitante anônimo.
+  }
+
+  return next();
+}
+
 export function autorizar(...tiposPermitidos: TipoConta[]) {
   return (req: Request, res: Response, next: NextFunction) => {
     if (!req.usuario) {

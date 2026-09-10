@@ -23,48 +23,100 @@ enum StatusPonto {
   REJEITADO
 }
 
-model Usuario {
-  id           Int        @id @default(autoincrement())
-  nome         String
-  email        String     @unique
-  senhaHash    String     @map("senha_hash")
-  tipoConta    TipoConta  @default(VISITANTE) @map("tipo_conta")
-  cidadeBase   String?    @map("cidade_base")
-  ativo        Boolean    @default(true)
-  dataCriacao  DateTime   @default(now()) @map("data_criacao")
+enum StatusSolicitacao {
+  PENDENTE
+  APROVADA
+  REJEITADA
+}
 
-  pontosResponsaveis PontoTuristico[]
-  roteiros           Roteiro[]
+model Usuario {
+  id          Int       @id @default(autoincrement())
+  nome        String
+  email       String    @unique
+  senhaHash   String    @map("senha_hash")
+  tipoConta   TipoConta @default(VISITANTE) @map("tipo_conta")
+  cidadeBase  String?   @map("cidade_base")
+  ativo       Boolean   @default(true)
+  dataCriacao DateTime  @default(now()) @map("data_criacao")
+
+  pontosResponsaveis  PontoTuristico[]
+  roteiros            Roteiro[]
+  sugestoesEdicao     SugestaoEdicao[]         @relation("autorSugestao")
+  verificacoesPedidas SolicitacaoVerificacao[] @relation("solicitanteVerificacao")
 
   @@map("usuario")
 }
 
 model PontoTuristico {
-  id                Int          @id @default(autoincrement())
-  nome              String
-  descricao         String?
-  categoria         String
-  cidade            String
-  endereco          String?
-  latitude          Float?
-  longitude         Float?
-  faixaPreco        String?      @map("faixa_preco")
-  acessibilidade    String?
-  siteOficial       String?      @map("site_oficial")
-  telefoneContato   String?      @map("telefone_contato")
-  status            StatusPonto  @default(PUBLICADO)
-  seloVerificado    Boolean      @default(false) @map("selo_verificado")
-  dataCriacao       DateTime     @default(now()) @map("data_criacao")
-  dataAtualizacao   DateTime     @updatedAt @map("data_atualizacao")
-  idResponsavel     Int?         @map("id_responsavel")
+  id                   Int         @id @default(autoincrement())
+  nome                 String
+  descricao            String?
+  categoria            String
+  cidade               String
+  endereco             String?
+  latitude             Float?
+  longitude            Float?
+  faixaPreco           String?     @map("faixa_preco")
+  acessibilidade       String?
+  siteOficial          String?     @map("site_oficial")
+  telefoneContato      String?     @map("telefone_contato")
+  horarioFuncionamento String?     @map("horario_funcionamento")
+  imagemUrl            String?     @map("imagem_url")
+  status               StatusPonto @default(RASCUNHO)
+  seloVerificado       Boolean     @default(false) @map("selo_verificado")
+  motivoRejeicao       String?     @map("motivo_rejeicao")
+  dataCriacao          DateTime    @default(now()) @map("data_criacao")
+  dataAtualizacao      DateTime    @updatedAt @map("data_atualizacao")
+  idResponsavel        Int?        @map("id_responsavel")
 
-  responsavel  Usuario?      @relation(fields: [idResponsavel], references: [id])
+  responsavel  Usuario?                 @relation(fields: [idResponsavel], references: [id])
   itensRoteiro ItemRoteiro[]
+  sugestoes    SugestaoEdicao[]
+  verificacoes SolicitacaoVerificacao[]
 
   @@index([cidade])
   @@index([categoria])
   @@index([status])
   @@map("ponto_turistico")
+}
+
+model SugestaoEdicao {
+  id              Int               @id @default(autoincrement())
+  idPonto         Int               @map("id_ponto")
+  idAutor         Int               @map("id_autor")
+  camposPropostos Json              @map("campos_propostos")
+  mensagem        String?
+  status          StatusSolicitacao @default(PENDENTE)
+  idModerador     Int?              @map("id_moderador")
+  motivoRejeicao  String?           @map("motivo_rejeicao")
+  dataCriacao     DateTime          @default(now()) @map("data_criacao")
+  dataResolucao   DateTime?         @map("data_resolucao")
+
+  ponto PontoTuristico @relation(fields: [idPonto], references: [id], onDelete: Cascade)
+  autor Usuario        @relation("autorSugestao", fields: [idAutor], references: [id])
+
+  @@index([idPonto])
+  @@index([status])
+  @@map("sugestao_edicao")
+}
+
+model SolicitacaoVerificacao {
+  id             Int               @id @default(autoincrement())
+  idPonto        Int               @map("id_ponto")
+  idSolicitante  Int               @map("id_solicitante")
+  comprovacao    String?
+  status         StatusSolicitacao @default(PENDENTE)
+  idModerador    Int?              @map("id_moderador")
+  motivoRejeicao String?           @map("motivo_rejeicao")
+  dataCriacao    DateTime          @default(now()) @map("data_criacao")
+  dataResolucao  DateTime?         @map("data_resolucao")
+
+  ponto       PontoTuristico @relation(fields: [idPonto], references: [id], onDelete: Cascade)
+  solicitante Usuario        @relation("solicitanteVerificacao", fields: [idSolicitante], references: [id])
+
+  @@index([idPonto])
+  @@index([status])
+  @@map("solicitacao_verificacao")
 }
 
 model Roteiro {

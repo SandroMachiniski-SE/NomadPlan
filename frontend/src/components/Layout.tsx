@@ -53,6 +53,19 @@ function Layout() {
                   Meus roteiros
                 </NavLink>
 
+                {usuario &&
+                  ["NEGOCIO", "GESTOR", "MODERADOR", "ADMIN"].includes(usuario.tipoConta) && (
+                    <NavLink to="/pontos/meus" style={estiloLink}>
+                      Meus pontos
+                    </NavLink>
+                  )}
+
+                {usuario && ["MODERADOR", "ADMIN"].includes(usuario.tipoConta) && (
+                  <NavLink to="/moderacao" style={estiloLink}>
+                    Moderação
+                  </NavLink>
+                )}
+
                 <NavLink to="/perfil" style={estiloLink}>
                   {usuario?.nome ?? "Perfil"}
                 </NavLink>

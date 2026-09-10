@@ -1,4 +1,5 @@
 import "dotenv/config";
+import path from "path";
 import express from "express";
 import cors from "cors";
 import helmet from "helmet";
@@ -7,6 +8,8 @@ import prisma from "./lib/prisma";
 import pontosRouter from "./routes/pontos.routes";
 import roteirosRouter from "./routes/roteiros.routes";
 import authRouter from "./routes/auth.routes";
+import sugestoesRouter from "./routes/sugestoes.routes";
+import verificacoesRouter from "./routes/verificacoes.routes";
 
 const app = express();
 
@@ -25,6 +28,15 @@ app.use(
 app.use(express.json());
 app.use(morgan("dev"));
 
+app.use(
+  "/uploads",
+  (_req, res, next) => {
+    res.setHeader("Cross-Origin-Resource-Policy", "cross-origin");
+    next();
+  },
+  express.static(path.join(__dirname, "..", "uploads")),
+);
+
 app.get("/health", (_req, res) => {
   res.json({
     status: "ok",
@@ -35,6 +47,8 @@ app.get("/health", (_req, res) => {
 app.use("/auth", authRouter);
 app.use("/pontos", pontosRouter);
 app.use("/roteiros", roteirosRouter);
+app.use("/sugestoes", sugestoesRouter);
+app.use("/verificacoes", verificacoesRouter);
 
 app.use((_req, res) => {
   res.status(404).json({
