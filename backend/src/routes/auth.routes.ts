@@ -36,6 +36,7 @@ const loginSchema = z.object({
 const atualizarPerfilSchema = z.object({
   nome: z.string().trim().min(1).max(120).optional(),
   cidadeBase: z.string().trim().max(120).nullable().optional(),
+  interesses: z.array(z.string().trim().min(1).max(80)).max(20).optional(),
 });
 
 const esqueciSenhaSchema = z.object({
@@ -53,6 +54,7 @@ const usuarioSelecaoPublica = {
   email: true,
   tipoConta: true,
   cidadeBase: true,
+  interesses: true,
   dataCriacao: true,
 } as const;
 
@@ -195,6 +197,7 @@ authRouter.put("/me", autenticar, async (req: Request, res: Response) => {
         ...(dados.cidadeBase !== undefined
           ? { cidadeBase: dados.cidadeBase || null }
           : {}),
+        ...(dados.interesses !== undefined ? { interesses: dados.interesses } : {}),
       },
       select: usuarioSelecaoPublica,
     });

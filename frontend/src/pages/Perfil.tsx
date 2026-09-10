@@ -1,15 +1,23 @@
 import { useState, type FormEvent } from "react";
 import { useAuth } from "../context/useAuth";
 import { extrairMensagemErro } from "../utils/erro";
+import { CATEGORIAS_PONTOS } from "../constants/categorias";
 
 function Perfil() {
   const { usuario, atualizarPerfil } = useAuth();
 
   const [nome, setNome] = useState(usuario?.nome ?? "");
   const [cidadeBase, setCidadeBase] = useState(usuario?.cidadeBase ?? "");
+  const [interesses, setInteresses] = useState<string[]>(usuario?.interesses ?? []);
   const [salvando, setSalvando] = useState(false);
   const [erro, setErro] = useState<string | null>(null);
   const [sucesso, setSucesso] = useState(false);
+
+  function alternarInteresse(categoria: string) {
+    setInteresses((atual) =>
+      atual.includes(categoria) ? atual.filter((c) => c !== categoria) : [...atual, categoria],
+    );
+  }
 
   if (!usuario) {
     return null;
@@ -31,6 +39,7 @@ function Perfil() {
       await atualizarPerfil({
         nome: nome.trim(),
         cidadeBase: cidadeBase.trim() || null,
+        interesses,
       });
 
       setSucesso(true);
@@ -72,6 +81,34 @@ function Perfil() {
             style={{ padding: "0.5rem", borderRadius: 6, border: "1px solid #ccc" }}
           />
         </label>
+
+        <div>
+          <p style={{ margin: "0 0 0.5rem" }}>Interesses (usados para sugerir roteiros)</p>
+          <div style={{ display: "flex", flexWrap: "wrap", gap: "0.5rem" }}>
+            {CATEGORIAS_PONTOS.map((categoria) => (
+              <label
+                key={categoria}
+                style={{
+                  display: "flex",
+                  alignItems: "center",
+                  gap: "0.35rem",
+                  border: "1px solid #ccc",
+                  borderRadius: 6,
+                  padding: "0.35rem 0.6rem",
+                  cursor: "pointer",
+                  backgroundColor: interesses.includes(categoria) ? "#dbeafe" : "#fff",
+                }}
+              >
+                <input
+                  type="checkbox"
+                  checked={interesses.includes(categoria)}
+                  onChange={() => alternarInteresse(categoria)}
+                />
+                {categoria}
+              </label>
+            ))}
+          </div>
+        </div>
 
         {erro && (
           <div

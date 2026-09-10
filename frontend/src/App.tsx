@@ -16,6 +16,8 @@ import Perfil from "./pages/Perfil";
 import MeusPontos from "./pages/MeusPontos";
 import PontoFormulario from "./pages/PontoFormulario";
 import Moderacao from "./pages/Moderacao";
+import GerarRoteiro from "./pages/GerarRoteiro";
+import RoteiroPublico from "./pages/RoteiroPublico";
 
 const PAPEIS_CADASTRADORES = ["NEGOCIO", "GESTOR", "MODERADOR", "ADMIN"] as const;
 const PAPEIS_MODERADORES = ["MODERADOR", "ADMIN"] as const;
@@ -31,11 +33,13 @@ function App() {
           <Route path="/registrar" element={<Registrar />} />
           <Route path="/esqueci-senha" element={<EsqueciSenha />} />
           <Route path="/redefinir-senha" element={<RedefinirSenha />} />
+          <Route path="/roteiros/publico/:slug" element={<RoteiroPublico />} />
 
           <Route element={<RotaProtegida />}>
             <Route path="/roteiros" element={<Roteiros />} />
             <Route path="/roteiros/:id" element={<RoteiroDetalhes />} />
             <Route path="/roteiros/novo" element={<NovoRoteiro />} />
+            <Route path="/roteiros/gerar" element={<GerarRoteiro />} />
             <Route path="/perfil" element={<Perfil />} />
           </Route>
 

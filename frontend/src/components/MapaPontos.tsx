@@ -5,8 +5,6 @@ import "leaflet/dist/leaflet.css";
 import markerIcon2x from "leaflet/dist/images/marker-icon-2x.png";
 import markerIcon from "leaflet/dist/images/marker-icon.png";
 import markerShadow from "leaflet/dist/images/marker-shadow.png";
-import type { Ponto } from "../types/ponto";
-
 // Vite não resolve os ícones padrão do Leaflet a partir do pacote — configuramos
 // explicitamente os arquivos importados como assets.
 L.Icon.Default.mergeOptions({
@@ -15,8 +13,17 @@ L.Icon.Default.mergeOptions({
   shadowUrl: markerShadow,
 });
 
+export interface PontoNoMapa {
+  id: number;
+  nome: string;
+  categoria: string;
+  cidade: string;
+  latitude: number | null;
+  longitude: number | null;
+}
+
 interface MapaPontosProps {
-  pontos: Ponto[];
+  pontos: PontoNoMapa[];
   altura?: number;
 }
 
@@ -24,7 +31,7 @@ const CENTRO_PADRAO: [number, number] = [-26.3045, -48.8487]; // Joinville
 
 function MapaPontos({ pontos, altura = 420 }: MapaPontosProps) {
   const comCoordenadas = pontos.filter(
-    (ponto): ponto is Ponto & { latitude: number; longitude: number } =>
+    (ponto): ponto is PontoNoMapa & { latitude: number; longitude: number } =>
       ponto.latitude !== null && ponto.longitude !== null,
   );
 

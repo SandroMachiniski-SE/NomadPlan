@@ -37,6 +37,57 @@
   text-align: left;
 }
 
+.roteiro-acoes {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  margin-top: 1rem;
+}
+
+.roteiro-btn-secundario {
+  padding: 0.45rem 0.9rem;
+  border-radius: 6px;
+  border: 1px solid var(--accent-border, var(--accent));
+  background: transparent;
+  color: var(--accent);
+  cursor: pointer;
+  font-weight: 500;
+}
+
+.roteiro-btn-secundario:disabled {
+  cursor: not-allowed;
+  opacity: 0.6;
+}
+
+.roteiro-compartilhar-link {
+  margin-top: 0.75rem;
+  padding: 0.75rem;
+  border-radius: 8px;
+  border: 1px solid var(--border);
+  background: var(--code-bg);
+  word-break: break-all;
+}
+
+.roteiro-item-reordenar {
+  display: flex;
+  gap: 0.4rem;
+  margin-top: 0.75rem;
+}
+
+.roteiro-btn-icone {
+  padding: 0.3rem 0.6rem;
+  border-radius: 6px;
+  border: 1px solid var(--border);
+  background: var(--bg);
+  color: var(--text-h);
+  cursor: pointer;
+}
+
+.roteiro-btn-icone:disabled {
+  cursor: not-allowed;
+  opacity: 0.4;
+}
+
 .roteiro-cidade {
   color: var(--text);
   margin-top: 0.25rem;

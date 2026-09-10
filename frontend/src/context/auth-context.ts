@@ -18,6 +18,7 @@ export interface AuthContextValor {
   atualizarPerfil: (dados: {
     nome?: string;
     cidadeBase?: string | null;
+    interesses?: string[];
   }) => Promise<void>;
 }
 

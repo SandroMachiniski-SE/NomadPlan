@@ -58,6 +58,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   async function atualizarPerfil(dados: {
     nome?: string;
     cidadeBase?: string | null;
+    interesses?: string[];
   }) {
     const resposta = await api.put<Usuario>("/auth/me", dados);
     setUsuario(resposta.data);
