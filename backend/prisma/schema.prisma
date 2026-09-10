@@ -36,6 +36,7 @@ model Usuario {
   senhaHash   String    @map("senha_hash")
   tipoConta   TipoConta @default(VISITANTE) @map("tipo_conta")
   cidadeBase  String?   @map("cidade_base")
+  interesses  String[]  @default([])
   ativo       Boolean   @default(true)
   dataCriacao DateTime  @default(now()) @map("data_criacao")
 
@@ -69,12 +70,12 @@ model PontoTuristico {
   dataAtualizacao      DateTime    @updatedAt @map("data_atualizacao")
   idResponsavel        Int?        @map("id_responsavel")
 
-  // Nota: a coluna geográfica "geom" (PostGIS, gerada a partir de latitude/longitude
-  // pelo próprio Postgres) existe no banco — ver migration modulo3_geom_indice_geografico —
-  // mas foi deixada de fora deste model. O Prisma não sabe expressar uma coluna
-  // "GENERATED ALWAYS AS ... STORED" no schema, e declará-la como Unsupported fazia o
-  // `prisma migrate dev` detectar divergência e tentar apagar o índice a cada execução.
-  // A coluna é usada apenas via $queryRaw em pontos.routes.ts.
+  // Coluna geográfica (PostGIS), gerada pelo Postgres a partir de latitude/longitude —
+  // ver migration modulo3_geom_indice_geografico. O Prisma não modela colunas
+  // "GENERATED ALWAYS AS ... STORED", então toda vez que o schema muda, `prisma migrate
+  // dev --create-only` tenta "corrigir" o índice/coluna; revisar e remover essa parte do
+  // SQL gerado antes de aplicar (nunca aceitar um DROP COLUMN "geom" automático).
+  geom Unsupported("geography(Point,4326)")?
   responsavel  Usuario?                 @relation(fields: [idResponsavel], references: [id])
   itensRoteiro ItemRoteiro[]
   sugestoes    SugestaoEdicao[]
@@ -133,6 +134,8 @@ model Roteiro {
   dataInicio      DateTime? @map("data_inicio")
   dataFim         DateTime? @map("data_fim")
   idUsuario       Int       @map("id_usuario")
+  publico         Boolean   @default(false)
+  slugPublico     String?   @unique @map("slug_publico")
   dataCriacao     DateTime  @default(now()) @map("data_criacao")
   dataAtualizacao DateTime  @updatedAt @map("data_atualizacao")
 

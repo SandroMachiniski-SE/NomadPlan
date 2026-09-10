@@ -1,5 +1,5 @@
-﻿import { useCallback, useEffect, useState, type SyntheticEvent } from "react";
-import { Link, useParams } from "react-router-dom";
+import { useCallback, useEffect, useState, type FormEvent, type SyntheticEvent } from "react";
+import { Link, useNavigate, useParams } from "react-router-dom";
 import api from "../services/api";
 import type { Roteiro } from "../types/roteiro";
 import type { Ponto, RespostaPontos } from "../types/ponto";
@@ -8,6 +8,7 @@ import "./RoteiroDetalhes.css";
 
 function RoteiroDetalhes() {
   const { id } = useParams();
+  const navigate = useNavigate();
 
   const [roteiro, setRoteiro] = useState<Roteiro | null>(null);
   const [carregando, setCarregando] = useState(true);
@@ -15,12 +16,21 @@ function RoteiroDetalhes() {
 
   const [pontosDisponiveis, setPontosDisponiveis] = useState<Ponto[]>([]);
   const [idPontoSelecionado, setIdPontoSelecionado] = useState("");
-  const [ordem, setOrdem] = useState("");
   const [observacao, setObservacao] = useState("");
   const [enviandoPonto, setEnviandoPonto] = useState(false);
   const [erroPonto, setErroPonto] = useState<string | null>(null);
 
   const [removendoId, setRemovendoId] = useState<number | null>(null);
+  const [reordenando, setReordenando] = useState(false);
+
+  const [editando, setEditando] = useState(false);
+  const [nomeEdicao, setNomeEdicao] = useState("");
+  const [descricaoEdicao, setDescricaoEdicao] = useState("");
+  const [cidadeEdicao, setCidadeEdicao] = useState("");
+  const [salvandoEdicao, setSalvandoEdicao] = useState(false);
+
+  const [excluindo, setExcluindo] = useState(false);
+  const [compartilhando, setCompartilhando] = useState(false);
 
   const buscarRoteiro = useCallback(async () => {
     try {
@@ -29,8 +39,9 @@ function RoteiroDetalhes() {
 
       const resposta = await api.get<Roteiro>(`/roteiros/${id}`);
       setRoteiro(resposta.data);
-
-      setOrdem(String(resposta.data.itens.length + 1));
+      setNomeEdicao(resposta.data.nome);
+      setDescricaoEdicao(resposta.data.descricao ?? "");
+      setCidadeEdicao(resposta.data.cidade ?? "");
     } catch (err) {
       console.error(err);
       setErro("Nao foi possivel carregar este roteiro.");
@@ -69,10 +80,6 @@ function RoteiroDetalhes() {
       const payload: Record<string, unknown> = {
         idPonto: Number(idPontoSelecionado),
       };
-
-      if (ordem.trim() !== "") {
-        payload.ordem = Number(ordem);
-      }
 
       if (observacao.trim() !== "") {
         payload.observacao = observacao.trim();
@@ -119,9 +126,107 @@ function RoteiroDetalhes() {
     }
   }
 
-  const itensOrdenados = roteiro
-    ? [...roteiro.itens].sort((a, b) => a.ordem - b.ordem)
-    : [];
+  const itensOrdenados = roteiro ? [...roteiro.itens].sort((a, b) => a.ordem - b.ordem) : [];
+
+  async function aoMoverItem(indice: number, direcao: -1 | 1) {
+    const destino = indice + direcao;
+
+    if (destino < 0 || destino >= itensOrdenados.length) {
+      return;
+    }
+
+    const novaOrdem = [...itensOrdenados];
+    [novaOrdem[indice], novaOrdem[destino]] = [novaOrdem[destino], novaOrdem[indice]];
+
+    try {
+      setReordenando(true);
+
+      await api.post(`/roteiros/${id}/itens/reordenar`, {
+        idsItensEmOrdem: novaOrdem.map((item) => item.id),
+      });
+
+      await buscarRoteiro();
+    } catch (err) {
+      console.error(err);
+      alert(extrairMensagemErro(err, "Nao foi possivel reordenar os pontos."));
+    } finally {
+      setReordenando(false);
+    }
+  }
+
+  async function aoSalvarEdicao(evento: FormEvent) {
+    evento.preventDefault();
+
+    try {
+      setSalvandoEdicao(true);
+
+      await api.put(`/roteiros/${id}`, {
+        nome: nomeEdicao.trim(),
+        descricao: descricaoEdicao.trim() || undefined,
+        cidade: cidadeEdicao.trim() || undefined,
+      });
+
+      setEditando(false);
+      await buscarRoteiro();
+    } catch (err) {
+      console.error(err);
+      alert(extrairMensagemErro(err, "Nao foi possivel salvar as alteracoes do roteiro."));
+    } finally {
+      setSalvandoEdicao(false);
+    }
+  }
+
+  async function aoExcluirRoteiro() {
+    const confirmar = window.confirm(
+      "Tem certeza que deseja excluir este roteiro? Essa acao nao pode ser desfeita.",
+    );
+
+    if (!confirmar) return;
+
+    try {
+      setExcluindo(true);
+      await api.delete(`/roteiros/${id}`);
+      navigate("/roteiros", { replace: true });
+    } catch (err) {
+      console.error(err);
+      alert(extrairMensagemErro(err, "Nao foi possivel excluir o roteiro."));
+      setExcluindo(false);
+    }
+  }
+
+  async function aoAlternarCompartilhamento() {
+    if (!roteiro) return;
+
+    try {
+      setCompartilhando(true);
+
+      const resposta = await api.patch<Pick<Roteiro, "publico" | "slugPublico">>(
+        `/roteiros/${id}/compartilhar`,
+        { publico: !roteiro.publico },
+      );
+
+      setRoteiro((atual) => (atual ? { ...atual, ...resposta.data } : atual));
+    } catch (err) {
+      console.error(err);
+      alert(extrairMensagemErro(err, "Nao foi possivel alterar o compartilhamento do roteiro."));
+    } finally {
+      setCompartilhando(false);
+    }
+  }
+
+  async function aoCopiarLink(link: string) {
+    try {
+      await navigator.clipboard.writeText(link);
+      alert("Link copiado!");
+    } catch {
+      // Clipboard indisponível (ex.: permissão negada) — o link já fica visível na tela.
+    }
+  }
+
+  const linkPublico =
+    roteiro?.publico && roteiro.slugPublico
+      ? `${window.location.origin}/roteiros/publico/${roteiro.slugPublico}`
+      : null;
 
   return (
     <div className="roteiro-detalhes">
@@ -135,33 +240,142 @@ function RoteiroDetalhes() {
 
       {!carregando && !erro && roteiro && (
         <div className="roteiro-conteudo">
-          <div className="roteiro-cabecalho">
-            <h1>{roteiro.nome}</h1>
-            <p className="roteiro-cidade">{roteiro.cidade}</p>
+          {editando ? (
+            <form onSubmit={aoSalvarEdicao} className="roteiro-form" style={{ maxWidth: 480 }}>
+              <label className="roteiro-campo">
+                <span>Nome *</span>
+                <input
+                  className="roteiro-input"
+                  type="text"
+                  maxLength={120}
+                  value={nomeEdicao}
+                  onChange={(e) => setNomeEdicao(e.target.value)}
+                />
+              </label>
 
-            {roteiro.descricao && (
-              <p className="roteiro-descricao">{roteiro.descricao}</p>
-            )}
-          </div>
+              <label className="roteiro-campo">
+                <span>Cidade</span>
+                <input
+                  className="roteiro-input"
+                  type="text"
+                  maxLength={120}
+                  value={cidadeEdicao}
+                  onChange={(e) => setCidadeEdicao(e.target.value)}
+                />
+              </label>
+
+              <label className="roteiro-campo">
+                <span>Descricao</span>
+                <textarea
+                  className="roteiro-input"
+                  maxLength={1000}
+                  rows={3}
+                  value={descricaoEdicao}
+                  onChange={(e) => setDescricaoEdicao(e.target.value)}
+                />
+              </label>
+
+              <div className="roteiro-acoes">
+                <button type="submit" className="roteiro-btn-primario" disabled={salvandoEdicao}>
+                  {salvandoEdicao ? "Salvando..." : "Salvar"}
+                </button>
+                <button
+                  type="button"
+                  className="roteiro-btn-secundario"
+                  onClick={() => setEditando(false)}
+                >
+                  Cancelar
+                </button>
+              </div>
+            </form>
+          ) : (
+            <div className="roteiro-cabecalho">
+              <h1>{roteiro.nome}</h1>
+              <p className="roteiro-cidade">{roteiro.cidade}</p>
+
+              {roteiro.descricao && <p className="roteiro-descricao">{roteiro.descricao}</p>}
+
+              <div className="roteiro-acoes">
+                <button
+                  type="button"
+                  className="roteiro-btn-secundario"
+                  onClick={() => setEditando(true)}
+                >
+                  Editar
+                </button>
+
+                <button
+                  type="button"
+                  className="roteiro-btn-secundario"
+                  onClick={aoAlternarCompartilhamento}
+                  disabled={compartilhando}
+                >
+                  {roteiro.publico ? "Parar de compartilhar" : "Compartilhar"}
+                </button>
+
+                <button
+                  type="button"
+                  className="roteiro-btn-remover"
+                  onClick={aoExcluirRoteiro}
+                  disabled={excluindo}
+                >
+                  {excluindo ? "Excluindo..." : "Excluir roteiro"}
+                </button>
+              </div>
+
+              {linkPublico && (
+                <div className="roteiro-compartilhar-link">
+                  Link público:{" "}
+                  <a href={linkPublico} target="_blank" rel="noreferrer">
+                    {linkPublico}
+                  </a>{" "}
+                  <button
+                    type="button"
+                    className="roteiro-btn-icone"
+                    onClick={() => aoCopiarLink(linkPublico)}
+                  >
+                    Copiar
+                  </button>
+                </div>
+              )}
+            </div>
+          )}
 
           <h2 className="roteiro-secao-titulo">Pontos do roteiro</h2>
 
           {itensOrdenados.length === 0 && (
-            <p className="roteiro-vazio">
-              Este roteiro ainda nao tem pontos cadastrados.
-            </p>
+            <p className="roteiro-vazio">Este roteiro ainda nao tem pontos cadastrados.</p>
           )}
 
           <div className="roteiro-lista">
-            {itensOrdenados.map((item) => (
+            {itensOrdenados.map((item, indice) => (
               <div key={item.id} className="roteiro-item">
-                <p className="roteiro-item-parada">Parada {item.ordem}</p>
+                <p className="roteiro-item-parada">Parada {indice + 1}</p>
                 <h3 className="roteiro-item-titulo">{item.ponto.nome}</h3>
                 <p className="roteiro-item-categoria">{item.ponto.categoria}</p>
 
-                {item.observacao && (
-                  <p className="roteiro-item-obs">{item.observacao}</p>
-                )}
+                {item.observacao && <p className="roteiro-item-obs">{item.observacao}</p>}
+
+                <div className="roteiro-item-reordenar">
+                  <button
+                    type="button"
+                    className="roteiro-btn-icone"
+                    onClick={() => aoMoverItem(indice, -1)}
+                    disabled={indice === 0 || reordenando}
+                    title="Mover para cima"
+                  >
+                    ↑
+                  </button>
+                  <button
+                    type="button"
+                    className="roteiro-btn-icone"
+                    onClick={() => aoMoverItem(indice, 1)}
+                    disabled={indice === itensOrdenados.length - 1 || reordenando}
+                    title="Mover para baixo"
+                  >
+                    ↓
+                  </button>
+                </div>
 
                 <button
                   type="button"
@@ -195,17 +409,6 @@ function RoteiroDetalhes() {
             </label>
 
             <label className="roteiro-campo">
-              <span>Ordem</span>
-              <input
-                className="roteiro-input"
-                type="number"
-                min={0}
-                value={ordem}
-                onChange={(e) => setOrdem(e.target.value)}
-              />
-            </label>
-
-            <label className="roteiro-campo">
               <span>Observacao</span>
               <input
                 className="roteiro-input"
@@ -218,11 +421,7 @@ function RoteiroDetalhes() {
 
             {erroPonto && <div className="roteiro-alerta">{erroPonto}</div>}
 
-            <button
-              type="submit"
-              className="roteiro-btn-primario"
-              disabled={enviandoPonto}
-            >
+            <button type="submit" className="roteiro-btn-primario" disabled={enviandoPonto}>
               {enviandoPonto ? "Adicionando..." : "Adicionar ponto"}
             </button>
           </form>

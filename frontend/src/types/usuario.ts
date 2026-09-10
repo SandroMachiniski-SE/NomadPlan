@@ -12,6 +12,7 @@ export interface Usuario {
   email: string;
   tipoConta: TipoConta;
   cidadeBase: string | null;
+  interesses: string[];
   dataCriacao: string;
 }
 
