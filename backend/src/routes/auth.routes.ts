@@ -10,6 +10,7 @@ import {
   verificarTokenRedefinicaoSenha,
 } from "../lib/auth";
 import { autenticar } from "../middleware/auth";
+import { limiteCriacaoConta } from "../middleware/rateLimit";
 
 const authRouter = Router();
 
@@ -55,10 +56,11 @@ const usuarioSelecaoPublica = {
   tipoConta: true,
   cidadeBase: true,
   interesses: true,
+  reputacao: true,
   dataCriacao: true,
 } as const;
 
-authRouter.post("/registrar", async (req: Request, res: Response) => {
+authRouter.post("/registrar", limiteCriacaoConta, async (req: Request, res: Response) => {
   try {
     const resultado = registrarSchema.safeParse(req.body);
 

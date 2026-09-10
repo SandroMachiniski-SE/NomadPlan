@@ -3,6 +3,10 @@ import { z } from "zod";
 import { Prisma, StatusSolicitacao, TipoConta } from "@prisma/client";
 import prisma from "../lib/prisma";
 import { autenticar, autorizar } from "../middleware/auth";
+import { registrarVersaoPonto } from "../lib/versionamento";
+import { incrementarReputacao, PONTOS_REPUTACAO } from "../lib/reputacao";
+import { criarNotificacao } from "../lib/notificacoes";
+import { registrarAuditoria } from "../lib/auditoria";
 
 const sugestoesRouter = Router();
 
@@ -53,12 +57,23 @@ sugestoesRouter.post("/:id/aprovar", async (req: Request, res: Response) => {
       return res.status(409).json({ erro: "Esta sugestão já foi analisada." });
     }
 
+    const ponto = await prisma.pontoTuristico.findUnique({ where: { id: sugestao.idPonto } });
+
+    if (!ponto) {
+      return res.status(404).json({ erro: "Ponto turístico não encontrado." });
+    }
+
     const camposPropostos = sugestao.camposPropostos as Prisma.JsonObject;
+
+    await registrarVersaoPonto(ponto, "sugestao_aprovada", req.usuario!.id);
 
     await prisma.$transaction([
       prisma.pontoTuristico.update({
         where: { id: sugestao.idPonto },
-        data: camposPropostos as Prisma.PontoTuristicoUpdateInput,
+        data: {
+          ...(camposPropostos as Prisma.PontoTuristicoUpdateInput),
+          versao: { increment: 1 },
+        },
       }),
       prisma.sugestaoEdicao.update({
         where: { id: id.data },
@@ -69,6 +84,21 @@ sugestoesRouter.post("/:id/aprovar", async (req: Request, res: Response) => {
         },
       }),
     ]);
+
+    await incrementarReputacao(sugestao.idAutor, PONTOS_REPUTACAO.SUGESTAO_APROVADA);
+
+    await registrarAuditoria({
+      idUsuario: req.usuario!.id,
+      acao: "aprovar",
+      entidade: "sugestao_edicao",
+      idEntidade: id.data,
+    });
+
+    await criarNotificacao(
+      sugestao.idAutor,
+      `Sua sugestão de edição para "${ponto.nome}" foi aprovada.`,
+      `/pontos/${ponto.id}`,
+    );
 
     return res.json({ mensagem: "Sugestão aprovada e aplicada ao ponto." });
   } catch (error) {
@@ -113,7 +143,22 @@ sugestoesRouter.post("/:id/rejeitar", async (req: Request, res: Response) => {
         motivoRejeicao: resultado.data.motivo,
         dataResolucao: new Date(),
       },
+      include: { ponto: { select: { id: true, nome: true } } },
     });
+
+    await registrarAuditoria({
+      idUsuario: req.usuario!.id,
+      acao: "rejeitar",
+      entidade: "sugestao_edicao",
+      idEntidade: id.data,
+      detalhes: { motivo: resultado.data.motivo },
+    });
+
+    await criarNotificacao(
+      sugestao.idAutor,
+      `Sua sugestão de edição para "${sugestaoAtualizada.ponto.nome}" foi rejeitada: ${resultado.data.motivo}`,
+      `/pontos/${sugestaoAtualizada.ponto.id}`,
+    );
 
     return res.json(sugestaoAtualizada);
   } catch (error) {

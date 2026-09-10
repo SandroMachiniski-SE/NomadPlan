@@ -1,7 +1,13 @@
 import { useCallback, useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 import api from "../services/api";
-import type { Ponto, RespostaPontos, SolicitacaoVerificacao, SugestaoEdicao } from "../types/ponto";
+import type {
+  Avaliacao,
+  Ponto,
+  RespostaPontos,
+  SolicitacaoVerificacao,
+  SugestaoEdicao,
+} from "../types/ponto";
 import { extrairMensagemErro } from "../utils/erro";
 
 const estiloCartao = { border: "1px solid #ddd", borderRadius: 8, padding: "1.25rem" };
@@ -26,6 +32,7 @@ function Moderacao() {
   const [pontos, setPontos] = useState<Ponto[]>([]);
   const [sugestoes, setSugestoes] = useState<SugestaoEdicao[]>([]);
   const [verificacoes, setVerificacoes] = useState<SolicitacaoVerificacao[]>([]);
+  const [avaliacoes, setAvaliacoes] = useState<Avaliacao[]>([]);
   const [carregando, setCarregando] = useState(true);
   const [erro, setErro] = useState<string | null>(null);
   const [processandoId, setProcessandoId] = useState<string | null>(null);
@@ -35,15 +42,18 @@ function Moderacao() {
       setCarregando(true);
       setErro(null);
 
-      const [respostaPontos, respostaSugestoes, respostaVerificacoes] = await Promise.all([
-        api.get<RespostaPontos>("/pontos/moderacao"),
-        api.get<{ total: number; dados: SugestaoEdicao[] }>("/sugestoes"),
-        api.get<{ total: number; dados: SolicitacaoVerificacao[] }>("/verificacoes"),
-      ]);
+      const [respostaPontos, respostaSugestoes, respostaVerificacoes, respostaAvaliacoes] =
+        await Promise.all([
+          api.get<RespostaPontos>("/pontos/moderacao"),
+          api.get<{ total: number; dados: SugestaoEdicao[] }>("/sugestoes"),
+          api.get<{ total: number; dados: SolicitacaoVerificacao[] }>("/verificacoes"),
+          api.get<{ total: number; dados: Avaliacao[] }>("/avaliacoes"),
+        ]);
 
       setPontos(respostaPontos.data.dados);
       setSugestoes(respostaSugestoes.data.dados);
       setVerificacoes(respostaVerificacoes.data.dados);
+      setAvaliacoes(respostaAvaliacoes.data.dados);
     } catch (err) {
       console.error(err);
       setErro(extrairMensagemErro(err, "Não foi possível carregar a fila de moderação."));
@@ -133,6 +143,33 @@ function Moderacao() {
       await carregarTudo();
     } catch (err) {
       alert(extrairMensagemErro(err, "Não foi possível rejeitar esta solicitação."));
+    } finally {
+      setProcessandoId(null);
+    }
+  }
+
+  async function aprovarAvaliacao(id: number) {
+    try {
+      setProcessandoId(`avaliacao-${id}`);
+      await api.post(`/avaliacoes/${id}/aprovar`);
+      await carregarTudo();
+    } catch (err) {
+      alert(extrairMensagemErro(err, "Não foi possível aprovar esta avaliação."));
+    } finally {
+      setProcessandoId(null);
+    }
+  }
+
+  async function rejeitarAvaliacao(id: number) {
+    const motivo = window.prompt("Motivo da rejeição:");
+    if (!motivo) return;
+
+    try {
+      setProcessandoId(`avaliacao-${id}`);
+      await api.post(`/avaliacoes/${id}/rejeitar`, { motivo });
+      await carregarTudo();
+    } catch (err) {
+      alert(extrairMensagemErro(err, "Não foi possível rejeitar esta avaliação."));
     } finally {
       setProcessandoId(null);
     }
@@ -266,6 +303,44 @@ function Moderacao() {
                   type="button"
                   onClick={() => rejeitarVerificacao(solicitacao.id)}
                   disabled={processandoId === `verificacao-${solicitacao.id}`}
+                  style={estiloBotaoRejeitar}
+                >
+                  Rejeitar
+                </button>
+              </div>
+            </div>
+          ))}
+        </div>
+      </section>
+
+      <section style={{ marginTop: "2rem" }}>
+        <h2>Avaliações pendentes ({avaliacoes.length})</h2>
+
+        {avaliacoes.length === 0 && <p style={{ color: "#666" }}>Nenhuma avaliação pendente.</p>}
+
+        <div style={{ display: "grid", gap: "1rem" }}>
+          {avaliacoes.map((avaliacao) => (
+            <div key={avaliacao.id} style={estiloCartao}>
+              <p style={{ margin: 0, fontWeight: "bold" }}>
+                {avaliacao.ponto?.nome} ({avaliacao.ponto?.cidade}) — {"★".repeat(avaliacao.nota)}
+              </p>
+              <p style={{ color: "#666", margin: "0.25rem 0 0.75rem" }}>
+                Por {avaliacao.autor?.nome}
+                {avaliacao.comentario ? ` — "${avaliacao.comentario}"` : ""}
+              </p>
+              <div style={{ display: "flex", gap: "0.5rem" }}>
+                <button
+                  type="button"
+                  onClick={() => aprovarAvaliacao(avaliacao.id)}
+                  disabled={processandoId === `avaliacao-${avaliacao.id}`}
+                  style={estiloBotaoAprovar}
+                >
+                  Aprovar
+                </button>
+                <button
+                  type="button"
+                  onClick={() => rejeitarAvaliacao(avaliacao.id)}
+                  disabled={processandoId === `avaliacao-${avaliacao.id}`}
                   style={estiloBotaoRejeitar}
                 >
                   Rejeitar

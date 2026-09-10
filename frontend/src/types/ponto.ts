@@ -23,6 +23,7 @@ export interface Ponto {
   idResponsavel?: number | null;
   responsavel?: { id: number; nome: string } | null;
   distanciaMetros?: number;
+  versao?: number;
 }
 
 export interface RespostaPontos {
@@ -53,4 +54,33 @@ export interface SolicitacaoVerificacao {
   dataCriacao: string;
   solicitante?: { id: number; nome: string };
   ponto?: { id: number; nome: string; cidade: string };
+}
+
+export interface Avaliacao {
+  id: number;
+  idPonto: number;
+  idAutor: number;
+  nota: number;
+  comentario: string | null;
+  fotoUrl: string | null;
+  status: "PENDENTE" | "APROVADA" | "REJEITADA";
+  motivoRejeicao: string | null;
+  dataCriacao: string;
+  autor?: { id: number; nome: string };
+  ponto?: { id: number; nome: string; cidade: string };
+}
+
+export interface RespostaAvaliacoes {
+  total: number;
+  media: number | null;
+  dados: Avaliacao[];
+}
+
+export interface VersaoPonto {
+  id: number;
+  idPonto: number;
+  dados: Record<string, unknown>;
+  idAutor: number | null;
+  motivo: string;
+  dataCriacao: string;
 }

@@ -1,5 +1,6 @@
 import { NavLink, Outlet, useNavigate } from "react-router-dom";
 import { useAuth } from "../context/useAuth";
+import NotificacoesSino from "./NotificacoesSino";
 
 function Layout() {
   const { usuario, autenticado, logout } = useAuth();
@@ -65,6 +66,14 @@ function Layout() {
                     Moderação
                   </NavLink>
                 )}
+
+                {usuario && usuario.tipoConta === "ADMIN" && (
+                  <NavLink to="/admin" style={estiloLink}>
+                    Admin
+                  </NavLink>
+                )}
+
+                <NotificacoesSino />
 
                 <NavLink to="/perfil" style={estiloLink}>
                   {usuario?.nome ?? "Perfil"}

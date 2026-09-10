@@ -1,7 +1,7 @@
 import { useEffect, useState, type FormEvent } from "react";
 import { Link, useNavigate, useParams } from "react-router-dom";
 import api from "../services/api";
-import type { Ponto } from "../types/ponto";
+import type { Ponto, VersaoPonto } from "../types/ponto";
 import { extrairMensagemErro } from "../utils/erro";
 
 interface CamposPonto {
@@ -58,6 +58,10 @@ function PontoFormulario() {
   const [arquivoImagem, setArquivoImagem] = useState<File | null>(null);
   const [publicando, setPublicando] = useState(false);
 
+  const [versoes, setVersoes] = useState<VersaoPonto[]>([]);
+  const [restaurandoId, setRestaurandoId] = useState<number | null>(null);
+  const [mostrarHistorico, setMostrarHistorico] = useState(false);
+
   useEffect(() => {
     if (!id) {
       return;
@@ -111,7 +115,54 @@ function PontoFormulario() {
       telefoneContato: campos.telefoneContato.trim() || undefined,
       horarioFuncionamento: campos.horarioFuncionamento.trim() || undefined,
       confirmarDuplicidade,
+      versaoEsperada: ponto?.versao,
     };
+  }
+
+  async function carregarHistorico() {
+    if (!id) return;
+
+    try {
+      const resposta = await api.get<{ dados: VersaoPonto[] }>(`/pontos/${id}/versoes`);
+      setVersoes(resposta.data.dados);
+      setMostrarHistorico(true);
+    } catch (err) {
+      console.error(err);
+      alert(extrairMensagemErro(err, "Não foi possível carregar o histórico de versões."));
+    }
+  }
+
+  async function aoRestaurarVersao(versaoId: number) {
+    if (!id) return;
+
+    const confirmar = window.confirm("Restaurar esta versão? O estado atual será salvo no histórico.");
+    if (!confirmar) return;
+
+    try {
+      setRestaurandoId(versaoId);
+      const resposta = await api.post<Ponto>(`/pontos/${id}/versoes/${versaoId}/restaurar`);
+      setPonto(resposta.data);
+      setCampos({
+        nome: resposta.data.nome,
+        categoria: resposta.data.categoria,
+        cidade: resposta.data.cidade,
+        endereco: resposta.data.endereco ?? "",
+        descricao: resposta.data.descricao ?? "",
+        latitude: resposta.data.latitude !== null ? String(resposta.data.latitude) : "",
+        longitude: resposta.data.longitude !== null ? String(resposta.data.longitude) : "",
+        faixaPreco: resposta.data.faixaPreco ?? "",
+        acessibilidade: resposta.data.acessibilidade ?? "",
+        siteOficial: resposta.data.siteOficial ?? "",
+        telefoneContato: resposta.data.telefoneContato ?? "",
+        horarioFuncionamento: resposta.data.horarioFuncionamento ?? "",
+      });
+      await carregarHistorico();
+    } catch (err) {
+      console.error(err);
+      alert(extrairMensagemErro(err, "Não foi possível restaurar esta versão."));
+    } finally {
+      setRestaurandoId(null);
+    }
   }
 
   async function salvar(confirmarDuplicidade = false) {
@@ -138,13 +189,24 @@ function PontoFormulario() {
       console.error(err);
 
       const status = (err as { response?: { status?: number } })?.response?.status;
-      const dados = (err as { response?: { data?: { possiveisDuplicados?: PossivelDuplicado[] } } })
-        ?.response?.data;
+      const dados = (
+        err as {
+          response?: { data?: { possiveisDuplicados?: PossivelDuplicado[]; pontoAtual?: Ponto } };
+        }
+      )?.response?.data;
 
       if (status === 409 && dados?.possiveisDuplicados) {
         setDuplicados(dados.possiveisDuplicados);
         setErro(
           "Encontramos possíveis pontos duplicados. Revise abaixo ou confirme o cadastro mesmo assim.",
+        );
+        return;
+      }
+
+      if (status === 409 && dados?.pontoAtual) {
+        setPonto(dados.pontoAtual);
+        setErro(
+          "Este ponto foi alterado por outra pessoa enquanto você editava. Recarregue os campos abaixo e tente novamente.",
         );
         return;
       }
@@ -469,6 +531,41 @@ function PontoFormulario() {
             >
               {publicando ? "Enviando..." : "Enviar para publicação"}
             </button>
+          )}
+
+          <h2 style={{ marginTop: "2rem" }}>Histórico de versões</h2>
+
+          {!mostrarHistorico ? (
+            <button
+              type="button"
+              onClick={carregarHistorico}
+              style={{ padding: "0.5rem 1rem", borderRadius: 6, border: "1px solid #ccc", background: "transparent" }}
+            >
+              Ver histórico
+            </button>
+          ) : versoes.length === 0 ? (
+            <p style={{ color: "#666" }}>Nenhuma alteração registrada ainda.</p>
+          ) : (
+            <div style={{ display: "grid", gap: "0.5rem" }}>
+              {versoes.map((versao) => (
+                <div key={versao.id} style={{ border: "1px solid #ddd", borderRadius: 8, padding: "0.75rem" }}>
+                  <p style={{ margin: 0, fontSize: "0.85rem", color: "#666" }}>
+                    {new Date(versao.dataCriacao).toLocaleString("pt-BR")} — {versao.motivo}
+                  </p>
+                  <p style={{ margin: "0.25rem 0" }}>
+                    Nome salvo: {(versao.dados as { nome?: string }).nome ?? "—"}
+                  </p>
+                  <button
+                    type="button"
+                    onClick={() => aoRestaurarVersao(versao.id)}
+                    disabled={restaurandoId === versao.id}
+                    style={{ padding: "0.35rem 0.75rem", borderRadius: 6, border: "1px solid #b45309", background: "transparent", color: "#b45309" }}
+                  >
+                    {restaurandoId === versao.id ? "Restaurando..." : "Restaurar esta versão"}
+                  </button>
+                </div>
+              ))}
+            </div>
           )}
         </>
       )}

@@ -10,6 +10,9 @@ import roteirosRouter from "./routes/roteiros.routes";
 import authRouter from "./routes/auth.routes";
 import sugestoesRouter from "./routes/sugestoes.routes";
 import verificacoesRouter from "./routes/verificacoes.routes";
+import avaliacoesRouter from "./routes/avaliacoes.routes";
+import notificacoesRouter from "./routes/notificacoes.routes";
+import adminRouter from "./routes/admin.routes";
 
 const app = express();
 
@@ -49,6 +52,9 @@ app.use("/pontos", pontosRouter);
 app.use("/roteiros", roteirosRouter);
 app.use("/sugestoes", sugestoesRouter);
 app.use("/verificacoes", verificacoesRouter);
+app.use("/avaliacoes", avaliacoesRouter);
+app.use("/notificacoes", notificacoesRouter);
+app.use("/admin", adminRouter);
 
 app.use((_req, res) => {
   res.status(404).json({

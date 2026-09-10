@@ -13,6 +13,7 @@ export interface Usuario {
   tipoConta: TipoConta;
   cidadeBase: string | null;
   interesses: string[];
+  reputacao: number;
   dataCriacao: string;
 }
 

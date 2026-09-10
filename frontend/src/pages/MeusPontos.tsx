@@ -3,6 +3,9 @@ import { Link } from "react-router-dom";
 import api from "../services/api";
 import type { Ponto, RespostaPontos } from "../types/ponto";
 import { extrairMensagemErro } from "../utils/erro";
+import { useAuth } from "../context/useAuth";
+
+const PAPEIS_FERRAMENTAS = ["GESTOR", "MODERADOR", "ADMIN"];
 
 const ROTULO_STATUS: Record<string, string> = {
   RASCUNHO: "Rascunho",
@@ -19,6 +22,7 @@ const COR_STATUS: Record<string, string> = {
 };
 
 function MeusPontos() {
+  const { usuario } = useAuth();
   const [pontos, setPontos] = useState<Ponto[]>([]);
   const [carregando, setCarregando] = useState(true);
   const [erro, setErro] = useState<string | null>(null);
@@ -75,6 +79,24 @@ function MeusPontos() {
       >
         + Novo ponto
       </Link>
+
+      {usuario && PAPEIS_FERRAMENTAS.includes(usuario.tipoConta) && (
+        <Link
+          to="/pontos/ferramentas"
+          style={{
+            display: "inline-block",
+            marginBottom: "1rem",
+            marginLeft: "0.75rem",
+            padding: "0.5rem 1rem",
+            borderRadius: 6,
+            border: "1px solid #2563eb",
+            color: "#2563eb",
+            textDecoration: "none",
+          }}
+        >
+          Exportar / Importar
+        </Link>
+      )}
 
       {carregando && <p>Carregando...</p>}
 

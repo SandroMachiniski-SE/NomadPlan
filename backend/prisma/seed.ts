@@ -1,18 +1,20 @@
 import "dotenv/config";
 import { PrismaClient, StatusPonto, TipoConta } from "@prisma/client";
+import { gerarHashSenha } from "../src/lib/auth";
 
 const prisma = new PrismaClient();
 
 async function main() {
   const usuario = await prisma.usuario.upsert({
     where: {
-      email: "admin@NomadPlanmais.local",
+      email: "admin@nomadplanmais.local",
     },
     update: {},
     create: {
       nome: "Administrador NomadPlan",
-      email: "admin@NomadPlanmais.local",
-      senhaHash: "senha-temporaria",
+      email: "admin@nomadplanmais.local",
+      // Login de demonstração: admin@nomadplanmais.local / senha-temporaria (troque em produção).
+      senhaHash: await gerarHashSenha("senha-temporaria"),
       tipoConta: TipoConta.ADMIN,
       cidadeBase: "Joinville",
     },

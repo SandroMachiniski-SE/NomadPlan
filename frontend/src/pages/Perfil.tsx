@@ -58,6 +58,10 @@ function Perfil() {
       <p style={{ color: "#666" }}>
         {usuario.email} — conta {usuario.tipoConta.toLowerCase()}
       </p>
+      <p style={{ color: "#166534" }}>
+        Reputação: {usuario.reputacao} pontos
+        {usuario.reputacao >= 5 && " — suas sugestões de edição são aplicadas automaticamente"}
+      </p>
 
       <form onSubmit={aoEnviar} style={{ display: "grid", gap: "1rem", marginTop: "1rem" }}>
         <label style={{ display: "grid", gap: "0.25rem" }}>

@@ -1,7 +1,7 @@
 import { useCallback, useEffect, useState, type FormEvent } from "react";
 import { Link, useParams } from "react-router-dom";
 import api from "../services/api";
-import type { Ponto } from "../types/ponto";
+import type { Ponto, RespostaAvaliacoes } from "../types/ponto";
 import type { RespostaRoteiros } from "../types/roteiro";
 import { useAuth } from "../context/useAuth";
 import { extrairMensagemErro } from "../utils/erro";
@@ -35,6 +35,13 @@ function PontoDetalhes() {
   const [roteiroSelecionado, setRoteiroSelecionado] = useState("");
   const [adicionandoRoteiro, setAdicionandoRoteiro] = useState(false);
   const [adicionadoRoteiro, setAdicionadoRoteiro] = useState(false);
+
+  const [avaliacoes, setAvaliacoes] = useState<RespostaAvaliacoes | null>(null);
+  const [notaAvaliacao, setNotaAvaliacao] = useState(5);
+  const [comentarioAvaliacao, setComentarioAvaliacao] = useState("");
+  const [enviandoAvaliacao, setEnviandoAvaliacao] = useState(false);
+  const [erroAvaliacao, setErroAvaliacao] = useState<string | null>(null);
+  const [avaliacaoEnviada, setAvaliacaoEnviada] = useState<string | null>(null);
 
   const buscarPonto = useCallback(async () => {
     if (!id) {
@@ -75,6 +82,51 @@ function PontoDetalhes() {
 
     buscarRoteiros();
   }, [autenticado, ponto]);
+
+  const buscarAvaliacoes = useCallback(async () => {
+    if (!id) return;
+
+    try {
+      const resposta = await api.get<RespostaAvaliacoes>(`/pontos/${id}/avaliacoes`);
+      setAvaliacoes(resposta.data);
+    } catch (err) {
+      console.error(err);
+    }
+  }, [id]);
+
+  useEffect(() => {
+    if (ponto?.status === "PUBLICADO") {
+      // eslint-disable-next-line react-hooks/set-state-in-effect -- fetch disparado quando o ponto termina de carregar
+      buscarAvaliacoes();
+    }
+  }, [ponto, buscarAvaliacoes]);
+
+  async function aoEnviarAvaliacao(evento: FormEvent) {
+    evento.preventDefault();
+    setErroAvaliacao(null);
+
+    try {
+      setEnviandoAvaliacao(true);
+
+      const resposta = await api.post<{ retidaParaModeracao: boolean }>(
+        `/pontos/${id}/avaliacoes`,
+        { nota: notaAvaliacao, comentario: comentarioAvaliacao.trim() || undefined },
+      );
+
+      setAvaliacaoEnviada(
+        resposta.data.retidaParaModeracao
+          ? "Sua avaliação foi recebida e está em análise antes de ser publicada."
+          : "Sua avaliação foi publicada. Obrigado!",
+      );
+      setComentarioAvaliacao("");
+      await buscarAvaliacoes();
+    } catch (err) {
+      console.error(err);
+      setErroAvaliacao(extrairMensagemErro(err, "Não foi possível enviar sua avaliação."));
+    } finally {
+      setEnviandoAvaliacao(false);
+    }
+  }
 
   async function aoAdicionarAoRoteiro() {
     if (!roteiroSelecionado || !id) return;
@@ -362,6 +414,77 @@ function PontoDetalhes() {
                 >
                   Sugerir edição
                 </button>
+              )}
+            </div>
+          )}
+
+          {ponto.status === "PUBLICADO" && (
+            <div style={{ marginTop: "2rem" }}>
+              <h2>Avaliações {avaliacoes?.media && `— ${avaliacoes.media.toFixed(1)} ★`}</h2>
+
+              {avaliacoes && avaliacoes.total === 0 && (
+                <p style={{ color: "#666" }}>Ainda não há avaliações para este ponto.</p>
+              )}
+
+              <div style={{ display: "grid", gap: "0.75rem", marginBottom: "1.5rem" }}>
+                {avaliacoes?.dados.map((avaliacao) => (
+                  <div key={avaliacao.id} style={{ border: "1px solid #ddd", borderRadius: 8, padding: "0.75rem 1rem" }}>
+                    <p style={{ margin: 0, fontWeight: "bold" }}>
+                      {"★".repeat(avaliacao.nota)}{"☆".repeat(5 - avaliacao.nota)} — {avaliacao.autor?.nome}
+                    </p>
+                    {avaliacao.comentario && <p style={{ margin: "0.35rem 0 0" }}>{avaliacao.comentario}</p>}
+                  </div>
+                ))}
+              </div>
+
+              {autenticado && (
+                <>
+                  {avaliacaoEnviada ? (
+                    <p style={{ color: "#166534" }}>{avaliacaoEnviada}</p>
+                  ) : (
+                    <form onSubmit={aoEnviarAvaliacao} style={{ display: "grid", gap: "0.75rem", maxWidth: 420 }}>
+                      <label style={{ display: "grid", gap: "0.25rem" }}>
+                        Sua nota
+                        <select
+                          value={notaAvaliacao}
+                          onChange={(e) => setNotaAvaliacao(Number(e.target.value))}
+                          style={{ padding: "0.5rem", borderRadius: 6, border: "1px solid #ccc" }}
+                        >
+                          {[5, 4, 3, 2, 1].map((n) => (
+                            <option key={n} value={n}>
+                              {"★".repeat(n)} ({n})
+                            </option>
+                          ))}
+                        </select>
+                      </label>
+
+                      <label style={{ display: "grid", gap: "0.25rem" }}>
+                        Comentário (opcional)
+                        <textarea
+                          value={comentarioAvaliacao}
+                          onChange={(e) => setComentarioAvaliacao(e.target.value)}
+                          maxLength={1000}
+                          rows={3}
+                          style={{ padding: "0.5rem", borderRadius: 6, border: "1px solid #ccc" }}
+                        />
+                      </label>
+
+                      {erroAvaliacao && (
+                        <div style={{ border: "1px solid #f87171", backgroundColor: "#fee2e2", color: "#991b1b", borderRadius: 8, padding: "0.75rem" }}>
+                          {erroAvaliacao}
+                        </div>
+                      )}
+
+                      <button
+                        type="submit"
+                        disabled={enviandoAvaliacao}
+                        style={{ padding: "0.5rem 1rem", borderRadius: 6, border: "none", backgroundColor: "#2563eb", color: "#fff" }}
+                      >
+                        {enviandoAvaliacao ? "Enviando..." : "Enviar avaliação"}
+                      </button>
+                    </form>
+                  )}
+                </>
               )}
             </div>
           )}

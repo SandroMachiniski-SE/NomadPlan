@@ -1,8 +1,9 @@
-import { useState, type FormEvent } from "react";
+import { useEffect, useState, type FormEvent } from "react";
 import { Link } from "react-router-dom";
 import api from "../services/api";
 import type { Ponto, RespostaPontos } from "../types/ponto";
 import MapaPontos from "../components/MapaPontos";
+import { useAuth } from "../context/useAuth";
 
 const estiloCampo = { padding: "0.5rem", borderRadius: 6, border: "1px solid #ccc" };
 
@@ -15,6 +16,26 @@ function formatarDistancia(metros: number): string {
 }
 
 function Home() {
+  const { autenticado } = useAuth();
+  const [recomendados, setRecomendados] = useState<Ponto[]>([]);
+
+  useEffect(() => {
+    if (!autenticado) {
+      return;
+    }
+
+    async function buscarRecomendados() {
+      try {
+        const resposta = await api.get<RespostaPontos>("/pontos/recomendados");
+        setRecomendados(resposta.data.dados);
+      } catch (err) {
+        console.error(err);
+      }
+    }
+
+    buscarRecomendados();
+  }, [autenticado]);
+
   const [cidade, setCidade] = useState("");
   const [categoria, setCategoria] = useState("");
   const [busca, setBusca] = useState("");
@@ -87,6 +108,33 @@ function Home() {
     <div style={{ maxWidth: 960, margin: "0 auto", padding: "2rem 1rem" }}>
       <h1>NomadPlan</h1>
       <p>Descubra pontos turísticos e monte seu roteiro personalizado.</p>
+
+      {recomendados.length > 0 && (
+        <div style={{ marginBottom: "2rem" }}>
+          <h2>Recomendados para você</h2>
+          <div style={{ display: "flex", gap: "1rem", overflowX: "auto", paddingBottom: "0.5rem" }}>
+            {recomendados.map((ponto) => (
+              <Link
+                key={ponto.id}
+                to={`/pontos/${ponto.id}`}
+                style={{
+                  flex: "0 0 220px",
+                  border: "1px solid #ddd",
+                  borderRadius: 8,
+                  padding: "1rem",
+                  textDecoration: "none",
+                  color: "inherit",
+                }}
+              >
+                <h3 style={{ margin: "0 0 0.25rem" }}>{ponto.nome}</h3>
+                <p style={{ margin: 0, color: "#555", fontSize: "0.9rem" }}>
+                  {ponto.categoria} • {ponto.cidade}
+                </p>
+              </Link>
+            ))}
+          </div>
+        </div>
+      )}
 
       <form
         onSubmit={buscarPontos}
