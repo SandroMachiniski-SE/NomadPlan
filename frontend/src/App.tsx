@@ -18,9 +18,13 @@ import PontoFormulario from "./pages/PontoFormulario";
 import Moderacao from "./pages/Moderacao";
 import GerarRoteiro from "./pages/GerarRoteiro";
 import RoteiroPublico from "./pages/RoteiroPublico";
+import FerramentasPontos from "./pages/FerramentasPontos";
+import Admin from "./pages/Admin";
 
 const PAPEIS_CADASTRADORES = ["NEGOCIO", "GESTOR", "MODERADOR", "ADMIN"] as const;
+const PAPEIS_FERRAMENTAS = ["GESTOR", "MODERADOR", "ADMIN"] as const;
 const PAPEIS_MODERADORES = ["MODERADOR", "ADMIN"] as const;
+const PAPEIS_ADMIN = ["ADMIN"] as const;
 
 function App() {
   return (
@@ -49,8 +53,16 @@ function App() {
             <Route path="/pontos/:id/editar" element={<PontoFormulario />} />
           </Route>
 
+          <Route element={<RotaProtegida papeis={[...PAPEIS_FERRAMENTAS]} />}>
+            <Route path="/pontos/ferramentas" element={<FerramentasPontos />} />
+          </Route>
+
           <Route element={<RotaProtegida papeis={[...PAPEIS_MODERADORES]} />}>
             <Route path="/moderacao" element={<Moderacao />} />
+          </Route>
+
+          <Route element={<RotaProtegida papeis={[...PAPEIS_ADMIN]} />}>
+            <Route path="/admin" element={<Admin />} />
           </Route>
         </Route>
 

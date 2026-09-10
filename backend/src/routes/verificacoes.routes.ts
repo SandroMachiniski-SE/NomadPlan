@@ -3,6 +3,8 @@ import { z } from "zod";
 import { StatusPonto, StatusSolicitacao, TipoConta } from "@prisma/client";
 import prisma from "../lib/prisma";
 import { autenticar, autorizar } from "../middleware/auth";
+import { criarNotificacao } from "../lib/notificacoes";
+import { registrarAuditoria } from "../lib/auditoria";
 
 const verificacoesRouter = Router();
 
@@ -53,7 +55,7 @@ verificacoesRouter.post("/:id/aprovar", async (req: Request, res: Response) => {
       return res.status(409).json({ erro: "Esta solicitação já foi analisada." });
     }
 
-    await prisma.$transaction([
+    const [ponto] = await prisma.$transaction([
       prisma.pontoTuristico.update({
         where: { id: solicitacao.idPonto },
         data: { seloVerificado: true, status: StatusPonto.PUBLICADO },
@@ -67,6 +69,19 @@ verificacoesRouter.post("/:id/aprovar", async (req: Request, res: Response) => {
         },
       }),
     ]);
+
+    await registrarAuditoria({
+      idUsuario: req.usuario!.id,
+      acao: "aprovar",
+      entidade: "solicitacao_verificacao",
+      idEntidade: id.data,
+    });
+
+    await criarNotificacao(
+      solicitacao.idSolicitante,
+      `Seu ponto "${ponto.nome}" recebeu o selo de verificação.`,
+      `/pontos/${ponto.id}`,
+    );
 
     return res.json({ mensagem: "Selo de verificação concedido ao ponto." });
   } catch (error) {
@@ -111,7 +126,22 @@ verificacoesRouter.post("/:id/rejeitar", async (req: Request, res: Response) => 
         motivoRejeicao: resultado.data.motivo,
         dataResolucao: new Date(),
       },
+      include: { ponto: { select: { id: true, nome: true } } },
     });
+
+    await registrarAuditoria({
+      idUsuario: req.usuario!.id,
+      acao: "rejeitar",
+      entidade: "solicitacao_verificacao",
+      idEntidade: id.data,
+      detalhes: { motivo: resultado.data.motivo },
+    });
+
+    await criarNotificacao(
+      solicitacao.idSolicitante,
+      `Sua solicitação de selo para "${solicitacaoAtualizada.ponto.nome}" foi rejeitada: ${resultado.data.motivo}`,
+      `/pontos/${solicitacaoAtualizada.ponto.id}`,
+    );
 
     return res.json(solicitacaoAtualizada);
   } catch (error) {

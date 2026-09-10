@@ -5,7 +5,15 @@ import prisma from "../lib/prisma";
 import { StatusPonto, StatusSolicitacao, TipoConta } from "@prisma/client";
 import { autenticar, autenticarOpcional, autorizar } from "../middleware/auth";
 import { uploadImagemPonto, caminhoPublicoImagem } from "../middleware/upload";
+import { uploadCsv } from "../middleware/uploadCsv";
 import { distanciaMetros } from "../lib/geo";
+import { registrarAuditoria } from "../lib/auditoria";
+import { criarNotificacao } from "../lib/notificacoes";
+import { registrarVersaoPonto } from "../lib/versionamento";
+import { conteudoSuspeito } from "../lib/moderacaoTexto";
+import { ehUsuarioConfiavel, incrementarReputacao, PONTOS_REPUTACAO } from "../lib/reputacao";
+import { limiteContribuicao } from "../middleware/rateLimit";
+import { analisarCsv, linhasParaObjetos, objetosParaCsv } from "../lib/csv";
 
 const pontosRouter = Router();
 
@@ -68,6 +76,7 @@ const pontoSelecaoPublica = {
 const pontoSelecaoCompleta = {
   ...pontoSelecaoPublica,
   motivoRejeicao: true,
+  versao: true,
   dataCriacao: true,
   dataAtualizacao: true,
   idResponsavel: true,
@@ -97,10 +106,25 @@ const criarPontoSchema = z.object({
 
 const atualizarPontoSchema = criarPontoSchema
   .omit({ confirmarDuplicidade: true })
-  .partial();
+  .partial()
+  .extend({
+    // RB08/AF04: se informado, a atualização só é aplicada se ninguém tiver
+    // alterado o ponto desde que o cliente carregou esta versão.
+    versaoEsperada: z.coerce.number().int().positive().optional(),
+  });
 
 const rejeitarSchema = z.object({
   motivo: z.string().trim().min(1).max(500),
+});
+
+const avaliacaoSchema = z.object({
+  nota: z.coerce.number().int().min(1).max(5),
+  comentario: z.string().trim().max(1000).optional(),
+  fotoUrl: z.string().trim().url().max(500).optional(),
+});
+
+const importarPontosQuerySchema = z.object({
+  confirmarDuplicidade: z.coerce.boolean().default(false),
 });
 
 const sugestaoSchema = z.object({
@@ -383,6 +407,222 @@ pontosRouter.post(
   },
 );
 
+const TIPOS_EXPORTADORES = [TipoConta.GESTOR, TipoConta.MODERADOR, TipoConta.ADMIN] as const;
+
+const COLUNAS_EXPORTACAO = [
+  "id",
+  "nome",
+  "descricao",
+  "categoria",
+  "cidade",
+  "endereco",
+  "latitude",
+  "longitude",
+  "faixaPreco",
+  "acessibilidade",
+  "siteOficial",
+  "telefoneContato",
+  "horarioFuncionamento",
+  "status",
+  "seloVerificado",
+];
+
+// RF17: exportação de dados para gestores/pesquisadores em CSV ou GeoJSON.
+pontosRouter.get(
+  "/exportar",
+  autenticar,
+  autorizar(...TIPOS_EXPORTADORES),
+  async (req: Request, res: Response) => {
+    try {
+      const formato = z.enum(["csv", "geojson"]).default("csv").parse(req.query.formato ?? "csv");
+
+      const pontos = await prisma.pontoTuristico.findMany({
+        where: { status: StatusPonto.PUBLICADO },
+        orderBy: { nome: "asc" },
+        select: pontoSelecaoPublica,
+      });
+
+      if (formato === "geojson") {
+        const geojson = {
+          type: "FeatureCollection",
+          features: pontos
+            .filter((p) => p.latitude !== null && p.longitude !== null)
+            .map((p) => ({
+              type: "Feature",
+              geometry: { type: "Point", coordinates: [p.longitude, p.latitude] },
+              properties: {
+                id: p.id,
+                nome: p.nome,
+                categoria: p.categoria,
+                cidade: p.cidade,
+                faixaPreco: p.faixaPreco,
+                seloVerificado: p.seloVerificado,
+              },
+            })),
+        };
+
+        res.setHeader("Content-Disposition", "attachment; filename=pontos.geojson");
+        return res.json(geojson);
+      }
+
+      const csv = objetosParaCsv(COLUNAS_EXPORTACAO, pontos);
+
+      res.setHeader("Content-Type", "text/csv; charset=utf-8");
+      res.setHeader("Content-Disposition", "attachment; filename=pontos.csv");
+      return res.send(csv);
+    } catch (error) {
+      console.error("Erro ao exportar pontos turísticos:", error);
+
+      return res.status(500).json({ erro: "Erro interno ao exportar pontos turísticos." });
+    }
+  },
+);
+
+// RF18/AF09: importação em lote via CSV, com relatório de erro por linha.
+pontosRouter.post(
+  "/importar",
+  autenticar,
+  autorizar(...TIPOS_EXPORTADORES),
+  (req: Request, res: Response, next) => {
+    uploadCsv(req, res, (erro: unknown) => {
+      if (erro) {
+        const mensagem = erro instanceof Error ? erro.message : "Falha no upload do arquivo.";
+        return res.status(400).json({ erro: mensagem });
+      }
+      return next();
+    });
+  },
+  async (req: Request, res: Response) => {
+    try {
+      if (!req.file) {
+        return res.status(400).json({ erro: "Nenhum arquivo enviado." });
+      }
+
+      const { confirmarDuplicidade } = importarPontosQuerySchema.parse(req.query);
+
+      const linhas = linhasParaObjetos(analisarCsv(req.file.buffer.toString("utf-8")));
+
+      const resultados: { linha: number; sucesso: boolean; motivo?: string }[] = [];
+
+      for (let indice = 0; indice < linhas.length; indice += 1) {
+        const numeroLinha = indice + 2; // +1 cabeçalho, +1 para contagem humana (1-based)
+        const linha = linhas[indice];
+
+        const validacao = criarPontoSchema
+          .omit({ confirmarDuplicidade: true })
+          .safeParse({
+            ...linha,
+            latitude: linha.latitude || undefined,
+            longitude: linha.longitude || undefined,
+          });
+
+        if (!validacao.success) {
+          resultados.push({
+            linha: numeroLinha,
+            sucesso: false,
+            motivo: validacao.error.issues.map((i) => `${i.path.join(".")}: ${i.message}`).join("; "),
+          });
+          continue;
+        }
+
+        const dados = validacao.data;
+
+        if (!confirmarDuplicidade) {
+          const duplicados = await buscarPossiveisDuplicados(
+            dados.nome,
+            dados.cidade,
+            dados.latitude,
+            dados.longitude,
+          );
+
+          if (duplicados.length > 0) {
+            resultados.push({
+              linha: numeroLinha,
+              sucesso: false,
+              motivo: `Possível duplicado de "${duplicados[0].nome}".`,
+            });
+            continue;
+          }
+        }
+
+        await prisma.pontoTuristico.create({
+          data: {
+            nome: dados.nome,
+            descricao: dados.descricao || null,
+            categoria: dados.categoria,
+            cidade: dados.cidade,
+            endereco: dados.endereco || null,
+            latitude: dados.latitude ?? null,
+            longitude: dados.longitude ?? null,
+            faixaPreco: dados.faixaPreco || null,
+            acessibilidade: dados.acessibilidade || null,
+            siteOficial: dados.siteOficial || null,
+            telefoneContato: dados.telefoneContato || null,
+            horarioFuncionamento: dados.horarioFuncionamento || null,
+            status: StatusPonto.RASCUNHO,
+            idResponsavel: req.usuario!.id,
+          },
+        });
+
+        resultados.push({ linha: numeroLinha, sucesso: true });
+      }
+
+      await registrarAuditoria({
+        idUsuario: req.usuario!.id,
+        acao: "importar",
+        entidade: "ponto_turistico",
+        detalhes: {
+          total: resultados.length,
+          sucesso: resultados.filter((r) => r.sucesso).length,
+        },
+      });
+
+      return res.json({
+        total: resultados.length,
+        sucesso: resultados.filter((r) => r.sucesso).length,
+        falhas: resultados.filter((r) => !r.sucesso),
+      });
+    } catch (error) {
+      console.error("Erro ao importar pontos turísticos:", error);
+
+      return res.status(500).json({ erro: "Erro interno ao importar pontos turísticos." });
+    }
+  },
+);
+
+// RF24 (simplificado): sugestão passiva com base nos interesses do perfil —
+// não é filtragem colaborativa entre usuários (fora do escopo acadêmico definido
+// no RFC, seção 6.6), apenas prioriza categorias que o usuário já demonstrou gostar.
+pontosRouter.get("/recomendados", autenticar, async (req: Request, res: Response) => {
+  try {
+    const usuario = await prisma.usuario.findUnique({
+      where: { id: req.usuario!.id },
+      select: { interesses: true, cidadeBase: true },
+    });
+
+    if (!usuario || usuario.interesses.length === 0) {
+      return res.json({ total: 0, dados: [] });
+    }
+
+    const pontos = await prisma.pontoTuristico.findMany({
+      where: {
+        status: StatusPonto.PUBLICADO,
+        categoria: { in: usuario.interesses, mode: "insensitive" },
+        ...(usuario.cidadeBase ? { cidade: { equals: usuario.cidadeBase, mode: "insensitive" } } : {}),
+      },
+      orderBy: [{ seloVerificado: "desc" }, { nome: "asc" }],
+      take: 12,
+      select: pontoSelecaoPublica,
+    });
+
+    return res.json({ total: pontos.length, dados: pontos });
+  } catch (error) {
+    console.error("Erro ao buscar pontos recomendados:", error);
+
+    return res.status(500).json({ erro: "Erro interno ao buscar pontos recomendados." });
+  }
+});
+
 pontosRouter.get("/:id", autenticarOpcional, async (req: Request, res: Response) => {
   try {
     const id = idSchema.safeParse(req.params.id);
@@ -455,6 +695,17 @@ pontosRouter.put("/:id", autenticar, async (req: Request, res: Response) => {
 
     const dados = resultado.data;
 
+    // RB08/AF04: lock otimista — se o cliente informar a versão que tinha em mãos e
+    // ela não bater com a atual, alguém alterou o ponto nesse meio-tempo.
+    if (dados.versaoEsperada !== undefined && dados.versaoEsperada !== ponto.versao) {
+      return res.status(409).json({
+        erro: "O conteúdo foi alterado por outro usuário desde que você abriu esta edição.",
+        pontoAtual: ponto,
+      });
+    }
+
+    await registrarVersaoPonto(ponto, "edicao", req.usuario!.id);
+
     const ponteAtualizado = await prisma.pontoTuristico.update({
       where: { id: id.data },
       data: {
@@ -479,8 +730,16 @@ pontosRouter.put("/:id", autenticar, async (req: Request, res: Response) => {
         // Uma edição corrige o ponto: volta ao rascunho e limpa uma eventual rejeição anterior.
         status: StatusPonto.RASCUNHO,
         motivoRejeicao: null,
+        versao: { increment: 1 },
       },
       select: pontoSelecaoCompleta,
+    });
+
+    await registrarAuditoria({
+      idUsuario: req.usuario!.id,
+      acao: "atualizar",
+      entidade: "ponto_turistico",
+      idEntidade: id.data,
     });
 
     return res.json(ponteAtualizado);
@@ -620,6 +879,21 @@ pontosRouter.post(
         select: pontoSelecaoCompleta,
       });
 
+      await registrarAuditoria({
+        idUsuario: req.usuario!.id,
+        acao: "aprovar",
+        entidade: "ponto_turistico",
+        idEntidade: id.data,
+      });
+
+      if (ponto.idResponsavel) {
+        await criarNotificacao(
+          ponto.idResponsavel,
+          `Seu ponto "${ponto.nome}" foi aprovado e já está publicado.`,
+          `/pontos/${id.data}`,
+        );
+      }
+
       return res.json(ponteAtualizado);
     } catch (error) {
       console.error("Erro ao aprovar ponto turístico:", error);
@@ -666,6 +940,22 @@ pontosRouter.post(
         select: pontoSelecaoCompleta,
       });
 
+      await registrarAuditoria({
+        idUsuario: req.usuario!.id,
+        acao: "rejeitar",
+        entidade: "ponto_turistico",
+        idEntidade: id.data,
+        detalhes: { motivo: resultado.data.motivo },
+      });
+
+      if (ponto.idResponsavel) {
+        await criarNotificacao(
+          ponto.idResponsavel,
+          `Seu ponto "${ponto.nome}" foi rejeitado: ${resultado.data.motivo}`,
+          `/pontos/${id.data}/editar`,
+        );
+      }
+
       return res.json(ponteAtualizado);
     } catch (error) {
       console.error("Erro ao rejeitar ponto turístico:", error);
@@ -709,58 +999,100 @@ pontosRouter.get("/:id/sugestoes", autenticar, async (req: Request, res: Respons
   }
 });
 
-pontosRouter.post("/:id/sugestoes", autenticar, async (req: Request, res: Response) => {
-  try {
-    const id = idSchema.safeParse(req.params.id);
+pontosRouter.post(
+  "/:id/sugestoes",
+  autenticar,
+  limiteContribuicao,
+  async (req: Request, res: Response) => {
+    try {
+      const id = idSchema.safeParse(req.params.id);
 
-    if (!id.success) {
-      return res.status(400).json({ erro: "Identificador inválido." });
-    }
+      if (!id.success) {
+        return res.status(400).json({ erro: "Identificador inválido." });
+      }
 
-    const resultado = sugestaoSchema.safeParse(req.body);
+      const resultado = sugestaoSchema.safeParse(req.body);
 
-    if (!resultado.success) {
-      return res.status(400).json({
-        erro: "Dados da sugestão inválidos.",
-        detalhes: resultado.error.flatten(),
+      if (!resultado.success) {
+        return res.status(400).json({
+          erro: "Dados da sugestão inválidos.",
+          detalhes: resultado.error.flatten(),
+        });
+      }
+
+      const camposInvalidos = Object.keys(resultado.data.camposPropostos).filter(
+        (campo) => !CAMPOS_SUGERIVEIS.has(campo),
+      );
+
+      if (camposInvalidos.length > 0) {
+        return res.status(400).json({
+          erro: `Campos não permitidos para sugestão: ${camposInvalidos.join(", ")}.`,
+        });
+      }
+
+      const ponto = await prisma.pontoTuristico.findFirst({
+        where: { id: id.data, status: StatusPonto.PUBLICADO },
       });
-    }
 
-    const camposInvalidos = Object.keys(resultado.data.camposPropostos).filter(
-      (campo) => !CAMPOS_SUGERIVEIS.has(campo),
-    );
+      if (!ponto) {
+        return res.status(404).json({ erro: "Ponto turístico não encontrado." });
+      }
 
-    if (camposInvalidos.length > 0) {
-      return res.status(400).json({
-        erro: `Campos não permitidos para sugestão: ${camposInvalidos.join(", ")}.`,
+      // RB04: usuários confiáveis (reputação acima do limite) têm a sugestão
+      // aplicada automaticamente, sem passar pela fila de moderação manual.
+      const confiavel = await ehUsuarioConfiavel(req.usuario!.id);
+
+      if (confiavel) {
+        await registrarVersaoPonto(ponto, "sugestao_auto_aplicada", req.usuario!.id);
+
+        await prisma.pontoTuristico.update({
+          where: { id: id.data },
+          data: {
+            ...(resultado.data.camposPropostos as Prisma.PontoTuristicoUpdateInput),
+            versao: { increment: 1 },
+          },
+        });
+
+        const sugestao = await prisma.sugestaoEdicao.create({
+          data: {
+            idPonto: id.data,
+            idAutor: req.usuario!.id,
+            camposPropostos: resultado.data.camposPropostos,
+            mensagem: resultado.data.mensagem || null,
+            status: StatusSolicitacao.APROVADA,
+            dataResolucao: new Date(),
+          },
+        });
+
+        await incrementarReputacao(req.usuario!.id, PONTOS_REPUTACAO.SUGESTAO_APROVADA);
+
+        await registrarAuditoria({
+          idUsuario: req.usuario!.id,
+          acao: "sugestao_auto_aplicada",
+          entidade: "ponto_turistico",
+          idEntidade: id.data,
+        });
+
+        return res.status(201).json({ ...sugestao, aplicadaAutomaticamente: true });
+      }
+
+      const sugestao = await prisma.sugestaoEdicao.create({
+        data: {
+          idPonto: id.data,
+          idAutor: req.usuario!.id,
+          camposPropostos: resultado.data.camposPropostos,
+          mensagem: resultado.data.mensagem || null,
+        },
       });
+
+      return res.status(201).json(sugestao);
+    } catch (error) {
+      console.error("Erro ao criar sugestão de edição:", error);
+
+      return res.status(500).json({ erro: "Erro interno ao criar sugestão de edição." });
     }
-
-    const ponto = await prisma.pontoTuristico.findFirst({
-      where: { id: id.data, status: StatusPonto.PUBLICADO },
-      select: { id: true },
-    });
-
-    if (!ponto) {
-      return res.status(404).json({ erro: "Ponto turístico não encontrado." });
-    }
-
-    const sugestao = await prisma.sugestaoEdicao.create({
-      data: {
-        idPonto: id.data,
-        idAutor: req.usuario!.id,
-        camposPropostos: resultado.data.camposPropostos,
-        mensagem: resultado.data.mensagem || null,
-      },
-    });
-
-    return res.status(201).json(sugestao);
-  } catch (error) {
-    console.error("Erro ao criar sugestão de edição:", error);
-
-    return res.status(500).json({ erro: "Erro interno ao criar sugestão de edição." });
-  }
-});
+  },
+);
 
 pontosRouter.post(
   "/:id/solicitar-verificacao",
@@ -823,6 +1155,195 @@ pontosRouter.post(
       console.error("Erro ao solicitar verificação:", error);
 
       return res.status(500).json({ erro: "Erro interno ao solicitar verificação." });
+    }
+  },
+);
+
+pontosRouter.get("/:id/versoes", autenticar, async (req: Request, res: Response) => {
+  try {
+    const id = idSchema.safeParse(req.params.id);
+
+    if (!id.success) {
+      return res.status(400).json({ erro: "Identificador inválido." });
+    }
+
+    const ponto = await prisma.pontoTuristico.findUnique({ where: { id: id.data } });
+
+    if (!ponto) {
+      return res.status(404).json({ erro: "Ponto turístico não encontrado." });
+    }
+
+    const ehDono = ponto.idResponsavel === req.usuario!.id;
+
+    if (!ehDono && !ehModerador(req.usuario!.tipoConta)) {
+      return res.status(403).json({ erro: "Você não tem permissão para ver este histórico." });
+    }
+
+    const versoes = await prisma.versaoPonto.findMany({
+      where: { idPonto: id.data },
+      orderBy: { dataCriacao: "desc" },
+    });
+
+    return res.json({ total: versoes.length, dados: versoes });
+  } catch (error) {
+    console.error("Erro ao listar versões do ponto:", error);
+
+    return res.status(500).json({ erro: "Erro interno ao listar versões do ponto." });
+  }
+});
+
+pontosRouter.post(
+  "/:id/versoes/:versaoId/restaurar",
+  autenticar,
+  async (req: Request, res: Response) => {
+    try {
+      const id = idSchema.safeParse(req.params.id);
+      const versaoId = idSchema.safeParse(req.params.versaoId);
+
+      if (!id.success || !versaoId.success) {
+        return res.status(400).json({ erro: "Identificador inválido." });
+      }
+
+      const ponto = await prisma.pontoTuristico.findUnique({ where: { id: id.data } });
+
+      if (!ponto) {
+        return res.status(404).json({ erro: "Ponto turístico não encontrado." });
+      }
+
+      const ehDono = ponto.idResponsavel === req.usuario!.id;
+
+      if (!ehDono && !ehModerador(req.usuario!.tipoConta)) {
+        return res.status(403).json({ erro: "Você não tem permissão para restaurar este ponto." });
+      }
+
+      const versao = await prisma.versaoPonto.findFirst({
+        where: { id: versaoId.data, idPonto: id.data },
+      });
+
+      if (!versao) {
+        return res.status(404).json({ erro: "Versão não encontrada." });
+      }
+
+      // A própria restauração gera uma nova versão do estado atual, para que a
+      // ação seja reversível (RB09).
+      await registrarVersaoPonto(ponto, "antes_de_restaurar", req.usuario!.id);
+
+      const ponteAtualizado = await prisma.pontoTuristico.update({
+        where: { id: id.data },
+        data: {
+          ...(versao.dados as Prisma.PontoTuristicoUpdateInput),
+          versao: { increment: 1 },
+        },
+        select: pontoSelecaoCompleta,
+      });
+
+      await registrarAuditoria({
+        idUsuario: req.usuario!.id,
+        acao: "restaurar_versao",
+        entidade: "ponto_turistico",
+        idEntidade: id.data,
+        detalhes: { versaoRestaurada: versaoId.data },
+      });
+
+      return res.json(ponteAtualizado);
+    } catch (error) {
+      console.error("Erro ao restaurar versão do ponto:", error);
+
+      return res.status(500).json({ erro: "Erro interno ao restaurar versão do ponto." });
+    }
+  },
+);
+
+pontosRouter.get("/:id/avaliacoes", async (req: Request, res: Response) => {
+  try {
+    const id = idSchema.safeParse(req.params.id);
+
+    if (!id.success) {
+      return res.status(400).json({ erro: "Identificador inválido." });
+    }
+
+    const avaliacoes = await prisma.avaliacao.findMany({
+      where: { idPonto: id.data, status: StatusSolicitacao.APROVADA },
+      orderBy: { dataCriacao: "desc" },
+      include: { autor: { select: { id: true, nome: true } } },
+    });
+
+    const media =
+      avaliacoes.length > 0
+        ? avaliacoes.reduce((soma, a) => soma + a.nota, 0) / avaliacoes.length
+        : null;
+
+    return res.json({ total: avaliacoes.length, media, dados: avaliacoes });
+  } catch (error) {
+    console.error("Erro ao listar avaliações do ponto:", error);
+
+    return res.status(500).json({ erro: "Erro interno ao listar avaliações do ponto." });
+  }
+});
+
+pontosRouter.post(
+  "/:id/avaliacoes",
+  autenticar,
+  limiteContribuicao,
+  async (req: Request, res: Response) => {
+    try {
+      const id = idSchema.safeParse(req.params.id);
+
+      if (!id.success) {
+        return res.status(400).json({ erro: "Identificador inválido." });
+      }
+
+      const resultado = avaliacaoSchema.safeParse(req.body);
+
+      if (!resultado.success) {
+        return res.status(400).json({
+          erro: "Dados da avaliação inválidos.",
+          detalhes: resultado.error.flatten(),
+        });
+      }
+
+      const ponto = await prisma.pontoTuristico.findFirst({
+        where: { id: id.data, status: StatusPonto.PUBLICADO },
+        select: { id: true },
+      });
+
+      if (!ponto) {
+        return res.status(404).json({ erro: "Ponto turístico não encontrado." });
+      }
+
+      const jaAvaliou = await prisma.avaliacao.findFirst({
+        where: { idPonto: id.data, idAutor: req.usuario!.id },
+      });
+
+      if (jaAvaliou) {
+        return res.status(409).json({ erro: "Você já avaliou este ponto." });
+      }
+
+      // RF15: filtro automático simples de spam/linguagem antes da fila de
+      // moderação humana — comentários suspeitos ficam pendentes, os demais são
+      // publicados imediatamente.
+      const suspeito = conteudoSuspeito(resultado.data.comentario);
+
+      const avaliacao = await prisma.avaliacao.create({
+        data: {
+          idPonto: id.data,
+          idAutor: req.usuario!.id,
+          nota: resultado.data.nota,
+          comentario: resultado.data.comentario || null,
+          fotoUrl: resultado.data.fotoUrl || null,
+          status: suspeito ? StatusSolicitacao.PENDENTE : StatusSolicitacao.APROVADA,
+        },
+      });
+
+      if (!suspeito) {
+        await incrementarReputacao(req.usuario!.id, PONTOS_REPUTACAO.AVALIACAO_APROVADA);
+      }
+
+      return res.status(201).json({ ...avaliacao, retidaParaModeracao: suspeito });
+    } catch (error) {
+      console.error("Erro ao criar avaliação:", error);
+
+      return res.status(500).json({ erro: "Erro interno ao criar avaliação." });
     }
   },
 );

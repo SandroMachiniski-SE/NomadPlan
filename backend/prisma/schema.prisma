@@ -37,6 +37,7 @@ model Usuario {
   tipoConta   TipoConta @default(VISITANTE) @map("tipo_conta")
   cidadeBase  String?   @map("cidade_base")
   interesses  String[]  @default([])
+  reputacao   Int       @default(0)
   ativo       Boolean   @default(true)
   dataCriacao DateTime  @default(now()) @map("data_criacao")
 
@@ -44,6 +45,9 @@ model Usuario {
   roteiros            Roteiro[]
   sugestoesEdicao     SugestaoEdicao[]         @relation("autorSugestao")
   verificacoesPedidas SolicitacaoVerificacao[] @relation("solicitanteVerificacao")
+  avaliacoes          Avaliacao[]
+  notificacoes        Notificacao[]
+  logsAuditoria       LogAuditoria[]
 
   @@map("usuario")
 }
@@ -66,6 +70,7 @@ model PontoTuristico {
   status               StatusPonto @default(RASCUNHO)
   seloVerificado       Boolean     @default(false) @map("selo_verificado")
   motivoRejeicao       String?     @map("motivo_rejeicao")
+  versao               Int         @default(1)
   dataCriacao          DateTime    @default(now()) @map("data_criacao")
   dataAtualizacao      DateTime    @updatedAt @map("data_atualizacao")
   idResponsavel        Int?        @map("id_responsavel")
@@ -80,11 +85,76 @@ model PontoTuristico {
   itensRoteiro ItemRoteiro[]
   sugestoes    SugestaoEdicao[]
   verificacoes SolicitacaoVerificacao[]
+  avaliacoes   Avaliacao[]
+  versoes      VersaoPonto[]
 
   @@index([cidade])
   @@index([categoria])
   @@index([status])
   @@map("ponto_turistico")
+}
+
+model Avaliacao {
+  id             Int               @id @default(autoincrement())
+  idPonto        Int               @map("id_ponto")
+  idAutor        Int               @map("id_autor")
+  nota           Int
+  comentario     String?
+  fotoUrl        String?           @map("foto_url")
+  status         StatusSolicitacao @default(PENDENTE)
+  motivoRejeicao String?           @map("motivo_rejeicao")
+  dataCriacao    DateTime          @default(now()) @map("data_criacao")
+
+  ponto PontoTuristico @relation(fields: [idPonto], references: [id], onDelete: Cascade)
+  autor Usuario        @relation(fields: [idAutor], references: [id])
+
+  @@index([idPonto])
+  @@index([status])
+  @@map("avaliacao")
+}
+
+model VersaoPonto {
+  id          Int      @id @default(autoincrement())
+  idPonto     Int      @map("id_ponto")
+  dados       Json
+  idAutor     Int?     @map("id_autor")
+  motivo      String
+  dataCriacao DateTime @default(now()) @map("data_criacao")
+
+  ponto PontoTuristico @relation(fields: [idPonto], references: [id], onDelete: Cascade)
+
+  @@index([idPonto])
+  @@map("versao_ponto")
+}
+
+model Notificacao {
+  id          Int      @id @default(autoincrement())
+  idUsuario   Int      @map("id_usuario")
+  mensagem    String
+  link        String?
+  lida        Boolean  @default(false)
+  dataCriacao DateTime @default(now()) @map("data_criacao")
+
+  usuario Usuario @relation(fields: [idUsuario], references: [id], onDelete: Cascade)
+
+  @@index([idUsuario])
+  @@map("notificacao")
+}
+
+model LogAuditoria {
+  id          Int      @id @default(autoincrement())
+  idUsuario   Int?     @map("id_usuario")
+  acao        String
+  entidade    String
+  idEntidade  Int?     @map("id_entidade")
+  detalhes    Json?
+  dataCriacao DateTime @default(now()) @map("data_criacao")
+
+  usuario Usuario? @relation(fields: [idUsuario], references: [id])
+
+  @@index([entidade, idEntidade])
+  @@index([dataCriacao])
+  @@map("log_auditoria")
 }
 
 model SugestaoEdicao {
