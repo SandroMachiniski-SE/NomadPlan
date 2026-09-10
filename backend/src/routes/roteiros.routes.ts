@@ -1,8 +1,11 @@
 import { Router, Request, Response } from "express";
 import { z } from "zod";
 import prisma from "../lib/prisma";
+import { autenticar } from "../middleware/auth";
 
 const roteirosRouter = Router();
+
+roteirosRouter.use(autenticar);
 
 const criarRoteiroSchema = z.object({
   nome: z.string().trim().min(1).max(120),
@@ -10,7 +13,6 @@ const criarRoteiroSchema = z.object({
   cidade: z.string().trim().max(120).optional(),
   dataInicio: z.coerce.date().optional(),
   dataFim: z.coerce.date().optional(),
-  idUsuario: z.coerce.number().int().positive(),
 });
 
 const adicionarItemSchema = z.object({
@@ -21,24 +23,18 @@ const adicionarItemSchema = z.object({
 
 const idSchema = z.coerce.number().int().positive();
 
+async function buscarRoteiroDoUsuario(id: number, idUsuario: number) {
+  return prisma.roteiro.findFirst({
+    where: { id, idUsuario },
+    select: { id: true },
+  });
+}
+
 roteirosRouter.get("/", async (req: Request, res: Response) => {
   try {
-    const resultado = z
-      .object({
-        idUsuario: idSchema,
-      })
-      .safeParse(req.query);
-
-    if (!resultado.success) {
-      return res.status(400).json({
-        erro: "Parâmetros de busca inválidos.",
-        detalhes: resultado.error.flatten(),
-      });
-    }
-
     const roteiros = await prisma.roteiro.findMany({
       where: {
-        idUsuario: resultado.data.idUsuario,
+        idUsuario: req.usuario!.id,
       },
       orderBy: {
         dataAtualizacao: "desc",
@@ -75,9 +71,10 @@ roteirosRouter.get("/:id", async (req: Request, res: Response) => {
       });
     }
 
-    const roteiro = await prisma.roteiro.findUnique({
+    const roteiro = await prisma.roteiro.findFirst({
       where: {
         id: id.data,
+        idUsuario: req.usuario!.id,
       },
       include: {
         itens: {
@@ -134,21 +131,6 @@ roteirosRouter.post("/", async (req: Request, res: Response) => {
 
     const dados = resultado.data;
 
-    const usuario = await prisma.usuario.findUnique({
-      where: {
-        id: dados.idUsuario,
-      },
-      select: {
-        id: true,
-      },
-    });
-
-    if (!usuario) {
-      return res.status(404).json({
-        erro: "Usuário não encontrado.",
-      });
-    }
-
     if (dados.dataInicio && dados.dataFim && dados.dataFim < dados.dataInicio) {
       return res.status(400).json({
         erro: "A data final não pode ser anterior à data inicial.",
@@ -162,7 +144,7 @@ roteirosRouter.post("/", async (req: Request, res: Response) => {
         cidade: dados.cidade || null,
         dataInicio: dados.dataInicio || null,
         dataFim: dados.dataFim || null,
-        idUsuario: dados.idUsuario,
+        idUsuario: req.usuario!.id,
       },
     });
 
@@ -195,14 +177,7 @@ roteirosRouter.post("/:id/itens", async (req: Request, res: Response) => {
       });
     }
 
-    const roteiro = await prisma.roteiro.findUnique({
-      where: {
-        id: idRoteiro.data,
-      },
-      select: {
-        id: true,
-      },
-    });
+    const roteiro = await buscarRoteiroDoUsuario(idRoteiro.data, req.usuario!.id);
 
     if (!roteiro) {
       return res.status(404).json({
@@ -259,6 +234,14 @@ roteirosRouter.delete("/:id/itens/:idPonto", async (req: Request, res: Response)
       });
     }
 
+    const roteiro = await buscarRoteiroDoUsuario(idRoteiro.data, req.usuario!.id);
+
+    if (!roteiro) {
+      return res.status(404).json({
+        erro: "Roteiro não encontrado.",
+      });
+    }
+
     const item = await prisma.itemRoteiro.findFirst({
       where: {
         idRoteiro: idRoteiro.data,
@@ -298,14 +281,7 @@ roteirosRouter.delete("/:id", async (req: Request, res: Response) => {
       });
     }
 
-    const roteiro = await prisma.roteiro.findUnique({
-      where: {
-        id: id.data,
-      },
-      select: {
-        id: true,
-      },
-    });
+    const roteiro = await buscarRoteiroDoUsuario(id.data, req.usuario!.id);
 
     if (!roteiro) {
       return res.status(404).json({

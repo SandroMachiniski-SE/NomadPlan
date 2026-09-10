@@ -3,8 +3,6 @@ import { Link } from "react-router-dom";
 import api from "../services/api";
 import type { Roteiro, RespostaRoteiros } from "../types/roteiro";
 
-const ID_USUARIO_TESTE = 1;
-
 function Roteiros() {
   const [roteiros, setRoteiros] = useState<Roteiro[]>([]);
   const [carregando, setCarregando] = useState(true);
@@ -16,9 +14,7 @@ function Roteiros() {
         setCarregando(true);
         setErro(null);
 
-        const resposta = await api.get<RespostaRoteiros>("/roteiros", {
-          params: { idUsuario: ID_USUARIO_TESTE },
-        });
+        const resposta = await api.get<RespostaRoteiros>("/roteiros");
 
         setRoteiros(resposta.data.dados);
       } catch (err) {
@@ -77,7 +73,7 @@ function Roteiros() {
           }}
         >
           <p>Voce ainda nao tem roteiros cadastrados.</p>
-          <p>Em breve sera possivel criar e organizar suas viagens.</p>
+          <p>Clique em "+ Novo roteiro" para comecar a organizar sua viagem.</p>
         </div>
       )}
 
