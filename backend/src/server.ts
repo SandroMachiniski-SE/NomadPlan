@@ -6,6 +6,7 @@ import morgan from "morgan";
 import prisma from "./lib/prisma";
 import pontosRouter from "./routes/pontos.routes";
 import roteirosRouter from "./routes/roteiros.routes";
+import authRouter from "./routes/auth.routes";
 
 const app = express();
 
@@ -31,6 +32,7 @@ app.get("/health", (_req, res) => {
   });
 });
 
+app.use("/auth", authRouter);
 app.use("/pontos", pontosRouter);
 app.use("/roteiros", roteirosRouter);
 

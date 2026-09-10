@@ -3,8 +3,6 @@ import { useNavigate, Link } from "react-router-dom";
 import api from "../services/api";
 import type { Roteiro } from "../types/roteiro";
 
-const ID_USUARIO_TESTE = 1;
-
 function NovoRoteiro() {
   const navigate = useNavigate();
 
@@ -40,7 +38,6 @@ function NovoRoteiro() {
         cidade: cidade.trim() || undefined,
         dataInicio: dataInicio || undefined,
         dataFim: dataFim || undefined,
-        idUsuario: ID_USUARIO_TESTE,
       };
 
       const resposta = await api.post<Roteiro>("/roteiros", payload);

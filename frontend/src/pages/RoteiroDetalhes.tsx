@@ -3,27 +3,8 @@ import { Link, useParams } from "react-router-dom";
 import api from "../services/api";
 import type { Roteiro } from "../types/roteiro";
 import type { Ponto, RespostaPontos } from "../types/ponto";
+import { extrairMensagemErro } from "../utils/erro";
 import "./RoteiroDetalhes.css";
-
-interface ErroApi {
-  response?: {
-    data?: {
-      erro?: string;
-    };
-  };
-}
-
-function extrairMensagemErro(err: unknown, mensagemPadrao: string): string {
-  if (typeof err === "object" && err !== null && "response" in err) {
-    const possivelErro = err as ErroApi;
-
-    if (typeof possivelErro.response?.data?.erro === "string") {
-      return possivelErro.response.data.erro;
-    }
-  }
-
-  return mensagemPadrao;
-}
 
 function RoteiroDetalhes() {
   const { id } = useParams();
