@@ -22,6 +22,7 @@ export interface Ponto {
   dataAtualizacao?: string;
   idResponsavel?: number | null;
   responsavel?: { id: number; nome: string } | null;
+  distanciaMetros?: number;
 }
 
 export interface RespostaPontos {

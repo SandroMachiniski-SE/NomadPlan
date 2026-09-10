@@ -66,7 +66,74 @@ async function main() {
     skipDuplicates: true,
   });
 
+  await prisma.pontoTuristico.createMany({
+    data: gerarPontosAdicionais(usuario.id),
+    skipDuplicates: true,
+  });
+
   console.log("Dados iniciais inseridos com sucesso.");
+}
+
+// Gera um dataset maior (RFC seção 5.3: cobertura mínima de 100 pontos) para
+// exercitar busca, filtros e paginação com um volume mais realista. Usa um PRNG
+// simples e determinístico (sem dependências) para manter o seed reprodutível.
+function gerarPontosAdicionais(idResponsavel: number) {
+  const CIDADES = [
+    { cidade: "Joinville", lat: -26.3045, lng: -48.8487 },
+    { cidade: "Florianópolis", lat: -27.5954, lng: -48.548 },
+    { cidade: "Blumenau", lat: -26.9194, lng: -49.0661 },
+  ];
+
+  const CATEGORIAS = [
+    "Natureza",
+    "Cultura",
+    "Gastronomia",
+    "Hospedagem",
+    "Aventura",
+    "Compras",
+    "Religioso",
+  ];
+
+  const FAIXAS_PRECO = ["Gratuito", "$", "$$", "$$$"];
+  const ACESSIBILIDADES = ["Acessível", "Parcialmente acessível", "A verificar"];
+  const HORARIOS = ["Todos os dias, 9h-18h", "Seg-Sáb, 8h-20h", "Ter-Dom, 10h-17h", "24h"];
+
+  let semente = 42;
+  function proximoAleatorio() {
+    // PRNG determinístico (xorshift32) — mesmo dataset a cada execução do seed.
+    semente ^= semente << 13;
+    semente ^= semente >>> 17;
+    semente ^= semente << 5;
+    semente |= 0;
+    return (semente >>> 0) / 4294967295;
+  }
+
+  const TOTAL_PONTOS_GERADOS = 110;
+  const pontos = [];
+
+  for (let i = 0; i < TOTAL_PONTOS_GERADOS; i += 1) {
+    const cidadeBase = CIDADES[i % CIDADES.length];
+    const categoria = CATEGORIAS[i % CATEGORIAS.length];
+    const jitterLat = (proximoAleatorio() - 0.5) * 0.09; // ~ +/-5km
+    const jitterLng = (proximoAleatorio() - 0.5) * 0.09;
+
+    pontos.push({
+      nome: `${categoria} ${cidadeBase.cidade} #${i + 1}`,
+      descricao: `Atrativo de ${categoria.toLowerCase()} gerado para testes de busca em ${cidadeBase.cidade}.`,
+      categoria,
+      cidade: cidadeBase.cidade,
+      endereco: `${cidadeBase.cidade} - SC`,
+      latitude: cidadeBase.lat + jitterLat,
+      longitude: cidadeBase.lng + jitterLng,
+      faixaPreco: FAIXAS_PRECO[i % FAIXAS_PRECO.length],
+      acessibilidade: ACESSIBILIDADES[i % ACESSIBILIDADES.length],
+      horarioFuncionamento: HORARIOS[i % HORARIOS.length],
+      status: StatusPonto.PUBLICADO,
+      idResponsavel,
+    });
+  }
+
+  return pontos;
 }
 
 main()

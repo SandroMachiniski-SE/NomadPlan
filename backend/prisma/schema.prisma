@@ -69,6 +69,12 @@ model PontoTuristico {
   dataAtualizacao      DateTime    @updatedAt @map("data_atualizacao")
   idResponsavel        Int?        @map("id_responsavel")
 
+  // Nota: a coluna geográfica "geom" (PostGIS, gerada a partir de latitude/longitude
+  // pelo próprio Postgres) existe no banco — ver migration modulo3_geom_indice_geografico —
+  // mas foi deixada de fora deste model. O Prisma não sabe expressar uma coluna
+  // "GENERATED ALWAYS AS ... STORED" no schema, e declará-la como Unsupported fazia o
+  // `prisma migrate dev` detectar divergência e tentar apagar o índice a cada execução.
+  // A coluna é usada apenas via $queryRaw em pontos.routes.ts.
   responsavel  Usuario?                 @relation(fields: [idResponsavel], references: [id])
   itensRoteiro ItemRoteiro[]
   sugestoes    SugestaoEdicao[]
