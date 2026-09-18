@@ -20,3 +20,15 @@ export const limiteContribuicao = rateLimit({
     erro: "Muitas contribuições em pouco tempo. Aguarde alguns minutos e tente novamente.",
   },
 });
+
+// Limita tentativas de login por IP para dificultar força bruta de senha.
+export const limiteLogin = rateLimit({
+  windowMs: 15 * 60 * 1000,
+  limit: 10,
+  standardHeaders: true,
+  legacyHeaders: false,
+  skipSuccessfulRequests: true,
+  message: {
+    erro: "Muitas tentativas de login. Aguarde alguns minutos e tente novamente.",
+  },
+});

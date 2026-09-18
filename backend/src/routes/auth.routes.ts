@@ -10,7 +10,7 @@ import {
   verificarTokenRedefinicaoSenha,
 } from "../lib/auth";
 import { autenticar } from "../middleware/auth";
-import { limiteCriacaoConta } from "../middleware/rateLimit";
+import { limiteCriacaoConta, limiteLogin } from "../middleware/rateLimit";
 
 const authRouter = Router();
 
@@ -109,7 +109,7 @@ authRouter.post("/registrar", limiteCriacaoConta, async (req: Request, res: Resp
   }
 });
 
-authRouter.post("/login", async (req: Request, res: Response) => {
+authRouter.post("/login", limiteLogin, async (req: Request, res: Response) => {
   try {
     const resultado = loginSchema.safeParse(req.body);
 
