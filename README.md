@@ -1,4 +1,4 @@
-# Viaje+
+# NomadPlan
 
 Plataforma de turismo inteligente que centraliza inventários turísticos das cidades e sugere roteiros personalizados para cada usuário.
 
@@ -21,4 +21,4 @@ O projeto foi desenvolvido como parte do portfólio acadêmico da 7ª fase do cu
 ## 📌 Como executar
 1. Clone o repositório:
    ```bash
-   git clone https://github.com/SandroMachiniski-SE/Viaje-Mais.git
+   git clone https://github.com/SandroMachiniski-SE/NomadPlan.git
