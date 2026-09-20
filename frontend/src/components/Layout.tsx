@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { Suspense, useState } from "react";
 import { Link, NavLink, Outlet, useNavigate } from "react-router-dom";
 import { useAuth } from "../context/useAuth";
 import Icone from "./Icone";
@@ -129,7 +129,15 @@ function Layout() {
       </header>
 
       <main id="conteudo" className="app__main">
-        <Outlet />
+        <Suspense
+          fallback={
+            <div className="container page">
+              <p className="loading">Carregando...</p>
+            </div>
+          }
+        >
+          <Outlet />
+        </Suspense>
       </main>
 
       <footer className="site-footer">

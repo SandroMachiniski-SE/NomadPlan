@@ -6,12 +6,7 @@ import { useAuth } from "../context/useAuth";
 import { extrairMensagemErro } from "../utils/erro";
 import { CATEGORIAS_PONTOS, iconeDaCategoria } from "../constants/categorias";
 import Icone from "../components/Icone";
-
-function formatarDistancia(metros: number | null): string {
-  if (metros === null) return "";
-  if (metros < 1000) return `${Math.round(metros)} m`;
-  return `${(metros / 1000).toFixed(1)} km`;
-}
+import { formatarDistancia } from "../utils/formatar";
 
 function GerarRoteiro() {
   const { usuario } = useAuth();

@@ -2,7 +2,7 @@ import { useEffect, useState } from "react";
 import { Link, useParams } from "react-router-dom";
 import api from "../services/api";
 import type { RoteiroPublico as RoteiroPublicoTipo } from "../types/roteiro";
-import MapaPontos from "../components/MapaPontos";
+import MapaCarregavel from "../components/MapaCarregavel";
 import Icone from "../components/Icone";
 
 function RoteiroPublico() {
@@ -75,7 +75,7 @@ function RoteiroPublico() {
 
           {itensOrdenados.length > 0 && (
             <div className="mapa-wrap">
-              <MapaPontos pontos={itensOrdenados.map((item) => item.ponto)} />
+              <MapaCarregavel pontos={itensOrdenados.map((item) => item.ponto)} />
             </div>
           )}
 

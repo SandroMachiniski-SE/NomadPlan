@@ -20,7 +20,7 @@ export interface PontoNoMapa {
   longitude: number | null;
 }
 
-interface MapaPontosProps {
+export interface MapaPontosProps {
   pontos: PontoNoMapa[];
   altura?: number;
 }

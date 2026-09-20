@@ -5,7 +5,7 @@ import type { Ponto, RespostaAvaliacoes } from "../types/ponto";
 import type { RespostaRoteiros } from "../types/roteiro";
 import { useAuth } from "../context/useAuth";
 import { extrairMensagemErro } from "../utils/erro";
-import MapaPontos from "../components/MapaPontos";
+import MapaCarregavel from "../components/MapaCarregavel";
 import Icone from "../components/Icone";
 import Estrelas from "../components/Estrelas";
 import { iconeDaCategoria } from "../constants/categorias";
@@ -264,7 +264,7 @@ function PontoDetalhes() {
               {ponto.latitude !== null && ponto.longitude !== null && (
                 <section className="stack stack--sm" aria-label="Localização no mapa">
                   <div className="mapa-wrap">
-                    <MapaPontos pontos={[ponto]} altura={300} />
+                    <MapaCarregavel pontos={[ponto]} altura={300} />
                   </div>
                   <div>
                     <a

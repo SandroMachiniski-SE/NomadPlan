@@ -6,11 +6,18 @@ import {
   gerarHashSenha,
   gerarToken,
   gerarTokenRedefinicaoSenha,
-  verificarSenha,
+  impressaoSenha,
+  impressoesIguais,
+  verificarSenhaOuFalso,
   verificarTokenRedefinicaoSenha,
 } from "../lib/auth";
 import { autenticar } from "../middleware/auth";
-import { limiteCriacaoConta, limiteLogin, limiteLoginPorEmail } from "../middleware/rateLimit";
+import {
+  limiteCriacaoConta,
+  limiteLogin,
+  limiteLoginPorEmail,
+  limiteRecuperacaoSenha,
+} from "../middleware/rateLimit";
 
 const authRouter = Router();
 
@@ -126,9 +133,9 @@ authRouter.post("/login", limiteLogin, limiteLoginPorEmail, async (req: Request,
       where: { email },
     });
 
-    const senhaValida = usuario
-      ? await verificarSenha(senha, usuario.senhaHash)
-      : false;
+    // Compara sempre (com hash falso se a conta não existe) para não revelar, pelo
+    // tempo de resposta, quais e-mails estão cadastrados.
+    const senhaValida = await verificarSenhaOuFalso(senha, usuario?.senhaHash);
 
     if (!usuario || !senhaValida) {
       return res.status(401).json({
@@ -214,7 +221,7 @@ authRouter.put("/me", autenticar, async (req: Request, res: Response) => {
   }
 });
 
-authRouter.post("/esqueci-senha", async (req: Request, res: Response) => {
+authRouter.post("/esqueci-senha", limiteRecuperacaoSenha, async (req: Request, res: Response) => {
   try {
     const resultado = esqueciSenhaSchema.safeParse(req.body);
 
@@ -226,12 +233,12 @@ authRouter.post("/esqueci-senha", async (req: Request, res: Response) => {
 
     const usuario = await prisma.usuario.findUnique({
       where: { email: resultado.data.email },
-      select: { id: true },
+      select: { id: true, senhaHash: true },
     });
 
     // Resposta genérica sempre — evita que a rota revele quais e-mails existem.
     if (usuario) {
-      const token = gerarTokenRedefinicaoSenha(usuario.id);
+      const token = gerarTokenRedefinicaoSenha(usuario.id, usuario.senhaHash);
 
       // TODO(módulo futuro): substituir por envio real de e-mail (RF02).
       // Por ora, o link é registrado no log do servidor para uso em ambiente de
@@ -253,7 +260,7 @@ authRouter.post("/esqueci-senha", async (req: Request, res: Response) => {
   }
 });
 
-authRouter.post("/redefinir-senha", async (req: Request, res: Response) => {
+authRouter.post("/redefinir-senha", limiteRecuperacaoSenha, async (req: Request, res: Response) => {
   try {
     const resultado = redefinirSenhaSchema.safeParse(req.body);
 
@@ -264,20 +271,33 @@ authRouter.post("/redefinir-senha", async (req: Request, res: Response) => {
       });
     }
 
-    let idUsuario: number;
+    const erroTokenInvalido = {
+      erro: "Token de redefinição inválido ou expirado.",
+    };
+
+    let dadosToken: ReturnType<typeof verificarTokenRedefinicaoSenha>;
 
     try {
-      idUsuario = verificarTokenRedefinicaoSenha(resultado.data.token);
+      dadosToken = verificarTokenRedefinicaoSenha(resultado.data.token);
     } catch {
-      return res.status(400).json({
-        erro: "Token de redefinição inválido ou expirado.",
-      });
+      return res.status(400).json(erroTokenInvalido);
+    }
+
+    const usuario = await prisma.usuario.findUnique({
+      where: { id: dadosToken.idUsuario },
+      select: { id: true, senhaHash: true },
+    });
+
+    // O token só vale enquanto a senha for a mesma de quando ele foi emitido:
+    // depois de usado (ou de qualquer troca de senha) ele deixa de funcionar.
+    if (!usuario || !impressoesIguais(dadosToken.impressao, impressaoSenha(usuario.senhaHash))) {
+      return res.status(400).json(erroTokenInvalido);
     }
 
     const senhaHash = await gerarHashSenha(resultado.data.novaSenha);
 
     await prisma.usuario.update({
-      where: { id: idUsuario },
+      where: { id: usuario.id },
       data: { senhaHash },
     });
 

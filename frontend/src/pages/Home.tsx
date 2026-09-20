@@ -2,7 +2,7 @@ import { useEffect, useState, type FormEvent } from "react";
 import { Link } from "react-router-dom";
 import api from "../services/api";
 import type { Ponto, RespostaPontos } from "../types/ponto";
-import MapaPontos from "../components/MapaPontos";
+import MapaCarregavel from "../components/MapaCarregavel";
 import PontoCard from "../components/PontoCard";
 import Icone from "../components/Icone";
 import { useAuth } from "../context/useAuth";
@@ -287,7 +287,7 @@ function Home() {
 
             {!erro && !carregando && pontos.length > 0 && visualizacao === "mapa" && (
               <div className="mapa-wrap">
-                <MapaPontos pontos={pontos} altura={520} />
+                <MapaCarregavel pontos={pontos} altura={520} />
               </div>
             )}
 
