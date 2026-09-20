@@ -51,3 +51,15 @@ export const limiteLoginPorEmail = rateLimit({
     erro: "Muitas tentativas de login para esta conta. Aguarde alguns minutos e tente novamente.",
   },
 });
+
+// Recuperação de senha: sem limite, /esqueci-senha permite disparar e-mails em
+// massa e /redefinir-senha permite tentar tokens à vontade.
+export const limiteRecuperacaoSenha = rateLimit({
+  windowMs: 15 * 60 * 1000,
+  limit: 10,
+  standardHeaders: true,
+  legacyHeaders: false,
+  message: {
+    erro: "Muitas solicitações de recuperação de senha. Aguarde alguns minutos e tente novamente.",
+  },
+});

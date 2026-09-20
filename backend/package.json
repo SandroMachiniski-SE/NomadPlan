@@ -5,7 +5,7 @@
   "scripts": {
     "postinstall": "prisma generate",
     "dev": "tsx watch src/server.ts",
-    "test": "tsx --test src/middleware/rateLimit.test.ts",
+    "test": "tsx --test \"src/**/*.test.ts\"",
     "build": "tsc",
     "start": "node dist/src/server.js",
     "prisma:generate": "prisma generate",

@@ -675,3 +675,9 @@
   color: var(--text);
   overflow-wrap: anywhere;
 }
+
+.mapa-carregando {
+  display: grid;
+  place-items: center;
+  background: var(--surface-2);
+}

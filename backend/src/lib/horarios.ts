@@ -102,5 +102,11 @@ export function estaAbertoNoHorario(
 
   const horaAtual = dataHora.getHours() + dataHora.getMinutes() / 60;
 
+  // Faixa que atravessa a meia-noite (ex.: "22h-2h"): está aberto depois do início
+  // OU antes do fim.
+  if (faixaHoras.fim < faixaHoras.inicio) {
+    return horaAtual >= faixaHoras.inicio || horaAtual <= faixaHoras.fim;
+  }
+
   return horaAtual >= faixaHoras.inicio && horaAtual <= faixaHoras.fim;
 }

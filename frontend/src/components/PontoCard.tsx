@@ -2,19 +2,12 @@ import { Link } from "react-router-dom";
 import api from "../services/api";
 import type { Ponto } from "../types/ponto";
 import { iconeDaCategoria } from "../constants/categorias";
+import { formatarDistancia } from "../utils/formatar";
 import Icone from "./Icone";
 
 interface PontoCardProps {
   ponto: Ponto;
   compacto?: boolean;
-}
-
-function formatarDistancia(metros: number): string {
-  if (metros < 1000) {
-    return `${Math.round(metros)} m`;
-  }
-
-  return `${(metros / 1000).toFixed(1)} km`;
 }
 
 function PontoCard({ ponto, compacto = false }: PontoCardProps) {
