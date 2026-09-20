@@ -55,7 +55,22 @@ cd backend
 npm test
 ```
 
-A suíte usa o executor de testes nativo do Node (`node:test`) e cobre o rate limit de login e de recuperação de senha, a autenticação (senhas, tokens e redefinição de uso único), a validação do `JWT_SECRET`, o cálculo de distância, a interpretação de horários de funcionamento, o parser de CSV e o filtro de conteúdo.
+A suíte usa o executor de testes nativo do Node (`node:test`) e cobre o rate limit de login e de recuperação de senha, o envio de e-mail, a autenticação (senhas, tokens e redefinição de uso único), a validação do `JWT_SECRET`, o cálculo de distância, a interpretação de horários de funcionamento, o parser de CSV e o filtro de conteúdo.
+
+## 📧 Recuperação de senha
+
+Na tela de login, **"Esqueci minha senha"** envia por e-mail um link para escolher uma nova senha. O link vale por 15 minutos e só pode ser usado uma vez.
+
+Para o e-mail sair de verdade, configure um servidor SMTP no `backend/.env` (variáveis `SMTP_*` e `EMAIL_FROM`, documentadas no `.env.example`). Exemplo com Gmail, usando uma [senha de app](https://myaccount.google.com/apppasswords):
+
+```env
+SMTP_HOST="smtp.gmail.com"
+SMTP_PORT=587
+SMTP_USER="seuemail@gmail.com"
+SMTP_PASS="senha-de-app"
+```
+
+Sem `SMTP_HOST`, em desenvolvimento o link de redefinição é impresso no **console do backend** (procure por `[e-mail em modo de desenvolvimento]`), o que permite testar o fluxo sem servidor de e-mail. Em produção, sem SMTP, nenhum e-mail é enviado e o servidor registra um aviso.
 
 ## 🔒 Segurança
 

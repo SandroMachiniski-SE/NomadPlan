@@ -11,6 +11,7 @@ import {
   verificarSenhaOuFalso,
   verificarTokenRedefinicaoSenha,
 } from "../lib/auth";
+import { enviarEmailRedefinicaoSenha } from "../lib/email";
 import { autenticar } from "../middleware/auth";
 import {
   limiteCriacaoConta,
@@ -233,18 +234,25 @@ authRouter.post("/esqueci-senha", limiteRecuperacaoSenha, async (req: Request, r
 
     const usuario = await prisma.usuario.findUnique({
       where: { email: resultado.data.email },
-      select: { id: true, senhaHash: true },
+      select: { id: true, nome: true, senhaHash: true, ativo: true },
     });
 
     // Resposta genérica sempre — evita que a rota revele quais e-mails existem.
-    if (usuario) {
+    if (usuario?.ativo) {
       const token = gerarTokenRedefinicaoSenha(usuario.id, usuario.senhaHash);
+      const frontendUrl = process.env.FRONTEND_URL ?? "http://localhost:5173";
+      const link = `${frontendUrl}/redefinir-senha?token=${token}`;
 
-      // TODO(módulo futuro): substituir por envio real de e-mail (RF02).
-      // Por ora, o link é registrado no log do servidor para uso em ambiente de
-      // desenvolvimento/demonstração acadêmica.
-      const linkRedefinicao = `${process.env.FRONTEND_URL ?? "http://localhost:5173"}/redefinir-senha?token=${token}`;
-      console.log(`Link de redefinição de senha para ${resultado.data.email}: ${linkRedefinicao}`);
+      // Não aguardamos o envio: o SMTP leva segundos, e esperar faria a resposta
+      // demorar só quando a conta existe — o que revelaria quais e-mails estão
+      // cadastrados. Falhas de envio ficam registradas no log do servidor.
+      enviarEmailRedefinicaoSenha({
+        para: resultado.data.email,
+        nome: usuario.nome,
+        link,
+      }).catch((error) => {
+        console.error("Falha ao enviar e-mail de redefinição de senha:", error);
+      });
     }
 
     return res.json({

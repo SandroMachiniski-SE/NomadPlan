@@ -14,7 +14,9 @@ function Login() {
   const [enviando, setEnviando] = useState(false);
   const [erro, setErro] = useState<string | null>(null);
 
-  const destino = (location.state as { destino?: string } | null)?.destino ?? "/roteiros";
+  const estadoNavegacao = location.state as { destino?: string; mensagem?: string } | null;
+  const destino = estadoNavegacao?.destino ?? "/roteiros";
+  const mensagem = estadoNavegacao?.mensagem;
 
   async function aoEnviar(evento: FormEvent) {
     evento.preventDefault();
@@ -43,6 +45,12 @@ function Login() {
       }
     >
       <form onSubmit={aoEnviar} className="form">
+        {mensagem && (
+          <div className="alert alert--success" role="status">
+            <p>{mensagem}</p>
+          </div>
+        )}
+
         <label className="field">
           <span>E-mail</span>
           <input

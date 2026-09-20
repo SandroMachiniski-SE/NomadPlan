@@ -37,10 +37,22 @@ function EsqueciSenha() {
       }
     >
       {enviado ? (
-        <div className="alert alert--success" role="status">
-          <p>
-            Se houver uma conta com este e-mail, enviaremos instruções de redefinição em instantes.
-          </p>
+        <div className="stack">
+          <div className="alert alert--success" role="status">
+            <p>
+              Se houver uma conta com este e-mail, enviaremos instruções de redefinição em
+              instantes.
+            </p>
+          </div>
+
+          <ul className="auth__dicas">
+            <li>Confira também a caixa de spam ou lixo eletrônico.</li>
+            <li>O link vale por 15 minutos e só pode ser usado uma vez.</li>
+          </ul>
+
+          <button type="button" className="btn btn--outline btn--block" onClick={() => setEnviado(false)}>
+            Usar outro e-mail
+          </button>
         </div>
       ) : (
         <form onSubmit={aoEnviar} className="form">
