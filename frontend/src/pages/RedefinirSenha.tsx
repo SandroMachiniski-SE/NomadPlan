@@ -10,8 +10,10 @@ function RedefinirSenha() {
   const token = searchParams.get("token") ?? "";
 
   const [novaSenha, setNovaSenha] = useState("");
+  const [confirmacao, setConfirmacao] = useState("");
   const [enviando, setEnviando] = useState(false);
   const [erro, setErro] = useState<string | null>(null);
+  const [linkRejeitado, setLinkRejeitado] = useState(false);
 
   async function aoEnviar(evento: FormEvent) {
     evento.preventDefault();
@@ -22,12 +24,21 @@ function RedefinirSenha() {
       return;
     }
 
+    if (novaSenha !== confirmacao) {
+      setErro("As senhas não coincidem. Digite a mesma senha nos dois campos.");
+      return;
+    }
+
     try {
       setEnviando(true);
       await api.post("/auth/redefinir-senha", { token, novaSenha });
-      navigate("/login", { replace: true });
+      navigate("/login", {
+        replace: true,
+        state: { mensagem: "Senha redefinida com sucesso. Entre com a sua nova senha." },
+      });
     } catch (err) {
       console.error(err);
+      setLinkRejeitado((err as { response?: { status?: number } })?.response?.status === 400);
       setErro(extrairMensagemErro(err, "Não foi possível redefinir sua senha."));
     } finally {
       setEnviando(false);
@@ -68,9 +79,29 @@ function RedefinirSenha() {
           />
         </label>
 
+        <label className="field">
+          <span>Confirme a nova senha</span>
+          <input
+            type="password"
+            required
+            minLength={8}
+            autoComplete="new-password"
+            value={confirmacao}
+            onChange={(e) => setConfirmacao(e.target.value)}
+          />
+        </label>
+
         {erro && (
           <div className="alert alert--error" role="alert">
-            <p>{erro}</p>
+            <p>
+              {erro}
+              {linkRejeitado && (
+                <>
+                  {" "}
+                  <Link to="/esqueci-senha">Solicitar um novo link</Link>
+                </>
+              )}
+            </p>
           </div>
         )}
 
