@@ -1,139 +1,192 @@
-import { NavLink, Outlet, useNavigate } from "react-router-dom";
+import { useState } from "react";
+import { Link, NavLink, Outlet, useNavigate } from "react-router-dom";
 import { useAuth } from "../context/useAuth";
+import Icone from "./Icone";
 import NotificacoesSino from "./NotificacoesSino";
+
+function Marca() {
+  return (
+    <>
+      <img className="brand__logo" src="/emblema.png" alt="" width={40} height={40} />
+      <span className="brand__name">
+        Nomad<span>Plan</span>
+      </span>
+    </>
+  );
+}
 
 function Layout() {
   const { usuario, autenticado, logout } = useAuth();
   const navigate = useNavigate();
+  const [menuAberto, setMenuAberto] = useState(false);
 
-  const estiloLink = ({ isActive }: { isActive: boolean }) => ({
-    color: "white",
-    textDecoration: "none",
-    fontWeight: isActive ? "bold" : "normal",
-  });
+  const tipoConta = usuario?.tipoConta;
+  const podeCadastrarPontos =
+    tipoConta === "NEGOCIO" || tipoConta === "GESTOR" || tipoConta === "MODERADOR" || tipoConta === "ADMIN";
+  const podeModerar = tipoConta === "MODERADOR" || tipoConta === "ADMIN";
+  const ehAdmin = tipoConta === "ADMIN";
 
   function aoSair() {
     logout();
     navigate("/");
   }
 
+  const inicial = (usuario?.nome ?? "?").trim().charAt(0).toUpperCase();
+
   return (
-    <div>
-      <header
-        style={{
-          backgroundColor: "#2563eb",
-          color: "white",
-          padding: "1rem",
-        }}
-      >
-        <div
-          style={{
-            maxWidth: 960,
-            margin: "0 auto",
-            display: "flex",
-            alignItems: "center",
-            justifyContent: "space-between",
-            gap: "1rem",
-          }}
-        >
-          <NavLink
-            to="/"
-            style={{ color: "white", textDecoration: "none", fontWeight: "bold" }}
+    <div className="app">
+      <a className="skip-link" href="#conteudo">
+        Ir para o conteúdo
+      </a>
+
+      <header className="site-header">
+        <div className="container site-header__inner">
+          <Link to="/" className="brand" aria-label="NomadPlan — página inicial">
+            <Marca />
+          </Link>
+
+          <div
+            id="menu-principal"
+            className="site-menu"
+            data-aberto={menuAberto}
+            onClick={() => setMenuAberto(false)}
           >
-            NomadPlan
-          </NavLink>
+            <nav className="site-nav" aria-label="Principal">
+              <NavLink to="/" end className="nav-link">
+                Explorar
+              </NavLink>
 
-          <nav style={{ display: "flex", alignItems: "center", gap: "1rem" }}>
-            <NavLink to="/" style={estiloLink}>
-              Explorar
-            </NavLink>
-
-            {autenticado ? (
-              <>
-                <NavLink to="/roteiros" style={estiloLink}>
+              {autenticado && (
+                <NavLink to="/roteiros" className="nav-link">
                   Meus roteiros
                 </NavLink>
+              )}
 
-                {usuario &&
-                  ["NEGOCIO", "GESTOR", "MODERADOR", "ADMIN"].includes(usuario.tipoConta) && (
-                    <NavLink to="/pontos/meus" style={estiloLink}>
-                      Meus pontos
-                    </NavLink>
-                  )}
+              {autenticado && podeCadastrarPontos && (
+                <NavLink to="/pontos/meus" className="nav-link">
+                  Meus pontos
+                </NavLink>
+              )}
 
-                {usuario && ["MODERADOR", "ADMIN"].includes(usuario.tipoConta) && (
-                  <NavLink to="/moderacao" style={estiloLink}>
-                    Moderação
+              {autenticado && podeModerar && (
+                <NavLink to="/moderacao" className="nav-link">
+                  Moderação
+                </NavLink>
+              )}
+
+              {autenticado && ehAdmin && (
+                <NavLink to="/admin" className="nav-link">
+                  Admin
+                </NavLink>
+              )}
+            </nav>
+
+            <div className="site-account">
+              {autenticado ? (
+                <>
+                  <NavLink to="/perfil" className="user-chip">
+                    <span className="user-chip__avatar" aria-hidden="true">
+                      {inicial}
+                    </span>
+                    <span className="user-chip__name">{usuario?.nome ?? "Perfil"}</span>
                   </NavLink>
-                )}
 
-                {usuario && usuario.tipoConta === "ADMIN" && (
-                  <NavLink to="/admin" style={estiloLink}>
-                    Admin
+                  <button type="button" className="btn btn--ghost btn--sm" onClick={aoSair}>
+                    <Icone nome="sair" />
+                    Sair
+                  </button>
+                </>
+              ) : (
+                <>
+                  <NavLink to="/login" className="btn btn--ghost">
+                    Entrar
                   </NavLink>
-                )}
+                  <NavLink to="/registrar" className="btn btn--primary">
+                    Cadastre-se
+                  </NavLink>
+                </>
+              )}
+            </div>
+          </div>
 
-                <NotificacoesSino />
+          {autenticado && (
+            <div className="site-header__bell">
+              <NotificacoesSino />
+            </div>
+          )}
 
-                <NavLink to="/perfil" style={estiloLink}>
-                  {usuario?.nome ?? "Perfil"}
-                </NavLink>
-
-                <button
-                  type="button"
-                  onClick={aoSair}
-                  style={{
-                    background: "none",
-                    border: "1px solid rgba(255,255,255,0.6)",
-                    borderRadius: 6,
-                    color: "white",
-                    padding: "0.35rem 0.75rem",
-                    cursor: "pointer",
-                  }}
-                >
-                  Sair
-                </button>
-              </>
-            ) : (
-              <>
-                <NavLink to="/login" style={estiloLink}>
-                  Entrar
-                </NavLink>
-
-                <NavLink
-                  to="/registrar"
-                  style={{
-                    color: "#2563eb",
-                    backgroundColor: "white",
-                    textDecoration: "none",
-                    borderRadius: 6,
-                    padding: "0.35rem 0.75rem",
-                    fontWeight: "bold",
-                  }}
-                >
-                  Cadastre-se
-                </NavLink>
-              </>
-            )}
-          </nav>
+          <button
+            type="button"
+            className="nav-toggle"
+            aria-label={menuAberto ? "Fechar menu" : "Abrir menu"}
+            aria-expanded={menuAberto}
+            aria-controls="menu-principal"
+            onClick={() => setMenuAberto((atual) => !atual)}
+          >
+            <Icone nome={menuAberto ? "fechar" : "menu"} />
+          </button>
         </div>
       </header>
 
-      <main>
+      <main id="conteudo" className="app__main">
         <Outlet />
       </main>
 
-      <footer
-        style={{
-          maxWidth: 960,
-          margin: "2rem auto 0",
-          padding: "1rem",
-          borderTop: "1px solid #ddd",
-          color: "#666",
-          textAlign: "center",
-        }}
-      >
-        NomadPlan — descubra novos destinos.
+      <footer className="site-footer">
+        <div className="container site-footer__inner">
+          <div>
+            <Link to="/" className="brand" aria-label="NomadPlan — página inicial">
+              <Marca />
+            </Link>
+            <p className="site-footer__tagline">
+              Sua jornada digital, planejada e conectada. Descubra lugares e monte roteiros sob
+              medida.
+            </p>
+          </div>
+
+          <div>
+            <h2 className="site-footer__title">Explorar</h2>
+            <ul className="site-footer__links">
+              <li>
+                <Link to="/">Buscar pontos turísticos</Link>
+              </li>
+              {autenticado && (
+                <li>
+                  <Link to="/roteiros/gerar">Gerar roteiro</Link>
+                </li>
+              )}
+              {autenticado && (
+                <li>
+                  <Link to="/roteiros">Meus roteiros</Link>
+                </li>
+              )}
+            </ul>
+          </div>
+
+          <div>
+            <h2 className="site-footer__title">Conta</h2>
+            <ul className="site-footer__links">
+              {autenticado ? (
+                <li>
+                  <Link to="/perfil">Meu perfil</Link>
+                </li>
+              ) : (
+                <>
+                  <li>
+                    <Link to="/login">Entrar</Link>
+                  </li>
+                  <li>
+                    <Link to="/registrar">Criar conta</Link>
+                  </li>
+                </>
+              )}
+            </ul>
+          </div>
+        </div>
+
+        <div className="container site-footer__bottom">
+          © {new Date().getFullYear()} NomadPlan — Explore. Organize. Thrive.
+        </div>
       </footer>
     </div>
   );

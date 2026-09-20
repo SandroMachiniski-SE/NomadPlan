@@ -64,9 +64,9 @@ function App() {
           <Route element={<RotaProtegida papeis={[...PAPEIS_ADMIN]} />}>
             <Route path="/admin" element={<Admin />} />
           </Route>
-        </Route>
 
-        <Route path="*" element={<NaoEncontrado />} />
+          <Route path="*" element={<NaoEncontrado />} />
+        </Route>
       </Routes>
     </AuthProvider>
   );

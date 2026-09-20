@@ -3,17 +3,10 @@ import { Link } from "react-router-dom";
 import api from "../services/api";
 import type { Ponto, RespostaPontos } from "../types/ponto";
 import MapaPontos from "../components/MapaPontos";
+import PontoCard from "../components/PontoCard";
+import Icone from "../components/Icone";
 import { useAuth } from "../context/useAuth";
-
-const estiloCampo = { padding: "0.5rem", borderRadius: 6, border: "1px solid #ccc" };
-
-function formatarDistancia(metros: number): string {
-  if (metros < 1000) {
-    return `${Math.round(metros)} m`;
-  }
-
-  return `${(metros / 1000).toFixed(1)} km`;
-}
+import { CATEGORIAS_PONTOS, iconeDaCategoria } from "../constants/categorias";
 
 function Home() {
   const { autenticado } = useAuth();
@@ -51,8 +44,10 @@ function Home() {
   const [buscou, setBuscou] = useState(false);
   const [visualizacao, setVisualizacao] = useState<"lista" | "mapa">("lista");
 
-  async function buscarPontos(event?: FormEvent) {
+  async function buscarPontos(event?: FormEvent, categoriaEscolhida?: string) {
     event?.preventDefault();
+
+    const categoriaFiltro = categoriaEscolhida ?? categoria;
 
     setCarregando(true);
     setErro(null);
@@ -61,7 +56,7 @@ function Home() {
     try {
       const params: Record<string, string> = {};
       if (cidade.trim()) params.cidade = cidade.trim();
-      if (categoria.trim()) params.categoria = categoria.trim();
+      if (categoriaFiltro.trim()) params.categoria = categoriaFiltro.trim();
       if (busca.trim()) params.busca = busca.trim();
       if (acessibilidade.trim()) params.acessibilidade = acessibilidade.trim();
       if (faixaPreco.trim()) params.faixaPreco = faixaPreco.trim();
@@ -81,6 +76,12 @@ function Home() {
     } finally {
       setCarregando(false);
     }
+  }
+
+  function aoEscolherCategoria(nova: string) {
+    const proxima = categoria === nova ? "" : nova;
+    setCategoria(proxima);
+    buscarPontos(undefined, proxima);
   }
 
   function aoUsarLocalizacao() {
@@ -105,178 +106,259 @@ function Home() {
   }
 
   return (
-    <div style={{ maxWidth: 960, margin: "0 auto", padding: "2rem 1rem" }}>
-      <h1>NomadPlan</h1>
-      <p>Descubra pontos turísticos e monte seu roteiro personalizado.</p>
+    <>
+      <section className="hero">
+        <div className="container hero__inner">
+          <p className="hero__eyebrow">
+            <Icone nome="bussola" />
+            Explore. Organize. Thrive.
+          </p>
+          <h1 className="hero__titulo">
+            Descubra destinos e monte o <span>roteiro perfeito</span>
+          </h1>
+          <p className="hero__texto">
+            Pontos turísticos, restaurantes, hospedagens e eventos reunidos em um só lugar, com
+            roteiros personalizados para o seu jeito de viajar.
+          </p>
 
-      {recomendados.length > 0 && (
-        <div style={{ marginBottom: "2rem" }}>
-          <h2>Recomendados para você</h2>
-          <div style={{ display: "flex", gap: "1rem", overflowX: "auto", paddingBottom: "0.5rem" }}>
-            {recomendados.map((ponto) => (
-              <Link
-                key={ponto.id}
-                to={`/pontos/${ponto.id}`}
-                style={{
-                  flex: "0 0 220px",
-                  border: "1px solid #ddd",
-                  borderRadius: 8,
-                  padding: "1rem",
-                  textDecoration: "none",
-                  color: "inherit",
-                }}
+          <form className="busca" onSubmit={buscarPontos} role="search">
+            <div className="busca__linha">
+              <label className="busca__campo">
+                <Icone nome="pin" />
+                <input
+                  type="text"
+                  value={cidade}
+                  onChange={(event) => setCidade(event.target.value)}
+                  placeholder="Para onde você vai?"
+                  aria-label="Cidade"
+                />
+              </label>
+
+              <label className="busca__campo busca__campo--grande">
+                <Icone nome="busca" />
+                <input
+                  type="text"
+                  value={busca}
+                  onChange={(event) => setBusca(event.target.value)}
+                  placeholder="Buscar por nome ou descrição"
+                  aria-label="Buscar por nome ou descrição"
+                />
+              </label>
+
+              <button type="submit" className="btn btn--accent btn--lg" disabled={carregando}>
+                {carregando ? "Buscando..." : "Buscar"}
+              </button>
+            </div>
+
+            <details className="busca__avancado">
+              <summary>Mais filtros</summary>
+
+              <div className="busca__filtros">
+                <label className="field">
+                  <span>Acessibilidade</span>
+                  <input
+                    type="text"
+                    value={acessibilidade}
+                    onChange={(event) => setAcessibilidade(event.target.value)}
+                    placeholder="Ex.: rampa de acesso"
+                  />
+                </label>
+
+                <label className="field">
+                  <span>Faixa de preço</span>
+                  <input
+                    type="text"
+                    value={faixaPreco}
+                    onChange={(event) => setFaixaPreco(event.target.value)}
+                    placeholder="Ex.: Gratuito, $$"
+                  />
+                </label>
+
+                <div className="field">
+                  <span>Localização</span>
+                  <div className="cluster">
+                    <button
+                      type="button"
+                      className={localizacao ? "btn btn--primary" : "btn btn--outline"}
+                      onClick={aoUsarLocalizacao}
+                      disabled={buscandoLocalizacao}
+                    >
+                      <Icone nome={localizacao ? "check" : "localizar"} />
+                      {buscandoLocalizacao ? "Localizando..." : localizacao ? "Perto de mim" : "Usar minha localização"}
+                    </button>
+
+                    {localizacao && (
+                      <select
+                        value={raioKm}
+                        onChange={(event) => setRaioKm(event.target.value)}
+                        aria-label="Raio de busca"
+                        className="busca__raio"
+                      >
+                        <option value="5">até 5 km</option>
+                        <option value="10">até 10 km</option>
+                        <option value="25">até 25 km</option>
+                        <option value="50">até 50 km</option>
+                      </select>
+                    )}
+                  </div>
+                </div>
+              </div>
+            </details>
+          </form>
+
+          <div className="chips hero__chips" role="group" aria-label="Filtrar por categoria">
+            {CATEGORIAS_PONTOS.map((nome) => (
+              <button
+                key={nome}
+                type="button"
+                className="chip chip--hero"
+                aria-pressed={categoria === nome}
+                onClick={() => aoEscolherCategoria(nome)}
               >
-                <h3 style={{ margin: "0 0 0.25rem" }}>{ponto.nome}</h3>
-                <p style={{ margin: 0, color: "#555", fontSize: "0.9rem" }}>
-                  {ponto.categoria} • {ponto.cidade}
-                </p>
-              </Link>
+                <Icone nome={iconeDaCategoria(nome)} />
+                {nome}
+              </button>
             ))}
           </div>
         </div>
-      )}
+      </section>
 
-      <form
-        onSubmit={buscarPontos}
-        style={{ display: "flex", flexWrap: "wrap", gap: "0.5rem", marginBottom: "1rem" }}
-      >
-        <input
-          type="text"
-          value={cidade}
-          onChange={(event) => setCidade(event.target.value)}
-          placeholder="Cidade"
-          style={{ ...estiloCampo, flex: "1 1 160px" }}
-        />
-        <input
-          type="text"
-          value={categoria}
-          onChange={(event) => setCategoria(event.target.value)}
-          placeholder="Categoria"
-          style={{ ...estiloCampo, flex: "1 1 140px" }}
-        />
-        <input
-          type="text"
-          value={busca}
-          onChange={(event) => setBusca(event.target.value)}
-          placeholder="Buscar por nome ou descrição"
-          style={{ ...estiloCampo, flex: "2 1 220px" }}
-        />
-        <input
-          type="text"
-          value={acessibilidade}
-          onChange={(event) => setAcessibilidade(event.target.value)}
-          placeholder="Acessibilidade"
-          style={{ ...estiloCampo, flex: "1 1 160px" }}
-        />
-        <input
-          type="text"
-          value={faixaPreco}
-          onChange={(event) => setFaixaPreco(event.target.value)}
-          placeholder="Faixa de preço"
-          style={{ ...estiloCampo, flex: "1 1 140px" }}
-        />
+      <div className="container home">
+        {recomendados.length > 0 && (
+          <section className="section" aria-labelledby="titulo-recomendados">
+            <div className="section__cabecalho">
+              <h2 id="titulo-recomendados">Recomendados para você</h2>
+              <p className="muted">Sugestões baseadas nos seus interesses.</p>
+            </div>
 
-        <button
-          type="button"
-          onClick={aoUsarLocalizacao}
-          disabled={buscandoLocalizacao}
-          style={{ ...estiloCampo, backgroundColor: localizacao ? "#dcfce7" : "#fff", cursor: "pointer" }}
-        >
-          {buscandoLocalizacao ? "Localizando..." : localizacao ? "✔ Perto de mim" : "Perto de mim"}
-        </button>
-
-        {localizacao && (
-          <select
-            value={raioKm}
-            onChange={(event) => setRaioKm(event.target.value)}
-            style={estiloCampo}
-          >
-            <option value="5">até 5 km</option>
-            <option value="10">até 10 km</option>
-            <option value="25">até 25 km</option>
-            <option value="50">até 50 km</option>
-          </select>
+            <div className="carrossel">
+              {recomendados.map((ponto) => (
+                <PontoCard key={ponto.id} ponto={ponto} compacto />
+              ))}
+            </div>
+          </section>
         )}
 
-        <button type="submit" disabled={carregando} style={{ ...estiloCampo, backgroundColor: "#2563eb", color: "#fff", border: "none", fontWeight: "bold" }}>
-          {carregando ? "Buscando..." : "Buscar"}
-        </button>
-      </form>
+        {buscou && (
+          <section className="section" aria-live="polite">
+            <div className="section__cabecalho section__cabecalho--linha">
+              <h2>{carregando ? "Buscando..." : erro ? "Resultados" : `${pontos.length} ${pontos.length === 1 ? "resultado" : "resultados"}`}</h2>
 
-      {buscou && !carregando && !erro && (
-        <div style={{ display: "flex", gap: "0.5rem", marginBottom: "1rem" }}>
-          <button
-            type="button"
-            onClick={() => setVisualizacao("lista")}
-            style={{
-              padding: "0.35rem 0.75rem",
-              borderRadius: 6,
-              border: "1px solid #2563eb",
-              backgroundColor: visualizacao === "lista" ? "#2563eb" : "transparent",
-              color: visualizacao === "lista" ? "#fff" : "#2563eb",
-              cursor: "pointer",
-            }}
-          >
-            Lista
-          </button>
-          <button
-            type="button"
-            onClick={() => setVisualizacao("mapa")}
-            style={{
-              padding: "0.35rem 0.75rem",
-              borderRadius: 6,
-              border: "1px solid #2563eb",
-              backgroundColor: visualizacao === "mapa" ? "#2563eb" : "transparent",
-              color: visualizacao === "mapa" ? "#fff" : "#2563eb",
-              cursor: "pointer",
-            }}
-          >
-            Mapa
-          </button>
-        </div>
-      )}
+              {!carregando && !erro && pontos.length > 0 && (
+                <div className="segmented" role="group" aria-label="Modo de visualização">
+                  <button
+                    type="button"
+                    aria-pressed={visualizacao === "lista"}
+                    onClick={() => setVisualizacao("lista")}
+                  >
+                    <Icone nome="lista" />
+                    Lista
+                  </button>
+                  <button
+                    type="button"
+                    aria-pressed={visualizacao === "mapa"}
+                    onClick={() => setVisualizacao("mapa")}
+                  >
+                    <Icone nome="mapa" />
+                    Mapa
+                  </button>
+                </div>
+              )}
+            </div>
 
-      {erro && <p style={{ color: "red" }}>{erro}</p>}
+            {carregando && <p className="loading">Buscando pontos turísticos...</p>}
 
-      {!erro && buscou && !carregando && pontos.length === 0 && (
-        <p>Nenhum ponto turístico encontrado.</p>
-      )}
+            {erro && (
+              <div className="alert alert--error" role="alert">
+                <Icone nome="alerta" />
+                <p>{erro}</p>
+              </div>
+            )}
 
-      {!erro && !carregando && pontos.length > 0 && visualizacao === "mapa" && (
-        <MapaPontos pontos={pontos} />
-      )}
+            {!erro && !carregando && pontos.length === 0 && (
+              <div className="empty">
+                <div className="empty__icon">
+                  <Icone nome="busca" />
+                </div>
+                <p className="empty__title">Nenhum ponto turístico encontrado</p>
+                <p>Tente ajustar os filtros ou buscar por outra cidade.</p>
+              </div>
+            )}
 
-      {!erro && !carregando && pontos.length > 0 && visualizacao === "lista" && (
-        <div style={{ display: "grid", gap: "1rem" }}>
-          {pontos.map((ponto) => (
-            <Link
-              key={ponto.id}
-              to={`/pontos/${ponto.id}`}
-              style={{
-                border: "1px solid #ddd",
-                borderRadius: 8,
-                padding: "1rem",
-                textDecoration: "none",
-                color: "inherit",
-                display: "block",
-              }}
-            >
-              <h2 style={{ margin: "0 0 0.25rem" }}>
-                {ponto.nome} {ponto.seloVerificado && <span title="Verificado">✔</span>}
-              </h2>
-              <p style={{ margin: "0 0 0.5rem", color: "#555" }}>
-                {ponto.categoria} • {ponto.cidade}
-                {ponto.distanciaMetros !== undefined && ` • ${formatarDistancia(ponto.distanciaMetros)} de você`}
-              </p>
-              <p style={{ margin: "0 0 0.5rem" }}>{ponto.descricao}</p>
-              <p style={{ margin: 0, fontSize: "0.9rem", color: "#777" }}>
-                {ponto.endereco} — {ponto.faixaPreco}
-              </p>
-            </Link>
-          ))}
-        </div>
-      )}
-    </div>
+            {!erro && !carregando && pontos.length > 0 && visualizacao === "mapa" && (
+              <div className="mapa-wrap">
+                <MapaPontos pontos={pontos} altura={520} />
+              </div>
+            )}
+
+            {!erro && !carregando && pontos.length > 0 && visualizacao === "lista" && (
+              <div className="grid-cards">
+                {pontos.map((ponto) => (
+                  <PontoCard key={ponto.id} ponto={ponto} />
+                ))}
+              </div>
+            )}
+          </section>
+        )}
+
+        {!buscou && (
+          <section className="section" aria-labelledby="titulo-como-funciona">
+            <div className="section__cabecalho text-center">
+              <h2 id="titulo-como-funciona">Como o NomadPlan funciona</h2>
+              <p className="muted">Do primeiro destino ao roteiro pronto para compartilhar.</p>
+            </div>
+
+            <div className="passos">
+              <div className="passo card">
+                <span className="passo__icone">
+                  <Icone nome="busca" />
+                </span>
+                <h3>Explore</h3>
+                <p className="muted">
+                  Busque atrações, restaurantes e hospedagens por cidade, categoria, acessibilidade
+                  ou proximidade.
+                </p>
+              </div>
+
+              <div className="passo card">
+                <span className="passo__icone passo__icone--coral">
+                  <Icone nome="calendario" />
+                </span>
+                <h3>Organize</h3>
+                <p className="muted">
+                  Monte roteiros por dia, reordene as paradas ou gere uma sugestão automática com base
+                  nos seus interesses.
+                </p>
+              </div>
+
+              <div className="passo card">
+                <span className="passo__icone">
+                  <Icone nome="compartilhar" />
+                </span>
+                <h3>Compartilhe</h3>
+                <p className="muted">
+                  Publique um link do seu roteiro, avalie os lugares que visitou e ajude a manter
+                  os dados atualizados.
+                </p>
+              </div>
+            </div>
+
+            {!autenticado && (
+              <div className="cta-final">
+                <div>
+                  <h2>Pronto para planejar a próxima viagem?</h2>
+                  <p>Crie sua conta gratuita e comece a montar seus roteiros.</p>
+                </div>
+                <Link to="/registrar" className="btn btn--accent btn--lg">
+                  Criar conta grátis
+                  <Icone nome="avancar" />
+                </Link>
+              </div>
+            )}
+          </section>
+        )}
+      </div>
+    </>
   );
 }
 

@@ -1,8 +1,9 @@
 import { useEffect, useState } from "react";
-import { useParams } from "react-router-dom";
+import { Link, useParams } from "react-router-dom";
 import api from "../services/api";
 import type { RoteiroPublico as RoteiroPublicoTipo } from "../types/roteiro";
 import MapaPontos from "../components/MapaPontos";
+import Icone from "../components/Icone";
 
 function RoteiroPublico() {
   const { slug } = useParams<{ slug: string }>();
@@ -30,40 +31,77 @@ function RoteiroPublico() {
   const itensOrdenados = roteiro ? [...roteiro.itens].sort((a, b) => a.ordem - b.ordem) : [];
 
   return (
-    <div style={{ maxWidth: 720, margin: "0 auto", padding: "2rem 1rem" }}>
-      {carregando && <p>Carregando roteiro...</p>}
+    <div className="container container--narrow page">
+      {carregando && <p className="loading">Carregando roteiro...</p>}
 
-      {erro && <p style={{ color: "red" }}>{erro}</p>}
+      {erro && (
+        <div className="stack">
+          <div className="alert alert--error" role="alert">
+            <Icone nome="alerta" />
+            <p>{erro}</p>
+          </div>
+          <Link to="/" className="back-link">
+            <Icone nome="voltar" />
+            Ir para a página inicial
+          </Link>
+        </div>
+      )}
 
       {roteiro && (
-        <article>
-          <h1>{roteiro.nome}</h1>
-          <p style={{ color: "#555" }}>
-            {roteiro.cidade} • roteiro de {roteiro.usuario.nome}
-          </p>
+        <article className="stack stack--lg">
+          <header className="card card--pad stack stack--sm">
+            <span className="badge badge--accent">
+              <Icone nome="compartilhar" />
+              Roteiro compartilhado
+            </span>
 
-          {roteiro.descricao && <p>{roteiro.descricao}</p>}
+            <h1>{roteiro.nome}</h1>
+
+            <div className="roteiro-meta">
+              {roteiro.cidade && (
+                <span>
+                  <Icone nome="pin" />
+                  {roteiro.cidade}
+                </span>
+              )}
+              <span>
+                <Icone nome="usuario" />
+                por {roteiro.usuario.nome}
+              </span>
+            </div>
+
+            {roteiro.descricao && <p className="muted">{roteiro.descricao}</p>}
+          </header>
 
           {itensOrdenados.length > 0 && (
-            <div style={{ margin: "1.5rem 0" }}>
+            <div className="mapa-wrap">
               <MapaPontos pontos={itensOrdenados.map((item) => item.ponto)} />
             </div>
           )}
 
-          <h2>Pontos do roteiro</h2>
+          <section>
+            <h2 className="section__title">Pontos do roteiro</h2>
 
-          <div style={{ display: "grid", gap: "1rem" }}>
-            {itensOrdenados.map((item, indice) => (
-              <div key={item.id} style={{ border: "1px solid #ddd", borderRadius: 8, padding: "1rem" }}>
-                <p style={{ margin: 0, color: "#666", fontSize: "0.85rem" }}>Parada {indice + 1}</p>
-                <h3 style={{ margin: "0.25rem 0" }}>{item.ponto.nome}</h3>
-                <p style={{ margin: 0, color: "#555" }}>
-                  {item.ponto.categoria} • {item.ponto.cidade}
-                </p>
-                {item.observacao && <p style={{ marginTop: "0.5rem" }}>{item.observacao}</p>}
-              </div>
-            ))}
-          </div>
+            <ol className="paradas">
+              {itensOrdenados.map((item, indice) => (
+                <li key={item.id} className="parada">
+                  <span className="parada__num">{indice + 1}</span>
+
+                  <div className="card parada__card">
+                    <div className="stack stack--sm">
+                      <h3>{item.ponto.nome}</h3>
+                      <div className="cluster">
+                        <span className="badge badge--primary">{item.ponto.categoria}</span>
+                        <span className="muted small">{item.ponto.cidade}</span>
+                      </div>
+                    </div>
+
+                    {item.observacao && <p className="parada__obs">{item.observacao}</p>}
+                  </div>
+                </li>
+              ))}
+            </ol>
+          </section>
         </article>
       )}
     </div>

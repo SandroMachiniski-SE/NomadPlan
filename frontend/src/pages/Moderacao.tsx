@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useState } from "react";
+import { useCallback, useEffect, useState, type ReactNode } from "react";
 import { Link } from "react-router-dom";
 import api from "../services/api";
 import type {
@@ -9,24 +9,8 @@ import type {
   SugestaoEdicao,
 } from "../types/ponto";
 import { extrairMensagemErro } from "../utils/erro";
-
-const estiloCartao = { border: "1px solid #ddd", borderRadius: 8, padding: "1.25rem" };
-const estiloBotaoAprovar = {
-  padding: "0.35rem 0.75rem",
-  borderRadius: 6,
-  border: "none",
-  backgroundColor: "#166534",
-  color: "#fff",
-  cursor: "pointer",
-};
-const estiloBotaoRejeitar = {
-  padding: "0.35rem 0.75rem",
-  borderRadius: 6,
-  border: "1px solid #991b1b",
-  backgroundColor: "transparent",
-  color: "#991b1b",
-  cursor: "pointer",
-};
+import Icone from "../components/Icone";
+import Estrelas from "../components/Estrelas";
 
 function Moderacao() {
   const [pontos, setPontos] = useState<Ponto[]>([]);
@@ -177,179 +161,205 @@ function Moderacao() {
 
   if (carregando) {
     return (
-      <div style={{ maxWidth: 960, margin: "0 auto", padding: "2rem 1rem" }}>
-        <p>Carregando fila de moderação...</p>
+      <div className="container page">
+        <p className="loading">Carregando fila de moderação...</p>
       </div>
     );
   }
 
+  const total = pontos.length + sugestoes.length + verificacoes.length + avaliacoes.length;
+
   return (
-    <div style={{ maxWidth: 960, margin: "0 auto", padding: "2rem 1rem" }}>
-      <h1>Moderação</h1>
+    <div className="container page">
+      <div className="page-head">
+        <div className="page-head__text">
+          <h1>Moderação</h1>
+          <p className="page-head__sub">
+            {total === 0
+              ? "Tudo em dia — não há itens aguardando revisão."
+              : `${total} ${total === 1 ? "item aguarda" : "itens aguardam"} a sua revisão.`}
+          </p>
+        </div>
+      </div>
 
       {erro && (
-        <div style={{ border: "1px solid #f87171", backgroundColor: "#fee2e2", color: "#991b1b", borderRadius: 8, padding: "1rem" }}>
-          {erro}
+        <div className="alert alert--error" role="alert">
+          <Icone nome="alerta" />
+          <p>{erro}</p>
         </div>
       )}
 
-      <section style={{ marginTop: "1.5rem" }}>
-        <h2>Pontos aguardando publicação ({pontos.length})</h2>
+      <div className="stat-grid">
+        <div className="stat">
+          <div className="stat__value">{pontos.length}</div>
+          <div className="stat__label">Pontos para publicar</div>
+        </div>
+        <div className="stat">
+          <div className="stat__value">{sugestoes.length}</div>
+          <div className="stat__label">Sugestões de edição</div>
+        </div>
+        <div className="stat">
+          <div className="stat__value">{verificacoes.length}</div>
+          <div className="stat__label">Selos solicitados</div>
+        </div>
+        <div className="stat">
+          <div className="stat__value">{avaliacoes.length}</div>
+          <div className="stat__label">Avaliações pendentes</div>
+        </div>
+      </div>
 
-        {pontos.length === 0 && <p style={{ color: "#666" }}>Nenhum ponto pendente.</p>}
-
-        <div style={{ display: "grid", gap: "1rem" }}>
-          {pontos.map((ponto) => (
-            <div key={ponto.id} style={estiloCartao}>
-              <Link to={`/pontos/${ponto.id}`} style={{ fontWeight: "bold", color: "inherit" }}>
-                {ponto.nome}
-              </Link>
-              <p style={{ color: "#666", margin: "0.25rem 0 0.75rem" }}>
-                {ponto.categoria} • {ponto.cidade} • responsável: {ponto.responsavel?.nome ?? "—"}
-              </p>
-              <div style={{ display: "flex", gap: "0.5rem" }}>
-                <button
-                  type="button"
-                  onClick={() => aprovarPonto(ponto.id)}
-                  disabled={processandoId === `ponto-${ponto.id}`}
-                  style={estiloBotaoAprovar}
-                >
-                  Aprovar
-                </button>
-                <button
-                  type="button"
-                  onClick={() => rejeitarPonto(ponto.id)}
-                  disabled={processandoId === `ponto-${ponto.id}`}
-                  style={estiloBotaoRejeitar}
-                >
-                  Rejeitar
-                </button>
+      <FilaModeracao titulo="Pontos aguardando publicação" quantidade={pontos.length} vazio="Nenhum ponto pendente.">
+        {pontos.map((ponto) => (
+          <article key={ponto.id} className="card card--pad fila-item">
+            <div className="stack stack--sm">
+              <h3>
+                <Link to={`/pontos/${ponto.id}`}>{ponto.nome}</Link>
+              </h3>
+              <div className="cluster">
+                <span className="badge badge--primary">{ponto.categoria}</span>
+                <span className="muted small">
+                  {ponto.cidade} · responsável: {ponto.responsavel?.nome ?? "—"}
+                </span>
               </div>
             </div>
-          ))}
-        </div>
-      </section>
 
-      <section style={{ marginTop: "2rem" }}>
-        <h2>Sugestões de edição ({sugestoes.length})</h2>
+            <AcoesModeracao
+              desabilitado={processandoId === `ponto-${ponto.id}`}
+              aoAprovar={() => aprovarPonto(ponto.id)}
+              aoRejeitar={() => rejeitarPonto(ponto.id)}
+            />
+          </article>
+        ))}
+      </FilaModeracao>
 
-        {sugestoes.length === 0 && <p style={{ color: "#666" }}>Nenhuma sugestão pendente.</p>}
-
-        <div style={{ display: "grid", gap: "1rem" }}>
-          {sugestoes.map((sugestao) => (
-            <div key={sugestao.id} style={estiloCartao}>
-              <p style={{ margin: 0, fontWeight: "bold" }}>
-                {sugestao.ponto?.nome} ({sugestao.ponto?.cidade})
-              </p>
-              <p style={{ color: "#666", margin: "0.25rem 0 0.75rem" }}>
+      <FilaModeracao titulo="Sugestões de edição" quantidade={sugestoes.length} vazio="Nenhuma sugestão pendente.">
+        {sugestoes.map((sugestao) => (
+          <article key={sugestao.id} className="card card--pad fila-item">
+            <div className="stack stack--sm">
+              <h3>
+                {sugestao.ponto?.nome} <span className="muted small">({sugestao.ponto?.cidade})</span>
+              </h3>
+              <p className="muted small">
                 Sugerido por {sugestao.autor?.nome}
                 {sugestao.mensagem ? ` — "${sugestao.mensagem}"` : ""}
               </p>
-              <ul style={{ margin: "0 0 0.75rem" }}>
+              <ul className="fila-item__campos">
                 {Object.entries(sugestao.camposPropostos).map(([campo, valor]) => (
                   <li key={campo}>
                     <strong>{campo}:</strong> {valor}
                   </li>
                 ))}
               </ul>
-              <div style={{ display: "flex", gap: "0.5rem" }}>
-                <button
-                  type="button"
-                  onClick={() => aprovarSugestao(sugestao.id)}
-                  disabled={processandoId === `sugestao-${sugestao.id}`}
-                  style={estiloBotaoAprovar}
-                >
-                  Aprovar
-                </button>
-                <button
-                  type="button"
-                  onClick={() => rejeitarSugestao(sugestao.id)}
-                  disabled={processandoId === `sugestao-${sugestao.id}`}
-                  style={estiloBotaoRejeitar}
-                >
-                  Rejeitar
-                </button>
-              </div>
             </div>
-          ))}
-        </div>
-      </section>
 
-      <section style={{ marginTop: "2rem" }}>
-        <h2>Solicitações de selo verificado ({verificacoes.length})</h2>
+            <AcoesModeracao
+              desabilitado={processandoId === `sugestao-${sugestao.id}`}
+              aoAprovar={() => aprovarSugestao(sugestao.id)}
+              aoRejeitar={() => rejeitarSugestao(sugestao.id)}
+            />
+          </article>
+        ))}
+      </FilaModeracao>
 
-        {verificacoes.length === 0 && <p style={{ color: "#666" }}>Nenhuma solicitação pendente.</p>}
-
-        <div style={{ display: "grid", gap: "1rem" }}>
-          {verificacoes.map((solicitacao) => (
-            <div key={solicitacao.id} style={estiloCartao}>
-              <p style={{ margin: 0, fontWeight: "bold" }}>
-                {solicitacao.ponto?.nome} ({solicitacao.ponto?.cidade})
-              </p>
-              <p style={{ color: "#666", margin: "0.25rem 0 0.75rem" }}>
+      <FilaModeracao
+        titulo="Solicitações de selo verificado"
+        quantidade={verificacoes.length}
+        vazio="Nenhuma solicitação pendente."
+      >
+        {verificacoes.map((solicitacao) => (
+          <article key={solicitacao.id} className="card card--pad fila-item">
+            <div className="stack stack--sm">
+              <h3>
+                {solicitacao.ponto?.nome}{" "}
+                <span className="muted small">({solicitacao.ponto?.cidade})</span>
+              </h3>
+              <p className="muted small">
                 Solicitado por {solicitacao.solicitante?.nome}
                 {solicitacao.comprovacao ? ` — comprovação: ${solicitacao.comprovacao}` : ""}
               </p>
-              <div style={{ display: "flex", gap: "0.5rem" }}>
-                <button
-                  type="button"
-                  onClick={() => aprovarVerificacao(solicitacao.id)}
-                  disabled={processandoId === `verificacao-${solicitacao.id}`}
-                  style={estiloBotaoAprovar}
-                >
-                  Aprovar
-                </button>
-                <button
-                  type="button"
-                  onClick={() => rejeitarVerificacao(solicitacao.id)}
-                  disabled={processandoId === `verificacao-${solicitacao.id}`}
-                  style={estiloBotaoRejeitar}
-                >
-                  Rejeitar
-                </button>
-              </div>
             </div>
-          ))}
-        </div>
-      </section>
 
-      <section style={{ marginTop: "2rem" }}>
-        <h2>Avaliações pendentes ({avaliacoes.length})</h2>
+            <AcoesModeracao
+              desabilitado={processandoId === `verificacao-${solicitacao.id}`}
+              aoAprovar={() => aprovarVerificacao(solicitacao.id)}
+              aoRejeitar={() => rejeitarVerificacao(solicitacao.id)}
+            />
+          </article>
+        ))}
+      </FilaModeracao>
 
-        {avaliacoes.length === 0 && <p style={{ color: "#666" }}>Nenhuma avaliação pendente.</p>}
-
-        <div style={{ display: "grid", gap: "1rem" }}>
-          {avaliacoes.map((avaliacao) => (
-            <div key={avaliacao.id} style={estiloCartao}>
-              <p style={{ margin: 0, fontWeight: "bold" }}>
-                {avaliacao.ponto?.nome} ({avaliacao.ponto?.cidade}) — {"★".repeat(avaliacao.nota)}
-              </p>
-              <p style={{ color: "#666", margin: "0.25rem 0 0.75rem" }}>
+      <FilaModeracao titulo="Avaliações pendentes" quantidade={avaliacoes.length} vazio="Nenhuma avaliação pendente.">
+        {avaliacoes.map((avaliacao) => (
+          <article key={avaliacao.id} className="card card--pad fila-item">
+            <div className="stack stack--sm">
+              <h3>
+                {avaliacao.ponto?.nome} <span className="muted small">({avaliacao.ponto?.cidade})</span>
+              </h3>
+              <Estrelas nota={avaliacao.nota} />
+              <p className="muted small">
                 Por {avaliacao.autor?.nome}
                 {avaliacao.comentario ? ` — "${avaliacao.comentario}"` : ""}
               </p>
-              <div style={{ display: "flex", gap: "0.5rem" }}>
-                <button
-                  type="button"
-                  onClick={() => aprovarAvaliacao(avaliacao.id)}
-                  disabled={processandoId === `avaliacao-${avaliacao.id}`}
-                  style={estiloBotaoAprovar}
-                >
-                  Aprovar
-                </button>
-                <button
-                  type="button"
-                  onClick={() => rejeitarAvaliacao(avaliacao.id)}
-                  disabled={processandoId === `avaliacao-${avaliacao.id}`}
-                  style={estiloBotaoRejeitar}
-                >
-                  Rejeitar
-                </button>
-              </div>
             </div>
-          ))}
+
+            <AcoesModeracao
+              desabilitado={processandoId === `avaliacao-${avaliacao.id}`}
+              aoAprovar={() => aprovarAvaliacao(avaliacao.id)}
+              aoRejeitar={() => rejeitarAvaliacao(avaliacao.id)}
+            />
+          </article>
+        ))}
+      </FilaModeracao>
+    </div>
+  );
+}
+
+interface FilaModeracaoProps {
+  titulo: string;
+  quantidade: number;
+  vazio: string;
+  children: ReactNode;
+}
+
+function FilaModeracao({ titulo, quantidade, vazio, children }: FilaModeracaoProps) {
+  return (
+    <section className="section">
+      <h2 className="section__title">
+        {titulo} <span className="badge badge--primary">{quantidade}</span>
+      </h2>
+
+      {quantidade === 0 ? (
+        <div className="empty empty--compacto">
+          <p>{vazio}</p>
         </div>
-      </section>
+      ) : (
+        <div className="stack">{children}</div>
+      )}
+    </section>
+  );
+}
+
+interface AcoesModeracaoProps {
+  desabilitado: boolean;
+  aoAprovar: () => void;
+  aoRejeitar: () => void;
+}
+
+function AcoesModeracao({ desabilitado, aoAprovar, aoRejeitar }: AcoesModeracaoProps) {
+  return (
+    <div className="cluster">
+      <button type="button" className="btn btn--success btn--sm" onClick={aoAprovar} disabled={desabilitado}>
+        <Icone nome="check" />
+        Aprovar
+      </button>
+      <button
+        type="button"
+        className="btn btn--danger-outline btn--sm"
+        onClick={aoRejeitar}
+        disabled={desabilitado}
+      >
+        Rejeitar
+      </button>
     </div>
   );
 }

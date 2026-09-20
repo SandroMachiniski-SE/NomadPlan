@@ -4,9 +4,8 @@ import api from "../services/api";
 import type { PontoRecomendado, Roteiro, RespostaRecomendacao } from "../types/roteiro";
 import { useAuth } from "../context/useAuth";
 import { extrairMensagemErro } from "../utils/erro";
-import { CATEGORIAS_PONTOS } from "../constants/categorias";
-
-const estiloCampo = { padding: "0.5rem", borderRadius: 6, border: "1px solid #ccc" };
+import { CATEGORIAS_PONTOS, iconeDaCategoria } from "../constants/categorias";
+import Icone from "../components/Icone";
 
 function formatarDistancia(metros: number | null): string {
   if (metros === null) return "";
@@ -93,144 +92,124 @@ function GerarRoteiro() {
   }
 
   return (
-    <div style={{ maxWidth: 640, margin: "0 auto", padding: "2rem 1rem" }}>
-      <Link to="/roteiros" style={{ color: "#2563eb", textDecoration: "none" }}>
+    <div className="container container--narrow page">
+      <Link to="/roteiros" className="back-link">
+        <Icone nome="voltar" />
         Voltar para meus roteiros
       </Link>
 
-      <h1 style={{ marginTop: "1rem" }}>Gerar roteiro sugerido</h1>
-      <p style={{ color: "#666" }}>
-        Nosso motor sugere pontos com base nos seus interesses, no tempo disponível e na
-        proximidade entre os locais.
-      </p>
+      <div className="page-head">
+        <div className="page-head__text">
+          <h1>Gerar roteiro sugerido</h1>
+          <p className="page-head__sub">
+            Nosso motor sugere pontos com base nos seus interesses, no tempo disponível e na
+            proximidade entre os locais.
+          </p>
+        </div>
+      </div>
 
-      <form onSubmit={aoGerar} style={{ display: "grid", gap: "1rem", marginTop: "1rem" }}>
-        <label style={{ display: "grid", gap: "0.25rem" }}>
-          Cidade *
-          <input
-            type="text"
-            value={cidade}
-            onChange={(e) => setCidade(e.target.value)}
-            maxLength={120}
-            style={estiloCampo}
-          />
-        </label>
+      <form onSubmit={aoGerar} className="card form-card form">
+        <div className="form-grid">
+          <label className="field">
+            <span>Cidade *</span>
+            <input
+              type="text"
+              value={cidade}
+              onChange={(e) => setCidade(e.target.value)}
+              maxLength={120}
+            />
+          </label>
 
-        <label style={{ display: "grid", gap: "0.25rem" }}>
-          Tempo disponível (horas)
-          <input
-            type="number"
-            min={1}
-            max={24}
-            step={0.5}
-            value={horasDisponiveis}
-            onChange={(e) => setHorasDisponiveis(e.target.value)}
-            style={estiloCampo}
-          />
-        </label>
-
-        <div>
-          <p style={{ margin: "0 0 0.5rem" }}>Interesses</p>
-          <div style={{ display: "flex", flexWrap: "wrap", gap: "0.5rem" }}>
-            {CATEGORIAS_PONTOS.map((categoria) => (
-              <label
-                key={categoria}
-                style={{
-                  display: "flex",
-                  alignItems: "center",
-                  gap: "0.35rem",
-                  border: "1px solid #ccc",
-                  borderRadius: 6,
-                  padding: "0.35rem 0.6rem",
-                  cursor: "pointer",
-                  backgroundColor: interesses.includes(categoria) ? "#dbeafe" : "#fff",
-                }}
-              >
-                <input
-                  type="checkbox"
-                  checked={interesses.includes(categoria)}
-                  onChange={() => alternarInteresse(categoria)}
-                />
-                {categoria}
-              </label>
-            ))}
-          </div>
+          <label className="field">
+            <span>Tempo disponível (horas)</span>
+            <input
+              type="number"
+              min={1}
+              max={24}
+              step={0.5}
+              value={horasDisponiveis}
+              onChange={(e) => setHorasDisponiveis(e.target.value)}
+            />
+          </label>
         </div>
 
+        <fieldset className="field">
+          <legend className="field__legenda">Interesses</legend>
+          <div className="chips">
+            {CATEGORIAS_PONTOS.map((categoria) => (
+              <button
+                key={categoria}
+                type="button"
+                className="chip"
+                aria-pressed={interesses.includes(categoria)}
+                onClick={() => alternarInteresse(categoria)}
+              >
+                <Icone nome={iconeDaCategoria(categoria)} />
+                {categoria}
+              </button>
+            ))}
+          </div>
+        </fieldset>
+
         {erro && (
-          <div
-            style={{
-              border: "1px solid #f87171",
-              backgroundColor: "#fee2e2",
-              color: "#991b1b",
-              borderRadius: 8,
-              padding: "1rem",
-            }}
-          >
-            {erro}
+          <div className="alert alert--error" role="alert">
+            <p>{erro}</p>
           </div>
         )}
 
-        <button
-          type="submit"
-          disabled={gerando}
-          style={{
-            padding: "0.75rem",
-            borderRadius: 6,
-            border: "none",
-            backgroundColor: "#2563eb",
-            color: "#fff",
-            fontWeight: "bold",
-            cursor: gerando ? "not-allowed" : "pointer",
-          }}
-        >
-          {gerando ? "Gerando..." : "Gerar roteiro"}
-        </button>
+        <div className="form-actions">
+          <button type="submit" disabled={gerando} className="btn btn--primary btn--lg">
+            <Icone nome="brilho" />
+            {gerando ? "Gerando..." : "Gerar roteiro"}
+          </button>
+        </div>
       </form>
 
       {sugestao && sugestao.length > 0 && (
-        <div style={{ marginTop: "2rem" }}>
-          <h2>Roteiro sugerido</h2>
+        <section className="section">
+          <h2 className="section__title">Roteiro sugerido</h2>
 
           {fallbackUsado && (
-            <p style={{ color: "#92400e" }}>
-              O motor de recomendação não pôde considerar interesses e horários agora; esta é
-              uma sugestão simplificada pelos pontos mais próximos.
-            </p>
+            <div className="alert alert--warning" role="status" style={{ marginBottom: "1rem" }}>
+              <Icone nome="alerta" />
+              <p>
+                O motor de recomendação não pôde considerar interesses e horários agora; esta é uma
+                sugestão simplificada pelos pontos mais próximos.
+              </p>
+            </div>
           )}
 
-          <div style={{ display: "grid", gap: "0.75rem" }}>
+          <ol className="paradas">
             {sugestao.map((ponto, indice) => (
-              <div key={ponto.id} style={{ border: "1px solid #ddd", borderRadius: 8, padding: "1rem" }}>
-                <p style={{ margin: 0, color: "#666", fontSize: "0.85rem" }}>Parada {indice + 1}</p>
-                <h3 style={{ margin: "0.25rem 0" }}>{ponto.nome}</h3>
-                <p style={{ margin: 0, color: "#555" }}>
-                  {ponto.categoria} • {ponto.cidade}
-                  {ponto.distanciaMetros !== null && ` • ${formatarDistancia(ponto.distanciaMetros)}`}
-                </p>
-              </div>
+              <li key={ponto.id} className="parada">
+                <span className="parada__num">{indice + 1}</span>
+
+                <div className="card parada__card">
+                  <div className="stack stack--sm">
+                    <h3>{ponto.nome}</h3>
+                    <div className="cluster">
+                      <span className="badge badge--primary">{ponto.categoria}</span>
+                      <span className="muted small">
+                        {ponto.cidade}
+                        {ponto.distanciaMetros !== null && ` · ${formatarDistancia(ponto.distanciaMetros)}`}
+                      </span>
+                    </div>
+                  </div>
+                </div>
+              </li>
             ))}
-          </div>
+          </ol>
 
           <button
             type="button"
             onClick={aoSalvarComoRoteiro}
             disabled={salvando}
-            style={{
-              marginTop: "1.5rem",
-              padding: "0.75rem",
-              width: "100%",
-              borderRadius: 6,
-              border: "none",
-              backgroundColor: "#166534",
-              color: "#fff",
-              fontWeight: "bold",
-              cursor: salvando ? "not-allowed" : "pointer",
-            }}
+            className="btn btn--accent btn--lg btn--block"
+            style={{ marginTop: "1.5rem" }}
           >
             {salvando ? "Salvando..." : "Salvar como meu roteiro"}
           </button>
-        </div>
+        </section>
       )}
     </div>
   );

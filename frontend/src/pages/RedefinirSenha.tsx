@@ -2,6 +2,7 @@ import { useState, type FormEvent } from "react";
 import { Link, useNavigate, useSearchParams } from "react-router-dom";
 import api from "../services/api";
 import { extrairMensagemErro } from "../utils/erro";
+import AuthShell from "../components/AuthShell";
 
 function RedefinirSenha() {
   const [searchParams] = useSearchParams();
@@ -35,64 +36,49 @@ function RedefinirSenha() {
 
   if (!token) {
     return (
-      <div style={{ maxWidth: 420, margin: "0 auto", padding: "2rem 1rem" }}>
-        <h1>Redefinir senha</h1>
-        <p>Link inválido. Solicite uma nova redefinição de senha.</p>
-        <Link to="/esqueci-senha" style={{ color: "#2563eb" }}>
-          Solicitar redefinição
-        </Link>
-      </div>
+      <AuthShell
+        titulo="Redefinir senha"
+        rodape={
+          <p>
+            <Link to="/esqueci-senha">Solicitar redefinição</Link>
+          </p>
+        }
+      >
+        <div className="alert alert--error" role="alert">
+          <p>Link inválido. Solicite uma nova redefinição de senha.</p>
+        </div>
+      </AuthShell>
     );
   }
 
   return (
-    <div style={{ maxWidth: 420, margin: "0 auto", padding: "2rem 1rem" }}>
-      <h1>Redefinir senha</h1>
-
-      <form onSubmit={aoEnviar} style={{ display: "grid", gap: "1rem", marginTop: "1rem" }}>
-        <label style={{ display: "grid", gap: "0.25rem" }}>
-          Nova senha (mínimo 8 caracteres)
+    <AuthShell titulo="Redefinir senha" subtitulo="Escolha uma nova senha para acessar sua conta.">
+      <form onSubmit={aoEnviar} className="form">
+        <label className="field">
+          <span>
+            Nova senha <span className="field__hint">mínimo de 8 caracteres</span>
+          </span>
           <input
             type="password"
             required
             minLength={8}
+            autoComplete="new-password"
             value={novaSenha}
             onChange={(e) => setNovaSenha(e.target.value)}
-            style={{ padding: "0.5rem", borderRadius: 6, border: "1px solid #ccc" }}
           />
         </label>
 
         {erro && (
-          <div
-            style={{
-              border: "1px solid #f87171",
-              backgroundColor: "#fee2e2",
-              color: "#991b1b",
-              borderRadius: 8,
-              padding: "1rem",
-            }}
-          >
-            {erro}
+          <div className="alert alert--error" role="alert">
+            <p>{erro}</p>
           </div>
         )}
 
-        <button
-          type="submit"
-          disabled={enviando}
-          style={{
-            padding: "0.75rem",
-            borderRadius: 6,
-            border: "none",
-            backgroundColor: "#2563eb",
-            color: "#fff",
-            fontWeight: "bold",
-            cursor: enviando ? "not-allowed" : "pointer",
-          }}
-        >
+        <button type="submit" disabled={enviando} className="btn btn--primary btn--lg btn--block">
           {enviando ? "Salvando..." : "Redefinir senha"}
         </button>
       </form>
-    </div>
+    </AuthShell>
   );
 }
 

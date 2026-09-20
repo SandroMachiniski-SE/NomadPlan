@@ -6,6 +6,9 @@ import type { RespostaRoteiros } from "../types/roteiro";
 import { useAuth } from "../context/useAuth";
 import { extrairMensagemErro } from "../utils/erro";
 import MapaPontos from "../components/MapaPontos";
+import Icone from "../components/Icone";
+import Estrelas from "../components/Estrelas";
+import { iconeDaCategoria } from "../constants/categorias";
 
 const ROTULO_STATUS: Record<string, string> = {
   RASCUNHO: "Rascunho — ainda não publicado",
@@ -194,303 +197,393 @@ function PontoDetalhes() {
   const ehResponsavel = Boolean(usuario && ponto && usuario.id === ponto.idResponsavel);
 
   return (
-    <main style={{ maxWidth: 720, margin: "0 auto", padding: "2rem 1rem" }}>
-      <Link to="/" style={{ display: "inline-block", marginBottom: "1.5rem" }}>
-        ← Voltar para a busca
+    <div className="container page">
+      <Link to="/" className="back-link">
+        <Icone nome="voltar" />
+        Voltar para a busca
       </Link>
 
-      {carregando && <p>Carregando detalhes...</p>}
+      {carregando && <p className="loading">Carregando detalhes...</p>}
 
-      {erro && <p style={{ color: "red" }}>{erro}</p>}
+      {erro && (
+        <div className="alert alert--error" role="alert">
+          <Icone nome="alerta" />
+          <p>{erro}</p>
+        </div>
+      )}
 
       {ponto && (
-        <article>
+        <article className="stack stack--lg">
           {ponto.status !== "PUBLICADO" && (
-            <p
-              style={{
-                display: "inline-block",
-                backgroundColor: "#fef3c7",
-                color: "#92400e",
-                borderRadius: 6,
-                padding: "0.35rem 0.75rem",
-                marginBottom: "1rem",
-              }}
-            >
-              {ROTULO_STATUS[ponto.status] ?? ponto.status}
-              {ponto.status === "REJEITADO" && ponto.motivoRejeicao ? `: ${ponto.motivoRejeicao}` : ""}
-            </p>
-          )}
-
-          {ponto.imagemUrl && (
-            <img
-              src={`${api.defaults.baseURL}${ponto.imagemUrl}`}
-              alt={ponto.nome}
-              style={{ width: "100%", borderRadius: 8, marginBottom: "1rem" }}
-            />
-          )}
-
-          <h1>{ponto.nome}</h1>
-
-          <p style={{ color: "#555" }}>
-            {ponto.categoria} • {ponto.cidade}
-          </p>
-
-          <p>{ponto.descricao}</p>
-
-          <div style={{ display: "grid", gap: "0.5rem" }}>
-            <p>
-              <strong>Endereço:</strong> {ponto.endereco}
-            </p>
-
-            <p>
-              <strong>Horário de funcionamento:</strong> {ponto.horarioFuncionamento ?? "Não informado"}
-            </p>
-
-            <p>
-              <strong>Faixa de preço:</strong> {ponto.faixaPreco}
-            </p>
-
-            <p>
-              <strong>Acessibilidade:</strong> {ponto.acessibilidade}
-            </p>
-
-            {ponto.siteOficial && (
+            <div className={ponto.status === "REJEITADO" ? "alert alert--error" : "alert alert--warning"}>
+              <Icone nome="info" />
               <p>
-                <strong>Site oficial:</strong>{" "}
-                <a href={ponto.siteOficial} target="_blank" rel="noreferrer">
-                  Acessar site
-                </a>
+                {ROTULO_STATUS[ponto.status] ?? ponto.status}
+                {ponto.status === "REJEITADO" && ponto.motivoRejeicao ? `: ${ponto.motivoRejeicao}` : ""}
               </p>
-            )}
-
-            {ponto.telefoneContato && (
-              <p>
-                <strong>Telefone:</strong> {ponto.telefoneContato}
-              </p>
-            )}
-
-            {ponto.seloVerificado && <p style={{ color: "green" }}>✔ Local verificado</p>}
-          </div>
-
-          {ponto.latitude !== null && ponto.longitude !== null && (
-            <div style={{ marginTop: "1.5rem" }}>
-              <MapaPontos pontos={[ponto]} altura={280} />
-              <a
-                href={`https://www.google.com/maps/dir/?api=1&destination=${ponto.latitude},${ponto.longitude}`}
-                target="_blank"
-                rel="noreferrer"
-                style={{ display: "inline-block", marginTop: "0.5rem", color: "#2563eb" }}
-              >
-                Como chegar
-              </a>
             </div>
           )}
 
-          {autenticado && ponto.status === "PUBLICADO" && (
-            <div style={{ marginTop: "1.5rem" }}>
-              {adicionadoRoteiro ? (
-                <p style={{ color: "#166534" }}>Ponto adicionado ao roteiro.</p>
-              ) : roteiros && roteiros.length > 0 ? (
-                <div style={{ display: "flex", gap: "0.5rem", flexWrap: "wrap" }}>
-                  <select
-                    value={roteiroSelecionado}
-                    onChange={(e) => setRoteiroSelecionado(e.target.value)}
-                    style={{ padding: "0.5rem", borderRadius: 6, border: "1px solid #ccc" }}
-                  >
-                    <option value="">Selecione um roteiro</option>
-                    {roteiros.map((roteiro) => (
-                      <option key={roteiro.id} value={roteiro.id}>
-                        {roteiro.nome}
-                      </option>
-                    ))}
-                  </select>
-                  <button
-                    type="button"
-                    onClick={aoAdicionarAoRoteiro}
-                    disabled={!roteiroSelecionado || adicionandoRoteiro}
-                    style={{ padding: "0.5rem 1rem", borderRadius: 6, border: "none", backgroundColor: "#2563eb", color: "#fff" }}
-                  >
-                    {adicionandoRoteiro ? "Adicionando..." : "Adicionar ao roteiro"}
-                  </button>
-                </div>
-              ) : roteiros && roteiros.length === 0 ? (
-                <p>
-                  Você ainda não tem roteiros.{" "}
-                  <Link to="/roteiros/novo" style={{ color: "#2563eb" }}>
-                    Criar um roteiro
-                  </Link>
-                </p>
-              ) : null}
-            </div>
-          )}
-
-          {ehResponsavel && ponto.status === "PUBLICADO" && !ponto.seloVerificado && (
-            <button
-              type="button"
-              onClick={aoSolicitarSelo}
-              disabled={solicitandoSelo || seloSolicitado}
-              style={{
-                marginTop: "1.5rem",
-                padding: "0.5rem 1rem",
-                borderRadius: 6,
-                border: "1px solid #166534",
-                background: "transparent",
-                color: "#166534",
-                cursor: solicitandoSelo || seloSolicitado ? "not-allowed" : "pointer",
-              }}
-            >
-              {seloSolicitado ? "Solicitação enviada" : "Solicitar selo de verificação"}
-            </button>
-          )}
-
-          {autenticado && !ehResponsavel && ponto.status === "PUBLICADO" && (
-            <div style={{ marginTop: "1.5rem" }}>
-              {sugestaoEnviada ? (
-                <p style={{ color: "#166534" }}>
-                  Sugestão enviada. Obrigado por ajudar a manter os dados atualizados!
-                </p>
-              ) : mostrarSugestao ? (
-                <form onSubmit={aoEnviarSugestao} style={{ display: "grid", gap: "0.75rem", maxWidth: 420 }}>
-                  <label style={{ display: "grid", gap: "0.25rem" }}>
-                    Campo
-                    <select
-                      value={campoSugestao}
-                      onChange={(e) => setCampoSugestao(e.target.value)}
-                      style={{ padding: "0.5rem", borderRadius: 6, border: "1px solid #ccc" }}
-                    >
-                      <option value="horarioFuncionamento">Horário de funcionamento</option>
-                      <option value="telefoneContato">Telefone</option>
-                      <option value="siteOficial">Site oficial</option>
-                      <option value="faixaPreco">Faixa de preço</option>
-                      <option value="acessibilidade">Acessibilidade</option>
-                      <option value="descricao">Descrição</option>
-                    </select>
-                  </label>
-
-                  <label style={{ display: "grid", gap: "0.25rem" }}>
-                    Novo valor
-                    <input
-                      type="text"
-                      value={valorSugestao}
-                      onChange={(e) => setValorSugestao(e.target.value)}
-                      maxLength={2000}
-                      style={{ padding: "0.5rem", borderRadius: 6, border: "1px solid #ccc" }}
-                    />
-                  </label>
-
-                  <label style={{ display: "grid", gap: "0.25rem" }}>
-                    Mensagem para a moderação (opcional)
-                    <input
-                      type="text"
-                      value={mensagemSugestao}
-                      onChange={(e) => setMensagemSugestao(e.target.value)}
-                      maxLength={500}
-                      style={{ padding: "0.5rem", borderRadius: 6, border: "1px solid #ccc" }}
-                    />
-                  </label>
-
-                  <div style={{ display: "flex", gap: "0.5rem" }}>
-                    <button
-                      type="submit"
-                      disabled={enviandoSugestao}
-                      style={{ padding: "0.5rem 1rem", borderRadius: 6, border: "none", backgroundColor: "#2563eb", color: "#fff" }}
-                    >
-                      {enviandoSugestao ? "Enviando..." : "Enviar sugestão"}
-                    </button>
-                    <button
-                      type="button"
-                      onClick={() => setMostrarSugestao(false)}
-                      style={{ padding: "0.5rem 1rem", borderRadius: 6, border: "1px solid #ccc", background: "transparent" }}
-                    >
-                      Cancelar
-                    </button>
-                  </div>
-                </form>
-              ) : (
-                <button
-                  type="button"
-                  onClick={() => setMostrarSugestao(true)}
-                  style={{ padding: "0.5rem 1rem", borderRadius: 6, border: "1px solid #2563eb", background: "transparent", color: "#2563eb" }}
-                >
-                  Sugerir edição
-                </button>
-              )}
-            </div>
-          )}
-
-          {ponto.status === "PUBLICADO" && (
-            <div style={{ marginTop: "2rem" }}>
-              <h2>Avaliações {avaliacoes?.media && `— ${avaliacoes.media.toFixed(1)} ★`}</h2>
-
-              {avaliacoes && avaliacoes.total === 0 && (
-                <p style={{ color: "#666" }}>Ainda não há avaliações para este ponto.</p>
-              )}
-
-              <div style={{ display: "grid", gap: "0.75rem", marginBottom: "1.5rem" }}>
-                {avaliacoes?.dados.map((avaliacao) => (
-                  <div key={avaliacao.id} style={{ border: "1px solid #ddd", borderRadius: 8, padding: "0.75rem 1rem" }}>
-                    <p style={{ margin: 0, fontWeight: "bold" }}>
-                      {"★".repeat(avaliacao.nota)}{"☆".repeat(5 - avaliacao.nota)} — {avaliacao.autor?.nome}
-                    </p>
-                    {avaliacao.comentario && <p style={{ margin: "0.35rem 0 0" }}>{avaliacao.comentario}</p>}
-                  </div>
-                ))}
+          <div className="ponto-layout">
+            <div className="ponto-principal stack stack--lg">
+              <div className="ponto-capa" data-cat={ponto.categoria}>
+                {ponto.imagemUrl ? (
+                  <img src={`${api.defaults.baseURL}${ponto.imagemUrl}`} alt={ponto.nome} />
+                ) : (
+                  <Icone nome={iconeDaCategoria(ponto.categoria)} className="ponto-capa__icone" />
+                )}
               </div>
 
-              {autenticado && (
-                <>
-                  {avaliacaoEnviada ? (
-                    <p style={{ color: "#166534" }}>{avaliacaoEnviada}</p>
-                  ) : (
-                    <form onSubmit={aoEnviarAvaliacao} style={{ display: "grid", gap: "0.75rem", maxWidth: 420 }}>
-                      <label style={{ display: "grid", gap: "0.25rem" }}>
-                        Sua nota
-                        <select
-                          value={notaAvaliacao}
-                          onChange={(e) => setNotaAvaliacao(Number(e.target.value))}
-                          style={{ padding: "0.5rem", borderRadius: 6, border: "1px solid #ccc" }}
-                        >
-                          {[5, 4, 3, 2, 1].map((n) => (
-                            <option key={n} value={n}>
-                              {"★".repeat(n)} ({n})
-                            </option>
-                          ))}
+              <header className="stack stack--sm">
+                <div className="cluster">
+                  <span className="badge badge--primary">{ponto.categoria}</span>
+                  {ponto.seloVerificado && (
+                    <span className="badge badge--success">
+                      <Icone nome="verificado" />
+                      Local verificado
+                    </span>
+                  )}
+                  {avaliacoes?.media != null && (
+                    <span className="badge badge--accent">
+                      <Icone nome="estrela" className="icon--fill" />
+                      {avaliacoes.media.toFixed(1)}
+                    </span>
+                  )}
+                </div>
+
+                <h1>{ponto.nome}</h1>
+
+                <p className="ponto-cidade">
+                  <Icone nome="pin" />
+                  {ponto.cidade}
+                </p>
+              </header>
+
+              {ponto.descricao && <p className="ponto-descricao">{ponto.descricao}</p>}
+
+              {ponto.latitude !== null && ponto.longitude !== null && (
+                <section className="stack stack--sm" aria-label="Localização no mapa">
+                  <div className="mapa-wrap">
+                    <MapaPontos pontos={[ponto]} altura={300} />
+                  </div>
+                  <div>
+                    <a
+                      href={`https://www.google.com/maps/dir/?api=1&destination=${ponto.latitude},${ponto.longitude}`}
+                      target="_blank"
+                      rel="noreferrer"
+                      className="btn btn--outline btn--sm"
+                    >
+                      <Icone nome="localizar" />
+                      Como chegar
+                    </a>
+                  </div>
+                </section>
+              )}
+            </div>
+
+            <aside className="ponto-lateral stack">
+              <section className="card card--pad">
+                <h2 className="ponto-lateral__titulo">Informações</h2>
+
+                <ul className="meta-list">
+                  <li className="meta-item">
+                    <Icone nome="pin" />
+                    <div>
+                      <span className="meta-item__label">Endereço</span>
+                      <span className="meta-item__value">{ponto.endereco ?? "Não informado"}</span>
+                    </div>
+                  </li>
+
+                  <li className="meta-item">
+                    <Icone nome="relogio" />
+                    <div>
+                      <span className="meta-item__label">Horário de funcionamento</span>
+                      <span className="meta-item__value">
+                        {ponto.horarioFuncionamento ?? "Não informado"}
+                      </span>
+                    </div>
+                  </li>
+
+                  <li className="meta-item">
+                    <Icone nome="dinheiro" />
+                    <div>
+                      <span className="meta-item__label">Faixa de preço</span>
+                      <span className="meta-item__value">{ponto.faixaPreco ?? "Não informado"}</span>
+                    </div>
+                  </li>
+
+                  <li className="meta-item">
+                    <Icone nome="acessibilidade" />
+                    <div>
+                      <span className="meta-item__label">Acessibilidade</span>
+                      <span className="meta-item__value">{ponto.acessibilidade ?? "Não informado"}</span>
+                    </div>
+                  </li>
+
+                  {ponto.siteOficial && (
+                    <li className="meta-item">
+                      <Icone nome="globo" />
+                      <div>
+                        <span className="meta-item__label">Site oficial</span>
+                        <span className="meta-item__value">
+                          <a href={ponto.siteOficial} target="_blank" rel="noreferrer">
+                            Acessar site
+                          </a>
+                        </span>
+                      </div>
+                    </li>
+                  )}
+
+                  {ponto.telefoneContato && (
+                    <li className="meta-item">
+                      <Icone nome="telefone" />
+                      <div>
+                        <span className="meta-item__label">Telefone</span>
+                        <span className="meta-item__value">{ponto.telefoneContato}</span>
+                      </div>
+                    </li>
+                  )}
+                </ul>
+              </section>
+
+              {autenticado && ponto.status === "PUBLICADO" && (
+                <section className="card card--pad stack stack--sm">
+                  <h2 className="ponto-lateral__titulo">Adicionar a um roteiro</h2>
+
+                  {adicionadoRoteiro ? (
+                    <div className="alert alert--success" role="status">
+                      <Icone nome="check" />
+                      <p>Ponto adicionado ao roteiro.</p>
+                    </div>
+                  ) : roteiros && roteiros.length > 0 ? (
+                    <div className="stack stack--sm">
+                      <select
+                        value={roteiroSelecionado}
+                        onChange={(e) => setRoteiroSelecionado(e.target.value)}
+                        aria-label="Roteiro"
+                      >
+                        <option value="">Selecione um roteiro</option>
+                        {roteiros.map((roteiro) => (
+                          <option key={roteiro.id} value={roteiro.id}>
+                            {roteiro.nome}
+                          </option>
+                        ))}
+                      </select>
+                      <button
+                        type="button"
+                        className="btn btn--primary btn--block"
+                        onClick={aoAdicionarAoRoteiro}
+                        disabled={!roteiroSelecionado || adicionandoRoteiro}
+                      >
+                        <Icone nome="mais" />
+                        {adicionandoRoteiro ? "Adicionando..." : "Adicionar ao roteiro"}
+                      </button>
+                    </div>
+                  ) : roteiros && roteiros.length === 0 ? (
+                    <p className="muted">
+                      Você ainda não tem roteiros. <Link to="/roteiros/novo">Criar um roteiro</Link>
+                    </p>
+                  ) : null}
+                </section>
+              )}
+
+              {ehResponsavel && ponto.status === "PUBLICADO" && !ponto.seloVerificado && (
+                <button
+                  type="button"
+                  className="btn btn--outline btn--block"
+                  onClick={aoSolicitarSelo}
+                  disabled={solicitandoSelo || seloSolicitado}
+                >
+                  <Icone nome="verificado" />
+                  {seloSolicitado ? "Solicitação enviada" : "Solicitar selo de verificação"}
+                </button>
+              )}
+
+              {autenticado && !ehResponsavel && ponto.status === "PUBLICADO" && (
+                <section className="card card--pad stack stack--sm">
+                  <h2 className="ponto-lateral__titulo">Dados desatualizados?</h2>
+
+                  {sugestaoEnviada ? (
+                    <div className="alert alert--success" role="status">
+                      <Icone nome="check" />
+                      <p>Sugestão enviada. Obrigado por ajudar a manter os dados atualizados!</p>
+                    </div>
+                  ) : mostrarSugestao ? (
+                    <form onSubmit={aoEnviarSugestao} className="form">
+                      <label className="field">
+                        <span>Campo</span>
+                        <select value={campoSugestao} onChange={(e) => setCampoSugestao(e.target.value)}>
+                          <option value="horarioFuncionamento">Horário de funcionamento</option>
+                          <option value="telefoneContato">Telefone</option>
+                          <option value="siteOficial">Site oficial</option>
+                          <option value="faixaPreco">Faixa de preço</option>
+                          <option value="acessibilidade">Acessibilidade</option>
+                          <option value="descricao">Descrição</option>
                         </select>
                       </label>
 
-                      <label style={{ display: "grid", gap: "0.25rem" }}>
-                        Comentário (opcional)
+                      <label className="field">
+                        <span>Novo valor</span>
+                        <input
+                          type="text"
+                          value={valorSugestao}
+                          onChange={(e) => setValorSugestao(e.target.value)}
+                          maxLength={2000}
+                        />
+                      </label>
+
+                      <label className="field">
+                        <span>
+                          Mensagem para a moderação <span className="field__optional">(opcional)</span>
+                        </span>
+                        <input
+                          type="text"
+                          value={mensagemSugestao}
+                          onChange={(e) => setMensagemSugestao(e.target.value)}
+                          maxLength={500}
+                        />
+                      </label>
+
+                      <div className="form-actions">
+                        <button type="submit" className="btn btn--primary" disabled={enviandoSugestao}>
+                          {enviandoSugestao ? "Enviando..." : "Enviar sugestão"}
+                        </button>
+                        <button
+                          type="button"
+                          className="btn btn--ghost"
+                          onClick={() => setMostrarSugestao(false)}
+                        >
+                          Cancelar
+                        </button>
+                      </div>
+                    </form>
+                  ) : (
+                    <>
+                      <p className="muted small">
+                        Encontrou alguma informação errada? Sugira uma correção para a moderação.
+                      </p>
+                      <button
+                        type="button"
+                        className="btn btn--outline btn--block"
+                        onClick={() => setMostrarSugestao(true)}
+                      >
+                        <Icone nome="editar" />
+                        Sugerir edição
+                      </button>
+                    </>
+                  )}
+                </section>
+              )}
+            </aside>
+          </div>
+
+          {ponto.status === "PUBLICADO" && (
+            <section className="avaliacoes" aria-labelledby="titulo-avaliacoes">
+              <div className="avaliacoes__topo">
+                <h2 id="titulo-avaliacoes">Avaliações</h2>
+
+                {avaliacoes && avaliacoes.total > 0 && avaliacoes.media !== null && (
+                  <div className="avaliacoes__resumo">
+                    <span className="avaliacoes__nota">{avaliacoes.media.toFixed(1)}</span>
+                    <div>
+                      <Estrelas nota={avaliacoes.media} tamanho="grande" />
+                      <p className="muted small">
+                        {avaliacoes.total} {avaliacoes.total === 1 ? "avaliação" : "avaliações"}
+                      </p>
+                    </div>
+                  </div>
+                )}
+              </div>
+
+              {avaliacoes && avaliacoes.total === 0 && (
+                <div className="empty empty--compacto">
+                  <p>Ainda não há avaliações para este ponto.</p>
+                </div>
+              )}
+
+              {avaliacoes && avaliacoes.dados.length > 0 && (
+                <div className="grid-cards avaliacoes__lista">
+                  {avaliacoes.dados.map((avaliacao) => (
+                    <div key={avaliacao.id} className="card card--pad avaliacao">
+                      <div className="avaliacao__autor">
+                        <span className="user-chip__avatar" aria-hidden="true">
+                          {(avaliacao.autor?.nome ?? "?").trim().charAt(0).toUpperCase()}
+                        </span>
+                        <div>
+                          <strong>{avaliacao.autor?.nome}</strong>
+                          <div>
+                            <Estrelas nota={avaliacao.nota} />
+                          </div>
+                        </div>
+                      </div>
+                      {avaliacao.comentario && <p className="muted">{avaliacao.comentario}</p>}
+                    </div>
+                  ))}
+                </div>
+              )}
+
+              {autenticado && (
+                <div className="avaliacoes__form card form-card">
+                  <h3>Deixe sua avaliação</h3>
+
+                  {avaliacaoEnviada ? (
+                    <div className="alert alert--success" role="status">
+                      <Icone nome="check" />
+                      <p>{avaliacaoEnviada}</p>
+                    </div>
+                  ) : (
+                    <form onSubmit={aoEnviarAvaliacao} className="form">
+                      <fieldset className="field">
+                        <legend className="field__legenda">Sua nota</legend>
+                        <div className="seletor-nota" role="radiogroup" aria-label="Sua nota">
+                          {[1, 2, 3, 4, 5].map((valor) => (
+                            <button
+                              key={valor}
+                              type="button"
+                              role="radio"
+                              aria-checked={notaAvaliacao === valor}
+                              aria-label={`${valor} ${valor === 1 ? "estrela" : "estrelas"}`}
+                              className={valor <= notaAvaliacao ? "seletor-nota__estrela ativa" : "seletor-nota__estrela"}
+                              onClick={() => setNotaAvaliacao(valor)}
+                            >
+                              <Icone nome="estrela" className="icon--fill" />
+                            </button>
+                          ))}
+                        </div>
+                      </fieldset>
+
+                      <label className="field">
+                        <span>
+                          Comentário <span className="field__optional">(opcional)</span>
+                        </span>
                         <textarea
                           value={comentarioAvaliacao}
                           onChange={(e) => setComentarioAvaliacao(e.target.value)}
                           maxLength={1000}
                           rows={3}
-                          style={{ padding: "0.5rem", borderRadius: 6, border: "1px solid #ccc" }}
                         />
                       </label>
 
                       {erroAvaliacao && (
-                        <div style={{ border: "1px solid #f87171", backgroundColor: "#fee2e2", color: "#991b1b", borderRadius: 8, padding: "0.75rem" }}>
-                          {erroAvaliacao}
+                        <div className="alert alert--error" role="alert">
+                          <p>{erroAvaliacao}</p>
                         </div>
                       )}
 
-                      <button
-                        type="submit"
-                        disabled={enviandoAvaliacao}
-                        style={{ padding: "0.5rem 1rem", borderRadius: 6, border: "none", backgroundColor: "#2563eb", color: "#fff" }}
-                      >
-                        {enviandoAvaliacao ? "Enviando..." : "Enviar avaliação"}
-                      </button>
+                      <div className="form-actions">
+                        <button type="submit" className="btn btn--primary" disabled={enviandoAvaliacao}>
+                          {enviandoAvaliacao ? "Enviando..." : "Enviar avaliação"}
+                        </button>
+                      </div>
                     </form>
                   )}
-                </>
+                </div>
               )}
-            </div>
+            </section>
           )}
         </article>
       )}
-    </main>
+    </div>
   );
 }
 

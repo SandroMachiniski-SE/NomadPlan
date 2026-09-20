@@ -2,6 +2,7 @@ import { useState, type FormEvent } from "react";
 import { Link } from "react-router-dom";
 import api from "../services/api";
 import { extrairMensagemErro } from "../utils/erro";
+import AuthShell from "../components/AuthShell";
 
 function EsqueciSenha() {
   const [email, setEmail] = useState("");
@@ -26,65 +27,47 @@ function EsqueciSenha() {
   }
 
   return (
-    <div style={{ maxWidth: 420, margin: "0 auto", padding: "2rem 1rem" }}>
-      <h1>Recuperar senha</h1>
-
-      {enviado ? (
+    <AuthShell
+      titulo="Recuperar senha"
+      subtitulo="Informe seu e-mail e enviaremos as instruções para criar uma nova senha."
+      rodape={
         <p>
-          Se houver uma conta com este e-mail, enviaremos instruções de
-          redefinição em instantes.
+          <Link to="/login">Voltar para o login</Link>
         </p>
+      }
+    >
+      {enviado ? (
+        <div className="alert alert--success" role="status">
+          <p>
+            Se houver uma conta com este e-mail, enviaremos instruções de redefinição em instantes.
+          </p>
+        </div>
       ) : (
-        <form onSubmit={aoEnviar} style={{ display: "grid", gap: "1rem", marginTop: "1rem" }}>
-          <label style={{ display: "grid", gap: "0.25rem" }}>
-            E-mail
+        <form onSubmit={aoEnviar} className="form">
+          <label className="field">
+            <span>E-mail</span>
             <input
               type="email"
               required
+              autoComplete="email"
+              placeholder="voce@exemplo.com"
               value={email}
               onChange={(e) => setEmail(e.target.value)}
-              style={{ padding: "0.5rem", borderRadius: 6, border: "1px solid #ccc" }}
             />
           </label>
 
           {erro && (
-            <div
-              style={{
-                border: "1px solid #f87171",
-                backgroundColor: "#fee2e2",
-                color: "#991b1b",
-                borderRadius: 8,
-                padding: "1rem",
-              }}
-            >
-              {erro}
+            <div className="alert alert--error" role="alert">
+              <p>{erro}</p>
             </div>
           )}
 
-          <button
-            type="submit"
-            disabled={enviando}
-            style={{
-              padding: "0.75rem",
-              borderRadius: 6,
-              border: "none",
-              backgroundColor: "#2563eb",
-              color: "#fff",
-              fontWeight: "bold",
-              cursor: enviando ? "not-allowed" : "pointer",
-            }}
-          >
+          <button type="submit" disabled={enviando} className="btn btn--primary btn--lg btn--block">
             {enviando ? "Enviando..." : "Enviar instruções"}
           </button>
         </form>
       )}
-
-      <p style={{ marginTop: "1rem" }}>
-        <Link to="/login" style={{ color: "#2563eb" }}>
-          Voltar para o login
-        </Link>
-      </p>
-    </div>
+    </AuthShell>
   );
 }
 

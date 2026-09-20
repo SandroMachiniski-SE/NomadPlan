@@ -1,6 +1,7 @@
 import { Navigate, Outlet, useLocation } from "react-router-dom";
 import { useAuth } from "../context/useAuth";
 import type { TipoConta } from "../types/usuario";
+import Icone from "./Icone";
 
 interface RotaProtegidaProps {
   papeis?: TipoConta[];
@@ -12,8 +13,8 @@ function RotaProtegida({ papeis }: RotaProtegidaProps) {
 
   if (carregando) {
     return (
-      <div style={{ maxWidth: 960, margin: "0 auto", padding: "2rem 1rem" }}>
-        <p>Carregando...</p>
+      <div className="container page">
+        <p className="loading">Carregando...</p>
       </div>
     );
   }
@@ -30,8 +31,11 @@ function RotaProtegida({ papeis }: RotaProtegidaProps) {
 
   if (papeis && !papeis.includes(usuario!.tipoConta)) {
     return (
-      <div style={{ maxWidth: 960, margin: "0 auto", padding: "2rem 1rem" }}>
-        <p>Você não tem permissão para acessar esta página.</p>
+      <div className="container page">
+        <div className="alert alert--warning" role="alert">
+          <Icone nome="alerta" />
+          <p>Você não tem permissão para acessar esta página.</p>
+        </div>
       </div>
     );
   }

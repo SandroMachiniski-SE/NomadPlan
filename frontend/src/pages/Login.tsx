@@ -2,6 +2,7 @@ import { useState, type FormEvent } from "react";
 import { Link, useLocation, useNavigate } from "react-router-dom";
 import { useAuth } from "../context/useAuth";
 import { extrairMensagemErro } from "../utils/erro";
+import AuthShell from "../components/AuthShell";
 
 function Login() {
   const { login } = useAuth();
@@ -32,76 +33,54 @@ function Login() {
   }
 
   return (
-    <div style={{ maxWidth: 420, margin: "0 auto", padding: "2rem 1rem" }}>
-      <h1>Entrar</h1>
-
-      <form onSubmit={aoEnviar} style={{ display: "grid", gap: "1rem", marginTop: "1rem" }}>
-        <label style={{ display: "grid", gap: "0.25rem" }}>
-          E-mail
+    <AuthShell
+      titulo="Bem-vindo de volta"
+      subtitulo="Entre para acessar seus roteiros e recomendações."
+      rodape={
+        <p>
+          Não tem conta? <Link to="/registrar">Cadastre-se</Link>
+        </p>
+      }
+    >
+      <form onSubmit={aoEnviar} className="form">
+        <label className="field">
+          <span>E-mail</span>
           <input
             type="email"
             required
+            autoComplete="email"
+            placeholder="voce@exemplo.com"
             value={email}
             onChange={(e) => setEmail(e.target.value)}
-            style={{ padding: "0.5rem", borderRadius: 6, border: "1px solid #ccc" }}
           />
         </label>
 
-        <label style={{ display: "grid", gap: "0.25rem" }}>
-          Senha
+        <label className="field">
+          <span>Senha</span>
           <input
             type="password"
             required
+            autoComplete="current-password"
             value={senha}
             onChange={(e) => setSenha(e.target.value)}
-            style={{ padding: "0.5rem", borderRadius: 6, border: "1px solid #ccc" }}
           />
         </label>
 
         {erro && (
-          <div
-            style={{
-              border: "1px solid #f87171",
-              backgroundColor: "#fee2e2",
-              color: "#991b1b",
-              borderRadius: 8,
-              padding: "1rem",
-            }}
-          >
-            {erro}
+          <div className="alert alert--error" role="alert">
+            <p>{erro}</p>
           </div>
         )}
 
-        <button
-          type="submit"
-          disabled={enviando}
-          style={{
-            padding: "0.75rem",
-            borderRadius: 6,
-            border: "none",
-            backgroundColor: "#2563eb",
-            color: "#fff",
-            fontWeight: "bold",
-            cursor: enviando ? "not-allowed" : "pointer",
-          }}
-        >
+        <button type="submit" disabled={enviando} className="btn btn--primary btn--lg btn--block">
           {enviando ? "Entrando..." : "Entrar"}
         </button>
-      </form>
 
-      <p style={{ marginTop: "1rem" }}>
-        <Link to="/esqueci-senha" style={{ color: "#2563eb" }}>
+        <Link to="/esqueci-senha" className="auth__link">
           Esqueci minha senha
         </Link>
-      </p>
-
-      <p style={{ marginTop: "0.5rem" }}>
-        Não tem conta?{" "}
-        <Link to="/registrar" style={{ color: "#2563eb" }}>
-          Cadastre-se
-        </Link>
-      </p>
-    </div>
+      </form>
+    </AuthShell>
   );
 }
 

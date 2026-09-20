@@ -3,6 +3,8 @@ import { Link, useNavigate, useParams } from "react-router-dom";
 import api from "../services/api";
 import type { Ponto, VersaoPonto } from "../types/ponto";
 import { extrairMensagemErro } from "../utils/erro";
+import { CATEGORIAS_PONTOS } from "../constants/categorias";
+import Icone from "../components/Icone";
 
 interface CamposPonto {
   nome: string;
@@ -39,9 +41,6 @@ interface PossivelDuplicado {
   nome: string;
   endereco: string | null;
 }
-
-const estiloCampo = { padding: "0.5rem", borderRadius: 6, border: "1px solid #ccc" };
-const estiloLabel = { display: "grid", gap: "0.25rem" };
 
 function PontoFormulario() {
   const { id } = useParams<{ id: string }>();
@@ -266,308 +265,291 @@ function PontoFormulario() {
 
   if (carregando) {
     return (
-      <div style={{ maxWidth: 640, margin: "0 auto", padding: "2rem 1rem" }}>
-        <p>Carregando...</p>
+      <div className="container container--narrow page">
+        <p className="loading">Carregando...</p>
       </div>
     );
   }
 
   return (
-    <div style={{ maxWidth: 640, margin: "0 auto", padding: "2rem 1rem" }}>
-      <Link to="/pontos/meus" style={{ color: "#2563eb", textDecoration: "none" }}>
+    <div className="container container--narrow page">
+      <Link to="/pontos/meus" className="back-link">
+        <Icone nome="voltar" />
         Voltar para meus pontos
       </Link>
 
-      <h1 style={{ marginTop: "1rem" }}>{emEdicao ? "Editar ponto turístico" : "Novo ponto turístico"}</h1>
+      <div className="page-head">
+        <div className="page-head__text">
+          <h1>{emEdicao ? "Editar ponto turístico" : "Novo ponto turístico"}</h1>
+          <p className="page-head__sub">
+            Campos marcados com * são obrigatórios. Após salvar, envie o ponto para publicação.
+          </p>
+        </div>
+      </div>
 
       {ponto && ponto.status === "REJEITADO" && ponto.motivoRejeicao && (
-        <div
-          style={{
-            border: "1px solid #f87171",
-            backgroundColor: "#fee2e2",
-            color: "#991b1b",
-            borderRadius: 8,
-            padding: "1rem",
-            marginBottom: "1rem",
-          }}
-        >
-          Este ponto foi rejeitado pela moderação: {ponto.motivoRejeicao}
+        <div className="alert alert--error" style={{ marginBottom: "1.25rem" }}>
+          <Icone nome="alerta" />
+          <p>Este ponto foi rejeitado pela moderação: {ponto.motivoRejeicao}</p>
         </div>
       )}
 
-      <form onSubmit={aoEnviar} style={{ display: "grid", gap: "1rem" }}>
-        <label style={estiloLabel}>
-          Nome *
-          <input
-            type="text"
-            value={campos.nome}
-            onChange={(e) => aoMudarCampo("nome", e.target.value)}
-            maxLength={160}
-            style={estiloCampo}
-          />
-        </label>
+      <form onSubmit={aoEnviar} className="card form-card form">
+        <h2 className="form-titulo">Informações básicas</h2>
 
-        <label style={estiloLabel}>
-          Categoria *
-          <input
-            type="text"
-            value={campos.categoria}
-            onChange={(e) => aoMudarCampo("categoria", e.target.value)}
-            maxLength={80}
-            style={estiloCampo}
-          />
-        </label>
+        <div className="form-grid">
+          <label className="field field--full">
+            <span>Nome *</span>
+            <input
+              type="text"
+              value={campos.nome}
+              onChange={(e) => aoMudarCampo("nome", e.target.value)}
+              maxLength={160}
+            />
+          </label>
 
-        <label style={estiloLabel}>
-          Cidade *
-          <input
-            type="text"
-            value={campos.cidade}
-            onChange={(e) => aoMudarCampo("cidade", e.target.value)}
-            maxLength={120}
-            style={estiloCampo}
-          />
-        </label>
+          <label className="field">
+            <span>Categoria *</span>
+            <input
+              type="text"
+              list="lista-categorias"
+              value={campos.categoria}
+              onChange={(e) => aoMudarCampo("categoria", e.target.value)}
+              maxLength={80}
+            />
+            <datalist id="lista-categorias">
+              {CATEGORIAS_PONTOS.map((categoria) => (
+                <option key={categoria} value={categoria} />
+              ))}
+            </datalist>
+          </label>
 
-        <label style={estiloLabel}>
-          Endereço
-          <input
-            type="text"
-            value={campos.endereco}
-            onChange={(e) => aoMudarCampo("endereco", e.target.value)}
-            maxLength={200}
-            style={estiloCampo}
-          />
-        </label>
+          <label className="field">
+            <span>Cidade *</span>
+            <input
+              type="text"
+              value={campos.cidade}
+              onChange={(e) => aoMudarCampo("cidade", e.target.value)}
+              maxLength={120}
+            />
+          </label>
 
-        <label style={estiloLabel}>
-          Descrição
-          <textarea
-            value={campos.descricao}
-            onChange={(e) => aoMudarCampo("descricao", e.target.value)}
-            maxLength={2000}
-            rows={4}
-            style={estiloCampo}
-          />
-        </label>
+          <label className="field field--full">
+            <span>Endereço</span>
+            <input
+              type="text"
+              value={campos.endereco}
+              onChange={(e) => aoMudarCampo("endereco", e.target.value)}
+              maxLength={200}
+            />
+          </label>
 
-        <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "1rem" }}>
-          <label style={estiloLabel}>
-            Latitude
+          <label className="field field--full">
+            <span>Descrição</span>
+            <textarea
+              value={campos.descricao}
+              onChange={(e) => aoMudarCampo("descricao", e.target.value)}
+              maxLength={2000}
+              rows={4}
+            />
+          </label>
+        </div>
+
+        <h2 className="form-titulo">Localização no mapa</h2>
+
+        <div className="form-grid">
+          <label className="field">
+            <span>Latitude</span>
             <input
               type="number"
               step="any"
               value={campos.latitude}
               onChange={(e) => aoMudarCampo("latitude", e.target.value)}
-              style={estiloCampo}
             />
           </label>
 
-          <label style={estiloLabel}>
-            Longitude
+          <label className="field">
+            <span>Longitude</span>
             <input
               type="number"
               step="any"
               value={campos.longitude}
               onChange={(e) => aoMudarCampo("longitude", e.target.value)}
-              style={estiloCampo}
             />
           </label>
         </div>
 
-        <label style={estiloLabel}>
-          Horário de funcionamento *
-          <input
-            type="text"
-            placeholder="Ex.: Seg-Sex 9h-18h"
-            value={campos.horarioFuncionamento}
-            onChange={(e) => aoMudarCampo("horarioFuncionamento", e.target.value)}
-            maxLength={200}
-            style={estiloCampo}
-          />
-        </label>
+        <h2 className="form-titulo">Funcionamento e contato</h2>
 
-        <label style={estiloLabel}>
-          Faixa de preço
-          <input
-            type="text"
-            value={campos.faixaPreco}
-            onChange={(e) => aoMudarCampo("faixaPreco", e.target.value)}
-            maxLength={60}
-            style={estiloCampo}
-          />
-        </label>
+        <div className="form-grid">
+          <label className="field field--full">
+            <span>Horário de funcionamento *</span>
+            <input
+              type="text"
+              placeholder="Ex.: Seg-Sex 9h-18h"
+              value={campos.horarioFuncionamento}
+              onChange={(e) => aoMudarCampo("horarioFuncionamento", e.target.value)}
+              maxLength={200}
+            />
+          </label>
 
-        <label style={estiloLabel}>
-          Acessibilidade
-          <input
-            type="text"
-            value={campos.acessibilidade}
-            onChange={(e) => aoMudarCampo("acessibilidade", e.target.value)}
-            maxLength={200}
-            style={estiloCampo}
-          />
-        </label>
+          <label className="field">
+            <span>Faixa de preço</span>
+            <input
+              type="text"
+              value={campos.faixaPreco}
+              onChange={(e) => aoMudarCampo("faixaPreco", e.target.value)}
+              maxLength={60}
+            />
+          </label>
 
-        <label style={estiloLabel}>
-          Site oficial
-          <input
-            type="text"
-            value={campos.siteOficial}
-            onChange={(e) => aoMudarCampo("siteOficial", e.target.value)}
-            maxLength={200}
-            style={estiloCampo}
-          />
-        </label>
+          <label className="field">
+            <span>Acessibilidade</span>
+            <input
+              type="text"
+              value={campos.acessibilidade}
+              onChange={(e) => aoMudarCampo("acessibilidade", e.target.value)}
+              maxLength={200}
+            />
+          </label>
 
-        <label style={estiloLabel}>
-          Telefone de contato
-          <input
-            type="text"
-            value={campos.telefoneContato}
-            onChange={(e) => aoMudarCampo("telefoneContato", e.target.value)}
-            maxLength={40}
-            style={estiloCampo}
-          />
-        </label>
+          <label className="field">
+            <span>Site oficial</span>
+            <input
+              type="text"
+              value={campos.siteOficial}
+              onChange={(e) => aoMudarCampo("siteOficial", e.target.value)}
+              maxLength={200}
+            />
+          </label>
+
+          <label className="field">
+            <span>Telefone de contato</span>
+            <input
+              type="text"
+              value={campos.telefoneContato}
+              onChange={(e) => aoMudarCampo("telefoneContato", e.target.value)}
+              maxLength={40}
+            />
+          </label>
+        </div>
 
         {erro && (
-          <div
-            style={{
-              border: "1px solid #f87171",
-              backgroundColor: "#fee2e2",
-              color: "#991b1b",
-              borderRadius: 8,
-              padding: "1rem",
-            }}
-          >
-            {erro}
+          <div className="alert alert--error" role="alert">
+            <p>{erro}</p>
           </div>
         )}
 
         {duplicados && duplicados.length > 0 && (
-          <div style={{ border: "1px solid #fbbf24", backgroundColor: "#fffbeb", borderRadius: 8, padding: "1rem" }}>
-            <p style={{ marginTop: 0 }}>Possíveis duplicados encontrados:</p>
-            <ul>
-              {duplicados.map((d) => (
-                <li key={d.id}>
-                  {d.nome} {d.endereco ? `— ${d.endereco}` : ""}
-                </li>
-              ))}
-            </ul>
-            <button
-              type="button"
-              onClick={() => salvar(true)}
-              disabled={salvando}
-              style={{ padding: "0.5rem 1rem", borderRadius: 6, border: "1px solid #b45309", background: "transparent", color: "#b45309" }}
-            >
-              Cadastrar mesmo assim
-            </button>
+          <div className="alert alert--warning">
+            <div>
+              <p>
+                <strong>Possíveis duplicados encontrados:</strong>
+              </p>
+              <ul className="relatorio__lista">
+                {duplicados.map((d) => (
+                  <li key={d.id}>
+                    {d.nome} {d.endereco ? `— ${d.endereco}` : ""}
+                  </li>
+                ))}
+              </ul>
+              <button
+                type="button"
+                className="btn btn--outline btn--sm"
+                onClick={() => salvar(true)}
+                disabled={salvando}
+                style={{ marginTop: "0.75rem" }}
+              >
+                Cadastrar mesmo assim
+              </button>
+            </div>
           </div>
         )}
 
-        <button
-          type="submit"
-          disabled={salvando}
-          style={{
-            padding: "0.75rem",
-            borderRadius: 6,
-            border: "none",
-            backgroundColor: "#2563eb",
-            color: "#fff",
-            fontWeight: "bold",
-            cursor: salvando ? "not-allowed" : "pointer",
-          }}
-        >
-          {salvando ? "Salvando..." : emEdicao ? "Salvar alterações" : "Cadastrar ponto"}
-        </button>
+        <div className="form-actions">
+          <button type="submit" disabled={salvando} className="btn btn--primary btn--lg">
+            {salvando ? "Salvando..." : emEdicao ? "Salvar alterações" : "Cadastrar ponto"}
+          </button>
+        </div>
       </form>
 
       {emEdicao && ponto && (
-        <>
-          <h2 style={{ marginTop: "2rem" }}>Imagem</h2>
+        <div className="stack stack--lg" style={{ marginTop: "1.5rem" }}>
+          <section className="card card--pad stack">
+            <h2>Imagem</h2>
 
-          {ponto.imagemUrl && (
-            <img
-              src={`${api.defaults.baseURL}${ponto.imagemUrl}`}
-              alt={ponto.nome}
-              style={{ maxWidth: "100%", borderRadius: 8, marginBottom: "1rem" }}
-            />
-          )}
+            {ponto.imagemUrl && (
+              <img
+                src={`${api.defaults.baseURL}${ponto.imagemUrl}`}
+                alt={ponto.nome}
+                className="imagem-previa"
+              />
+            )}
 
-          <div style={{ display: "flex", gap: "0.5rem", alignItems: "center" }}>
             <input
               type="file"
               accept="image/jpeg,image/png,image/webp"
               onChange={(e) => setArquivoImagem(e.target.files?.[0] ?? null)}
             />
 
-            <button
-              type="button"
-              onClick={aoEnviarImagem}
-              disabled={!arquivoImagem || enviandoImagem}
-              style={{ padding: "0.5rem 1rem", borderRadius: 6, border: "1px solid #2563eb", background: "transparent", color: "#2563eb" }}
-            >
-              {enviandoImagem ? "Enviando..." : "Enviar imagem"}
-            </button>
-          </div>
+            <div>
+              <button
+                type="button"
+                className="btn btn--outline"
+                onClick={aoEnviarImagem}
+                disabled={!arquivoImagem || enviandoImagem}
+              >
+                {enviandoImagem ? "Enviando..." : "Enviar imagem"}
+              </button>
+            </div>
+          </section>
 
           {(ponto.status === "RASCUNHO" || ponto.status === "REJEITADO") && (
             <button
               type="button"
               onClick={aoPublicar}
               disabled={publicando}
-              style={{
-                marginTop: "2rem",
-                padding: "0.75rem",
-                width: "100%",
-                borderRadius: 6,
-                border: "none",
-                backgroundColor: "#166534",
-                color: "#fff",
-                fontWeight: "bold",
-                cursor: publicando ? "not-allowed" : "pointer",
-              }}
+              className="btn btn--accent btn--lg btn--block"
             >
               {publicando ? "Enviando..." : "Enviar para publicação"}
             </button>
           )}
 
-          <h2 style={{ marginTop: "2rem" }}>Histórico de versões</h2>
+          <section className="card card--pad stack">
+            <h2>Histórico de versões</h2>
 
-          {!mostrarHistorico ? (
-            <button
-              type="button"
-              onClick={carregarHistorico}
-              style={{ padding: "0.5rem 1rem", borderRadius: 6, border: "1px solid #ccc", background: "transparent" }}
-            >
-              Ver histórico
-            </button>
-          ) : versoes.length === 0 ? (
-            <p style={{ color: "#666" }}>Nenhuma alteração registrada ainda.</p>
-          ) : (
-            <div style={{ display: "grid", gap: "0.5rem" }}>
-              {versoes.map((versao) => (
-                <div key={versao.id} style={{ border: "1px solid #ddd", borderRadius: 8, padding: "0.75rem" }}>
-                  <p style={{ margin: 0, fontSize: "0.85rem", color: "#666" }}>
-                    {new Date(versao.dataCriacao).toLocaleString("pt-BR")} — {versao.motivo}
-                  </p>
-                  <p style={{ margin: "0.25rem 0" }}>
-                    Nome salvo: {(versao.dados as { nome?: string }).nome ?? "—"}
-                  </p>
-                  <button
-                    type="button"
-                    onClick={() => aoRestaurarVersao(versao.id)}
-                    disabled={restaurandoId === versao.id}
-                    style={{ padding: "0.35rem 0.75rem", borderRadius: 6, border: "1px solid #b45309", background: "transparent", color: "#b45309" }}
-                  >
-                    {restaurandoId === versao.id ? "Restaurando..." : "Restaurar esta versão"}
-                  </button>
-                </div>
-              ))}
-            </div>
-          )}
-        </>
+            {!mostrarHistorico ? (
+              <div>
+                <button type="button" className="btn btn--outline" onClick={carregarHistorico}>
+                  Ver histórico
+                </button>
+              </div>
+            ) : versoes.length === 0 ? (
+              <p className="muted">Nenhuma alteração registrada ainda.</p>
+            ) : (
+              <div className="stack stack--sm">
+                {versoes.map((versao) => (
+                  <div key={versao.id} className="versao">
+                    <div>
+                      <p className="muted small">
+                        {new Date(versao.dataCriacao).toLocaleString("pt-BR")} — {versao.motivo}
+                      </p>
+                      <p>Nome salvo: {(versao.dados as { nome?: string }).nome ?? "—"}</p>
+                    </div>
+                    <button
+                      type="button"
+                      className="btn btn--outline btn--sm"
+                      onClick={() => aoRestaurarVersao(versao.id)}
+                      disabled={restaurandoId === versao.id}
+                    >
+                      {restaurandoId === versao.id ? "Restaurando..." : "Restaurar esta versão"}
+                    </button>
+                  </div>
+                ))}
+              </div>
+            )}
+          </section>
+        </div>
       )}
     </div>
   );

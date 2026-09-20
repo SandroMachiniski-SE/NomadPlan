@@ -2,6 +2,7 @@ import { useEffect, useRef, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import api from "../services/api";
 import type { Notificacao, RespostaNotificacoes } from "../types/admin";
+import Icone from "./Icone";
 
 function NotificacoesSino() {
   const navigate = useNavigate();
@@ -65,77 +66,35 @@ function NotificacoesSino() {
   }
 
   return (
-    <div ref={containerRef} style={{ position: "relative" }}>
+    <div ref={containerRef} className="sino">
       <button
         type="button"
+        className="sino__botao"
         onClick={aoAbrir}
-        style={{
-          position: "relative",
-          background: "none",
-          border: "1px solid rgba(255,255,255,0.6)",
-          borderRadius: 6,
-          color: "white",
-          padding: "0.35rem 0.6rem",
-          cursor: "pointer",
-        }}
+        aria-label={naoLidas > 0 ? `Notificações (${naoLidas} não lidas)` : "Notificações"}
+        aria-expanded={aberto}
       >
-        🔔
-        {naoLidas > 0 && (
-          <span
-            style={{
-              position: "absolute",
-              top: -6,
-              right: -6,
-              backgroundColor: "#dc2626",
-              color: "white",
-              borderRadius: 999,
-              fontSize: "0.7rem",
-              padding: "0 5px",
-            }}
-          >
-            {naoLidas}
-          </span>
-        )}
+        <Icone nome="sino" />
+        {naoLidas > 0 && <span className="sino__contador">{naoLidas}</span>}
       </button>
 
       {aberto && (
-        <div
-          style={{
-            position: "absolute",
-            right: 0,
-            top: "calc(100% + 0.5rem)",
-            width: 320,
-            maxHeight: 400,
-            overflowY: "auto",
-            backgroundColor: "#fff",
-            color: "#111",
-            border: "1px solid #ddd",
-            borderRadius: 8,
-            boxShadow: "0 4px 12px rgba(0,0,0,0.15)",
-            zIndex: 10,
-          }}
-        >
+        <div className="sino__painel">
+          <div className="sino__titulo">Notificações</div>
+
           {notificacoes.length === 0 ? (
-            <p style={{ padding: "1rem", color: "#666" }}>Nenhuma notificação ainda.</p>
+            <p className="sino__vazio">Nenhuma notificação ainda.</p>
           ) : (
             notificacoes.map((notificacao) => (
               <button
                 key={notificacao.id}
                 type="button"
+                className="sino__item"
+                data-lida={notificacao.lida}
                 onClick={() => aoClicarNotificacao(notificacao)}
-                style={{
-                  display: "block",
-                  width: "100%",
-                  textAlign: "left",
-                  padding: "0.75rem 1rem",
-                  border: "none",
-                  borderBottom: "1px solid #eee",
-                  backgroundColor: notificacao.lida ? "#fff" : "#eff6ff",
-                  cursor: "pointer",
-                }}
               >
-                <p style={{ margin: 0, fontSize: "0.9rem" }}>{notificacao.mensagem}</p>
-                <p style={{ margin: "0.25rem 0 0", fontSize: "0.75rem", color: "#666" }}>
+                <p className="sino__mensagem">{notificacao.mensagem}</p>
+                <p className="sino__data">
                   {new Date(notificacao.dataCriacao).toLocaleString("pt-BR")}
                 </p>
               </button>

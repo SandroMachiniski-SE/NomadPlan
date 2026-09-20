@@ -1,7 +1,17 @@
 import { useState, type FormEvent } from "react";
 import { useAuth } from "../context/useAuth";
 import { extrairMensagemErro } from "../utils/erro";
-import { CATEGORIAS_PONTOS } from "../constants/categorias";
+import { CATEGORIAS_PONTOS, iconeDaCategoria } from "../constants/categorias";
+import Icone from "../components/Icone";
+
+const ROTULO_CONTA: Record<string, string> = {
+  VISITANTE: "Visitante",
+  MORADOR: "Morador",
+  NEGOCIO: "Negócio",
+  GESTOR: "Gestor",
+  MODERADOR: "Moderador",
+  ADMIN: "Administrador",
+};
 
 function Perfil() {
   const { usuario, atualizarPerfil } = useAuth();
@@ -52,111 +62,95 @@ function Perfil() {
   }
 
   return (
-    <div style={{ maxWidth: 480, margin: "0 auto", padding: "2rem 1rem" }}>
-      <h1>Meu perfil</h1>
+    <div className="container container--narrow page">
+      <div className="perfil-topo card card--pad">
+        <span className="perfil-topo__avatar" aria-hidden="true">
+          {usuario.nome.trim().charAt(0).toUpperCase()}
+        </span>
 
-      <p style={{ color: "#666" }}>
-        {usuario.email} — conta {usuario.tipoConta.toLowerCase()}
-      </p>
-      <p style={{ color: "#166534" }}>
-        Reputação: {usuario.reputacao} pontos
-        {usuario.reputacao >= 5 && " — suas sugestões de edição são aplicadas automaticamente"}
-      </p>
-
-      <form onSubmit={aoEnviar} style={{ display: "grid", gap: "1rem", marginTop: "1rem" }}>
-        <label style={{ display: "grid", gap: "0.25rem" }}>
-          Nome
-          <input
-            type="text"
-            maxLength={120}
-            value={nome}
-            onChange={(e) => setNome(e.target.value)}
-            style={{ padding: "0.5rem", borderRadius: 6, border: "1px solid #ccc" }}
-          />
-        </label>
-
-        <label style={{ display: "grid", gap: "0.25rem" }}>
-          Cidade base
-          <input
-            type="text"
-            maxLength={120}
-            value={cidadeBase}
-            onChange={(e) => setCidadeBase(e.target.value)}
-            style={{ padding: "0.5rem", borderRadius: 6, border: "1px solid #ccc" }}
-          />
-        </label>
-
-        <div>
-          <p style={{ margin: "0 0 0.5rem" }}>Interesses (usados para sugerir roteiros)</p>
-          <div style={{ display: "flex", flexWrap: "wrap", gap: "0.5rem" }}>
-            {CATEGORIAS_PONTOS.map((categoria) => (
-              <label
-                key={categoria}
-                style={{
-                  display: "flex",
-                  alignItems: "center",
-                  gap: "0.35rem",
-                  border: "1px solid #ccc",
-                  borderRadius: 6,
-                  padding: "0.35rem 0.6rem",
-                  cursor: "pointer",
-                  backgroundColor: interesses.includes(categoria) ? "#dbeafe" : "#fff",
-                }}
-              >
-                <input
-                  type="checkbox"
-                  checked={interesses.includes(categoria)}
-                  onChange={() => alternarInteresse(categoria)}
-                />
-                {categoria}
-              </label>
-            ))}
+        <div className="stack stack--sm">
+          <h1>Meu perfil</h1>
+          <p className="muted">{usuario.email}</p>
+          <div className="cluster">
+            <span className="badge badge--primary">
+              {ROTULO_CONTA[usuario.tipoConta] ?? usuario.tipoConta}
+            </span>
+            <span className="badge badge--accent">
+              <Icone nome="estrela" className="icon--fill" />
+              {usuario.reputacao} pontos de reputação
+            </span>
           </div>
         </div>
+      </div>
+
+      {usuario.reputacao >= 5 && (
+        <div className="alert alert--success" style={{ marginTop: "1rem" }}>
+          <Icone nome="verificado" />
+          <p>Com essa reputação, suas sugestões de edição são aplicadas automaticamente.</p>
+        </div>
+      )}
+
+      <form onSubmit={aoEnviar} className="card form-card form" style={{ marginTop: "1.5rem" }}>
+        <div className="form-grid">
+          <label className="field">
+            <span>Nome</span>
+            <input
+              type="text"
+              maxLength={120}
+              value={nome}
+              onChange={(e) => setNome(e.target.value)}
+            />
+          </label>
+
+          <label className="field">
+            <span>Cidade base</span>
+            <input
+              type="text"
+              maxLength={120}
+              value={cidadeBase}
+              onChange={(e) => setCidadeBase(e.target.value)}
+            />
+          </label>
+        </div>
+
+        <fieldset className="field">
+          <legend className="field__legenda">
+            Interesses <span className="field__hint">usados para sugerir roteiros</span>
+          </legend>
+          <div className="chips">
+            {CATEGORIAS_PONTOS.map((categoria) => (
+              <button
+                key={categoria}
+                type="button"
+                className="chip"
+                aria-pressed={interesses.includes(categoria)}
+                onClick={() => alternarInteresse(categoria)}
+              >
+                <Icone nome={iconeDaCategoria(categoria)} />
+                {categoria}
+              </button>
+            ))}
+          </div>
+        </fieldset>
 
         {erro && (
-          <div
-            style={{
-              border: "1px solid #f87171",
-              backgroundColor: "#fee2e2",
-              color: "#991b1b",
-              borderRadius: 8,
-              padding: "1rem",
-            }}
-          >
-            {erro}
+          <div className="alert alert--error" role="alert">
+            <p>{erro}</p>
           </div>
         )}
 
         {sucesso && (
-          <div
-            style={{
-              border: "1px solid #86efac",
-              backgroundColor: "#dcfce7",
-              color: "#166534",
-              borderRadius: 8,
-              padding: "1rem",
-            }}
-          >
-            Perfil atualizado com sucesso.
+          <div className="alert alert--success" role="status">
+            <Icone nome="check" />
+            <p>Perfil atualizado com sucesso.</p>
           </div>
         )}
 
-        <button
-          type="submit"
-          disabled={salvando}
-          style={{
-            padding: "0.75rem",
-            borderRadius: 6,
-            border: "none",
-            backgroundColor: "#2563eb",
-            color: "#fff",
-            fontWeight: "bold",
-            cursor: salvando ? "not-allowed" : "pointer",
-          }}
-        >
-          {salvando ? "Salvando..." : "Salvar alterações"}
-        </button>
+        <div className="form-actions">
+          <button type="submit" disabled={salvando} className="btn btn--primary btn--lg">
+            {salvando ? "Salvando..." : "Salvar alterações"}
+          </button>
+        </div>
       </form>
     </div>
   );

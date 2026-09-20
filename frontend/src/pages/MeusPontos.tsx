@@ -4,6 +4,7 @@ import api from "../services/api";
 import type { Ponto, RespostaPontos } from "../types/ponto";
 import { extrairMensagemErro } from "../utils/erro";
 import { useAuth } from "../context/useAuth";
+import Icone from "../components/Icone";
 
 const PAPEIS_FERRAMENTAS = ["GESTOR", "MODERADOR", "ADMIN"];
 
@@ -14,11 +15,11 @@ const ROTULO_STATUS: Record<string, string> = {
   REJEITADO: "Rejeitado",
 };
 
-const COR_STATUS: Record<string, string> = {
-  RASCUNHO: "#6b7280",
-  PENDENTE_VERIFICACAO: "#b45309",
-  PUBLICADO: "#166534",
-  REJEITADO: "#991b1b",
+const CLASSE_STATUS: Record<string, string> = {
+  RASCUNHO: "badge",
+  PENDENTE_VERIFICACAO: "badge badge--warning",
+  PUBLICADO: "badge badge--success",
+  REJEITADO: "badge badge--danger",
 };
 
 function MeusPontos() {
@@ -62,115 +63,89 @@ function MeusPontos() {
   }
 
   return (
-    <div style={{ maxWidth: 960, margin: "0 auto", padding: "2rem 1rem" }}>
-      <h1>Meus pontos turísticos</h1>
+    <div className="container page">
+      <div className="page-head">
+        <div className="page-head__text">
+          <h1>Meus pontos turísticos</h1>
+          <p className="page-head__sub">
+            Cadastre e acompanhe o status de publicação dos seus pontos.
+          </p>
+        </div>
 
-      <Link
-        to="/pontos/novo"
-        style={{
-          display: "inline-block",
-          marginBottom: "1rem",
-          padding: "0.5rem 1rem",
-          borderRadius: 6,
-          backgroundColor: "#2563eb",
-          color: "#fff",
-          textDecoration: "none",
-        }}
-      >
-        + Novo ponto
-      </Link>
+        <div className="page-head__actions">
+          {usuario && PAPEIS_FERRAMENTAS.includes(usuario.tipoConta) && (
+            <Link to="/pontos/ferramentas" className="btn btn--outline">
+              <Icone nome="download" />
+              Exportar / Importar
+            </Link>
+          )}
+          <Link to="/pontos/novo" className="btn btn--primary">
+            <Icone nome="mais" />
+            Novo ponto
+          </Link>
+        </div>
+      </div>
 
-      {usuario && PAPEIS_FERRAMENTAS.includes(usuario.tipoConta) && (
-        <Link
-          to="/pontos/ferramentas"
-          style={{
-            display: "inline-block",
-            marginBottom: "1rem",
-            marginLeft: "0.75rem",
-            padding: "0.5rem 1rem",
-            borderRadius: 6,
-            border: "1px solid #2563eb",
-            color: "#2563eb",
-            textDecoration: "none",
-          }}
-        >
-          Exportar / Importar
-        </Link>
-      )}
-
-      {carregando && <p>Carregando...</p>}
+      {carregando && <p className="loading">Carregando...</p>}
 
       {erro && (
-        <div
-          style={{
-            border: "1px solid #f87171",
-            backgroundColor: "#fee2e2",
-            color: "#991b1b",
-            borderRadius: 8,
-            padding: "1rem",
-          }}
-        >
-          {erro}
+        <div className="alert alert--error" role="alert">
+          <Icone nome="alerta" />
+          <p>{erro}</p>
         </div>
       )}
 
       {!carregando && !erro && pontos.length === 0 && (
-        <div style={{ border: "1px dashed #aaa", borderRadius: 8, padding: "2rem", textAlign: "center" }}>
-          <p>Você ainda não cadastrou nenhum ponto turístico.</p>
+        <div className="empty">
+          <div className="empty__icon">
+            <Icone nome="pin" />
+          </div>
+          <p className="empty__title">Você ainda não cadastrou nenhum ponto turístico</p>
+          <p>Cadastre o primeiro para que ele apareça na busca após a moderação.</p>
+          <Link to="/pontos/novo" className="btn btn--primary">
+            <Icone nome="mais" />
+            Novo ponto
+          </Link>
         </div>
       )}
 
       {!carregando && !erro && pontos.length > 0 && (
-        <div style={{ display: "grid", gap: "1rem" }}>
+        <div className="stack">
           {pontos.map((ponto) => (
-            <div key={ponto.id} style={{ border: "1px solid #ddd", borderRadius: 8, padding: "1.5rem" }}>
-              <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start" }}>
-                <div>
-                  <h2 style={{ margin: 0 }}>{ponto.nome}</h2>
-                  <p style={{ color: "#666", margin: "0.25rem 0 0" }}>
-                    {ponto.categoria} • {ponto.cidade}
-                  </p>
+            <article key={ponto.id} className="card card--pad fila-item">
+              <div className="stack stack--sm">
+                <div className="cluster">
+                  <span className={CLASSE_STATUS[ponto.status] ?? "badge"}>
+                    {ROTULO_STATUS[ponto.status] ?? ponto.status}
+                  </span>
+                  <span className="badge badge--primary">{ponto.categoria}</span>
                 </div>
 
-                <span
-                  style={{
-                    color: "#fff",
-                    backgroundColor: COR_STATUS[ponto.status] ?? "#6b7280",
-                    borderRadius: 999,
-                    padding: "0.25rem 0.75rem",
-                    fontSize: "0.85rem",
-                    whiteSpace: "nowrap",
-                  }}
-                >
-                  {ROTULO_STATUS[ponto.status] ?? ponto.status}
-                </span>
+                <h2 className="card__title">{ponto.nome}</h2>
+                <p className="muted small">
+                  <Icone nome="pin" /> {ponto.cidade}
+                </p>
+
+                {ponto.status === "REJEITADO" && ponto.motivoRejeicao && (
+                  <div className="alert alert--error">
+                    <p>Motivo da rejeição: {ponto.motivoRejeicao}</p>
+                  </div>
+                )}
               </div>
 
-              {ponto.status === "REJEITADO" && ponto.motivoRejeicao && (
-                <p style={{ color: "#991b1b", marginTop: "0.75rem" }}>
-                  Motivo da rejeição: {ponto.motivoRejeicao}
-                </p>
-              )}
-
-              <div style={{ display: "flex", gap: "0.75rem", marginTop: "1rem" }}>
+              <div className="cluster">
                 {(ponto.status === "RASCUNHO" || ponto.status === "REJEITADO") && (
                   <>
-                    <Link to={`/pontos/${ponto.id}/editar`} style={{ color: "#2563eb" }}>
+                    <Link to={`/pontos/${ponto.id}/editar`} className="btn btn--outline btn--sm">
+                      <Icone nome="editar" />
                       Editar
                     </Link>
 
                     <button
                       type="button"
+                      className="btn btn--primary btn--sm"
                       onClick={() => aoPublicar(ponto.id)}
                       disabled={publicandoId === ponto.id}
-                      style={{
-                        padding: "0.35rem 0.75rem",
-                        borderRadius: 6,
-                        border: "1px solid #2563eb",
-                        backgroundColor: "transparent",
-                        color: "#2563eb",
-                        cursor: publicandoId === ponto.id ? "not-allowed" : "pointer",
-                      }}
                     >
                       {publicandoId === ponto.id ? "Enviando..." : "Enviar para publicação"}
                     </button>
@@ -178,12 +153,13 @@ function MeusPontos() {
                 )}
 
                 {ponto.status === "PUBLICADO" && (
-                  <Link to={`/pontos/${ponto.id}`} style={{ color: "#2563eb" }}>
+                  <Link to={`/pontos/${ponto.id}`} className="btn btn--outline btn--sm">
                     Ver página pública
+                    <Icone nome="avancar" />
                   </Link>
                 )}
               </div>
-            </div>
+            </article>
           ))}
         </div>
       )}
