@@ -16,6 +16,15 @@ import adminRouter from "./routes/admin.routes";
 
 const app = express();
 
+// Atrás de proxy reverso (Nginx, load balancer) o IP real do cliente vem do
+// X-Forwarded-For. Sem isso o rate limit por IP enxerga só o IP do proxy e
+// bloqueia todos os usuários juntos. Defina TRUST_PROXY com o número de proxies
+// confiáveis à frente da API (ex.: 1). Sem a variável, o comportamento não muda.
+const trustProxy = process.env.TRUST_PROXY;
+if (trustProxy) {
+  app.set("trust proxy", /^\d+$/.test(trustProxy) ? Number(trustProxy) : trustProxy);
+}
+
 const port = Number(process.env.PORT) || 3333;
 
 app.use(helmet());
