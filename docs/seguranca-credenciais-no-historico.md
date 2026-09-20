@@ -53,21 +53,35 @@ uma contribuição de branch.
 ## O que recomendamos que o Sandro faça
 
 1. **Trocar o `JWT_SECRET` real** usado em qualquer ambiente que não seja o
-   Docker local de desenvolvimento — mesmo sem limpar o histórico, isso já
-   invalida o segredo exposto.
-2. Quando tiver um momento tranquilo (sem ninguém com PR aberto), limpar o
-   histórico:
+   Docker local de desenvolvimento. **Esta é a medida que realmente resolve o
+   vazamento**: reescrever o histórico (passo 3) ajuda, mas não basta, porque o
+   GitHub continua guardando os commits antigos nos PRs já abertos ou mesclados
+   (`refs/pull/*`), em forks e em caches. O valor antigo deve ser tratado como
+   comprometido de qualquer forma.
+2. **Parar de rastrear o arquivo no commit atual.** O `.gitignore` só vale para
+   arquivos que ainda não foram commitados: enquanto `backend/.env` estiver no
+   índice do git, ele continua sendo versionado a cada alteração.
+   ```bash
+   git rm --cached backend/.env
+   git commit -m "chore: para de rastrear backend/.env"
+   ```
+   O arquivo continua no disco; o `backend/.env.example` (sem segredos reais)
+   segue como referência para novos ambientes.
+3. Quando tiver um momento tranquilo (sem ninguém com PR aberto), limpar o
+   histórico, **em um clone novo** (o `git filter-repo` se recusa a rodar em
+   um clone que não seja recém-criado):
    ```bash
    # instalar git-filter-repo, depois:
    git filter-repo --path backend/.env --invert-paths
+   # o filter-repo remove o remote "origin" por segurança; adicione de novo:
+   git remote add origin https://github.com/SandroMachiniski-SE/NomadPlan.git
    git push origin --force --all
    git push origin --force --tags
    ```
-3. Avisar os colaboradores para re-clonar o repositório após o force-push
+4. Avisar os colaboradores para re-clonar o repositório após o force-push
    (um `git pull` normal não resolve, pois o histórico mudou).
-4. Confirmar que `backend/.env` continua listado em `.gitignore` (já está) e
-   que o `backend/.env.example` (sem segredos reais) segue sendo a referência
-   para novos ambientes.
+5. Confirmar que `backend/.env` está listado em `.gitignore` (já está; a regra
+   só passa a valer de fato depois do passo 2).
 
 ## Observação relacionada (fora do escopo desta branch)
 
