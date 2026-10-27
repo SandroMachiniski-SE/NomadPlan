@@ -1,7 +1,8 @@
 import { afterEach, beforeEach, describe, it, mock } from "node:test";
 import assert from "node:assert/strict";
-import nodemailer from "nodemailer";
+import nodemailer, { type SendMailOptions } from "nodemailer";
 import {
+  descreverConfiguracaoEmail,
   enviarEmailRedefinicaoSenha,
   lerConfiguracaoSmtp,
   montarEmailRedefinicao,
@@ -103,9 +104,9 @@ describe("enviarEmailRedefinicaoSenha", () => {
 
   it("envia pelo transporte SMTP com remetente, destinatário e corpo corretos", async () => {
     const transporte = nodemailer.createTransport({ jsonTransport: true });
-    const enviados: nodemailer.SendMailOptions[] = [];
+    const enviados: SendMailOptions[] = [];
     const original = transporte.sendMail.bind(transporte);
-    mock.method(transporte, "sendMail", (opcoes: nodemailer.SendMailOptions) => {
+    mock.method(transporte, "sendMail", (opcoes: SendMailOptions) => {
       enviados.push(opcoes);
       return original(opcoes);
     });
@@ -155,5 +156,23 @@ describe("enviarEmailRedefinicaoSenha", () => {
     assert.equal(resultado, "nao-configurado");
     assert.ok(erros.some((linha) => linha.includes("SMTP não configurado")));
     assert.ok(![...logs, ...erros].some((linha) => linha.includes("token=")));
+  });
+});
+
+describe("descreverConfiguracaoEmail", () => {
+  it("avisa que o link vai para o console quando não há SMTP em desenvolvimento", () => {
+    assert.match(descreverConfiguracaoEmail(null, false), /impresso neste console/);
+  });
+
+  it("avisa que nada será enviado quando não há SMTP em produção", () => {
+    assert.match(descreverConfiguracaoEmail(null, true), /NÃO serão enviados/);
+  });
+
+  it("informa servidor, porta e remetente quando há SMTP, sem expor a senha", () => {
+    const texto = descreverConfiguracaoEmail(CONFIG, false);
+
+    assert.match(texto, /smtp\.exemplo\.com:587/);
+    assert.match(texto, /conta@exemplo\.com/);
+    assert.ok(!texto.includes("segredo"));
   });
 });

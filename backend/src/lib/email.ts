@@ -111,7 +111,7 @@ export function montarEmailRedefinicao({ nome, link }: Pick<DadosEmailRedefinica
 
 let transporteEmCache: { chave: string; transporte: Transporter } | null = null;
 
-function obterTransporte(config: ConfiguracaoSmtp): Transporter {
+export function obterTransporte(config: ConfiguracaoSmtp): Transporter {
   const chave = JSON.stringify(config);
 
   if (transporteEmCache?.chave !== chave) {
@@ -178,4 +178,32 @@ export async function enviarEmailRedefinicaoSenha(
   });
 
   return "enviado";
+}
+
+/** Resumo, para o log de inicialização, de como os e-mails serão enviados. */
+export function descreverConfiguracaoEmail(
+  config: ConfiguracaoSmtp | null,
+  producao: boolean = process.env.NODE_ENV === "production",
+): string {
+  if (!config) {
+    return producao
+      ? "E-mail: SMTP NÃO configurado — os e-mails de recuperação de senha NÃO serão enviados (defina SMTP_HOST no ambiente)."
+      : "E-mail: SMTP não configurado (modo de desenvolvimento) — o link de recuperação de senha será impresso neste console, nenhum e-mail será enviado.";
+  }
+
+  return `E-mail: enviando por ${config.host}:${config.port} com remetente ${config.from}`;
+}
+
+/** Confere se dá para conectar e autenticar no servidor SMTP configurado. */
+export async function verificarConexaoSmtp(config: ConfiguracaoSmtp): Promise<void> {
+  await obterTransporte(config).verify();
+}
+
+export async function enviarEmailDeTeste(para: string, config: ConfiguracaoSmtp): Promise<void> {
+  await obterTransporte(config).sendMail({
+    from: config.from,
+    to: para,
+    subject: "Teste de e-mail — NomadPlan",
+    text: "Se você recebeu esta mensagem, o envio de e-mails do NomadPlan está funcionando. A recuperação de senha vai chegar assim na caixa de entrada de cada usuário.",
+  });
 }

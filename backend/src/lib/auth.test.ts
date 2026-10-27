@@ -4,13 +4,13 @@ import jwt from "jsonwebtoken";
 
 const SEGREDO_TESTE = "segredo-de-teste-apenas-para-a-suite-automatizada";
 
-type ModuloAuth = typeof import("./auth");
-let auth: ModuloAuth;
+import type * as ModuloAuth from "./auth";
+let auth: typeof ModuloAuth;
 
 // lib/auth lê o JWT_SECRET ao ser carregada, então definimos a variável antes do import.
-before(async () => {
+before(() => {
   process.env.JWT_SECRET = SEGREDO_TESTE;
-  auth = await import("./auth");
+  auth = require("./auth") as typeof ModuloAuth;
 });
 
 describe("senhas", () => {

@@ -1,6 +1,6 @@
 import { Router, Request, Response } from "express";
 import { z } from "zod";
-import { StatusPonto, StatusSolicitacao, TipoConta } from "@prisma/client";
+import { StatusSolicitacao, TipoConta } from "@prisma/client";
 import prisma from "../lib/prisma";
 import { autenticar, autorizar } from "../middleware/auth";
 import { criarNotificacao } from "../lib/notificacoes";
@@ -56,9 +56,11 @@ verificacoesRouter.post("/:id/aprovar", async (req: Request, res: Response) => {
     }
 
     const [ponto] = await prisma.$transaction([
+      // Só concede o selo: o status do ponto não é tocado (se ele voltou a rascunho depois do
+      // pedido, a aprovação do selo não pode republicá-lo por fora da moderação).
       prisma.pontoTuristico.update({
         where: { id: solicitacao.idPonto },
-        data: { seloVerificado: true, status: StatusPonto.PUBLICADO },
+        data: { seloVerificado: true },
       }),
       prisma.solicitacaoVerificacao.update({
         where: { id: id.data },

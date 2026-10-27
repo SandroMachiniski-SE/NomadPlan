@@ -3,7 +3,7 @@ import { z } from "zod";
 import { Prisma, StatusSolicitacao, TipoConta } from "@prisma/client";
 import prisma from "../lib/prisma";
 import { autenticar, autorizar } from "../middleware/auth";
-import { registrarVersaoPonto } from "../lib/versionamento";
+import { aplicarCamposAoPonto } from "../lib/sugestoesAplicacao";
 import { incrementarReputacao, PONTOS_REPUTACAO } from "../lib/reputacao";
 import { criarNotificacao } from "../lib/notificacoes";
 import { registrarAuditoria } from "../lib/auditoria";
@@ -65,25 +65,20 @@ sugestoesRouter.post("/:id/aprovar", async (req: Request, res: Response) => {
 
     const camposPropostos = sugestao.camposPropostos as Prisma.JsonObject;
 
-    await registrarVersaoPonto(ponto, "sugestao_aprovada", req.usuario!.id);
+    // Aplicar a mudança e marcar a sugestão como aprovada acontecem juntas: não fica
+    // sugestão aprovada sem a mudança, nem o contrário.
+    await prisma.$transaction(async (tx) => {
+      await aplicarCamposAoPonto(tx, ponto, camposPropostos, "sugestao_aprovada", req.usuario!.id);
 
-    await prisma.$transaction([
-      prisma.pontoTuristico.update({
-        where: { id: sugestao.idPonto },
-        data: {
-          ...(camposPropostos as Prisma.PontoTuristicoUpdateInput),
-          versao: { increment: 1 },
-        },
-      }),
-      prisma.sugestaoEdicao.update({
+      await tx.sugestaoEdicao.update({
         where: { id: id.data },
         data: {
           status: StatusSolicitacao.APROVADA,
           idModerador: req.usuario!.id,
           dataResolucao: new Date(),
         },
-      }),
-    ]);
+      });
+    });
 
     await incrementarReputacao(sugestao.idAutor, PONTOS_REPUTACAO.SUGESTAO_APROVADA);
 

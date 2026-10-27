@@ -41,6 +41,19 @@ model Usuario {
   ativo       Boolean   @default(true)
   dataCriacao DateTime  @default(now()) @map("data_criacao")
 
+  // LGPD: quando o usuário aceitou a política de privacidade e quando a conta foi
+  // anonimizada (a linha é mantida, sem dados pessoais, para preservar o histórico).
+  consentimentoEm DateTime? @map("consentimento_em")
+  removidoEm      DateTime? @map("removido_em")
+
+  // Preferências do perfil (RF03).
+  idioma                     String   @default("pt-BR")
+  preferenciasAcessibilidade String[] @default([]) @map("preferencias_acessibilidade")
+
+  // Autenticação em dois fatores por TOTP (RF21).
+  mfaSegredo String? @map("mfa_segredo")
+  mfaAtivo   Boolean @default(false) @map("mfa_ativo")
+
   pontosResponsaveis  PontoTuristico[]
   roteiros            Roteiro[]
   sugestoesEdicao     SugestaoEdicao[]         @relation("autorSugestao")
@@ -48,6 +61,7 @@ model Usuario {
   avaliacoes          Avaliacao[]
   notificacoes        Notificacao[]
   logsAuditoria       LogAuditoria[]
+  pontosSalvos        PontoSalvo[]
 
   @@map("usuario")
 }
@@ -87,6 +101,7 @@ model PontoTuristico {
   verificacoes SolicitacaoVerificacao[]
   avaliacoes   Avaliacao[]
   versoes      VersaoPonto[]
+  salvosPor    PontoSalvo[]
 
   @@index([cidade])
   @@index([categoria])
@@ -103,12 +118,15 @@ model Avaliacao {
   fotoUrl        String?           @map("foto_url")
   status         StatusSolicitacao @default(PENDENTE)
   motivoRejeicao String?           @map("motivo_rejeicao")
+  motivoRetencao String?           @map("motivo_retencao")
   dataCriacao    DateTime          @default(now()) @map("data_criacao")
 
   ponto PontoTuristico @relation(fields: [idPonto], references: [id], onDelete: Cascade)
   autor Usuario        @relation(fields: [idAutor], references: [id])
 
+  @@unique([idPonto, idAutor])
   @@index([idPonto])
+  @@index([idAutor])
   @@index([status])
   @@map("avaliacao")
 }
@@ -154,6 +172,7 @@ model LogAuditoria {
 
   @@index([entidade, idEntidade])
   @@index([dataCriacao])
+  @@index([idUsuario])
   @@map("log_auditoria")
 }
 
@@ -166,6 +185,7 @@ model SugestaoEdicao {
   status          StatusSolicitacao @default(PENDENTE)
   idModerador     Int?              @map("id_moderador")
   motivoRejeicao  String?           @map("motivo_rejeicao")
+  motivoRetencao  String?           @map("motivo_retencao")
   dataCriacao     DateTime          @default(now()) @map("data_criacao")
   dataResolucao   DateTime?         @map("data_resolucao")
 
@@ -206,11 +226,18 @@ model Roteiro {
   idUsuario       Int       @map("id_usuario")
   publico         Boolean   @default(false)
   slugPublico     String?   @unique @map("slug_publico")
+
+  // Anotações livres e teto de gastos da viagem (em centavos). Ficam só para o dono.
+  notas              String?
+  orcamentoCentavos  Int?      @map("orcamento_centavos")
+
   dataCriacao     DateTime  @default(now()) @map("data_criacao")
   dataAtualizacao DateTime  @updatedAt @map("data_atualizacao")
 
-  usuario Usuario       @relation(fields: [idUsuario], references: [id])
+  usuario Usuario         @relation(fields: [idUsuario], references: [id])
   itens   ItemRoteiro[]
+  versoes   VersaoRoteiro[]
+  checklist ItemChecklist[]
 
   @@index([idUsuario])
   @@map("roteiro")
@@ -220,8 +247,12 @@ model ItemRoteiro {
   id          Int      @id @default(autoincrement())
   idRoteiro   Int      @map("id_roteiro")
   idPonto     Int      @map("id_ponto")
+  // Dia do roteiro (1, 2, 3...) em que a parada acontece; a ordem vale dentro de cada dia.
+  dia         Int      @default(1)
   ordem       Int      @default(0)
   observacao  String?
+  // Quanto se pretende gastar nesta parada, em centavos (entrada, refeição...).
+  custoCentavos Int?     @map("custo_centavos")
   dataCriacao DateTime @default(now()) @map("data_criacao")
 
   roteiro Roteiro        @relation(fields: [idRoteiro], references: [id], onDelete: Cascade)
@@ -230,4 +261,55 @@ model ItemRoteiro {
   @@unique([idRoteiro, idPonto])
   @@index([idRoteiro])
   @@map("item_roteiro")
+}
+
+model PontoSalvo {
+  id          Int      @id @default(autoincrement())
+  idUsuario   Int      @map("id_usuario")
+  idPonto     Int      @map("id_ponto")
+  dataCriacao DateTime @default(now()) @map("data_criacao")
+
+  usuario Usuario        @relation(fields: [idUsuario], references: [id], onDelete: Cascade)
+  ponto   PontoTuristico @relation(fields: [idPonto], references: [id], onDelete: Cascade)
+
+  @@unique([idUsuario, idPonto])
+  @@index([idUsuario])
+  @@map("ponto_salvo")
+}
+
+model VersaoRoteiro {
+  id          Int      @id @default(autoincrement())
+  idRoteiro   Int      @map("id_roteiro")
+  dados       Json
+  idAutor     Int?     @map("id_autor")
+  motivo      String
+  dataCriacao DateTime @default(now()) @map("data_criacao")
+
+  roteiro Roteiro @relation(fields: [idRoteiro], references: [id], onDelete: Cascade)
+
+  @@index([idRoteiro])
+  @@map("versao_roteiro")
+}
+
+model MetricaDiaria {
+  dia   DateTime @db.Date
+  tipo  String
+  total Int      @default(0)
+
+  @@id([dia, tipo])
+  @@map("metrica_diaria")
+}
+
+model ItemChecklist {
+  id          Int      @id @default(autoincrement())
+  idRoteiro   Int      @map("id_roteiro")
+  texto       String
+  feito       Boolean  @default(false)
+  ordem       Int      @default(0)
+  dataCriacao DateTime @default(now()) @map("data_criacao")
+
+  roteiro Roteiro @relation(fields: [idRoteiro], references: [id], onDelete: Cascade)
+
+  @@index([idRoteiro])
+  @@map("item_checklist")
 }

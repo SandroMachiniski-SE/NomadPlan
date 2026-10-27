@@ -8,10 +8,18 @@ import {
   gerarTokenRedefinicaoSenha,
   impressaoSenha,
   impressoesIguais,
+  verificarSenha,
   verificarSenhaOuFalso,
   verificarTokenRedefinicaoSenha,
 } from "../lib/auth";
+import { cifrar, decifrar } from "../lib/criptografia";
 import { enviarEmailRedefinicaoSenha } from "../lib/email";
+import { registrarAuditoria } from "../lib/auditoria";
+import { registrarFalhaLogin } from "../lib/seguranca";
+import { gerarSegredoTotp, urlOtpauth, verificarTotp } from "../lib/totp";
+import { anonimizarUsuario, ErroPrivacidade, exportarDadosDoUsuario } from "../lib/privacidade";
+import { IDIOMAS, PREFERENCIAS_ACESSIBILIDADE } from "../lib/preferencias";
+import { registrarEvento } from "../lib/metricasUso";
 import { autenticar } from "../middleware/auth";
 import {
   limiteCriacaoConta,
@@ -35,17 +43,29 @@ const registrarSchema = z.object({
   senha: z.string().min(8).max(72),
   tipoConta: z.enum(tiposContaPublicos).default(TipoConta.VISITANTE),
   cidadeBase: z.string().trim().max(120).optional(),
+  // LGPD: o cadastro só é aceito com o consentimento explícito do usuário.
+  aceitouPolitica: z.literal(true, {
+    error: "É necessário aceitar a Política de Privacidade para criar a conta.",
+  }),
 });
+
+const codigoMfaSchema = z.string().trim().regex(/^\d{6}$/, "O código tem 6 números.");
 
 const loginSchema = z.object({
   email: z.string().trim().toLowerCase().email(),
   senha: z.string().min(1),
+  codigoMfa: codigoMfaSchema.optional(),
 });
 
 const atualizarPerfilSchema = z.object({
   nome: z.string().trim().min(1).max(120).optional(),
   cidadeBase: z.string().trim().max(120).nullable().optional(),
   interesses: z.array(z.string().trim().min(1).max(80)).max(20).optional(),
+  idioma: z.enum(IDIOMAS).optional(),
+  preferenciasAcessibilidade: z
+    .array(z.enum(PREFERENCIAS_ACESSIBILIDADE as [string, ...string[]]))
+    .max(PREFERENCIAS_ACESSIBILIDADE.length)
+    .optional(),
 });
 
 const esqueciSenhaSchema = z.object({
@@ -57,6 +77,13 @@ const redefinirSenhaSchema = z.object({
   novaSenha: z.string().min(8).max(72),
 });
 
+const confirmarComSenhaSchema = z.object({
+  senha: z.string().min(1),
+  codigoMfa: codigoMfaSchema.optional(),
+});
+
+const ativarMfaSchema = z.object({ codigo: codigoMfaSchema });
+
 const usuarioSelecaoPublica = {
   id: true,
   nome: true,
@@ -64,9 +91,34 @@ const usuarioSelecaoPublica = {
   tipoConta: true,
   cidadeBase: true,
   interesses: true,
+  idioma: true,
+  preferenciasAcessibilidade: true,
   reputacao: true,
+  mfaAtivo: true,
+  consentimentoEm: true,
   dataCriacao: true,
 } as const;
+
+// Último passo TOTP aceito por segredo: impede reaproveitar o mesmo código de 6 dígitos
+// enquanto ele ainda está dentro da janela de validade. A chave é o segredo cifrado (único
+// a cada configuração), então reconfigurar o 2FA começa do zero.
+const ultimoPassoMfa = new Map<string, number>();
+
+function confereCodigoMfa(segredoCifrado: string | null, codigo: string | undefined): boolean {
+  if (!segredoCifrado || !codigo) {
+    return false;
+  }
+
+  const passo = verificarTotp(decifrar(segredoCifrado), codigo);
+
+  if (passo === null || passo <= (ultimoPassoMfa.get(segredoCifrado) ?? -1)) {
+    return false;
+  }
+
+  ultimoPassoMfa.set(segredoCifrado, passo);
+
+  return true;
+}
 
 authRouter.post("/registrar", limiteCriacaoConta, async (req: Request, res: Response) => {
   try {
@@ -74,7 +126,9 @@ authRouter.post("/registrar", limiteCriacaoConta, async (req: Request, res: Resp
 
     if (!resultado.success) {
       return res.status(400).json({
-        erro: "Dados de cadastro inválidos.",
+        erro: resultado.error.issues[0]?.path.includes("aceitouPolitica")
+          ? resultado.error.issues[0].message
+          : "Dados de cadastro inválidos.",
         detalhes: resultado.error.flatten(),
       });
     }
@@ -101,9 +155,12 @@ authRouter.post("/registrar", limiteCriacaoConta, async (req: Request, res: Resp
         senhaHash,
         tipoConta: dados.tipoConta,
         cidadeBase: dados.cidadeBase || null,
+        consentimentoEm: new Date(),
       },
       select: usuarioSelecaoPublica,
     });
+
+    registrarEvento("cadastro");
 
     const token = gerarToken({ sub: usuario.id, tipoConta: usuario.tipoConta });
 
@@ -128,7 +185,7 @@ authRouter.post("/login", limiteLogin, limiteLoginPorEmail, async (req: Request,
       });
     }
 
-    const { email, senha } = resultado.data;
+    const { email, senha, codigoMfa } = resultado.data;
 
     const usuario = await prisma.usuario.findUnique({
       where: { email },
@@ -139,8 +196,14 @@ authRouter.post("/login", limiteLogin, limiteLoginPorEmail, async (req: Request,
     const senhaValida = await verificarSenhaOuFalso(senha, usuario?.senhaHash);
 
     if (!usuario || !senhaValida) {
+      await registrarFalhaLogin({
+        idUsuario: usuario?.id ?? null,
+        ip: req.ip ?? "",
+        motivo: "senha_invalida",
+      });
+
       return res.status(401).json({
-        erro: "E-mail ou senha inválidos.",
+        erro: "E-mail ou senha inválidos. Verifique e tente novamente.",
       });
     }
 
@@ -150,9 +213,33 @@ authRouter.post("/login", limiteLogin, limiteLoginPorEmail, async (req: Request,
       });
     }
 
+    if (usuario.mfaAtivo) {
+      // Senha correta, mas falta o segundo fator: não é falha (não conta para o bloqueio).
+      if (!codigoMfa) {
+        return res.json({ mfaNecessario: true });
+      }
+
+      if (!confereCodigoMfa(usuario.mfaSegredo, codigoMfa)) {
+        await registrarFalhaLogin({ idUsuario: usuario.id, ip: req.ip ?? "", motivo: "codigo_mfa_invalido" });
+
+        return res.status(401).json({ erro: "Código de verificação inválido ou já utilizado." });
+      }
+    }
+
     const token = gerarToken({ sub: usuario.id, tipoConta: usuario.tipoConta });
 
-    const { senhaHash: _senhaHash, ativo: _ativo, ...usuarioPublico } = usuario;
+    await registrarAuditoria({
+      idUsuario: usuario.id,
+      acao: "login_ok",
+      entidade: "autenticacao",
+      detalhes: { mfa: usuario.mfaAtivo },
+    });
+    registrarEvento("login");
+
+    const usuarioPublico = await prisma.usuario.findUnique({
+      where: { id: usuario.id },
+      select: usuarioSelecaoPublica,
+    });
 
     return res.json({ usuario: usuarioPublico, token });
   } catch (error) {
@@ -161,6 +248,27 @@ authRouter.post("/login", limiteLogin, limiteLoginPorEmail, async (req: Request,
     return res.status(500).json({
       erro: "Erro interno ao autenticar usuário.",
     });
+  }
+});
+
+// RNF09: a sessão expira, mas pode ser renovada enquanto o token atual ainda for válido
+// e a conta continuar ativa (o middleware já confere isso).
+authRouter.post("/renovar", autenticar, async (req: Request, res: Response) => {
+  try {
+    const usuario = await prisma.usuario.findUnique({
+      where: { id: req.usuario!.id },
+      select: usuarioSelecaoPublica,
+    });
+
+    if (!usuario) {
+      return res.status(404).json({ erro: "Usuário não encontrado." });
+    }
+
+    return res.json({ usuario, token: gerarToken({ sub: usuario.id, tipoConta: usuario.tipoConta }) });
+  } catch (error) {
+    console.error("Erro ao renovar sessão:", error);
+
+    return res.status(500).json({ erro: "Erro interno ao renovar sessão." });
   }
 });
 
@@ -208,6 +316,10 @@ authRouter.put("/me", autenticar, async (req: Request, res: Response) => {
           ? { cidadeBase: dados.cidadeBase || null }
           : {}),
         ...(dados.interesses !== undefined ? { interesses: dados.interesses } : {}),
+        ...(dados.idioma !== undefined ? { idioma: dados.idioma } : {}),
+        ...(dados.preferenciasAcessibilidade !== undefined
+          ? { preferenciasAcessibilidade: dados.preferenciasAcessibilidade }
+          : {}),
       },
       select: usuarioSelecaoPublica,
     });
@@ -219,6 +331,175 @@ authRouter.put("/me", autenticar, async (req: Request, res: Response) => {
     return res.status(500).json({
       erro: "Erro interno ao atualizar perfil.",
     });
+  }
+});
+
+// LGPD: quem já tinha conta antes da política passa a aceitá-la explicitamente.
+authRouter.post("/consentimento", autenticar, async (req: Request, res: Response) => {
+  try {
+    const atual = await prisma.usuario.findUnique({
+      where: { id: req.usuario!.id },
+      select: { consentimentoEm: true },
+    });
+
+    const usuario = await prisma.usuario.update({
+      where: { id: req.usuario!.id },
+      data: { consentimentoEm: atual?.consentimentoEm ?? new Date() },
+      select: usuarioSelecaoPublica,
+    });
+
+    return res.json(usuario);
+  } catch (error) {
+    console.error("Erro ao registrar consentimento:", error);
+
+    return res.status(500).json({ erro: "Erro interno ao registrar consentimento." });
+  }
+});
+
+// LGPD (portabilidade): o usuário baixa tudo o que o sistema guarda sobre ele.
+authRouter.get("/me/dados", autenticar, async (req: Request, res: Response) => {
+  try {
+    const dados = await exportarDadosDoUsuario(req.usuario!.id);
+
+    res.setHeader("Content-Disposition", "attachment; filename=meus-dados-nomadplan.json");
+
+    return res.json(dados);
+  } catch (error) {
+    console.error("Erro ao exportar dados do usuário:", error);
+
+    return res.status(500).json({ erro: "Erro interno ao exportar seus dados." });
+  }
+});
+
+// LGPD/AF10: exclusão (anonimização) da conta, confirmada com a senha.
+authRouter.delete("/me", autenticar, limiteLogin, async (req: Request, res: Response) => {
+  try {
+    const resultado = confirmarComSenhaSchema.safeParse(req.body);
+
+    if (!resultado.success) {
+      return res.status(400).json({ erro: "Informe sua senha para confirmar a exclusão da conta." });
+    }
+
+    const usuario = await prisma.usuario.findUnique({ where: { id: req.usuario!.id } });
+
+    if (!usuario || !(await verificarSenha(resultado.data.senha, usuario.senhaHash))) {
+      return res.status(403).json({ erro: "Senha incorreta." });
+    }
+
+    if (usuario.mfaAtivo && !confereCodigoMfa(usuario.mfaSegredo, resultado.data.codigoMfa)) {
+      return res.status(403).json({ erro: "Código de verificação inválido ou já utilizado." });
+    }
+
+    await anonimizarUsuario(usuario.id);
+
+    return res.json({ mensagem: "Seus dados pessoais foram removidos e a conta foi encerrada." });
+  } catch (error) {
+    if (error instanceof ErroPrivacidade) {
+      return res.status(error.status).json({ erro: error.message });
+    }
+
+    console.error("Erro ao excluir conta:", error);
+
+    return res.status(500).json({ erro: "Erro interno ao excluir a conta." });
+  }
+});
+
+// RF21: autenticação em dois fatores (TOTP). Configurar gera o segredo; a ativação só
+// vale depois de o usuário provar que o aplicativo autenticador gera o código certo.
+authRouter.post("/mfa/configurar", autenticar, async (req: Request, res: Response) => {
+  try {
+    const usuario = await prisma.usuario.findUnique({
+      where: { id: req.usuario!.id },
+      select: { id: true, email: true, mfaAtivo: true },
+    });
+
+    if (!usuario) {
+      return res.status(404).json({ erro: "Usuário não encontrado." });
+    }
+
+    if (usuario.mfaAtivo) {
+      return res.status(409).json({ erro: "A verificação em duas etapas já está ativa." });
+    }
+
+    const segredo = gerarSegredoTotp();
+
+    await prisma.usuario.update({ where: { id: usuario.id }, data: { mfaSegredo: cifrar(segredo) } });
+
+    return res.json({ segredo, otpauthUrl: urlOtpauth(usuario.email, segredo) });
+  } catch (error) {
+    console.error("Erro ao configurar a verificação em duas etapas:", error);
+
+    return res.status(500).json({ erro: "Erro interno ao configurar a verificação em duas etapas." });
+  }
+});
+
+authRouter.post("/mfa/ativar", autenticar, limiteLogin, async (req: Request, res: Response) => {
+  try {
+    const resultado = ativarMfaSchema.safeParse(req.body);
+
+    if (!resultado.success) {
+      return res.status(400).json({ erro: "Informe o código de 6 números do aplicativo." });
+    }
+
+    const usuario = await prisma.usuario.findUnique({
+      where: { id: req.usuario!.id },
+      select: { id: true, mfaAtivo: true, mfaSegredo: true },
+    });
+
+    if (!usuario?.mfaSegredo) {
+      return res.status(409).json({ erro: "Inicie a configuração antes de ativar." });
+    }
+
+    if (usuario.mfaAtivo) {
+      return res.status(409).json({ erro: "A verificação em duas etapas já está ativa." });
+    }
+
+    if (!confereCodigoMfa(usuario.mfaSegredo, resultado.data.codigo)) {
+      return res.status(400).json({ erro: "Código inválido. Confira o aplicativo e tente de novo." });
+    }
+
+    await prisma.usuario.update({ where: { id: usuario.id }, data: { mfaAtivo: true } });
+
+    await registrarAuditoria({ idUsuario: usuario.id, acao: "mfa_ativado", entidade: "usuario", idEntidade: usuario.id });
+
+    return res.json({ mensagem: "Verificação em duas etapas ativada." });
+  } catch (error) {
+    console.error("Erro ao ativar a verificação em duas etapas:", error);
+
+    return res.status(500).json({ erro: "Erro interno ao ativar a verificação em duas etapas." });
+  }
+});
+
+authRouter.post("/mfa/desativar", autenticar, limiteLogin, async (req: Request, res: Response) => {
+  try {
+    const resultado = confirmarComSenhaSchema.safeParse(req.body);
+
+    if (!resultado.success) {
+      return res.status(400).json({ erro: "Informe sua senha e o código do aplicativo." });
+    }
+
+    const usuario = await prisma.usuario.findUnique({ where: { id: req.usuario!.id } });
+
+    if (!usuario?.mfaAtivo) {
+      return res.status(409).json({ erro: "A verificação em duas etapas não está ativa." });
+    }
+
+    if (
+      !(await verificarSenha(resultado.data.senha, usuario.senhaHash)) ||
+      !confereCodigoMfa(usuario.mfaSegredo, resultado.data.codigoMfa)
+    ) {
+      return res.status(403).json({ erro: "Senha ou código de verificação incorretos." });
+    }
+
+    await prisma.usuario.update({ where: { id: usuario.id }, data: { mfaAtivo: false, mfaSegredo: null } });
+
+    await registrarAuditoria({ idUsuario: usuario.id, acao: "mfa_desativado", entidade: "usuario", idEntidade: usuario.id });
+
+    return res.json({ mensagem: "Verificação em duas etapas desativada." });
+  } catch (error) {
+    console.error("Erro ao desativar a verificação em duas etapas:", error);
+
+    return res.status(500).json({ erro: "Erro interno ao desativar a verificação em duas etapas." });
   }
 });
 
@@ -240,7 +521,7 @@ authRouter.post("/esqueci-senha", limiteRecuperacaoSenha, async (req: Request, r
     // Resposta genérica sempre — evita que a rota revele quais e-mails existem.
     if (usuario?.ativo) {
       const token = gerarTokenRedefinicaoSenha(usuario.id, usuario.senhaHash);
-      const frontendUrl = process.env.FRONTEND_URL ?? "http://localhost:5173";
+      const frontendUrl = process.env.FRONTEND_URL || "http://localhost:5173";
       const link = `${frontendUrl}/redefinir-senha?token=${token}`;
 
       // Não aguardamos o envio: o SMTP leva segundos, e esperar faria a resposta
@@ -293,12 +574,16 @@ authRouter.post("/redefinir-senha", limiteRecuperacaoSenha, async (req: Request,
 
     const usuario = await prisma.usuario.findUnique({
       where: { id: dadosToken.idUsuario },
-      select: { id: true, senhaHash: true },
+      select: { id: true, senhaHash: true, ativo: true },
     });
 
     // O token só vale enquanto a senha for a mesma de quando ele foi emitido:
     // depois de usado (ou de qualquer troca de senha) ele deixa de funcionar.
-    if (!usuario || !impressoesIguais(dadosToken.impressao, impressaoSenha(usuario.senhaHash))) {
+    if (
+      !usuario ||
+      !usuario.ativo ||
+      !impressoesIguais(dadosToken.impressao, impressaoSenha(usuario.senhaHash))
+    ) {
       return res.status(400).json(erroTokenInvalido);
     }
 
@@ -307,6 +592,13 @@ authRouter.post("/redefinir-senha", limiteRecuperacaoSenha, async (req: Request,
     await prisma.usuario.update({
       where: { id: usuario.id },
       data: { senhaHash },
+    });
+
+    await registrarAuditoria({
+      idUsuario: usuario.id,
+      acao: "senha_redefinida",
+      entidade: "usuario",
+      idEntidade: usuario.id,
     });
 
     return res.json({
