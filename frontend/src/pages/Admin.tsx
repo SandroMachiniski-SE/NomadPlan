@@ -3,11 +3,14 @@ import api from "../services/api";
 import type { LogAuditoria, Metricas, UsuarioAdmin } from "../types/admin";
 import type { TipoConta } from "../types/usuario";
 import { extrairMensagemErro } from "../utils/erro";
+import { useAuth } from "../context/useAuth";
 import Icone from "../components/Icone";
+import GraficoUso from "../components/GraficoUso";
 
 const PAPEIS: TipoConta[] = ["VISITANTE", "MORADOR", "NEGOCIO", "GESTOR", "MODERADOR", "ADMIN"];
 
 function Admin() {
+  const { usuario: usuarioLogado } = useAuth();
   const [usuarios, setUsuarios] = useState<UsuarioAdmin[]>([]);
   const [logs, setLogs] = useState<LogAuditoria[]>([]);
   const [metricas, setMetricas] = useState<Metricas | null>(null);
@@ -42,6 +45,24 @@ function Admin() {
     carregarTudo();
   }, [carregarTudo]);
 
+  async function aoAlterarAtivo(id: number, ativo: boolean) {
+    const confirmar = ativo
+      ? true
+      : window.confirm("Desativar esta conta? A pessoa perde o acesso imediatamente.");
+
+    if (!confirmar) return;
+
+    try {
+      setAlterandoId(id);
+      await api.patch(`/admin/usuarios/${id}/ativo`, { ativo });
+      await carregarTudo();
+    } catch (err) {
+      alert(extrairMensagemErro(err, "Não foi possível alterar o estado desta conta."));
+    } finally {
+      setAlterandoId(null);
+    }
+  }
+
   async function aoAlterarPapel(id: number, tipoConta: TipoConta) {
     try {
       setAlterandoId(id);
@@ -66,6 +87,8 @@ function Admin() {
   const cartoesMetricas = metricas
     ? [
         { valor: metricas.totalUsuarios, rotulo: "Usuários" },
+        { valor: metricas.usuariosAtivos7d, rotulo: "Ativos nos últimos 7 dias" },
+        { valor: metricas.usuariosAtivos30d, rotulo: "Ativos nos últimos 30 dias" },
         { valor: metricas.pontosPublicados, rotulo: "Pontos publicados" },
         { valor: metricas.totalPontos, rotulo: "Pontos (total)" },
         { valor: metricas.totalRoteiros, rotulo: "Roteiros" },
@@ -110,6 +133,13 @@ function Admin() {
         </section>
       )}
 
+      <section className="section" aria-labelledby="titulo-uso-diario">
+        <h2 id="titulo-uso-diario" className="section__title">
+          Uso diário
+        </h2>
+        <GraficoUso />
+      </section>
+
       <section className="section" aria-labelledby="titulo-usuarios">
         <h2 id="titulo-usuarios" className="section__title">
           Usuários e papéis
@@ -122,6 +152,7 @@ function Admin() {
                 <th>Usuário</th>
                 <th>Reputação</th>
                 <th>Papel</th>
+                <th>Conta</th>
               </tr>
             </thead>
             <tbody>
@@ -143,7 +174,7 @@ function Admin() {
                     <select
                       value={usuario.tipoConta}
                       onChange={(e) => aoAlterarPapel(usuario.id, e.target.value as TipoConta)}
-                      disabled={alterandoId === usuario.id}
+                      disabled={alterandoId === usuario.id || usuario.id === usuarioLogado?.id}
                       aria-label={`Papel de ${usuario.nome}`}
                       className="tabela-select"
                     >
@@ -153,6 +184,23 @@ function Admin() {
                         </option>
                       ))}
                     </select>
+                  </td>
+                  <td>
+                    <div className="cluster">
+                      <span className={usuario.ativo ? "badge badge--success" : "badge badge--danger"}>
+                        {usuario.ativo ? "Ativa" : "Desativada"}
+                      </span>
+                      {usuario.id !== usuarioLogado?.id && (
+                        <button
+                          type="button"
+                          className={usuario.ativo ? "btn btn--danger-outline btn--sm" : "btn btn--outline btn--sm"}
+                          onClick={() => aoAlterarAtivo(usuario.id, !usuario.ativo)}
+                          disabled={alterandoId === usuario.id}
+                        >
+                          {usuario.ativo ? "Desativar" : "Reativar"}
+                        </button>
+                      )}
+                    </div>
                   </td>
                 </tr>
               ))}

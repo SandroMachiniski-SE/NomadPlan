@@ -1,6 +1,6 @@
 import { useEffect, useState, type FormEvent } from "react";
 import { Link, useNavigate, useParams } from "react-router-dom";
-import api from "../services/api";
+import api, { urlDoArquivo } from "../services/api";
 import type { Ponto, VersaoPonto } from "../types/ponto";
 import { extrairMensagemErro } from "../utils/erro";
 import { CATEGORIAS_PONTOS } from "../constants/categorias";
@@ -36,6 +36,26 @@ const CAMPOS_VAZIOS: CamposPonto = {
   horarioFuncionamento: "",
 };
 
+function camposDoPonto(ponto: Ponto): CamposPonto {
+  return {
+    nome: ponto.nome,
+    categoria: ponto.categoria,
+    cidade: ponto.cidade,
+    endereco: ponto.endereco ?? "",
+    descricao: ponto.descricao ?? "",
+    latitude: ponto.latitude !== null ? String(ponto.latitude) : "",
+    longitude: ponto.longitude !== null ? String(ponto.longitude) : "",
+    faixaPreco: ponto.faixaPreco ?? "",
+    acessibilidade: ponto.acessibilidade ?? "",
+    siteOficial: ponto.siteOficial ?? "",
+    telefoneContato: ponto.telefoneContato ?? "",
+    horarioFuncionamento: ponto.horarioFuncionamento ?? "",
+  };
+}
+
+const LIMITE_IMAGEM_BYTES = 5 * 1024 * 1024;
+const FORMATOS_IMAGEM = ["image/jpeg", "image/png", "image/webp"];
+
 interface PossivelDuplicado {
   id: number;
   nome: string;
@@ -53,6 +73,9 @@ function PontoFormulario() {
   const [salvando, setSalvando] = useState(false);
   const [erro, setErro] = useState<string | null>(null);
   const [duplicados, setDuplicados] = useState<PossivelDuplicado[] | null>(null);
+  const [conflito, setConflito] = useState<Ponto | null>(null);
+  const [alteracoesSalvas, setAlteracoesSalvas] = useState(false);
+  const [erroImagem, setErroImagem] = useState<string | null>(null);
   const [enviandoImagem, setEnviandoImagem] = useState(false);
   const [arquivoImagem, setArquivoImagem] = useState<File | null>(null);
   const [publicando, setPublicando] = useState(false);
@@ -70,20 +93,7 @@ function PontoFormulario() {
       try {
         const resposta = await api.get<Ponto>(`/pontos/${id}`);
         setPonto(resposta.data);
-        setCampos({
-          nome: resposta.data.nome,
-          categoria: resposta.data.categoria,
-          cidade: resposta.data.cidade,
-          endereco: resposta.data.endereco ?? "",
-          descricao: resposta.data.descricao ?? "",
-          latitude: resposta.data.latitude !== null ? String(resposta.data.latitude) : "",
-          longitude: resposta.data.longitude !== null ? String(resposta.data.longitude) : "",
-          faixaPreco: resposta.data.faixaPreco ?? "",
-          acessibilidade: resposta.data.acessibilidade ?? "",
-          siteOficial: resposta.data.siteOficial ?? "",
-          telefoneContato: resposta.data.telefoneContato ?? "",
-          horarioFuncionamento: resposta.data.horarioFuncionamento ?? "",
-        });
+        setCampos(camposDoPonto(resposta.data));
       } catch (err) {
         console.error(err);
         setErro(extrairMensagemErro(err, "Não foi possível carregar este ponto turístico."));
@@ -141,20 +151,7 @@ function PontoFormulario() {
       setRestaurandoId(versaoId);
       const resposta = await api.post<Ponto>(`/pontos/${id}/versoes/${versaoId}/restaurar`);
       setPonto(resposta.data);
-      setCampos({
-        nome: resposta.data.nome,
-        categoria: resposta.data.categoria,
-        cidade: resposta.data.cidade,
-        endereco: resposta.data.endereco ?? "",
-        descricao: resposta.data.descricao ?? "",
-        latitude: resposta.data.latitude !== null ? String(resposta.data.latitude) : "",
-        longitude: resposta.data.longitude !== null ? String(resposta.data.longitude) : "",
-        faixaPreco: resposta.data.faixaPreco ?? "",
-        acessibilidade: resposta.data.acessibilidade ?? "",
-        siteOficial: resposta.data.siteOficial ?? "",
-        telefoneContato: resposta.data.telefoneContato ?? "",
-        horarioFuncionamento: resposta.data.horarioFuncionamento ?? "",
-      });
+      setCampos(camposDoPonto(resposta.data));
       await carregarHistorico();
     } catch (err) {
       console.error(err);
@@ -166,6 +163,8 @@ function PontoFormulario() {
 
   async function salvar(confirmarDuplicidade = false) {
     setErro(null);
+    setConflito(null);
+    setAlteracoesSalvas(false);
 
     if (!campos.nome.trim() || !campos.categoria.trim() || !campos.cidade.trim()) {
       setErro("Nome, categoria e cidade são obrigatórios.");
@@ -176,8 +175,12 @@ function PontoFormulario() {
       setSalvando(true);
 
       if (emEdicao) {
-        await api.put(`/pontos/${id}`, montarPayload(confirmarDuplicidade));
-        navigate(`/pontos/${id}/editar`, { replace: true });
+        // A resposta traz a nova versão do ponto: sem guardá-la, um segundo "salvar"
+        // enviaria a versão antiga e seria recusado como conflito.
+        const atualizado = await api.put<Ponto>(`/pontos/${id}`, montarPayload(confirmarDuplicidade));
+        setPonto(atualizado.data);
+        setCampos(camposDoPonto(atualizado.data));
+        setAlteracoesSalvas(true);
         return;
       }
 
@@ -203,10 +206,8 @@ function PontoFormulario() {
       }
 
       if (status === 409 && dados?.pontoAtual) {
-        setPonto(dados.pontoAtual);
-        setErro(
-          "Este ponto foi alterado por outra pessoa enquanto você editava. Recarregue os campos abaixo e tente novamente.",
-        );
+        setConflito(dados.pontoAtual);
+        setErro("Este ponto foi alterado por outra pessoa enquanto você editava.");
         return;
       }
 
@@ -221,6 +222,42 @@ function PontoFormulario() {
     await salvar(false);
   }
 
+  function aoEscolherImagem(arquivo: File | null) {
+    setErroImagem(null);
+
+    if (arquivo && !FORMATOS_IMAGEM.includes(arquivo.type)) {
+      setErroImagem("Formato não suportado. Envie uma imagem JPG, PNG ou WebP.");
+      setArquivoImagem(null);
+      return;
+    }
+
+    if (arquivo && arquivo.size > LIMITE_IMAGEM_BYTES) {
+      setErroImagem("A imagem excede 5 MB. Escolha um arquivo menor.");
+      setArquivoImagem(null);
+      return;
+    }
+
+    setArquivoImagem(arquivo);
+  }
+
+  function aoDescartarMinhasAlteracoes() {
+    if (!conflito) return;
+
+    setPonto(conflito);
+    setCampos(camposDoPonto(conflito));
+    setConflito(null);
+    setErro(null);
+  }
+
+  function aoManterMinhasAlteracoes() {
+    if (!conflito) return;
+
+    // Só atualiza a versão de referência: os campos continuam com o que a pessoa digitou.
+    setPonto(conflito);
+    setConflito(null);
+    setErro("Pronto: ao salvar de novo, suas alterações substituirão as da outra pessoa.");
+  }
+
   async function aoEnviarImagem() {
     if (!arquivoImagem || !id) {
       return;
@@ -228,6 +265,7 @@ function PontoFormulario() {
 
     try {
       setEnviandoImagem(true);
+      setErroImagem(null);
 
       const formData = new FormData();
       formData.append("imagem", arquivoImagem);
@@ -240,7 +278,7 @@ function PontoFormulario() {
       setArquivoImagem(null);
     } catch (err) {
       console.error(err);
-      alert(extrairMensagemErro(err, "Não foi possível enviar a imagem."));
+      setErroImagem(extrairMensagemErro(err, "Não foi possível enviar a imagem."));
     } finally {
       setEnviandoImagem(false);
     }
@@ -386,11 +424,15 @@ function PontoFormulario() {
             <span>Horário de funcionamento *</span>
             <input
               type="text"
-              placeholder="Ex.: Seg-Sex 9h-18h"
+              placeholder="Ex.: Seg-Sex 9h-18h; Sáb 9h-13h"
               value={campos.horarioFuncionamento}
               onChange={(e) => aoMudarCampo("horarioFuncionamento", e.target.value)}
               maxLength={200}
             />
+            <span className="field__hint">
+              Separe trechos com ponto e vírgula. &ldquo;Todos os dias, 24h&rdquo; também vale. Esse formato
+              alimenta o filtro &ldquo;aberto agora&rdquo; e a geração de roteiros.
+            </span>
           </label>
 
           <label className="field">
@@ -440,6 +482,32 @@ function PontoFormulario() {
           </div>
         )}
 
+        {conflito && (
+          <div className="alert alert--warning">
+            <div>
+              <p>
+                <strong>Conflito de edição.</strong> Outra pessoa salvou este ponto depois que você abriu a
+                página. Escolha como seguir:
+              </p>
+              <div className="cluster" style={{ marginTop: "0.75rem" }}>
+                <button type="button" className="btn btn--outline btn--sm" onClick={aoDescartarMinhasAlteracoes}>
+                  Descartar as minhas e carregar a versão atual
+                </button>
+                <button type="button" className="btn btn--outline btn--sm" onClick={aoManterMinhasAlteracoes}>
+                  Manter as minhas alterações
+                </button>
+              </div>
+            </div>
+          </div>
+        )}
+
+        {alteracoesSalvas && (
+          <div className="alert alert--success" role="status">
+            <Icone nome="check" />
+            <p>Alterações salvas.</p>
+          </div>
+        )}
+
         {duplicados && duplicados.length > 0 && (
           <div className="alert alert--warning">
             <div>
@@ -480,7 +548,7 @@ function PontoFormulario() {
 
             {ponto.imagemUrl && (
               <img
-                src={`${api.defaults.baseURL}${ponto.imagemUrl}`}
+                src={urlDoArquivo(ponto.imagemUrl)}
                 alt={ponto.nome}
                 className="imagem-previa"
               />
@@ -489,8 +557,15 @@ function PontoFormulario() {
             <input
               type="file"
               accept="image/jpeg,image/png,image/webp"
-              onChange={(e) => setArquivoImagem(e.target.files?.[0] ?? null)}
+              onChange={(e) => aoEscolherImagem(e.target.files?.[0] ?? null)}
             />
+            <p className="muted small">JPG, PNG ou WebP, até 5 MB.</p>
+
+            {erroImagem && (
+              <div className="alert alert--error" role="alert">
+                <p>{erroImagem}</p>
+              </div>
+            )}
 
             <div>
               <button

@@ -6,6 +6,9 @@ const api = axios.create({
 
 const CHAVE_TOKEN = "nomadplan.token";
 
+/** Disparado quando a API recusa o token (expirado, conta desativada...). */
+export const EVENTO_SESSAO_EXPIRADA = "nomadplan:sessao-expirada";
+
 export function obterToken(): string | null {
   try {
     return localStorage.getItem(CHAVE_TOKEN);
@@ -30,6 +33,11 @@ export function limparToken(): void {
   }
 }
 
+/** Endereço completo de um arquivo enviado (imagens de pontos e de avaliações). */
+export function urlDoArquivo(caminho: string): string {
+  return `${api.defaults.baseURL}${caminho}`;
+}
+
 api.interceptors.request.use((config) => {
   const token = obterToken();
 
@@ -39,5 +47,24 @@ api.interceptors.request.use((config) => {
 
   return config;
 });
+
+// RNF09: se a API recusar um token que o navegador ainda guardava, a sessão acabou —
+// avisa a aplicação para voltar ao estado de visitante em vez de falhar em silêncio.
+// Erros de login (senha errada) e de rotas públicas não passam por aqui.
+api.interceptors.response.use(
+  (resposta) => resposta,
+  (erro) => {
+    const status = erro?.response?.status;
+    const url: string = erro?.config?.url ?? "";
+    const rotaDeCredenciais = url.startsWith("/auth/login") || url.startsWith("/auth/registrar");
+
+    if (status === 401 && !rotaDeCredenciais && obterToken()) {
+      limparToken();
+      window.dispatchEvent(new Event(EVENTO_SESSAO_EXPIRADA));
+    }
+
+    return Promise.reject(erro);
+  },
+);
 
 export default api;

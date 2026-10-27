@@ -24,11 +24,28 @@ export interface Ponto {
   responsavel?: { id: number; nome: string } | null;
   distanciaMetros?: number;
   versao?: number;
+  mediaAvaliacao?: number | null;
+  totalAvaliacoes?: number;
+  /** Só no detalhe, para quem está logado. */
+  salvo?: boolean;
+  /** Só nas recomendações para o usuário. */
+  motivoRecomendacao?: "usuarios_semelhantes" | "interesses";
 }
 
 export interface RespostaPontos {
   total: number;
   dados: Ponto[];
+  /** A busca veio do cache porque o banco demorou a responder (AF02). */
+  desatualizado?: boolean;
+}
+
+export type Ordenacao = "relevancia" | "distancia" | "nome" | "avaliacao";
+
+export interface SugestaoCriada extends SugestaoEdicao {
+  retidaParaModeracao?: boolean;
+  aviso?: string;
+  aplicadaAutomaticamente?: boolean;
+  motivoAplicacao?: "dono_verificado" | "reputacao" | "confirmacoes";
 }
 
 export interface SugestaoEdicao {
@@ -39,6 +56,7 @@ export interface SugestaoEdicao {
   mensagem: string | null;
   status: "PENDENTE" | "APROVADA" | "REJEITADA";
   motivoRejeicao: string | null;
+  motivoRetencao?: string | null;
   dataCriacao: string;
   autor?: { id: number; nome: string };
   ponto?: { id: number; nome: string; cidade: string };
@@ -65,6 +83,7 @@ export interface Avaliacao {
   fotoUrl: string | null;
   status: "PENDENTE" | "APROVADA" | "REJEITADA";
   motivoRejeicao: string | null;
+  motivoRetencao?: string | null;
   dataCriacao: string;
   autor?: { id: number; nome: string };
   ponto?: { id: number; nome: string; cidade: string };

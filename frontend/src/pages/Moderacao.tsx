@@ -11,6 +11,22 @@ import type {
 import { extrairMensagemErro } from "../utils/erro";
 import Icone from "../components/Icone";
 import Estrelas from "../components/Estrelas";
+import { urlDoArquivo } from "../services/api";
+
+const MOTIVO_RETENCAO: Record<string, string> = {
+  conteudo_suspeito: "Sinalizada automaticamente como suspeita",
+  foto_anexada: "Contém foto (revisão obrigatória)",
+};
+
+function EtiquetaRetencao({ motivo }: { motivo?: string | null }) {
+  if (!motivo) return null;
+
+  return (
+    <span className={motivo === "conteudo_suspeito" ? "badge badge--warning" : "badge"}>
+      {MOTIVO_RETENCAO[motivo] ?? motivo}
+    </span>
+  );
+}
 
 function Moderacao() {
   const [pontos, setPontos] = useState<Ponto[]>([]);
@@ -239,6 +255,7 @@ function Moderacao() {
               <h3>
                 {sugestao.ponto?.nome} <span className="muted small">({sugestao.ponto?.cidade})</span>
               </h3>
+              <EtiquetaRetencao motivo={sugestao.motivoRetencao} />
               <p className="muted small">
                 Sugerido por {sugestao.autor?.nome}
                 {sugestao.mensagem ? ` — "${sugestao.mensagem}"` : ""}
@@ -296,10 +313,21 @@ function Moderacao() {
                 {avaliacao.ponto?.nome} <span className="muted small">({avaliacao.ponto?.cidade})</span>
               </h3>
               <Estrelas nota={avaliacao.nota} />
+              <EtiquetaRetencao motivo={avaliacao.motivoRetencao} />
               <p className="muted small">
                 Por {avaliacao.autor?.nome}
                 {avaliacao.comentario ? ` — "${avaliacao.comentario}"` : ""}
               </p>
+              {avaliacao.fotoUrl && (
+                <a href={urlDoArquivo(avaliacao.fotoUrl)} target="_blank" rel="noreferrer">
+                  <img
+                    className="avaliacao__foto"
+                    src={urlDoArquivo(avaliacao.fotoUrl)}
+                    alt={`Foto enviada por ${avaliacao.autor?.nome ?? "um usuário"}`}
+                    loading="lazy"
+                  />
+                </a>
+              )}
             </div>
 
             <AcoesModeracao

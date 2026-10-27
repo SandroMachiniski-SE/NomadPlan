@@ -681,3 +681,200 @@
   place-items: center;
   background: var(--surface-2);
 }
+
+/* ---------- Formulários: caixa de seleção com texto ---------- */
+.checkbox {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.6rem;
+  font-size: 0.92rem;
+  color: var(--text-muted);
+  cursor: pointer;
+}
+
+.checkbox input {
+  flex: none;
+  margin-top: 0.15rem;
+}
+
+button.auth__link {
+  background: none;
+  border: 0;
+  padding: 0;
+  color: var(--primary-text);
+  cursor: pointer;
+}
+
+button.auth__link:hover {
+  text-decoration: underline;
+}
+
+.site-footer__bottom a {
+  color: inherit;
+  text-decoration: underline;
+}
+
+/* ---------- Aviso de consentimento (LGPD) ---------- */
+.aviso-consentimento {
+  background: var(--primary-soft);
+  border-bottom: 1px solid var(--primary-soft-border);
+}
+
+.aviso-consentimento__inner {
+  display: flex;
+  align-items: center;
+  gap: 0.9rem;
+  padding-block: 0.7rem;
+  font-size: 0.92rem;
+}
+
+.aviso-consentimento__inner > p {
+  flex: 1;
+}
+
+.aviso-consentimento__inner > .icon {
+  flex: none;
+  color: var(--primary);
+}
+
+.aviso-consentimento__erro {
+  color: var(--danger-text);
+}
+
+@media (max-width: 640px) {
+  .aviso-consentimento__inner {
+    flex-wrap: wrap;
+  }
+}
+
+/* ---------- Texto corrido (política de privacidade) ---------- */
+.texto-longo h2 {
+  margin-top: 1.5rem;
+  font-size: 1.1rem;
+}
+
+.texto-longo h2:first-child {
+  margin-top: 0;
+}
+
+.texto-longo p,
+.texto-longo ul {
+  margin-top: 0.5rem;
+  color: var(--text-muted);
+  line-height: 1.65;
+}
+
+.texto-longo ul {
+  padding-left: 1.2rem;
+  list-style: disc;
+}
+
+/* ---------- Verificação em duas etapas ---------- */
+.mfa-passos {
+  padding-left: 1.2rem;
+  list-style: decimal;
+  color: var(--text-muted);
+  line-height: 1.6;
+}
+
+.mfa-qr {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 1rem;
+}
+
+.mfa-qr img {
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  background: #fff;
+}
+
+.mfa-chave {
+  display: inline-block;
+  padding: 0.4rem 0.6rem;
+  border-radius: var(--radius-sm);
+  background: var(--surface-2);
+  font-size: 0.95rem;
+  letter-spacing: 0.08em;
+  word-break: break-all;
+}
+
+.divisor {
+  border: 0;
+  border-top: 1px solid var(--border);
+  margin: 0.25rem 0;
+}
+
+/* ---------- Uso diário (painel admin) ---------- */
+.uso {
+  display: grid;
+  gap: 0.6rem;
+}
+
+.uso__linha {
+  display: grid;
+  grid-template-columns: minmax(7rem, 11rem) 1fr 3.5rem;
+  align-items: center;
+  gap: 0.9rem;
+}
+
+.uso__rotulo {
+  font-size: 0.9rem;
+  color: var(--text-muted);
+}
+
+.uso__barras {
+  display: flex;
+  align-items: flex-end;
+  gap: 2px;
+  height: 2.4rem;
+}
+
+.uso__barra {
+  flex: 1;
+  min-width: 2px;
+  border-radius: 2px 2px 0 0;
+  background: var(--primary);
+}
+
+.uso__barra[data-vazio="true"] {
+  background: var(--border);
+}
+
+.uso__total {
+  text-align: right;
+  font-variant-numeric: tabular-nums;
+}
+
+@media (max-width: 560px) {
+  .uso__linha {
+    grid-template-columns: 1fr 3rem;
+  }
+
+  .uso__barras {
+    grid-column: 1 / -1;
+    order: 3;
+  }
+}
+
+.sino__titulo {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.75rem;
+}
+
+.sino__acao {
+  border: 0;
+  background: none;
+  padding: 0;
+  font-size: 0.8rem;
+  font-weight: 500;
+  color: var(--primary-text);
+  cursor: pointer;
+}
+
+.sino__acao:hover {
+  text-decoration: underline;
+}

@@ -3,6 +3,7 @@ import { Link, NavLink, Outlet, useNavigate } from "react-router-dom";
 import { useAuth } from "../context/useAuth";
 import Icone from "./Icone";
 import NotificacoesSino from "./NotificacoesSino";
+import AvisoConsentimento from "./AvisoConsentimento";
 
 function Marca() {
   return (
@@ -59,6 +60,12 @@ function Layout() {
               {autenticado && (
                 <NavLink to="/roteiros" className="nav-link">
                   Meus roteiros
+                </NavLink>
+              )}
+
+              {autenticado && (
+                <NavLink to="/salvos" className="nav-link">
+                  Favoritos
                 </NavLink>
               )}
 
@@ -128,6 +135,8 @@ function Layout() {
         </div>
       </header>
 
+      <AvisoConsentimento />
+
       <main id="conteudo" className="app__main">
         <Suspense
           fallback={
@@ -168,6 +177,11 @@ function Layout() {
                   <Link to="/roteiros">Meus roteiros</Link>
                 </li>
               )}
+              {autenticado && (
+                <li>
+                  <Link to="/salvos">Favoritos</Link>
+                </li>
+              )}
             </ul>
           </div>
 
@@ -193,7 +207,8 @@ function Layout() {
         </div>
 
         <div className="container site-footer__bottom">
-          © {new Date().getFullYear()} NomadPlan — Explore. Organize. Thrive.
+          © {new Date().getFullYear()} NomadPlan — Explore. Organize. Thrive. ·{" "}
+          <Link to="/privacidade">Política de Privacidade</Link>
         </div>
       </footer>
     </div>

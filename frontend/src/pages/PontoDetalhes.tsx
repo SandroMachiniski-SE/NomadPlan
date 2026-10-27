@@ -1,14 +1,37 @@
-import { useCallback, useEffect, useState, type FormEvent } from "react";
+import { useCallback, useEffect, useMemo, useState, type FormEvent } from "react";
 import { Link, useParams } from "react-router-dom";
-import api from "../services/api";
-import type { Ponto, RespostaAvaliacoes } from "../types/ponto";
+import api, { urlDoArquivo } from "../services/api";
+import type { Ponto, RespostaAvaliacoes, SugestaoCriada } from "../types/ponto";
 import type { RespostaRoteiros } from "../types/roteiro";
 import { useAuth } from "../context/useAuth";
 import { extrairMensagemErro } from "../utils/erro";
 import MapaCarregavel from "../components/MapaCarregavel";
 import Icone from "../components/Icone";
 import Estrelas from "../components/Estrelas";
+import BotaoSalvar from "../components/BotaoSalvar";
 import { iconeDaCategoria } from "../constants/categorias";
+
+const LIMITE_FOTO_BYTES = 5 * 1024 * 1024;
+const FORMATOS_FOTO = ["image/jpeg", "image/png", "image/webp"];
+
+function mensagemDaSugestao(sugestao: SugestaoCriada): string {
+  if (sugestao.aplicadaAutomaticamente) {
+    switch (sugestao.motivoAplicacao) {
+      case "dono_verificado":
+        return "Sua alteração já foi aplicada, por você ser o responsável verificado deste ponto.";
+      case "confirmacoes":
+        return "Outra pessoa havia sugerido a mesma mudança. As duas sugestões se confirmaram e a informação foi atualizada.";
+      default:
+        return "Sua sugestão foi aplicada automaticamente, graças à sua boa reputação. Obrigado!";
+    }
+  }
+
+  if (sugestao.retidaParaModeracao) {
+    return sugestao.aviso ?? "Sua sugestão será analisada pela moderação.";
+  }
+
+  return "Sugestão enviada para a moderação. Obrigado por ajudar a manter os dados atualizados!";
+}
 
 const ROTULO_STATUS: Record<string, string> = {
   RASCUNHO: "Rascunho — ainda não publicado",
@@ -29,7 +52,7 @@ function PontoDetalhes() {
   const [valorSugestao, setValorSugestao] = useState("");
   const [mensagemSugestao, setMensagemSugestao] = useState("");
   const [enviandoSugestao, setEnviandoSugestao] = useState(false);
-  const [sugestaoEnviada, setSugestaoEnviada] = useState(false);
+  const [sugestaoEnviada, setSugestaoEnviada] = useState<string | null>(null);
 
   const [solicitandoSelo, setSolicitandoSelo] = useState(false);
   const [seloSolicitado, setSeloSolicitado] = useState(false);
@@ -45,6 +68,32 @@ function PontoDetalhes() {
   const [enviandoAvaliacao, setEnviandoAvaliacao] = useState(false);
   const [erroAvaliacao, setErroAvaliacao] = useState<string | null>(null);
   const [avaliacaoEnviada, setAvaliacaoEnviada] = useState<string | null>(null);
+  const [fotoAvaliacao, setFotoAvaliacao] = useState<File | null>(null);
+  const previaFoto = useMemo(() => (fotoAvaliacao ? URL.createObjectURL(fotoAvaliacao) : null), [fotoAvaliacao]);
+
+  useEffect(() => {
+    return () => {
+      if (previaFoto) URL.revokeObjectURL(previaFoto);
+    };
+  }, [previaFoto]);
+
+  function aoEscolherFoto(arquivo: File | null) {
+    setErroAvaliacao(null);
+
+    if (arquivo && !FORMATOS_FOTO.includes(arquivo.type)) {
+      setErroAvaliacao("Formato não suportado. Envie uma imagem JPG, PNG ou WebP.");
+      setFotoAvaliacao(null);
+      return;
+    }
+
+    if (arquivo && arquivo.size > LIMITE_FOTO_BYTES) {
+      setErroAvaliacao("A foto excede 5 MB. Escolha uma imagem menor.");
+      setFotoAvaliacao(null);
+      return;
+    }
+
+    setFotoAvaliacao(arquivo);
+  }
 
   const buscarPonto = useCallback(async () => {
     if (!id) {
@@ -111,17 +160,29 @@ function PontoDetalhes() {
     try {
       setEnviandoAvaliacao(true);
 
-      const resposta = await api.post<{ retidaParaModeracao: boolean }>(
-        `/pontos/${id}/avaliacoes`,
-        { nota: notaAvaliacao, comentario: comentarioAvaliacao.trim() || undefined },
-      );
+      const comentario = comentarioAvaliacao.trim();
+      let corpo: FormData | { nota: number; comentario?: string };
+
+      if (fotoAvaliacao) {
+        corpo = new FormData();
+        corpo.append("nota", String(notaAvaliacao));
+        if (comentario) corpo.append("comentario", comentario);
+        corpo.append("foto", fotoAvaliacao);
+      } else {
+        corpo = { nota: notaAvaliacao, comentario: comentario || undefined };
+      }
+
+      const resposta = await api.post<{ retidaParaModeracao: boolean }>(`/pontos/${id}/avaliacoes`, corpo);
 
       setAvaliacaoEnviada(
         resposta.data.retidaParaModeracao
-          ? "Sua avaliação foi recebida e está em análise antes de ser publicada."
+          ? fotoAvaliacao
+            ? "Sua avaliação foi recebida. Avaliações com foto passam por uma análise rápida antes de aparecer."
+            : "Sua avaliação foi recebida e está em análise antes de ser publicada."
           : "Sua avaliação foi publicada. Obrigado!",
       );
       setComentarioAvaliacao("");
+      setFotoAvaliacao(null);
       await buscarAvaliacoes();
     } catch (err) {
       console.error(err);
@@ -156,12 +217,17 @@ function PontoDetalhes() {
     try {
       setEnviandoSugestao(true);
 
-      await api.post(`/pontos/${id}/sugestoes`, {
+      const resposta = await api.post<SugestaoCriada>(`/pontos/${id}/sugestoes`, {
         camposPropostos: { [campoSugestao]: valorSugestao.trim() },
         mensagem: mensagemSugestao.trim() || undefined,
       });
 
-      setSugestaoEnviada(true);
+      setSugestaoEnviada(mensagemDaSugestao(resposta.data));
+
+      if (resposta.data.aplicadaAutomaticamente) {
+        await buscarPonto();
+      }
+
       setMostrarSugestao(false);
       setValorSugestao("");
       setMensagemSugestao("");
@@ -228,7 +294,7 @@ function PontoDetalhes() {
             <div className="ponto-principal stack stack--lg">
               <div className="ponto-capa" data-cat={ponto.categoria}>
                 {ponto.imagemUrl ? (
-                  <img src={`${api.defaults.baseURL}${ponto.imagemUrl}`} alt={ponto.nome} />
+                  <img src={urlDoArquivo(ponto.imagemUrl)} alt={ponto.nome} />
                 ) : (
                   <Icone nome={iconeDaCategoria(ponto.categoria)} className="ponto-capa__icone" />
                 )}
@@ -347,6 +413,10 @@ function PontoDetalhes() {
               </section>
 
               {autenticado && ponto.status === "PUBLICADO" && (
+                <BotaoSalvar idPonto={ponto.id} variante="completo" />
+              )}
+
+              {autenticado && ponto.status === "PUBLICADO" && (
                 <section className="card card--pad stack stack--sm">
                   <h2 className="ponto-lateral__titulo">Adicionar a um roteiro</h2>
 
@@ -406,7 +476,7 @@ function PontoDetalhes() {
                   {sugestaoEnviada ? (
                     <div className="alert alert--success" role="status">
                       <Icone nome="check" />
-                      <p>Sugestão enviada. Obrigado por ajudar a manter os dados atualizados!</p>
+                      <p>{sugestaoEnviada}</p>
                     </div>
                   ) : mostrarSugestao ? (
                     <form onSubmit={aoEnviarSugestao} className="form">
@@ -517,6 +587,16 @@ function PontoDetalhes() {
                         </div>
                       </div>
                       {avaliacao.comentario && <p className="muted">{avaliacao.comentario}</p>}
+                      {avaliacao.fotoUrl && (
+                        <a href={urlDoArquivo(avaliacao.fotoUrl)} target="_blank" rel="noreferrer">
+                          <img
+                            className="avaliacao__foto"
+                            src={urlDoArquivo(avaliacao.fotoUrl)}
+                            alt={`Foto enviada por ${avaliacao.autor?.nome ?? "um usuário"}`}
+                            loading="lazy"
+                          />
+                        </a>
+                      )}
                     </div>
                   ))}
                 </div>
@@ -563,6 +643,18 @@ function PontoDetalhes() {
                           rows={3}
                         />
                       </label>
+
+                      <div className="field">
+                        <span>
+                          Foto <span className="field__optional">(opcional · JPG, PNG ou WebP, até 5 MB)</span>
+                        </span>
+                        <input
+                          type="file"
+                          accept="image/jpeg,image/png,image/webp"
+                          onChange={(e) => aoEscolherFoto(e.target.files?.[0] ?? null)}
+                        />
+                        {previaFoto && <img className="avaliacao__previa" src={previaFoto} alt="Prévia da foto escolhida" />}
+                      </div>
 
                       {erroAvaliacao && (
                         <div className="alert alert--error" role="alert">

@@ -2,7 +2,8 @@ import { useEffect, useState } from "react";
 import { Link, useParams } from "react-router-dom";
 import api from "../services/api";
 import type { RoteiroPublico as RoteiroPublicoTipo } from "../types/roteiro";
-import MapaCarregavel from "../components/MapaCarregavel";
+import MapaRoteiroCarregavel from "../components/MapaRoteiroCarregavel";
+import { agruparPorDia, contarDias, corDoDia, descreverTrecho, rotuloDoDia } from "../utils/roteiro";
 import Icone from "../components/Icone";
 
 function RoteiroPublico() {
@@ -28,7 +29,8 @@ function RoteiroPublico() {
     buscar();
   }, [slug]);
 
-  const itensOrdenados = roteiro ? [...roteiro.itens].sort((a, b) => a.ordem - b.ordem) : [];
+  const totalDias = roteiro ? contarDias(roteiro.itens, roteiro.dataInicio, roteiro.dataFim) : 1;
+  const dias = agruparPorDia(roteiro?.itens ?? [], totalDias).filter((grupo) => grupo.itens.length > 0);
 
   return (
     <div className="container container--narrow page">
@@ -73,34 +75,68 @@ function RoteiroPublico() {
             {roteiro.descricao && <p className="muted">{roteiro.descricao}</p>}
           </header>
 
-          {itensOrdenados.length > 0 && (
+          {dias.length > 0 && (
             <div className="mapa-wrap">
-              <MapaCarregavel pontos={itensOrdenados.map((item) => item.ponto)} />
+              <MapaRoteiroCarregavel
+                comLinks={false}
+                paradas={dias.flatMap((grupo) =>
+                  grupo.itens.map((item, indice) => ({
+                    idPonto: item.ponto.id,
+                    nome: item.ponto.nome,
+                    categoria: item.ponto.categoria,
+                    dia: grupo.dia,
+                    numero: indice + 1,
+                    latitude: item.ponto.latitude,
+                    longitude: item.ponto.longitude,
+                  })),
+                )}
+              />
             </div>
           )}
 
           <section>
             <h2 className="section__title">Pontos do roteiro</h2>
 
-            <ol className="paradas">
-              {itensOrdenados.map((item, indice) => (
-                <li key={item.id} className="parada">
-                  <span className="parada__num">{indice + 1}</span>
-
-                  <div className="card parada__card">
-                    <div className="stack stack--sm">
-                      <h3>{item.ponto.nome}</h3>
-                      <div className="cluster">
-                        <span className="badge badge--primary">{item.ponto.categoria}</span>
-                        <span className="muted small">{item.ponto.cidade}</span>
-                      </div>
+            <div className="stack stack--lg">
+              {dias.map((grupo) => (
+                <div key={grupo.dia} className="dia" style={{ ["--cor-dia" as string]: corDoDia(grupo.dia) }}>
+                  {(dias.length > 1 || grupo.dia > 1) && (
+                    <div className="dia__cabecalho">
+                      <h3 className="dia__titulo">{rotuloDoDia(grupo.dia, roteiro.dataInicio)}</h3>
                     </div>
+                  )}
 
-                    {item.observacao && <p className="parada__obs">{item.observacao}</p>}
-                  </div>
-                </li>
+                  <ol className="paradas">
+                    {grupo.itens.map((item, indice) => (
+                      <li key={item.id} className="parada">
+                        <span className="parada__num" style={{ background: corDoDia(grupo.dia) }}>
+                          {indice + 1}
+                        </span>
+
+                        <div className="card parada__card">
+                          {item.deslocamento && (
+                            <p className="parada__trecho">
+                              <Icone nome="avancar" />
+                              {descreverTrecho(item.deslocamento)} desde a parada anterior
+                            </p>
+                          )}
+
+                          <div className="stack stack--sm">
+                            <h3>{item.ponto.nome}</h3>
+                            <div className="cluster">
+                              <span className="badge badge--primary">{item.ponto.categoria}</span>
+                              <span className="muted small">{item.ponto.cidade}</span>
+                            </div>
+                          </div>
+
+                          {item.observacao && <p className="parada__obs">{item.observacao}</p>}
+                        </div>
+                      </li>
+                    ))}
+                  </ol>
+                </div>
               ))}
-            </ol>
+            </div>
           </section>
         </article>
       )}

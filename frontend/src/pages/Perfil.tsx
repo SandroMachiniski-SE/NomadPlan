@@ -2,7 +2,10 @@ import { useState, type FormEvent } from "react";
 import { useAuth } from "../context/useAuth";
 import { extrairMensagemErro } from "../utils/erro";
 import { CATEGORIAS_PONTOS, iconeDaCategoria } from "../constants/categorias";
+import type { Idioma, PreferenciaAcessibilidade } from "../types/usuario";
 import Icone from "../components/Icone";
+import SecaoMfa from "../components/perfil/SecaoMfa";
+import SecaoPrivacidade from "../components/perfil/SecaoPrivacidade";
 
 const ROTULO_CONTA: Record<string, string> = {
   VISITANTE: "Visitante",
@@ -13,12 +16,30 @@ const ROTULO_CONTA: Record<string, string> = {
   ADMIN: "Administrador",
 };
 
+const IDIOMAS: { valor: Idioma; rotulo: string }[] = [
+  { valor: "pt-BR", rotulo: "Português (Brasil)" },
+  { valor: "en", rotulo: "English" },
+  { valor: "es", rotulo: "Español" },
+];
+
+const PREFERENCIAS: { valor: PreferenciaAcessibilidade; rotulo: string }[] = [
+  { valor: "mobilidade_reduzida", rotulo: "Mobilidade reduzida" },
+  { valor: "deficiencia_visual", rotulo: "Deficiência visual" },
+  { valor: "deficiencia_auditiva", rotulo: "Deficiência auditiva" },
+  { valor: "banheiro_adaptado", rotulo: "Banheiro adaptado" },
+  { valor: "estacionamento_reservado", rotulo: "Estacionamento reservado" },
+];
+
 function Perfil() {
   const { usuario, atualizarPerfil } = useAuth();
 
   const [nome, setNome] = useState(usuario?.nome ?? "");
   const [cidadeBase, setCidadeBase] = useState(usuario?.cidadeBase ?? "");
   const [interesses, setInteresses] = useState<string[]>(usuario?.interesses ?? []);
+  const [idioma, setIdioma] = useState<Idioma>(usuario?.idioma ?? "pt-BR");
+  const [acessibilidade, setAcessibilidade] = useState<PreferenciaAcessibilidade[]>(
+    usuario?.preferenciasAcessibilidade ?? [],
+  );
   const [salvando, setSalvando] = useState(false);
   const [erro, setErro] = useState<string | null>(null);
   const [sucesso, setSucesso] = useState(false);
@@ -26,6 +47,12 @@ function Perfil() {
   function alternarInteresse(categoria: string) {
     setInteresses((atual) =>
       atual.includes(categoria) ? atual.filter((c) => c !== categoria) : [...atual, categoria],
+    );
+  }
+
+  function alternarAcessibilidade(preferencia: PreferenciaAcessibilidade) {
+    setAcessibilidade((atual) =>
+      atual.includes(preferencia) ? atual.filter((p) => p !== preferencia) : [...atual, preferencia],
     );
   }
 
@@ -50,6 +77,8 @@ function Perfil() {
         nome: nome.trim(),
         cidadeBase: cidadeBase.trim() || null,
         interesses,
+        idioma,
+        preferenciasAcessibilidade: acessibilidade,
       });
 
       setSucesso(true);
@@ -111,6 +140,17 @@ function Perfil() {
               onChange={(e) => setCidadeBase(e.target.value)}
             />
           </label>
+
+          <label className="field">
+            <span>Idioma preferido</span>
+            <select value={idioma} onChange={(e) => setIdioma(e.target.value as Idioma)}>
+              {IDIOMAS.map((opcao) => (
+                <option key={opcao.valor} value={opcao.valor}>
+                  {opcao.rotulo}
+                </option>
+              ))}
+            </select>
+          </label>
         </div>
 
         <fieldset className="field">
@@ -128,6 +168,26 @@ function Perfil() {
               >
                 <Icone nome={iconeDaCategoria(categoria)} />
                 {categoria}
+              </button>
+            ))}
+          </div>
+        </fieldset>
+
+        <fieldset className="field">
+          <legend className="field__legenda">
+            Acessibilidade <span className="field__hint">damos preferência a lugares que atendem</span>
+          </legend>
+          <div className="chips">
+            {PREFERENCIAS.map((preferencia) => (
+              <button
+                key={preferencia.valor}
+                type="button"
+                className="chip"
+                aria-pressed={acessibilidade.includes(preferencia.valor)}
+                onClick={() => alternarAcessibilidade(preferencia.valor)}
+              >
+                <Icone nome="acessibilidade" />
+                {preferencia.rotulo}
               </button>
             ))}
           </div>
@@ -152,6 +212,11 @@ function Perfil() {
           </button>
         </div>
       </form>
+
+      <div className="stack stack--lg" style={{ marginTop: "1.5rem" }}>
+        <SecaoMfa />
+        <SecaoPrivacidade />
+      </div>
     </div>
   );
 }

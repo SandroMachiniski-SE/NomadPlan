@@ -3,6 +3,7 @@ import { Link, useNavigate } from "react-router-dom";
 import { useAuth } from "../context/useAuth";
 import { extrairMensagemErro } from "../utils/erro";
 import AuthShell from "../components/AuthShell";
+import type { DadosRegistro } from "../context/auth-context";
 
 function Registrar() {
   const { registrar } = useAuth();
@@ -12,6 +13,8 @@ function Registrar() {
   const [email, setEmail] = useState("");
   const [senha, setSenha] = useState("");
   const [cidadeBase, setCidadeBase] = useState("");
+  const [tipoConta, setTipoConta] = useState<DadosRegistro["tipoConta"]>("VISITANTE");
+  const [aceitouPolitica, setAceitouPolitica] = useState(false);
   const [enviando, setEnviando] = useState(false);
   const [erro, setErro] = useState<string | null>(null);
 
@@ -24,6 +27,11 @@ function Registrar() {
       return;
     }
 
+    if (!aceitouPolitica) {
+      setErro("É necessário aceitar a Política de Privacidade para criar a conta.");
+      return;
+    }
+
     try {
       setEnviando(true);
 
@@ -32,6 +40,8 @@ function Registrar() {
         email: email.trim(),
         senha,
         cidadeBase: cidadeBase.trim() || undefined,
+        tipoConta,
+        aceitouPolitica,
       });
 
       navigate("/roteiros", { replace: true });
@@ -102,6 +112,35 @@ function Registrar() {
             value={cidadeBase}
             onChange={(e) => setCidadeBase(e.target.value)}
           />
+        </label>
+
+        <label className="field">
+          <span>Como você vai usar o NomadPlan?</span>
+          <select
+            value={tipoConta}
+            onChange={(e) => setTipoConta(e.target.value as DadosRegistro["tipoConta"])}
+          >
+            <option value="VISITANTE">Sou visitante / turista</option>
+            <option value="MORADOR">Sou morador da região</option>
+            <option value="NEGOCIO">Tenho um negócio turístico</option>
+            <option value="GESTOR">Sou gestor de turismo / pesquisador</option>
+          </select>
+        </label>
+
+        <label className="checkbox">
+          <input
+            type="checkbox"
+            checked={aceitouPolitica}
+            onChange={(e) => setAceitouPolitica(e.target.checked)}
+            required
+          />
+          <span>
+            Li e aceito a{" "}
+            <Link to="/privacidade" target="_blank">
+              Política de Privacidade
+            </Link>{" "}
+            (LGPD).
+          </span>
         </label>
 
         {erro && (
