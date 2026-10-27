@@ -10,10 +10,12 @@ interface DetalhesDaParadaProps {
   item: ItemRoteiro;
   /** Chamado depois de salvar, para recarregar o roteiro. */
   aoSalvar: () => void | Promise<void>;
+  /** Leitores veem observação e custo, mas não editam. */
+  somenteLeitura?: boolean;
 }
 
 // Observação e custo previsto de uma parada: mostra o que há e abre um formulário curto.
-function DetalhesDaParada({ idRoteiro, item, aoSalvar }: DetalhesDaParadaProps) {
+function DetalhesDaParada({ idRoteiro, item, aoSalvar, somenteLeitura = false }: DetalhesDaParadaProps) {
   const [editando, setEditando] = useState(false);
   const [observacao, setObservacao] = useState(item.observacao ?? "");
   const [custo, setCusto] = useState(
@@ -119,10 +121,12 @@ function DetalhesDaParada({ idRoteiro, item, aoSalvar }: DetalhesDaParadaProps) 
           </span>
         )}
 
-        <button type="button" className="btn btn--ghost btn--sm" onClick={abrir}>
-          <Icone nome="editar" />
-          {item.observacao || item.custoCentavos != null ? "Editar detalhes" : "Observação e custo"}
-        </button>
+        {!somenteLeitura && (
+          <button type="button" className="btn btn--ghost btn--sm" onClick={abrir}>
+            <Icone nome="editar" />
+            {item.observacao || item.custoCentavos != null ? "Editar detalhes" : "Observação e custo"}
+          </button>
+        )}
       </div>
     </div>
   );

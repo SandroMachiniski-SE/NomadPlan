@@ -24,7 +24,7 @@ export class ErroPrivacidade extends Error {
 export async function anonimizarUsuario(idUsuario: number): Promise<void> {
   const usuario = await prisma.usuario.findUnique({
     where: { id: idUsuario },
-    select: { id: true, tipoConta: true, removidoEm: true },
+    select: { id: true, tipoConta: true, removidoEm: true, email: true },
   });
 
   if (!usuario || usuario.removidoEm) {
@@ -44,6 +44,8 @@ export async function anonimizarUsuario(idUsuario: number): Promise<void> {
     }
   }
 
+  const emailOriginal = usuario.email.toLowerCase();
+
   const hashInutilizavel = await gerarHashSenha(randomBytes(32).toString("hex"));
 
   const avaliacoesComFoto = await prisma.avaliacao.findMany({
@@ -53,6 +55,9 @@ export async function anonimizarUsuario(idUsuario: number): Promise<void> {
 
   await prisma.$transaction(async (tx) => {
     await tx.roteiro.deleteMany({ where: { idUsuario } });
+    // Participações em roteiros de outras pessoas e convites enviados ou recebidos.
+    await tx.colaboradorRoteiro.deleteMany({ where: { idUsuario } });
+    await tx.conviteRoteiro.deleteMany({ where: { OR: [{ idConvidante: idUsuario }, { email: emailOriginal }] } });
     await tx.notificacao.deleteMany({ where: { idUsuario } });
     await tx.pontoSalvo.deleteMany({ where: { idUsuario } });
     await tx.avaliacao.updateMany({ where: { idAutor: idUsuario }, data: { fotoUrl: null } });
@@ -109,7 +114,7 @@ export async function anonimizarUsuario(idUsuario: number): Promise<void> {
 
 /** Tudo o que o sistema guarda sobre a pessoa, num formato legível (portabilidade). */
 export async function exportarDadosDoUsuario(idUsuario: number) {
-  const [perfil, roteiros, avaliacoes, sugestoes, pontosCadastrados, pontosSalvos, notificacoes, historico] =
+  const [perfil, roteiros, participacoes, avaliacoes, sugestoes, pontosCadastrados, pontosSalvos, notificacoes, historico] =
     await Promise.all([
       prisma.usuario.findUnique({
         where: { id: idUsuario },
@@ -134,6 +139,10 @@ export async function exportarDadosDoUsuario(idUsuario: number) {
           itens: { orderBy: [{ dia: "asc" }, { ordem: "asc" }], include: { ponto: { select: { id: true, nome: true } } } },
           checklist: { orderBy: { ordem: "asc" } },
         },
+      }),
+      prisma.colaboradorRoteiro.findMany({
+        where: { idUsuario },
+        select: { papel: true, dataCriacao: true, roteiro: { select: { id: true, nome: true } } },
       }),
       prisma.avaliacao.findMany({
         where: { idAutor: idUsuario },
@@ -182,6 +191,7 @@ export async function exportarDadosDoUsuario(idUsuario: number) {
     geradoEm: new Date().toISOString(),
     perfil,
     roteiros,
+    roteirosCompartilhadosComigo: participacoes,
     avaliacoes,
     sugestoes,
     pontosCadastrados,

@@ -6,7 +6,7 @@ Plataforma de turismo inteligente que centraliza o inventário turístico das ci
 
 - **Explorar:** busca por cidade, categoria, texto, acessibilidade, faixa de preço, nota mínima, "aberto agora" e proximidade (raio a partir da localização), com ordenação por relevância, distância, nome ou avaliação; mapa interativo.
 - **Pontos salvos (favoritos)** e **recomendações** baseadas nos interesses do perfil e no gosto de usuários parecidos.
-- **Roteiros:** viagens de vários **dias** (com as datas e o dia da semana), mapa com paradas numeradas e trajeto de cada dia, **tempo e distância estimados entre as paradas**, botão para **otimizar a ordem** pelo caminho mais curto, **orçamento** (custo por parada, total por dia e teto de gastos), **checklist** e **notas** da viagem, compartilhamento por link público, histórico de versões com restauração e **geração automática** com horários estimados de chegada e saída, deslocamento e espera.
+- **Roteiros:** viagens de vários **dias** (com as datas e o dia da semana), mapa com paradas numeradas e trajeto de cada dia, **tempo e distância estimados entre as paradas**, botão para **otimizar a ordem** pelo caminho mais curto, **orçamento** (custo por parada, total por dia e teto de gastos), **checklist** e **notas** da viagem, **colaboração** (convites por e-mail com papéis de editor e leitor, atualização automática entre os participantes), compartilhamento por link público, histórico de versões com restauração e **geração automática** com horários estimados de chegada e saída, deslocamento e espera.
 - **Contribuição da comunidade:** avaliações (com foto), sugestões de edição que se confirmam entre usuários ou são aplicadas direto por quem tem reputação, selo de ponto verificado.
 - **Cadastro e moderação:** pontos entram como rascunho, passam por revisão com motivo de rejeição, detecção de duplicados e bloqueio contra edições simultâneas; importação e exportação em CSV e GeoJSON.
 - **Administração:** papéis (visitante, morador, negócio, gestor, moderador, administrador), desativação de contas, log de auditoria, métricas de uso diário com exportação em CSV.
@@ -75,7 +75,7 @@ npx playwright test
 ```
 
 - Os testes de **integração** sobem a API de verdade e conversam por HTTP com um PostgreSQL real, cobrindo autenticação (inclusive 2FA e bloqueio de login), pontos, busca, contribuições, moderação, importação, roteiros, favoritos, notificações, administração e limites de taxa. Cada teste começa com o banco limpo.
-- Os testes **de ponta a ponta** (Playwright, 60 cenários) percorrem os fluxos principais no navegador: cadastro e login, busca e filtros, favoritos, avaliações com foto, cadastro e moderação de pontos, roteiros (manuais e gerados), perfil, 2FA, LGPD e administração. No computador usam o Microsoft Edge instalado; no CI, o Chromium.
+- Os testes **de ponta a ponta** (Playwright, 72 cenários) percorrem os fluxos principais no navegador: cadastro e login, busca e filtros, favoritos, avaliações com foto, cadastro e moderação de pontos, roteiros (manuais e gerados), perfil, 2FA, LGPD e administração. No computador usam o Microsoft Edge instalado; no CI, o Chromium.
 - A cada *push*, o GitHub Actions executa tudo isso (`.github/workflows/ci.yml`).
 - Teste de carga: [docs/relatorio-de-carga.md](docs/relatorio-de-carga.md).
 

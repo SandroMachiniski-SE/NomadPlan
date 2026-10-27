@@ -1294,3 +1294,49 @@ fieldset.field {
   flex: 1;
   min-width: 0;
 }
+
+/* ============ Roteiro colaborativo ============ */
+
+.participantes {
+  display: grid;
+  gap: 0.6rem;
+}
+
+.participantes li {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.6rem 0.75rem;
+}
+
+.participantes__nome {
+  flex: 1;
+  min-width: 8rem;
+  overflow-wrap: anywhere;
+}
+
+.participantes__pendente {
+  color: var(--text-muted);
+}
+
+.convite-form {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto auto;
+  align-items: end;
+  gap: 0.75rem;
+}
+
+@media (max-width: 640px) {
+  .convite-form {
+    grid-template-columns: 1fr;
+  }
+}
+
+.roteiro-card__compartilhado {
+  display: flex;
+  align-items: center;
+  gap: 0.35rem;
+  font-size: 0.85rem;
+  color: var(--accent-text);
+  font-weight: 500;
+}

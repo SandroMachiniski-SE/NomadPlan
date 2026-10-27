@@ -8,6 +8,14 @@ function Roteiros() {
   const [roteiros, setRoteiros] = useState<Roteiro[]>([]);
   const [carregando, setCarregando] = useState(true);
   const [erro, setErro] = useState<string | null>(null);
+  const [convitesPendentes, setConvitesPendentes] = useState(0);
+
+  useEffect(() => {
+    api
+      .get<{ total: number }>("/convites")
+      .then((resposta) => setConvitesPendentes(resposta.data.total))
+      .catch((err) => console.error(err));
+  }, []);
 
   useEffect(() => {
     async function buscarRoteiros() {
@@ -40,6 +48,12 @@ function Roteiros() {
         </div>
 
         <div className="page-head__actions">
+          {convitesPendentes > 0 && (
+            <Link to="/convites" className="btn btn--accent">
+              <Icone nome="sino" />
+              {convitesPendentes} {convitesPendentes === 1 ? "convite" : "convites"}
+            </Link>
+          )}
           <Link to="/roteiros/gerar" className="btn btn--outline">
             <Icone nome="brilho" />
             Gerar roteiro sugerido
@@ -92,6 +106,12 @@ function Roteiros() {
                 <Icone nome="mapa" />
               </span>
               <h2 className="card__title">{roteiro.nome}</h2>
+              {roteiro.meuPapel && roteiro.meuPapel !== "DONO" && (
+                <p className="roteiro-card__compartilhado">
+                  <Icone nome="compartilhar" />
+                  De {roteiro.usuario?.nome} · {roteiro.meuPapel === "EDITOR" ? "você edita" : "você acompanha"}
+                </p>
+              )}
               {roteiro.cidade && (
                 <p className="roteiro-card__cidade">
                   <Icone nome="pin" />

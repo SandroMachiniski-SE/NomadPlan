@@ -23,6 +23,11 @@ enum StatusPonto {
   REJEITADO
 }
 
+enum PapelColaborador {
+  EDITOR
+  LEITOR
+}
+
 enum StatusSolicitacao {
   PENDENTE
   APROVADA
@@ -62,6 +67,8 @@ model Usuario {
   notificacoes        Notificacao[]
   logsAuditoria       LogAuditoria[]
   pontosSalvos        PontoSalvo[]
+  colaboracoes        ColaboradorRoteiro[]
+  convitesEnviados    ConviteRoteiro[]
 
   @@map("usuario")
 }
@@ -239,6 +246,9 @@ model Roteiro {
   versoes   VersaoRoteiro[]
   checklist ItemChecklist[]
 
+  colaboradores ColaboradorRoteiro[]
+  convites      ConviteRoteiro[]
+
   @@index([idUsuario])
   @@map("roteiro")
 }
@@ -312,4 +322,38 @@ model ItemChecklist {
 
   @@index([idRoteiro])
   @@map("item_checklist")
+}
+
+// Pessoas que, além do dono, participam de um roteiro (editando ou só consultando).
+model ColaboradorRoteiro {
+  id          Int              @id @default(autoincrement())
+  idRoteiro   Int              @map("id_roteiro")
+  idUsuario   Int              @map("id_usuario")
+  papel       PapelColaborador
+  dataCriacao DateTime         @default(now()) @map("data_criacao")
+
+  roteiro Roteiro @relation(fields: [idRoteiro], references: [id], onDelete: Cascade)
+  usuario Usuario @relation(fields: [idUsuario], references: [id], onDelete: Cascade)
+
+  @@unique([idRoteiro, idUsuario])
+  @@index([idUsuario])
+  @@map("colaborador_roteiro")
+}
+
+// Convite pendente, feito por e-mail. Quando a pessoa aceita vira ColaboradorRoteiro; ao
+// aceitar ou recusar, o convite é apagado.
+model ConviteRoteiro {
+  id           Int              @id @default(autoincrement())
+  idRoteiro    Int              @map("id_roteiro")
+  email        String
+  papel        PapelColaborador
+  idConvidante Int              @map("id_convidante")
+  dataCriacao  DateTime         @default(now()) @map("data_criacao")
+
+  roteiro    Roteiro @relation(fields: [idRoteiro], references: [id], onDelete: Cascade)
+  convidante Usuario @relation(fields: [idConvidante], references: [id], onDelete: Cascade)
+
+  @@unique([idRoteiro, email])
+  @@index([email])
+  @@map("convite_roteiro")
 }

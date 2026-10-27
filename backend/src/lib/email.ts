@@ -207,3 +207,86 @@ export async function enviarEmailDeTeste(para: string, config: ConfiguracaoSmtp)
     text: "Se você recebeu esta mensagem, o envio de e-mails do NomadPlan está funcionando. A recuperação de senha vai chegar assim na caixa de entrada de cada usuário.",
   });
 }
+
+export interface DadosEmailConvite {
+  para: string;
+  nomeConvidante: string;
+  nomeRoteiro: string;
+  papel: "EDITOR" | "LEITOR";
+  link: string;
+  /** Se a pessoa já tem conta: muda a orientação ("entre" ou "crie uma conta com este e-mail"). */
+  temConta: boolean;
+}
+
+export function montarEmailConvite(dados: DadosEmailConvite) {
+  const acao = dados.papel === "EDITOR" ? "editar" : "acompanhar";
+  const orientacao = dados.temConta
+    ? "Entre no NomadPlan para aceitar ou recusar o convite."
+    : "Crie uma conta no NomadPlan com este mesmo e-mail para aceitar o convite.";
+
+  const texto = [
+    "Olá!",
+    "",
+    `${dados.nomeConvidante} convidou você para ${acao} o roteiro "${dados.nomeRoteiro}" no NomadPlan.`,
+    orientacao,
+    "",
+    dados.link,
+    "",
+    "Se você não conhece quem enviou, ignore este e-mail.",
+    "",
+    "— Equipe NomadPlan",
+  ].join("\n");
+
+  const linkHtml = escaparHtml(dados.link);
+
+  const html = `<!doctype html>
+<html lang="pt-BR">
+  <body style="margin:0;padding:24px;background:#f8f5ef;font-family:Arial,Helvetica,sans-serif;color:#1c2b31;">
+    <table role="presentation" width="100%" cellspacing="0" cellpadding="0"><tr><td align="center">
+      <table role="presentation" width="480" cellspacing="0" cellpadding="0" style="max-width:480px;background:#ffffff;border-radius:12px;border:1px solid #e4ded0;">
+        <tr><td style="padding:28px 32px 8px;"><span style="font-size:22px;font-weight:bold;color:#075963;">Nomad<span style="color:#de6b48;">Plan</span></span></td></tr>
+        <tr><td style="padding:8px 32px 24px;">
+          <h1 style="margin:0 0 12px;font-size:20px;color:#0a2f37;">Você recebeu um convite</h1>
+          <p style="margin:0 0 16px;line-height:1.5;"><strong>${escaparHtml(dados.nomeConvidante)}</strong> convidou você para ${acao} o roteiro <strong>${escaparHtml(dados.nomeRoteiro)}</strong>.</p>
+          <p style="margin:0 0 16px;line-height:1.5;">${escaparHtml(orientacao)}</p>
+          <p style="margin:24px 0;"><a href="${linkHtml}" style="display:inline-block;background:#075963;color:#ffffff;text-decoration:none;font-weight:bold;padding:12px 24px;border-radius:8px;">Ver convite</a></p>
+          <p style="margin:0;font-size:13px;color:#566468;line-height:1.5;">Se você não conhece quem enviou, ignore este e-mail.</p>
+        </td></tr>
+      </table>
+    </td></tr></table>
+  </body>
+</html>`;
+
+  return { assunto: `${dados.nomeConvidante} convidou você para um roteiro — NomadPlan`, texto, html };
+}
+
+/** Envia o convite por e-mail. Sem SMTP em desenvolvimento, só registra no console. */
+export async function enviarEmailConvite(
+  dados: DadosEmailConvite,
+  opcoes: OpcoesEnvio = {},
+): Promise<ResultadoEnvio> {
+  const config = opcoes.config === undefined ? lerConfiguracaoSmtp() : opcoes.config;
+  const producao = opcoes.producao ?? process.env.NODE_ENV === "production";
+
+  if (!config) {
+    if (producao) {
+      console.error("SMTP não configurado: o e-mail de convite de roteiro não foi enviado.");
+      return "nao-configurado";
+    }
+
+    console.log(`[e-mail em modo de desenvolvimento] Convite de roteiro para ${dados.para}: ${dados.link}`);
+    return "console";
+  }
+
+  const { assunto, texto, html } = montarEmailConvite(dados);
+
+  await (opcoes.transporte ?? obterTransporte(config)).sendMail({
+    from: config.from,
+    to: dados.para,
+    subject: assunto,
+    text: texto,
+    html,
+  });
+
+  return "enviado";
+}

@@ -8,10 +8,11 @@ interface ChecklistDoRoteiroProps {
   idRoteiro: number;
   itens: ItemChecklist[];
   aoMudar: () => void | Promise<void>;
+  somenteLeitura?: boolean;
 }
 
 // Lista de tarefas da viagem (documentos, bagagem, reservas a fazer...).
-function ChecklistDoRoteiro({ idRoteiro, itens, aoMudar }: ChecklistDoRoteiroProps) {
+function ChecklistDoRoteiro({ idRoteiro, itens, aoMudar, somenteLeitura = false }: ChecklistDoRoteiroProps) {
   const [novo, setNovo] = useState("");
   const [ocupado, setOcupado] = useState(false);
   const [erro, setErro] = useState<string | null>(null);
@@ -70,7 +71,7 @@ function ChecklistDoRoteiro({ idRoteiro, itens, aoMudar }: ChecklistDoRoteiroPro
                 <input
                   type="checkbox"
                   checked={estaFeito(item)}
-                  disabled={ocupado}
+                  disabled={ocupado || somenteLeitura}
                   onChange={(e) => {
                     const feito = e.target.checked;
                     setMarcados({ [item.id]: feito });
@@ -84,6 +85,7 @@ function ChecklistDoRoteiro({ idRoteiro, itens, aoMudar }: ChecklistDoRoteiroPro
                 <span>{item.texto}</span>
               </label>
 
+              {!somenteLeitura && (
               <button
                 type="button"
                 className="btn btn--ghost btn--icon"
@@ -96,6 +98,7 @@ function ChecklistDoRoteiro({ idRoteiro, itens, aoMudar }: ChecklistDoRoteiroPro
               >
                 <Icone nome="lixeira" />
               </button>
+              )}
             </li>
           ))}
         </ul>
@@ -107,6 +110,7 @@ function ChecklistDoRoteiro({ idRoteiro, itens, aoMudar }: ChecklistDoRoteiroPro
         </div>
       )}
 
+      {!somenteLeitura && (
       <form onSubmit={aoAdicionar} className="checklist__novo">
         <input
           type="text"
@@ -121,6 +125,7 @@ function ChecklistDoRoteiro({ idRoteiro, itens, aoMudar }: ChecklistDoRoteiroPro
           Adicionar
         </button>
       </form>
+      )}
     </section>
   );
 }

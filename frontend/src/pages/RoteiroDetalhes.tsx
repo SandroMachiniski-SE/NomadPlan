@@ -10,6 +10,7 @@ import DetalhesDaParada from "../components/roteiro/DetalhesDaParada";
 import PainelOrcamento from "../components/roteiro/PainelOrcamento";
 import ChecklistDoRoteiro from "../components/roteiro/ChecklistDoRoteiro";
 import NotasDoRoteiro from "../components/roteiro/NotasDoRoteiro";
+import Colaboradores from "../components/roteiro/Colaboradores";
 import { formatarDistancia, formatarMoeda } from "../utils/formatar";
 import {
   agruparPorDia,
@@ -127,6 +128,30 @@ function RoteiroDetalhes() {
     buscarRoteiro();
   }, [buscarRoteiro]);
 
+  // Traz, a cada 15 s, o que os outros participantes alteraram (e quem entrou no roteiro). Só
+  // pergunta com a aba visível, só troca o conteúdo se algo mudou e não mexe nos formulários
+  // que estão sendo preenchidos. Roda também para o dono sem convidados: ele não tem como
+  // saber de antemão quando alguém aceita um convite.
+  const roteiroCarregadoParaAtualizar = roteiro !== null;
+
+  useEffect(() => {
+    if (!roteiroCarregadoParaAtualizar) return;
+
+    const temporizador = window.setInterval(async () => {
+      if (document.visibilityState !== "visible") return;
+
+      try {
+        const resposta = await api.get<Roteiro>(`/roteiros/${id}`);
+
+        setRoteiro((atual) => (atual && JSON.stringify(atual) === JSON.stringify(resposta.data) ? atual : resposta.data));
+      } catch {
+        // Falha momentânea de rede (ou acesso removido): a próxima rodada tenta de novo.
+      }
+    }, 15_000);
+
+    return () => window.clearInterval(temporizador);
+  }, [roteiroCarregadoParaAtualizar, id]);
+
   const carregarVersoes = useCallback(async () => {
     try {
       const resposta = await api.get<{ dados: VersaoRoteiro[] }>(`/roteiros/${id}/versoes`);
@@ -223,6 +248,10 @@ function RoteiroDetalhes() {
       setRemovendoId(null);
     }
   }
+
+  const meuPapel = roteiro?.meuPapel ?? "DONO";
+  const ehDono = meuPapel === "DONO";
+  const podeEditar = meuPapel !== "LEITOR";
 
   const itens: ItemRoteiro[] = roteiro?.itens ?? [];
   const totalDias = roteiro ? contarDias(roteiro.itens, roteiro.dataInicio, roteiro.dataFim, diasMinimos) : 1;
@@ -465,6 +494,17 @@ function RoteiroDetalhes() {
                   ) : (
                     <span className="badge">Privado</span>
                   )}
+                  {!ehDono && (
+                    <span className="badge badge--accent">
+                      <Icone nome="compartilhar" />
+                      De {roteiro.usuario?.nome} · você é {meuPapel === "EDITOR" ? "editor" : "leitor"}
+                    </span>
+                  )}
+                  {ehDono && (roteiro.colaboradores?.length ?? 0) > 0 && (
+                    <span className="badge badge--primary">
+                      {(roteiro.colaboradores?.length ?? 0) + 1} participantes
+                    </span>
+                  )}
                 </div>
 
                 <h1>{roteiro.nome}</h1>
@@ -493,33 +533,39 @@ function RoteiroDetalhes() {
               </div>
 
               <div className="cluster">
-                <button type="button" className="btn btn--outline btn--sm" onClick={() => setEditando(true)}>
-                  <Icone nome="editar" />
-                  Editar
-                </button>
+                {podeEditar && (
+                  <button type="button" className="btn btn--outline btn--sm" onClick={() => setEditando(true)}>
+                    <Icone nome="editar" />
+                    Editar
+                  </button>
+                )}
 
-                <button
-                  type="button"
-                  className="btn btn--outline btn--sm"
-                  onClick={aoAlternarCompartilhamento}
-                  disabled={compartilhando}
-                >
-                  <Icone nome="compartilhar" />
-                  {roteiro.publico ? "Parar de compartilhar" : "Compartilhar"}
-                </button>
+                {ehDono && (
+                  <>
+                    <button
+                      type="button"
+                      className="btn btn--outline btn--sm"
+                      onClick={aoAlternarCompartilhamento}
+                      disabled={compartilhando}
+                    >
+                      <Icone nome="compartilhar" />
+                      {roteiro.publico ? "Parar de compartilhar" : "Compartilhar"}
+                    </button>
 
-                <button
-                  type="button"
-                  className="btn btn--danger-outline btn--sm"
-                  onClick={aoExcluirRoteiro}
-                  disabled={excluindo}
-                >
-                  <Icone nome="lixeira" />
-                  {excluindo ? "Excluindo..." : "Excluir"}
-                </button>
+                    <button
+                      type="button"
+                      className="btn btn--danger-outline btn--sm"
+                      onClick={aoExcluirRoteiro}
+                      disabled={excluindo}
+                    >
+                      <Icone nome="lixeira" />
+                      {excluindo ? "Excluindo..." : "Excluir"}
+                    </button>
+                  </>
+                )}
               </div>
 
-              {linkPublico && (
+              {linkPublico && ehDono && (
                 <div className="alert alert--info roteiro-link">
                   <Icone nome="link" />
                   <div>
@@ -596,7 +642,7 @@ function RoteiroDetalhes() {
               </h2>
 
               <div className="cluster">
-                {itens.length > 2 && (
+                {podeEditar && itens.length > 2 && (
                   <button
                     type="button"
                     className="btn btn--outline btn--sm"
@@ -607,15 +653,17 @@ function RoteiroDetalhes() {
                     {otimizando === "todos" ? "Otimizando..." : "Otimizar todos os dias"}
                   </button>
                 )}
-                <button
-                  type="button"
-                  className="btn btn--outline btn--sm"
-                  onClick={() => setDiasMinimos(Math.min(MAX_DIAS, totalDias + 1))}
-                  disabled={totalDias >= MAX_DIAS}
-                >
-                  <Icone nome="mais" />
-                  Adicionar dia
-                </button>
+                {podeEditar && (
+                  <button
+                    type="button"
+                    className="btn btn--outline btn--sm"
+                    onClick={() => setDiasMinimos(Math.min(MAX_DIAS, totalDias + 1))}
+                    disabled={totalDias >= MAX_DIAS}
+                  >
+                    <Icone nome="mais" />
+                    Adicionar dia
+                  </button>
+                )}
               </div>
             </div>
 
@@ -652,7 +700,7 @@ function RoteiroDetalhes() {
                           ` · ${formatarMoeda(roteiro.orcamento.porDia[grupo.dia])} previstos`}
                       </span>
 
-                      {grupo.itens.length > 2 && (
+                      {podeEditar && grupo.itens.length > 2 && (
                         <button
                           type="button"
                           className="btn btn--ghost btn--sm"
@@ -701,6 +749,7 @@ function RoteiroDetalhes() {
                                   </div>
                                 </div>
 
+                                {podeEditar && (
                                 <div className="cluster">
                                   <button
                                     type="button"
@@ -746,9 +795,15 @@ function RoteiroDetalhes() {
                                     {removendoId === item.ponto.id ? "Removendo..." : "Remover"}
                                   </button>
                                 </div>
+                                )}
                               </div>
 
-                              <DetalhesDaParada idRoteiro={roteiro!.id} item={item} aoSalvar={buscarRoteiro} />
+                              <DetalhesDaParada
+                                idRoteiro={roteiro!.id}
+                                item={item}
+                                aoSalvar={buscarRoteiro}
+                                somenteLeitura={!podeEditar}
+                              />
                             </div>
                           </li>
                         ))}
@@ -760,6 +815,7 @@ function RoteiroDetalhes() {
             </div>
           </section>
 
+          {podeEditar && (
           <section aria-labelledby="titulo-adicionar">
             <h2 id="titulo-adicionar" className="section__title">
               Adicionar ponto ao roteiro
@@ -827,6 +883,7 @@ function RoteiroDetalhes() {
               </div>
             </form>
           </section>
+          )}
 
           {roteiro && roteiro.orcamento && (
             <section aria-labelledby="titulo-planejamento">
@@ -841,11 +898,30 @@ function RoteiroDetalhes() {
                   resumo={roteiro.orcamento}
                   dataInicio={roteiro.dataInicio}
                   aoSalvar={buscarRoteiro}
+                  somenteLeitura={!podeEditar}
                 />
-                <ChecklistDoRoteiro idRoteiro={roteiro.id} itens={roteiro.checklist ?? []} aoMudar={buscarRoteiro} />
-                <NotasDoRoteiro idRoteiro={roteiro.id} notas={roteiro.notas ?? null} aoSalvar={buscarRoteiro} />
+                <ChecklistDoRoteiro
+                  idRoteiro={roteiro.id}
+                  itens={roteiro.checklist ?? []}
+                  aoMudar={buscarRoteiro}
+                  somenteLeitura={!podeEditar}
+                />
+                <NotasDoRoteiro
+                  idRoteiro={roteiro.id}
+                  notas={roteiro.notas ?? null}
+                  aoSalvar={buscarRoteiro}
+                  somenteLeitura={!podeEditar}
+                />
               </div>
             </section>
+          )}
+
+          {roteiro && (
+            <Colaboradores
+              roteiro={roteiro}
+              aoMudar={buscarRoteiro}
+              aoSair={() => navigate("/roteiros", { replace: true })}
+            />
           )}
 
           <section aria-labelledby="titulo-historico">
@@ -871,18 +947,21 @@ function RoteiroDetalhes() {
                         <strong>{ROTULO_MOTIVO_VERSAO[versao.motivo] ?? versao.motivo}</strong>
                       </p>
                       <p className="muted small">
-                        {new Date(versao.dataCriacao).toLocaleString("pt-BR")} · {versao.dados.itens.length}{" "}
+                        {new Date(versao.dataCriacao).toLocaleString("pt-BR")}
+                        {versao.autor ? ` · por ${versao.autor}` : ""} · {versao.dados.itens.length}{" "}
                         {versao.dados.itens.length === 1 ? "parada" : "paradas"} · &ldquo;{versao.dados.nome}&rdquo;
                       </p>
                     </div>
-                    <button
-                      type="button"
-                      className="btn btn--outline btn--sm"
-                      onClick={() => aoRestaurarVersao(versao.id)}
-                      disabled={restaurandoId === versao.id}
-                    >
-                      {restaurandoId === versao.id ? "Restaurando..." : "Restaurar"}
-                    </button>
+                    {podeEditar && (
+                      <button
+                        type="button"
+                        className="btn btn--outline btn--sm"
+                        onClick={() => aoRestaurarVersao(versao.id)}
+                        disabled={restaurandoId === versao.id}
+                      >
+                        {restaurandoId === versao.id ? "Restaurando..." : "Restaurar"}
+                      </button>
+                    )}
                   </div>
                 ))}
               </div>

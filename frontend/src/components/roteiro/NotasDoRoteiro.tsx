@@ -7,10 +7,11 @@ interface NotasDoRoteiroProps {
   idRoteiro: number;
   notas: string | null;
   aoSalvar: () => void | Promise<void>;
+  somenteLeitura?: boolean;
 }
 
 // Anotações livres da viagem (endereços, senhas de reserva, lembretes). Só o dono vê.
-function NotasDoRoteiro({ idRoteiro, notas, aoSalvar }: NotasDoRoteiroProps) {
+function NotasDoRoteiro({ idRoteiro, notas, aoSalvar, somenteLeitura = false }: NotasDoRoteiroProps) {
   const [texto, setTexto] = useState(notas ?? "");
   const [salvando, setSalvando] = useState(false);
   const [salvo, setSalvo] = useState(false);
@@ -40,7 +41,7 @@ function NotasDoRoteiro({ idRoteiro, notas, aoSalvar }: NotasDoRoteiroProps) {
     <section className="card card--pad stack" aria-labelledby="titulo-notas">
       <div>
         <h2 id="titulo-notas">Notas</h2>
-        <p className="muted small">Só você vê. Não aparecem no link público do roteiro.</p>
+        <p className="muted small">Visíveis só para quem participa do roteiro; não aparecem no link público.</p>
       </div>
 
       <form onSubmit={aoEnviar} className="form">
@@ -49,6 +50,7 @@ function NotasDoRoteiro({ idRoteiro, notas, aoSalvar }: NotasDoRoteiroProps) {
             rows={6}
             maxLength={5000}
             value={texto}
+            readOnly={somenteLeitura}
             onChange={(e) => {
               setTexto(e.target.value);
               setSalvo(false);
@@ -65,9 +67,11 @@ function NotasDoRoteiro({ idRoteiro, notas, aoSalvar }: NotasDoRoteiroProps) {
         )}
 
         <div className="cluster">
+          {!somenteLeitura && (
           <button type="submit" className="btn btn--outline btn--sm" disabled={salvando}>
             {salvando ? "Salvando..." : "Salvar notas"}
           </button>
+          )}
           {salvo && (
             <span className="muted small" role="status">
               <Icone nome="check" /> Notas salvas.

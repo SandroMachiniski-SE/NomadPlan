@@ -23,6 +23,7 @@ const RoteiroPublico = lazy(() => import("./pages/RoteiroPublico"));
 const FerramentasPontos = lazy(() => import("./pages/FerramentasPontos"));
 const Admin = lazy(() => import("./pages/Admin"));
 const Favoritos = lazy(() => import("./pages/Favoritos"));
+const Convites = lazy(() => import("./pages/Convites"));
 const Privacidade = lazy(() => import("./pages/Privacidade"));
 
 const PAPEIS_CADASTRADORES = ["NEGOCIO", "GESTOR", "MODERADOR", "ADMIN"] as const;
@@ -52,6 +53,7 @@ function App() {
             <Route path="/roteiros/gerar" element={<GerarRoteiro />} />
             <Route path="/perfil" element={<Perfil />} />
             <Route path="/salvos" element={<Favoritos />} />
+            <Route path="/convites" element={<Convites />} />
           </Route>
 
           <Route element={<RotaProtegida papeis={[...PAPEIS_CADASTRADORES]} />}>

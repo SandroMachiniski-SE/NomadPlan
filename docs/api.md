@@ -63,13 +63,15 @@ Erros têm o formato `{ "erro": "mensagem em português" }`; erros de validaçã
 
 ## Roteiros — `/roteiros` 🔒
 
+**Participantes e papéis.** Um roteiro tem um dono e, opcionalmente, convidados: `EDITOR` (altera paradas, dias, custos, notas, checklist, dados do roteiro e restaura versões) e `LEITOR` (só consulta). Só o **dono** exclui o roteiro, ativa o link público e gerencia convidados. Quem não participa recebe `404` (como se o roteiro não existisse); quem participa sem permissão recebe `403`. Notas, orçamento e checklist são visíveis a todos os participantes, mas nunca no link público.
+
 | Método | Rota | Descrição |
 | --- | --- | --- |
 | GET | `/roteiros/publico/:slug` (público) | Roteiro compartilhado por link, com `dia` e `deslocamento` em cada parada. |
-| GET | `/roteiros` | Roteiros do usuário. |
+| GET | `/roteiros` | Roteiros do usuário **e os compartilhados com ele**, cada um com `meuPapel` (`DONO`, `EDITOR` ou `LEITOR`) e `usuario` (o dono). |
 | POST | `/roteiros/gerar` | Gera um roteiro sugerido: `cidade`, `horasDisponiveis?`, `interesses?`, `dataHoraInicio?`, `latitude?`, `longitude?`. Resposta: `{ pontos[], avisos[], inicio, fallbackUsado }`; cada ponto traz `chegadaEstimada`, `saidaEstimada`, `deslocamentoMin`, `esperaMin`, `duracaoVisitaMin`. Considera horário de funcionamento, distância, interesses e acessibilidade. |
 | POST | `/roteiros` | Cria. Aceita `pontos: [{ idPonto, dia?, observacao? }]` para gravar o roteiro e as paradas de uma só vez (`dia` de 1 a 30, padrão 1; `custoCentavos` opcional). |
-| GET | `/roteiros/:id` | Detalhe com paradas, ordenadas por dia e, dentro do dia, pela ordem. Cada parada traz `dia`, `custoCentavos` e `deslocamento` (`{ metros, minutos }` desde a parada anterior do mesmo dia, em linha reta a ~25 km/h; `null` na primeira de cada dia ou sem coordenadas). Traz ainda `notas`, `checklist[]` e `orcamento` (`{ totalCentavos, porDia, orcamentoCentavos, restanteCentavos, paradasSemCusto }`). |
+| GET | `/roteiros/:id` | Detalhe com paradas, ordenadas por dia e, dentro do dia, pela ordem. Cada parada traz `dia`, `custoCentavos` e `deslocamento` (`{ metros, minutos }` desde a parada anterior do mesmo dia, em linha reta a ~25 km/h; `null` na primeira de cada dia ou sem coordenadas). Traz ainda `meuPapel`, `usuario` (dono), `colaboradores[]` (`{ idUsuario, nome, papel }`, sem e-mails), `notas`, `checklist[]` e `orcamento` (`{ totalCentavos, porDia, orcamentoCentavos, restanteCentavos, paradasSemCusto }`). |
 | PUT | `/roteiros/:id` | Edita nome, descrição, cidade e datas. |
 | DELETE | `/roteiros/:id` | Exclui. |
 | PATCH | `/roteiros/:id/compartilhar` | Corpo: `publico`. Gera ou desativa o link público. |
@@ -81,10 +83,23 @@ Erros têm o formato `{ "erro": "mensagem em português" }`; erros de validaçã
 | POST | `/roteiros/:id/checklist` | Novo item da checklist (`texto`, até 200 caracteres; máx. 100 itens, `409` além disso). |
 | PATCH | `/roteiros/:id/checklist/:idItem` | Altera `texto` e/ou `feito`. |
 | DELETE | `/roteiros/:id/checklist/:idItem` | Remove o item. |
+| GET | `/roteiros/:id/convites` | Convites pendentes, com o e-mail de cada pessoa. **Dono.** |
+| POST | `/roteiros/:id/convites` | Convida por e-mail. Corpo: `email`, `papel` (`EDITOR` ou `LEITOR`). **Dono.** Até 10 participantes + convites (`409` além disso); `409` se já há convite pendente ou a pessoa já participa; `400` se for o próprio dono. A pessoa é avisada no sino (se tiver conta) e por e-mail. O convite vale para a conta que usar aquele e-mail, inclusive uma criada depois. |
+| DELETE | `/roteiros/:id/convites/:idConvite` | Cancela um convite pendente. **Dono.** |
+| PATCH | `/roteiros/:id/colaboradores/:idUsuario` | Muda o papel de um participante (`papel`); vale na hora. **Dono.** |
+| DELETE | `/roteiros/:id/colaboradores/:idUsuario` | Remove um participante. O dono remove qualquer um; cada participante pode remover a si mesmo (sair). |
 | POST | `/roteiros/:id/otimizar` | Reordena as paradas para encurtar o percurso (vizinho mais próximo + 2-opt; a primeira parada de cada dia é a partida). Corpo: `dia?` (sem ele, todos os dias). Só grava, com uma versão no histórico, se algum dia melhorar. Resposta: `{ alterado, dias: [{ dia, alterado, metrosAntes, metrosDepois }] }`. |
 | DELETE | `/roteiros/:id/itens/:idPonto` | Remove parada. |
-| GET | `/roteiros/:id/versoes` | Histórico de versões (RF26). |
+| GET | `/roteiros/:id/versoes` | Histórico de versões (RF26), com o nome de quem fez cada alteração (`autor`). |
 | POST | `/roteiros/:id/versoes/:versaoId/restaurar` | Restaura uma versão. |
+
+## Convites recebidos — `/convites` 🔒
+
+| Método | Rota | Descrição |
+| --- | --- | --- |
+| GET | `/convites` | Convites pendentes para o e-mail da conta: `{ total, dados[{ id, papel, roteiro, convidante }] }`. |
+| POST | `/convites/:id/aceitar` | Aceita: a pessoa passa a participar com o papel do convite; o convidante é avisado. Resposta: `{ aceito, idRoteiro }`. |
+| POST | `/convites/:id/recusar` | Recusa e apaga o convite; o convidante é avisado. |
 
 ## Pontos salvos (favoritos) — `/salvos` 🔒
 

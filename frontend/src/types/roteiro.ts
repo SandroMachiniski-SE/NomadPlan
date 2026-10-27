@@ -75,6 +75,37 @@ export interface Roteiro {
   orcamentoCentavos?: number | null;
   checklist?: ItemChecklist[];
   orcamento?: ResumoOrcamentoRoteiro;
+  /** Papel de quem está vendo: dono, editor ou leitor. */
+  meuPapel?: MeuPapel;
+  /** Dono do roteiro (útil quando ele foi compartilhado). */
+  usuario?: { id: number; nome: string };
+  colaboradores?: Colaborador[];
+}
+
+export type PapelColaborador = "EDITOR" | "LEITOR";
+export type MeuPapel = "DONO" | PapelColaborador;
+
+export interface Colaborador {
+  idUsuario: number;
+  nome: string;
+  papel: PapelColaborador;
+}
+
+/** Convite pendente que o dono vê (com o e-mail da pessoa convidada). */
+export interface ConviteEnviado {
+  id: number;
+  email: string;
+  papel: PapelColaborador;
+  dataCriacao: string;
+}
+
+/** Convite recebido por quem está logado. */
+export interface ConviteRecebido {
+  id: number;
+  papel: PapelColaborador;
+  dataCriacao: string;
+  roteiro: { id: number; nome: string; cidade: string | null };
+  convidante: { nome: string };
 }
 
 export interface RespostaRoteiros {
@@ -119,6 +150,8 @@ export interface VersaoRoteiro {
   motivo: string;
   idAutor: number | null;
   dataCriacao: string;
+  /** Nome de quem fez a alteração. */
+  autor?: string | null;
   dados: {
     nome: string;
     descricao: string | null;

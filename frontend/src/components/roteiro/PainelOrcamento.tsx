@@ -10,11 +10,12 @@ interface PainelOrcamentoProps {
   resumo: ResumoOrcamentoRoteiro;
   dataInicio: string | null;
   aoSalvar: () => void | Promise<void>;
+  somenteLeitura?: boolean;
 }
 
 // Orçamento simples: soma dos custos previstos por dia e no total, comparada ao teto
 // de gastos que a pessoa definir.
-function PainelOrcamento({ idRoteiro, resumo, dataInicio, aoSalvar }: PainelOrcamentoProps) {
+function PainelOrcamento({ idRoteiro, resumo, dataInicio, aoSalvar, somenteLeitura = false }: PainelOrcamentoProps) {
   const [teto, setTeto] = useState(
     resumo.orcamentoCentavos != null ? (resumo.orcamentoCentavos / 100).toFixed(2).replace(".", ",") : "",
   );
@@ -95,13 +96,14 @@ function PainelOrcamento({ idRoteiro, resumo, dataInicio, aoSalvar }: PainelOrca
         </ul>
       )}
 
-      {resumo.paradasSemCusto > 0 && (
+      {resumo.paradasSemCusto > 0 && !somenteLeitura && (
         <p className="muted small">
           {resumo.paradasSemCusto} {resumo.paradasSemCusto === 1 ? "parada ainda está" : "paradas ainda estão"} sem custo
           informado. Use &ldquo;Observação e custo&rdquo; em cada parada.
         </p>
       )}
 
+      {!somenteLeitura && (
       <form onSubmit={aoEnviar} className="form">
         <label className="field">
           <span>
@@ -128,6 +130,7 @@ function PainelOrcamento({ idRoteiro, resumo, dataInicio, aoSalvar }: PainelOrca
           </button>
         </div>
       </form>
+      )}
     </section>
   );
 }

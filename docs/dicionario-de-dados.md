@@ -8,6 +8,7 @@ Banco PostgreSQL 16 com a extensão PostGIS. O esquema é definido em `backend/p
 | --- | --- |
 | `TipoConta` | `VISITANTE`, `MORADOR`, `NEGOCIO`, `GESTOR`, `MODERADOR`, `ADMIN` |
 | `StatusPonto` | `RASCUNHO`, `PENDENTE_VERIFICACAO` (aguardando moderação), `PUBLICADO`, `REJEITADO` |
+| `PapelColaborador` | `EDITOR`, `LEITOR` (o dono é quem criou o roteiro, em `roteiro.id_usuario`) |
 | `StatusSolicitacao` | `PENDENTE`, `APROVADA`, `REJEITADA` (sugestões, verificações e avaliações) |
 
 ## Tabelas
@@ -73,6 +74,10 @@ Histórico de alterações (RF26). `id`, `id_ponto`/`id_roteiro` (FK, cascata), 
 ### `item_checklist`
 
 Lista de tarefas do roteiro. `id`, `id_roteiro` (FK, cascata), `texto`, `feito`, `ordem`, `data_criacao`. Até 100 itens por roteiro.
+
+### `colaborador_roteiro` e `convite_roteiro`
+
+Roteiro colaborativo. `colaborador_roteiro`: `id`, `id_roteiro` (FK, cascata), `id_usuario` (FK, cascata), `papel` (`PapelColaborador`), `data_criacao`; único por (`id_roteiro`, `id_usuario`). `convite_roteiro`: convite pendente — `id`, `id_roteiro` (FK, cascata), `email` (minúsculas), `papel`, `id_convidante` (FK, cascata), `data_criacao`; único por (`id_roteiro`, `email`). Ao aceitar, vira `colaborador_roteiro`; aceito ou recusado, o convite é apagado. Máximo de 10 participantes + convites por roteiro.
 
 ### `ponto_salvo`
 

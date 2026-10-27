@@ -1,4 +1,4 @@
-import { Router, Request, Response } from "express";
+import { Router, Request, Response, NextFunction } from "express";
 import { randomBytes } from "crypto";
 import { z } from "zod";
 import prisma from "../lib/prisma";
@@ -11,6 +11,9 @@ import { ehViolacaoDeUnicidade } from "../lib/prismaErros";
 import { registrarVersaoRoteiro, type DadosVersaoRoteiro } from "../lib/versionamentoRoteiro";
 import { comTrechos, otimizarOrdem } from "../lib/trajeto";
 import { resumirOrcamento } from "../lib/orcamento";
+import { MAX_PARTICIPANTES, nivelExigido, papelNoRoteiro, papelPermite, type Papel } from "../lib/colaboracao";
+import { criarNotificacao } from "../lib/notificacoes";
+import { enviarEmailConvite } from "../lib/email";
 
 const roteirosRouter = Router();
 
@@ -90,6 +93,36 @@ roteirosRouter.get("/publico/:slug", async (req: Request, res: Response) => {
 });
 
 roteirosRouter.use(autenticar);
+
+// Acesso a /roteiros/:id/...: confere se a pessoa participa do roteiro (dono ou convidado) e
+// se o papel dela basta para a operação pedida. Quem não participa recebe 404, como se o
+// roteiro não existisse; quem participa sem permissão recebe 403.
+roteirosRouter.use("/:id(\\d+)", async (req: Request, res: Response, next: NextFunction) => {
+  try {
+    const id = Number(req.params.id);
+    const papel = id > 2_147_483_647 ? null : await papelNoRoteiro(id, req.usuario!.id);
+
+    if (!papel) {
+      return res.status(404).json({ erro: "Roteiro não encontrado." });
+    }
+
+    const nivel = nivelExigido(req.method, req.path);
+
+    if (!papelPermite(papel, nivel)) {
+      return res.status(403).json({
+        erro: nivel === "dono" ? "Só o dono do roteiro pode fazer isso." : "Você só pode visualizar este roteiro.",
+      });
+    }
+
+    res.locals.papelNoRoteiro = papel;
+
+    return next();
+  } catch (error) {
+    console.error("Erro ao conferir o acesso ao roteiro:", error);
+
+    return res.status(500).json({ erro: "Erro interno ao conferir o acesso ao roteiro." });
+  }
+});
 
 const camposDoRoteiroSchema = z.object({
   nome: z.string().trim().min(1).max(120),
@@ -173,9 +206,11 @@ const gerarRoteiroSchema = z.object({
   longitude: z.coerce.number().min(-180).max(180).optional(),
 });
 
-async function buscarRoteiroDoUsuario(id: number, idUsuario: number) {
-  return prisma.roteiro.findFirst({
-    where: { id, idUsuario },
+// A participação (e o nível de acesso) de quem chama já foi conferida pelo middleware de
+// "/:id" mais abaixo; aqui só se confirma que o roteiro existe.
+async function buscarRoteiro(id: number) {
+  return prisma.roteiro.findUnique({
+    where: { id },
     select: { id: true },
   });
 }
@@ -195,10 +230,10 @@ async function gerarSlugUnico(): Promise<string> {
 
 roteirosRouter.get("/", async (req: Request, res: Response) => {
   try {
+    const idUsuario = req.usuario!.id;
+
     const roteiros = await prisma.roteiro.findMany({
-      where: {
-        idUsuario: req.usuario!.id,
-      },
+      where: { OR: [{ idUsuario }, { colaboradores: { some: { idUsuario } } }] },
       orderBy: {
         dataAtualizacao: "desc",
       },
@@ -208,12 +243,17 @@ roteirosRouter.get("/", async (req: Request, res: Response) => {
             itens: true,
           },
         },
+        usuario: { select: { id: true, nome: true } },
+        colaboradores: { where: { idUsuario }, select: { papel: true } },
       },
     });
 
     return res.json({
       total: roteiros.length,
-      dados: roteiros,
+      dados: roteiros.map(({ colaboradores, notas: _notas, orcamentoCentavos: _orcamento, ...roteiro }) => ({
+        ...roteiro,
+        meuPapel: roteiro.idUsuario === idUsuario ? "DONO" : (colaboradores[0]?.papel ?? "LEITOR"),
+      })),
     });
   } catch (error) {
     console.error("Erro ao listar roteiros:", error);
@@ -277,12 +317,14 @@ roteirosRouter.get("/:id", async (req: Request, res: Response) => {
       });
     }
 
-    const roteiro = await prisma.roteiro.findFirst({
-      where: {
-        id: id.data,
-        idUsuario: req.usuario!.id,
-      },
+    const roteiro = await prisma.roteiro.findUnique({
+      where: { id: id.data },
       include: {
+        usuario: { select: { id: true, nome: true } },
+        colaboradores: {
+          orderBy: { id: "asc" },
+          select: { idUsuario: true, papel: true, usuario: { select: { nome: true } } },
+        },
         itens: {
           orderBy: [...ORDEM_DAS_PARADAS],
           include: {
@@ -303,6 +345,8 @@ roteirosRouter.get("/:id", async (req: Request, res: Response) => {
 
     return res.json({
       ...roteiro,
+      meuPapel: res.locals.papelNoRoteiro as Papel,
+      colaboradores: roteiro.colaboradores.map((c) => ({ idUsuario: c.idUsuario, nome: c.usuario.nome, papel: c.papel })),
       itens: comTrechos(roteiro.itens),
       orcamento: resumirOrcamento(roteiro.itens, roteiro.orcamentoCentavos),
     });
@@ -408,8 +452,8 @@ roteirosRouter.put("/:id", async (req: Request, res: Response) => {
       });
     }
 
-    const roteiro = await prisma.roteiro.findFirst({
-      where: { id: id.data, idUsuario: req.usuario!.id },
+    const roteiro = await prisma.roteiro.findUnique({
+      where: { id: id.data },
       select: { id: true, dataInicio: true, dataFim: true },
     });
 
@@ -474,9 +518,7 @@ roteirosRouter.patch("/:id/compartilhar", async (req: Request, res: Response) =>
       return res.status(400).json({ erro: "Dados inválidos." });
     }
 
-    const roteiro = await prisma.roteiro.findFirst({
-      where: { id: id.data, idUsuario: req.usuario!.id },
-    });
+    const roteiro = await prisma.roteiro.findUnique({ where: { id: id.data } });
 
     if (!roteiro) {
       return res.status(404).json({ erro: "Roteiro não encontrado." });
@@ -523,7 +565,7 @@ roteirosRouter.post("/:id/itens", async (req: Request, res: Response) => {
       });
     }
 
-    const roteiro = await buscarRoteiroDoUsuario(idRoteiro.data, req.usuario!.id);
+    const roteiro = await buscarRoteiro(idRoteiro.data);
 
     if (!roteiro) {
       return res.status(404).json({
@@ -630,7 +672,7 @@ roteirosRouter.post("/:id/itens/reordenar", async (req: Request, res: Response) 
       });
     }
 
-    const roteiro = await buscarRoteiroDoUsuario(idRoteiro.data, req.usuario!.id);
+    const roteiro = await buscarRoteiro(idRoteiro.data);
 
     if (!roteiro) {
       return res.status(404).json({ erro: "Roteiro não encontrado." });
@@ -687,7 +729,7 @@ roteirosRouter.put("/:id/itens/organizar", async (req: Request, res: Response) =
       return res.status(400).json({ erro: "Dados de organização inválidos.", detalhes: resultado.error.flatten() });
     }
 
-    const roteiro = await buscarRoteiroDoUsuario(idRoteiro.data, req.usuario!.id);
+    const roteiro = await buscarRoteiro(idRoteiro.data);
 
     if (!roteiro) {
       return res.status(404).json({ erro: "Roteiro não encontrado." });
@@ -746,7 +788,7 @@ roteirosRouter.post("/:id/otimizar", async (req: Request, res: Response) => {
       return res.status(400).json({ erro: "Dia inválido." });
     }
 
-    const roteiro = await buscarRoteiroDoUsuario(idRoteiro.data, req.usuario!.id);
+    const roteiro = await buscarRoteiro(idRoteiro.data);
 
     if (!roteiro) {
       return res.status(404).json({ erro: "Roteiro não encontrado." });
@@ -838,7 +880,7 @@ roteirosRouter.patch("/:id/itens/:idItem", async (req: Request, res: Response) =
       return res.status(400).json({ erro: "Dados da parada inválidos.", detalhes: resultado.error.flatten() });
     }
 
-    const roteiro = await buscarRoteiroDoUsuario(idRoteiro.data, req.usuario!.id);
+    const roteiro = await buscarRoteiro(idRoteiro.data);
     const item = roteiro
       ? await prisma.itemRoteiro.findFirst({ where: { id: idItem.data, idRoteiro: idRoteiro.data }, select: { id: true } })
       : null;
@@ -880,7 +922,7 @@ roteirosRouter.patch("/:id/anotacoes", async (req: Request, res: Response) => {
       return res.status(400).json({ erro: "Dados inválidos.", detalhes: resultado.error.flatten() });
     }
 
-    const roteiro = await buscarRoteiroDoUsuario(id.data, req.usuario!.id);
+    const roteiro = await buscarRoteiro(id.data);
 
     if (!roteiro) {
       return res.status(404).json({ erro: "Roteiro não encontrado." });
@@ -920,7 +962,7 @@ roteirosRouter.post("/:id/checklist", async (req: Request, res: Response) => {
       return res.status(400).json({ erro: "Informe o texto do item (até 200 caracteres)." });
     }
 
-    const roteiro = await buscarRoteiroDoUsuario(id.data, req.usuario!.id);
+    const roteiro = await buscarRoteiro(id.data);
 
     if (!roteiro) {
       return res.status(404).json({ erro: "Roteiro não encontrado." });
@@ -961,7 +1003,7 @@ roteirosRouter.patch("/:id/checklist/:idItem", async (req: Request, res: Respons
       return res.status(400).json({ erro: "Dados do item inválidos." });
     }
 
-    const roteiro = await buscarRoteiroDoUsuario(id.data, req.usuario!.id);
+    const roteiro = await buscarRoteiro(id.data);
     const item = roteiro
       ? await prisma.itemChecklist.findFirst({ where: { id: idItem.data, idRoteiro: id.data }, select: { id: true } })
       : null;
@@ -989,7 +1031,7 @@ roteirosRouter.delete("/:id/checklist/:idItem", async (req: Request, res: Respon
       return res.status(400).json({ erro: "Identificador inválido." });
     }
 
-    const roteiro = await buscarRoteiroDoUsuario(id.data, req.usuario!.id);
+    const roteiro = await buscarRoteiro(id.data);
     const removidos = roteiro
       ? await prisma.itemChecklist.deleteMany({ where: { id: idItem.data, idRoteiro: id.data } })
       : { count: 0 };
@@ -1006,6 +1048,222 @@ roteirosRouter.delete("/:id/checklist/:idItem", async (req: Request, res: Respon
   }
 });
 
+// ---------- Colaboração: convites e participantes ----------
+
+const conviteSchema = z.object({
+  email: z.string().trim().toLowerCase().email().max(180),
+  papel: z.enum(["EDITOR", "LEITOR"]),
+});
+
+const papelSchema = z.object({ papel: z.enum(["EDITOR", "LEITOR"]) });
+
+// Convites pendentes (com e-mail): só o dono vê.
+roteirosRouter.get("/:id/convites", async (req: Request, res: Response) => {
+  try {
+    const id = idSchema.parse(req.params.id);
+
+    const convites = await prisma.conviteRoteiro.findMany({
+      where: { idRoteiro: id },
+      orderBy: { id: "asc" },
+      select: { id: true, email: true, papel: true, dataCriacao: true },
+    });
+
+    return res.json({ total: convites.length, dados: convites });
+  } catch (error) {
+    console.error("Erro ao listar convites do roteiro:", error);
+
+    return res.status(500).json({ erro: "Erro interno ao listar os convites." });
+  }
+});
+
+roteirosRouter.post("/:id/convites", async (req: Request, res: Response) => {
+  try {
+    const id = idSchema.parse(req.params.id);
+    const resultado = conviteSchema.safeParse(req.body);
+
+    if (!resultado.success) {
+      return res.status(400).json({ erro: "Informe um e-mail válido e o papel (EDITOR ou LEITOR)." });
+    }
+
+    const { email, papel } = resultado.data;
+    const idDono = req.usuario!.id;
+
+    const [roteiro, dono, convidado, participantes, convitesPendentes] = await Promise.all([
+      prisma.roteiro.findUniqueOrThrow({ where: { id }, select: { id: true, nome: true } }),
+      prisma.usuario.findUniqueOrThrow({ where: { id: idDono }, select: { nome: true, email: true } }),
+      prisma.usuario.findUnique({ where: { email }, select: { id: true, ativo: true } }),
+      prisma.colaboradorRoteiro.count({ where: { idRoteiro: id } }),
+      prisma.conviteRoteiro.count({ where: { idRoteiro: id } }),
+    ]);
+
+    if (email === dono.email) {
+      return res.status(400).json({ erro: "Você já é o dono deste roteiro." });
+    }
+
+    if (participantes + convitesPendentes >= MAX_PARTICIPANTES) {
+      return res.status(409).json({ erro: `Um roteiro comporta até ${MAX_PARTICIPANTES} convidados.` });
+    }
+
+    if (convidado) {
+      const jaParticipa = await prisma.colaboradorRoteiro.findUnique({
+        where: { idRoteiro_idUsuario: { idRoteiro: id, idUsuario: convidado.id } },
+        select: { id: true },
+      });
+
+      if (jaParticipa) {
+        return res.status(409).json({ erro: "Esta pessoa já participa do roteiro." });
+      }
+    }
+
+    let convite;
+
+    try {
+      convite = await prisma.conviteRoteiro.create({
+        data: { idRoteiro: id, email, papel, idConvidante: idDono },
+        select: { id: true, email: true, papel: true, dataCriacao: true },
+      });
+    } catch (erro) {
+      if (ehViolacaoDeUnicidade(erro)) {
+        return res.status(409).json({ erro: "Já existe um convite pendente para este e-mail." });
+      }
+
+      throw erro;
+    }
+
+    const temConta = Boolean(convidado?.ativo);
+
+    if (convidado?.ativo) {
+      await criarNotificacao(convidado.id, `${dono.nome} convidou você para o roteiro "${roteiro.nome}".`, "/convites");
+    }
+
+    const frontendUrl = process.env.FRONTEND_URL || "http://localhost:5173";
+
+    // Não se espera o envio: o SMTP é lento e a resposta não deve depender dele.
+    enviarEmailConvite({
+      para: email,
+      nomeConvidante: dono.nome,
+      nomeRoteiro: roteiro.nome,
+      papel,
+      link: `${frontendUrl}/convites`,
+      temConta,
+    }).catch((erro) => console.error("Falha ao enviar e-mail de convite:", erro));
+
+    await registrarAuditoria({
+      idUsuario: idDono,
+      acao: "convidar_colaborador",
+      entidade: "roteiro",
+      idEntidade: id,
+      detalhes: { papel },
+    });
+
+    return res.status(201).json(convite);
+  } catch (error) {
+    console.error("Erro ao convidar para o roteiro:", error);
+
+    return res.status(500).json({ erro: "Erro interno ao enviar o convite." });
+  }
+});
+
+roteirosRouter.delete("/:id/convites/:idConvite", async (req: Request, res: Response) => {
+  try {
+    const id = idSchema.parse(req.params.id);
+    const idConvite = idSchema.safeParse(req.params.idConvite);
+
+    if (!idConvite.success) {
+      return res.status(400).json({ erro: "Identificador inválido." });
+    }
+
+    const removidos = await prisma.conviteRoteiro.deleteMany({ where: { id: idConvite.data, idRoteiro: id } });
+
+    if (removidos.count === 0) {
+      return res.status(404).json({ erro: "Convite não encontrado." });
+    }
+
+    return res.status(204).send();
+  } catch (error) {
+    console.error("Erro ao cancelar convite:", error);
+
+    return res.status(500).json({ erro: "Erro interno ao cancelar o convite." });
+  }
+});
+
+roteirosRouter.patch("/:id/colaboradores/:idUsuario", async (req: Request, res: Response) => {
+  try {
+    const id = idSchema.parse(req.params.id);
+    const idUsuario = idSchema.safeParse(req.params.idUsuario);
+    const resultado = papelSchema.safeParse(req.body);
+
+    if (!idUsuario.success || !resultado.success) {
+      return res.status(400).json({ erro: "Informe o papel (EDITOR ou LEITOR)." });
+    }
+
+    if (res.locals.papelNoRoteiro !== "DONO") {
+      return res.status(403).json({ erro: "Só o dono do roteiro pode fazer isso." });
+    }
+
+    const atualizados = await prisma.colaboradorRoteiro.updateMany({
+      where: { idRoteiro: id, idUsuario: idUsuario.data },
+      data: { papel: resultado.data.papel },
+    });
+
+    if (atualizados.count === 0) {
+      return res.status(404).json({ erro: "Participante não encontrado." });
+    }
+
+    await registrarAuditoria({
+      idUsuario: req.usuario!.id,
+      acao: "alterar_papel_colaborador",
+      entidade: "roteiro",
+      idEntidade: id,
+      detalhes: { idColaborador: idUsuario.data, papel: resultado.data.papel },
+    });
+
+    return res.status(204).send();
+  } catch (error) {
+    console.error("Erro ao alterar o papel do participante:", error);
+
+    return res.status(500).json({ erro: "Erro interno ao alterar o papel." });
+  }
+});
+
+// O dono remove qualquer participante; cada participante pode remover a si mesmo (sair).
+roteirosRouter.delete("/:id/colaboradores/:idUsuario", async (req: Request, res: Response) => {
+  try {
+    const id = idSchema.parse(req.params.id);
+    const idUsuario = idSchema.safeParse(req.params.idUsuario);
+
+    if (!idUsuario.success) {
+      return res.status(400).json({ erro: "Identificador inválido." });
+    }
+
+    const saindo = idUsuario.data === req.usuario!.id;
+
+    if (res.locals.papelNoRoteiro !== "DONO" && !saindo) {
+      return res.status(403).json({ erro: "Só o dono do roteiro pode fazer isso." });
+    }
+
+    const removidos = await prisma.colaboradorRoteiro.deleteMany({ where: { idRoteiro: id, idUsuario: idUsuario.data } });
+
+    if (removidos.count === 0) {
+      return res.status(404).json({ erro: "Participante não encontrado." });
+    }
+
+    await registrarAuditoria({
+      idUsuario: req.usuario!.id,
+      acao: saindo ? "sair_do_roteiro" : "remover_colaborador",
+      entidade: "roteiro",
+      idEntidade: id,
+      detalhes: { idColaborador: idUsuario.data },
+    });
+
+    return res.status(204).send();
+  } catch (error) {
+    console.error("Erro ao remover participante:", error);
+
+    return res.status(500).json({ erro: "Erro interno ao remover o participante." });
+  }
+});
+
 roteirosRouter.delete("/:id/itens/:idPonto", async (req: Request, res: Response) => {
   try {
     const idRoteiro = idSchema.safeParse(req.params.id);
@@ -1017,7 +1275,7 @@ roteirosRouter.delete("/:id/itens/:idPonto", async (req: Request, res: Response)
       });
     }
 
-    const roteiro = await buscarRoteiroDoUsuario(idRoteiro.data, req.usuario!.id);
+    const roteiro = await buscarRoteiro(idRoteiro.data);
 
     if (!roteiro) {
       return res.status(404).json({
@@ -1071,7 +1329,7 @@ roteirosRouter.delete("/:id", async (req: Request, res: Response) => {
       });
     }
 
-    const roteiro = await buscarRoteiroDoUsuario(id.data, req.usuario!.id);
+    const roteiro = await buscarRoteiro(id.data);
 
     if (!roteiro) {
       return res.status(404).json({
@@ -1111,7 +1369,7 @@ roteirosRouter.get("/:id/versoes", async (req: Request, res: Response) => {
       return res.status(400).json({ erro: "Identificador inválido." });
     }
 
-    const roteiro = await buscarRoteiroDoUsuario(id.data, req.usuario!.id);
+    const roteiro = await buscarRoteiro(id.data);
 
     if (!roteiro) {
       return res.status(404).json({ erro: "Roteiro não encontrado." });
@@ -1122,7 +1380,14 @@ roteirosRouter.get("/:id/versoes", async (req: Request, res: Response) => {
       orderBy: { id: "desc" },
     });
 
-    return res.json({ total: versoes.length, dados: versoes });
+    const idsAutores = [...new Set(versoes.map((v) => v.idAutor).filter((a): a is number => a !== null))];
+    const autores = await prisma.usuario.findMany({ where: { id: { in: idsAutores } }, select: { id: true, nome: true } });
+    const nomePorId = new Map(autores.map((a) => [a.id, a.nome]));
+
+    return res.json({
+      total: versoes.length,
+      dados: versoes.map((v) => ({ ...v, autor: v.idAutor !== null ? (nomePorId.get(v.idAutor) ?? null) : null })),
+    });
   } catch (error) {
     console.error("Erro ao listar versões do roteiro:", error);
 
@@ -1139,7 +1404,7 @@ roteirosRouter.post("/:id/versoes/:versaoId/restaurar", async (req: Request, res
       return res.status(400).json({ erro: "Identificador inválido." });
     }
 
-    const roteiro = await buscarRoteiroDoUsuario(id.data, req.usuario!.id);
+    const roteiro = await buscarRoteiro(id.data);
 
     if (!roteiro) {
       return res.status(404).json({ erro: "Roteiro não encontrado." });

@@ -3,8 +3,10 @@ import assert from "node:assert/strict";
 import nodemailer, { type SendMailOptions } from "nodemailer";
 import {
   descreverConfiguracaoEmail,
+  enviarEmailConvite,
   enviarEmailRedefinicaoSenha,
   lerConfiguracaoSmtp,
+  montarEmailConvite,
   montarEmailRedefinicao,
   type ConfiguracaoSmtp,
 } from "./email";
@@ -174,5 +176,53 @@ describe("descreverConfiguracaoEmail", () => {
     assert.match(texto, /smtp\.exemplo\.com:587/);
     assert.match(texto, /conta@exemplo\.com/);
     assert.ok(!texto.includes("segredo"));
+  });
+});
+
+describe("e-mail de convite para roteiro", () => {
+  const dados = {
+    para: "ana@exemplo.com",
+    nomeConvidante: "Beto <script>",
+    nomeRoteiro: 'Viagem "dos sonhos"',
+    papel: "EDITOR" as const,
+    link: "http://localhost:5173/convites",
+    temConta: true,
+  };
+
+  it("descreve o convite e orienta conforme a pessoa já tenha conta ou não", () => {
+    const comConta = montarEmailConvite(dados);
+    const semConta = montarEmailConvite({ ...dados, temConta: false, papel: "LEITOR" });
+
+    assert.match(comConta.texto, /convidou você para editar o roteiro/);
+    assert.match(comConta.texto, /Entre no NomadPlan/);
+    assert.match(semConta.texto, /acompanhar o roteiro/);
+    assert.match(semConta.texto, /Crie uma conta no NomadPlan com este mesmo e-mail/);
+    assert.match(comConta.assunto, /convidou você para um roteiro/);
+  });
+
+  it("escapa o HTML dos nomes digitados por usuários", () => {
+    const { html } = montarEmailConvite(dados);
+
+    assert.ok(!html.includes("<script>"));
+    assert.ok(html.includes("Beto &lt;script&gt;"));
+    assert.ok(html.includes("&quot;dos sonhos&quot;"));
+  });
+
+  it("sem SMTP em desenvolvimento só registra no console; em produção não envia", async () => {
+    assert.equal(await enviarEmailConvite(dados, { config: null, producao: false }), "console");
+    assert.equal(await enviarEmailConvite(dados, { config: null, producao: true }), "nao-configurado");
+  });
+
+  it("com SMTP envia a mensagem pelo transporte informado", async () => {
+    const enviadas: { to: string; subject: string }[] = [];
+    const transporte = { sendMail: async (m: { to: string; subject: string }) => void enviadas.push(m) } as never;
+
+    const r = await enviarEmailConvite(dados, {
+      config: { host: "smtp.teste", port: 587, secure: false, from: "NomadPlan <x@x>" },
+      transporte,
+    });
+
+    assert.equal(r, "enviado");
+    assert.equal(enviadas[0].to, "ana@exemplo.com");
   });
 });
