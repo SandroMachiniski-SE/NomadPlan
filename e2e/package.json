@@ -1,0 +1,16 @@
+{
+  "name": "nomadplan-e2e",
+  "private": true,
+  "version": "1.0.0",
+  "description": "Testes de ponta a ponta (Playwright) do NomadPlan",
+  "scripts": {
+    "test": "playwright test",
+    "test:ui": "playwright test --ui",
+    "relatorio": "playwright show-report"
+  },
+  "devDependencies": {
+    "@playwright/test": "^1.64.1",
+    "@types/node": "^24.13.3",
+    "typescript": "~6.0.2"
+  }
+}
