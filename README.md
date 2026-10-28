@@ -130,7 +130,7 @@ O Gmail permite cerca de 500 e-mails por dia e mostra como remetente a própria 
 
 Sem `SMTP_HOST`, nenhum e-mail é enviado: o link de redefinição é impresso no **console do backend** (procure por `[e-mail em modo de desenvolvimento]`) e o backend avisa disso ao subir. Em produção, sem SMTP, nada é enviado e o servidor registra um aviso.
 
-Opcionalmente, o `docker compose up -d` também sobe o [Mailpit](https://mailpit.axllent.org/), uma caixa de entrada de teste em http://localhost:8025 que **guarda** os e-mails sem entregá-los a ninguém. Para usá-lo, configure `SMTP_HOST="localhost"` e `SMTP_PORT=1025`.
+Opcionalmente, o `docker compose up -d` também sobe o [Mailpit](https://mailpit.axllent.org/), uma caixa de entrada de teste em http://localhost:8025 que **guarda** os e-mails sem entregá-los a ninguém. Para usá-lo, configure `SMTP_HOST="localhost"` e `SMTP_PORT=1025`. Se outro Mailpit já ocupa as portas 1025 e 8025 (o contêiner não sobe com "address already in use"), crie um `.env` na raiz do projeto com `MAILPIT_SMTP_PORT=1026` e `MAILPIT_WEB_PORT=8026`, rode `docker compose up -d mailpit` e use `SMTP_PORT=1026` no backend; a caixa de entrada passa a ser http://localhost:8026.
 
 ## 🔒 Segurança
 
