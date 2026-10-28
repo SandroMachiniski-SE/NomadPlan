@@ -13,6 +13,19 @@ import Icone from "../components/Icone";
 import Estrelas from "../components/Estrelas";
 import { urlDoArquivo } from "../services/api";
 
+const ROTULO_CAMPO: Record<string, string> = {
+  nome: "Nome",
+  descricao: "Descrição",
+  categoria: "Categoria",
+  cidade: "Cidade",
+  endereco: "Endereço",
+  faixaPreco: "Faixa de preço",
+  acessibilidade: "Acessibilidade",
+  siteOficial: "Site oficial",
+  telefoneContato: "Telefone",
+  horarioFuncionamento: "Horário de funcionamento",
+};
+
 const MOTIVO_RETENCAO: Record<string, string> = {
   conteudo_suspeito: "Sinalizada automaticamente como suspeita",
   foto_anexada: "Contém foto (revisão obrigatória)",
@@ -263,7 +276,7 @@ function Moderacao() {
               <ul className="fila-item__campos">
                 {Object.entries(sugestao.camposPropostos).map(([campo, valor]) => (
                   <li key={campo}>
-                    <strong>{campo}:</strong> {valor}
+                    <strong>{ROTULO_CAMPO[campo] ?? campo}:</strong> {valor}
                   </li>
                 ))}
               </ul>
