@@ -179,7 +179,7 @@ describe("planejarRoteiro", () => {
   });
 
   it("devolve lista vazia, sem erro, quando não há candidatos", () => {
-    assert.deepEqual(planejarRoteiro([], params()), { pontos: [], avisos: [] });
+    assert.deepEqual(planejarRoteiro([], params()), { pontos: [], avisos: [], fechados: [] });
   });
 
   it("lida com pontos sem coordenadas", () => {

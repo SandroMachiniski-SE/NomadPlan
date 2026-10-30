@@ -6,12 +6,19 @@ import { comTrechos, distanciaDoPercurso, minutosParaPercorrer, otimizarOrdem, t
 const P = (id: number, lng: number) => ({ id, latitude: 0, longitude: lng });
 
 describe("trechoEntre", () => {
-  it("estima distância e tempo (25 km/h) entre duas paradas", () => {
-    const trecho = trechoEntre(P(1, 0), P(2, 0.1))!;
+  it("dentro da cidade, estima o tempo a 25 km/h em linha reta", () => {
+    const trecho = trechoEntre(P(1, 0), P(2, 0.045))!;
 
-    assert.ok(trecho.metros > 11000 && trecho.metros < 11200);
+    assert.ok(trecho.metros > 4900 && trecho.metros < 5100);
     assert.equal(trecho.minutos, minutosParaPercorrer(trecho.metros));
-    assert.ok(trecho.minutos >= 26 && trecho.minutos <= 28);
+    assert.equal(trecho.minutos, 12);
+  });
+
+  it("entre cidades, estima pela estrada: 30% mais longa, a 70 km/h, mais 10 min", () => {
+    // Joinville a Blumenau: ~67 km em linha reta, perto de 1h30 de carro.
+    const minutos = minutosParaPercorrer(67_000);
+
+    assert.ok(minutos >= 80 && minutos <= 90, `${minutos} min`);
   });
 
   it("não inventa trecho quando falta coordenada", () => {

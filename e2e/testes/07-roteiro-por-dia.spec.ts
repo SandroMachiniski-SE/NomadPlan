@@ -155,7 +155,8 @@ test.describe("roteiro por dia", () => {
     await criarRoteiro(page, "Roteiro sem datas");
     await adicionar(page, MUSEU);
 
-    await expect(page.getByRole("heading", { name: "Dia 1", exact: true })).toBeVisible();
+    // Sem datas, o dia mostra o número e a cidade das paradas.
+    await expect(page.getByRole("heading", { name: "Dia 1 · Joinville", exact: true })).toBeVisible();
 
     await page.getByRole("button", { name: "Editar" }).click();
     await page.getByLabel("Data de início").fill("2026-12-25");

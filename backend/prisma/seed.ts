@@ -6,6 +6,7 @@ import { lerDadosOsm } from "../src/lib/dadosOsm";
 import { importarPontosOsm } from "../src/lib/importacaoOsm";
 import { importarOverture, lerDadosOverture } from "../src/lib/importacaoOverture";
 import { aplicarCuradoria, lerCuradoria } from "../src/lib/curadoria";
+import { criarRoteiroDeExemplo } from "../src/lib/roteiroExemplo";
 
 const SENHA_DEMONSTRACAO = "senha-temporaria";
 
@@ -40,6 +41,9 @@ async function main() {
   const overture = await importarOverture(lerDadosOverture());
   // Pontos conferidos pela equipe em fontes oficiais (prisma/dados/curadoria.json).
   const curadoria = await aplicarCuradoria(lerCuradoria());
+  // Roteiro de demonstração no formato de caderno de viagem (vários dias e cidades, pernoites).
+  const morador = await prisma.usuario.findUniqueOrThrow({ where: { email: "morador@nomadplan.local" } });
+  await criarRoteiroDeExemplo(morador.id);
 
   console.log("Dados iniciais inseridos com sucesso.");
   console.log(

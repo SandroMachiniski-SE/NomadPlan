@@ -92,6 +92,10 @@ const CLASSIFICACAO: Record<string, Record<string, [string, string]>> = {
     peak: ["Aventura", "Morro"],
     cave_entrance: ["Aventura", "Gruta"],
   },
+  // Cachoeiras costumam vir como "waterway=waterfall", não como "natural".
+  waterway: {
+    waterfall: ["Natureza", "Cachoeira"],
+  },
   shop: {
     mall: ["Compras", "Shopping"],
     gift: ["Compras", "Loja de presentes e lembranças"],
@@ -100,7 +104,17 @@ const CLASSIFICACAO: Record<string, Record<string, [string, string]>> = {
   },
 };
 
-const ORDEM_DAS_CHAVES = ["tourism", "amenity", "historic", "leisure", "natural", "shop"];
+const ORDEM_DAS_CHAVES = ["tourism", "amenity", "historic", "leisure", "natural", "waterway", "shop"];
+
+// Para o "tourism=attraction" sem outra etiqueta, o próprio nome costuma dizer o que é.
+const ATRACAO_PELO_NOME: [RegExp, Classificacao][] = [
+  [/^(cachoeira|cascata|salto)\b/i, { categoria: "Natureza", tipo: "Cachoeira" }],
+  [/^(praia|prainha)\b/i, { categoria: "Natureza", tipo: "Praia" }],
+  [/^(mirante|morro|pico|serra|pedra)\b/i, { categoria: "Natureza", tipo: "Mirante" }],
+  [/^(trilha|caminho)\b/i, { categoria: "Aventura", tipo: "Trilha" }],
+  [/^(gruta|caverna)s?\b/i, { categoria: "Aventura", tipo: "Gruta" }],
+  [/^(parque|reserva|jardim|bosque)\b/i, { categoria: "Natureza", tipo: "Parque" }],
+];
 
 const TIPO_DO_TEMPLO: Record<string, string> = {
   cathedral: "Catedral",
@@ -166,7 +180,13 @@ export function classificarElemento(tags: Record<string, string>): Classificacao
   }
 
   // "tourism=attraction" sozinho é genérico demais para escolher a categoria por ele.
-  return tags.tourism === "attraction" ? { categoria: "Cultura", tipo: "Atração turística" } : null;
+  if (tags.tourism !== "attraction") {
+    return null;
+  }
+
+  const peloNome = ATRACAO_PELO_NOME.find(([padrao]) => padrao.test(tags.name.trim()));
+
+  return peloNome ? peloNome[1] : { categoria: "Cultura", tipo: "Atração turística" };
 }
 
 const COZINHAS: Record<string, string> = {
@@ -328,6 +348,11 @@ export function pontoDoElemento(elemento: ElementoOsm, cidade: string): PontoOsm
   const longitude = elemento.lon ?? elemento.center?.lon;
 
   if (!classificacao || latitude === undefined || longitude === undefined) {
+    return null;
+  }
+
+  // Placas e marcos com o próprio nome da cidade ("Pomerode") não são um passeio.
+  if (tags.name.trim().toLowerCase() === cidade.trim().toLowerCase()) {
     return null;
   }
 

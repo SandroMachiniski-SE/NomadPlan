@@ -61,6 +61,21 @@ describe("classificarElemento", () => {
     );
   });
 
+  it("reconhece cachoeiras marcadas como waterway e atrações pelo nome", () => {
+    assert.deepEqual(classificarElemento({ name: "Cascata do Avencal", tourism: "attraction", waterway: "waterfall" }), {
+      categoria: "Natureza",
+      tipo: "Cachoeira",
+    });
+    assert.equal(classificarElemento({ name: "Cachoeira da Serrinha", tourism: "attraction" })?.categoria, "Natureza");
+    assert.equal(classificarElemento({ name: "Trilha da Natureza", tourism: "attraction" })?.categoria, "Aventura");
+    assert.equal(classificarElemento({ name: "Morro da Igreja", tourism: "attraction" })?.tipo, "Mirante");
+    assert.equal(classificarElemento({ name: "Casa do Imigrante", tourism: "attraction" })?.categoria, "Cultura");
+  });
+
+  it("descarta o marco com o próprio nome da cidade", () => {
+    assert.equal(pontoDoElemento(no({ name: "Pomerode", tourism: "attraction" }), "Pomerode"), null);
+  });
+
   it("mantém praças, igrejas e casas antigas quando há sinal de interesse turístico", () => {
     assert.equal(classificarElemento({ name: "Praça XV", leisure: "park", wikidata: "Q1" })?.categoria, "Natureza");
     assert.deepEqual(classificarElemento({ name: "Catedral", amenity: "place_of_worship", building: "cathedral" }), {

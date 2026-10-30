@@ -1,8 +1,9 @@
 import { useState, type FormEvent } from "react";
 import api from "../../services/api";
-import type { ItemRoteiro } from "../../types/roteiro";
+import type { ItemRoteiro, PeriodoDoDia } from "../../types/roteiro";
 import { extrairMensagemErro } from "../../utils/erro";
 import { formatarMoeda, lerValorEmCentavos } from "../../utils/formatar";
+import { nomeDoItem, ROTULO_PERIODO } from "../../utils/roteiro";
 import Icone from "../Icone";
 
 interface DetalhesDaParadaProps {
@@ -14,18 +15,24 @@ interface DetalhesDaParadaProps {
   somenteLeitura?: boolean;
 }
 
-// Observação e custo previsto de uma parada: mostra o que há e abre um formulário curto.
+// Observação, custo previsto e período de uma parada (e o título, se for atividade livre):
+// mostra o que há e abre um formulário curto.
 function DetalhesDaParada({ idRoteiro, item, aoSalvar, somenteLeitura = false }: DetalhesDaParadaProps) {
   const [editando, setEditando] = useState(false);
   const [observacao, setObservacao] = useState(item.observacao ?? "");
   const [custo, setCusto] = useState(
     item.custoCentavos != null ? (item.custoCentavos / 100).toFixed(2).replace(".", ",") : "",
   );
+  const [periodo, setPeriodo] = useState<PeriodoDoDia | "">(item.periodo ?? "");
+  const [titulo, setTitulo] = useState(item.titulo ?? "");
   const [salvando, setSalvando] = useState(false);
   const [erro, setErro] = useState<string | null>(null);
+  const ehAtividade = item.ponto === null;
 
   function abrir() {
     setObservacao(item.observacao ?? "");
+    setPeriodo(item.periodo ?? "");
+    setTitulo(item.titulo ?? "");
     setCusto(item.custoCentavos != null ? (item.custoCentavos / 100).toFixed(2).replace(".", ",") : "");
     setErro(null);
     setEditando(true);
@@ -41,6 +48,11 @@ function DetalhesDaParada({ idRoteiro, item, aoSalvar, somenteLeitura = false }:
       return;
     }
 
+    if (ehAtividade && !titulo.trim()) {
+      setErro("A atividade precisa de um título.");
+      return;
+    }
+
     try {
       setSalvando(true);
       setErro(null);
@@ -48,6 +60,8 @@ function DetalhesDaParada({ idRoteiro, item, aoSalvar, somenteLeitura = false }:
       await api.patch(`/roteiros/${idRoteiro}/itens/${item.id}`, {
         observacao: observacao.trim() || null,
         custoCentavos,
+        ...(item.pernoite ? {} : { periodo: periodo || null }),
+        ...(ehAtividade ? { titulo: titulo.trim() } : {}),
       });
 
       setEditando(false);
@@ -64,6 +78,31 @@ function DetalhesDaParada({ idRoteiro, item, aoSalvar, somenteLeitura = false }:
     return (
       <form onSubmit={aoEnviar} className="form detalhes-parada">
         <div className="form-grid">
+          {ehAtividade && (
+            <label className="field">
+              <span>{item.pernoite ? "Onde vai dormir" : "O que fazer"}</span>
+              <input type="text" maxLength={160} value={titulo} onChange={(e) => setTitulo(e.target.value)} />
+            </label>
+          )}
+
+          {!item.pernoite && (
+            <label className="field">
+              <span>Período</span>
+              <select
+                value={periodo}
+                onChange={(e) => setPeriodo(e.target.value as PeriodoDoDia | "")}
+                aria-label={`Período de ${nomeDoItem(item)}`}
+              >
+                <option value="">Sem período</option>
+                {(Object.keys(ROTULO_PERIODO) as PeriodoDoDia[]).map((opcao) => (
+                  <option key={opcao} value={opcao}>
+                    {ROTULO_PERIODO[opcao]}
+                  </option>
+                ))}
+              </select>
+            </label>
+          )}
+
           <label className="field">
             <span>
               Observação <span className="field__optional">(opcional)</span>
@@ -87,7 +126,7 @@ function DetalhesDaParada({ idRoteiro, item, aoSalvar, somenteLeitura = false }:
               value={custo}
               onChange={(e) => setCusto(e.target.value)}
               placeholder="0,00"
-              aria-label={`Custo previsto de ${item.ponto.nome}`}
+              aria-label={`Custo previsto de ${nomeDoItem(item)}`}
             />
           </label>
         </div>
@@ -124,7 +163,7 @@ function DetalhesDaParada({ idRoteiro, item, aoSalvar, somenteLeitura = false }:
         {!somenteLeitura && (
           <button type="button" className="btn btn--ghost btn--sm" onClick={abrir}>
             <Icone nome="editar" />
-            {item.observacao || item.custoCentavos != null ? "Editar detalhes" : "Observação e custo"}
+            {item.observacao || item.custoCentavos != null ? "Editar detalhes" : item.pernoite ? "Observação e custo" : "Período, observação e custo"}
           </button>
         )}
       </div>

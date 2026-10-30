@@ -1,7 +1,7 @@
-import { useCallback, useEffect, useState, type FormEvent, type SyntheticEvent } from "react";
+import { useCallback, useEffect, useRef, useState, type FormEvent, type SyntheticEvent } from "react";
 import { Link, useNavigate, useParams } from "react-router-dom";
 import api from "../services/api";
-import type { ItemRoteiro, ResumoOtimizacao, Roteiro, VersaoRoteiro } from "../types/roteiro";
+import type { ItemRoteiro, PeriodoDoDia, ResumoOtimizacao, Roteiro, VersaoRoteiro } from "../types/roteiro";
 import type { Ponto, RespostaPontos } from "../types/ponto";
 import { extrairMensagemErro } from "../utils/erro";
 import Icone from "../components/Icone";
@@ -11,21 +11,34 @@ import PainelOrcamento from "../components/roteiro/PainelOrcamento";
 import ChecklistDoRoteiro from "../components/roteiro/ChecklistDoRoteiro";
 import NotasDoRoteiro from "../components/roteiro/NotasDoRoteiro";
 import Colaboradores from "../components/roteiro/Colaboradores";
+import SugestoesDeCidade from "../components/SugestoesDeCidade";
+import { useCidadesDisponiveis } from "../services/cidades";
 import { formatarDistancia, formatarMoeda } from "../utils/formatar";
 import {
   agruparPorDia,
+  cidadesDoDia,
   contarDias,
   corDoDia,
   descreverTrecho,
   MAX_DIAS,
+  nomeDoItem,
+  ROTULO_PERIODO,
   rotuloDoDia,
   totalDoDia,
 } from "../utils/roteiro";
 
+type TipoDaNovaParada = "ponto" | "atividade" | "pernoite";
+
+function semAcento(texto: string): string {
+  return texto.toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "").trim();
+}
+
 const ROTULO_MOTIVO_VERSAO: Record<string, string> = {
   edicao: "Dados do roteiro editados",
   adicionar_ponto: "Parada adicionada",
+  adicionar_atividade: "Atividade adicionada",
   remover_ponto: "Parada removida",
+  remover_atividade: "Atividade removida",
   reordenar: "Paradas reordenadas",
   organizar: "Paradas reorganizadas ou movidas de dia",
   otimizar: "Ordem otimizada pelo trajeto",
@@ -51,6 +64,13 @@ function RoteiroDetalhes() {
   const [erro, setErro] = useState<string | null>(null);
 
   const [pontosDisponiveis, setPontosDisponiveis] = useState<Ponto[]>([]);
+  const [tipoNovaParada, setTipoNovaParada] = useState<TipoDaNovaParada>("ponto");
+  // Cidade de onde vêm as sugestões de pontos (um roteiro pode passar por várias).
+  const [cidadeDaBusca, setCidadeDaBusca] = useState("");
+  const cidadeDaBuscaDefinida = useRef(false);
+  const [tituloAtividade, setTituloAtividade] = useState("");
+  const [periodoNovo, setPeriodoNovo] = useState<PeriodoDoDia | "">("");
+  const cidadesDisponiveis = useCidadesDisponiveis();
   const [idPontoSelecionado, setIdPontoSelecionado] = useState("");
   const [observacao, setObservacao] = useState("");
   const [enviandoPonto, setEnviandoPonto] = useState(false);
@@ -103,16 +123,33 @@ function RoteiroDetalhes() {
   }, [id]);
 
   const roteiroCarregado = roteiro !== null;
-  const cidadeDoRoteiro = roteiro?.cidade ?? null;
 
-  // Sugere para adicionar os pontos da cidade do roteiro (ou, sem cidade, os mais relevantes).
+  // A busca de pontos começa pela cidade da última parada (ou a do roteiro).
+  useEffect(() => {
+    if (!roteiro || cidadeDaBuscaDefinida.current) return;
+
+    cidadeDaBuscaDefinida.current = true;
+    const ultimaComCidade = [...roteiro.itens].reverse().find((item) => item.ponto);
+    setCidadeDaBusca(ultimaComCidade?.ponto?.cidade ?? roteiro.cidade ?? "");
+  }, [roteiro]);
+
+  // Só busca quando o texto corresponde a uma cidade com pontos (sem acento e maiúsculas).
+  const cidadeEscolhida =
+    cidadesDisponiveis.find((c) => semAcento(c.cidade) === semAcento(cidadeDaBusca))?.cidade ?? null;
+  const categoriaDaBusca = tipoNovaParada === "pernoite" ? "Hospedagem" : null;
+
+  // Sugere os pontos da cidade escolhida (ou, sem cidade, os mais relevantes); para a pernoite, as hospedagens.
   useEffect(() => {
     if (!roteiroCarregado) return;
 
     async function buscarPontos() {
       try {
         const resposta = await api.get<RespostaPontos>("/pontos", {
-          params: { limite: 100, ...(cidadeDoRoteiro ? { cidade: cidadeDoRoteiro } : {}) },
+          params: {
+            limite: 100,
+            ...(cidadeEscolhida ? { cidade: cidadeEscolhida } : {}),
+            ...(categoriaDaBusca ? { categoria: categoriaDaBusca } : {}),
+          },
         });
         setPontosDisponiveis(resposta.data.dados);
       } catch (err) {
@@ -121,7 +158,7 @@ function RoteiroDetalhes() {
     }
 
     buscarPontos();
-  }, [roteiroCarregado, cidadeDoRoteiro]);
+  }, [roteiroCarregado, cidadeEscolhida, categoriaDaBusca]);
 
   useEffect(() => {
     // eslint-disable-next-line react-hooks/set-state-in-effect -- fetch inicial ao montar o componente, padrao recomendado pelo React
@@ -184,66 +221,71 @@ function RoteiroDetalhes() {
     }
   }
 
-  async function aoAdicionarPonto(evento: SyntheticEvent<HTMLFormElement>) {
+  // Ponto cadastrado, atividade livre ("Rolê pelo centro") ou onde dormir (hotel do banco ou texto).
+  async function aoAdicionarParada(evento: SyntheticEvent<HTMLFormElement>) {
     evento.preventDefault();
     setErroPonto(null);
 
-    if (!idPontoSelecionado) {
+    const titulo = tituloAtividade.trim();
+
+    if (tipoNovaParada === "ponto" && !idPontoSelecionado) {
       setErroPonto("Selecione um ponto para adicionar.");
+      return;
+    }
+
+    if (tipoNovaParada === "atividade" && !titulo) {
+      setErroPonto("Escreva o que vai ser feito, como “Rolê pelo centro histórico”.");
+      return;
+    }
+
+    if (tipoNovaParada === "pernoite" && !idPontoSelecionado && !titulo) {
+      setErroPonto("Escolha uma hospedagem da lista ou escreva onde vai dormir.");
       return;
     }
 
     try {
       setEnviandoPonto(true);
 
-      const payload: Record<string, unknown> = {
-        idPonto: Number(idPontoSelecionado),
-      };
+      const payload: Record<string, unknown> =
+        idPontoSelecionado && tipoNovaParada !== "atividade" ? { idPonto: Number(idPontoSelecionado) } : { titulo };
 
-      if (diaDoNovoPonto) {
-        payload.dia = Number(diaDoNovoPonto);
-      }
-
-      if (observacao.trim() !== "") {
-        payload.observacao = observacao.trim();
-      }
+      if (tipoNovaParada === "pernoite") payload.pernoite = true;
+      if (periodoNovo && tipoNovaParada !== "pernoite") payload.periodo = periodoNovo;
+      if (diaDoNovoPonto) payload.dia = Number(diaDoNovoPonto);
+      if (observacao.trim() !== "") payload.observacao = observacao.trim();
 
       await api.post(`/roteiros/${id}/itens`, payload);
 
       setIdPontoSelecionado("");
+      setTituloAtividade("");
+      setPeriodoNovo("");
       setObservacao("");
 
       await buscarRoteiro();
     } catch (err) {
       console.error(err);
-
-      const mensagem = extrairMensagemErro(
-        err,
-        "Não foi possível adicionar este ponto ao roteiro."
-      );
-
-      setErroPonto(mensagem);
+      setErroPonto(extrairMensagemErro(err, "Não foi possível adicionar ao roteiro."));
     } finally {
       setEnviandoPonto(false);
     }
   }
 
-  async function aoRemoverPonto(idPonto: number) {
-    const confirmar = window.confirm("Deseja remover este ponto do roteiro?");
+  async function aoRemoverParada(item: ItemRoteiro) {
+    const confirmar = window.confirm(`Remover “${nomeDoItem(item)}” do roteiro?`);
 
     if (!confirmar) {
       return;
     }
 
     try {
-      setRemovendoId(idPonto);
+      setRemovendoId(item.id);
 
-      await api.delete(`/roteiros/${id}/itens/${idPonto}`);
+      await api.delete(`/roteiros/${id}/paradas/${item.id}`);
 
       await buscarRoteiro();
     } catch (err) {
       console.error(err);
-      alert("Não foi possível remover este ponto do roteiro.");
+      alert("Não foi possível remover do roteiro.");
     } finally {
       setRemovendoId(null);
     }
@@ -510,11 +552,18 @@ function RoteiroDetalhes() {
                 <h1>{roteiro.nome}</h1>
 
                 <div className="roteiro-meta">
-                  {roteiro.cidade && (
+                  {(roteiro.cidades?.length ?? 0) > 0 ? (
                     <span>
                       <Icone nome="pin" />
-                      {roteiro.cidade}
+                      {roteiro.cidades!.join(" → ")}
                     </span>
+                  ) : (
+                    roteiro.cidade && (
+                      <span>
+                        <Icone nome="pin" />
+                        {roteiro.cidade}
+                      </span>
+                    )
                   )}
                   {(roteiro.dataInicio || roteiro.dataFim) && (
                     <span>
@@ -587,7 +636,7 @@ function RoteiroDetalhes() {
             </header>
           )}
 
-          {itens.some((item) => item.ponto.latitude !== null) && (
+          {itens.some((item) => item.ponto && item.ponto.latitude !== null) && (
             <section aria-labelledby="titulo-mapa">
               <div className="cluster spread">
                 <h2 id="titulo-mapa" className="section__title">
@@ -617,15 +666,23 @@ function RoteiroDetalhes() {
                 <MapaRoteiroCarregavel
                   dia={diaNoMapa}
                   paradas={dias.flatMap((grupo) =>
-                    grupo.itens.map((item, indice) => ({
-                      idPonto: item.ponto.id,
-                      nome: item.ponto.nome,
-                      categoria: item.ponto.categoria,
-                      dia: grupo.dia,
-                      numero: indice + 1,
-                      latitude: item.ponto.latitude,
-                      longitude: item.ponto.longitude,
-                    })),
+                    // O número no mapa é o mesmo da lista; atividades sem lugar não aparecem.
+                    grupo.itens.flatMap((item, indice) =>
+                      item.ponto
+                        ? [
+                            {
+                              idPonto: item.ponto.id,
+                              nome: item.ponto.nome,
+                              categoria: item.ponto.categoria,
+                              dia: grupo.dia,
+                              numero: item.pernoite ? 999 : indice + 1,
+                              pernoite: item.pernoite,
+                              latitude: item.ponto.latitude,
+                              longitude: item.ponto.longitude,
+                            },
+                          ]
+                        : [],
+                    ),
                   )}
                 />
               </div>
@@ -638,7 +695,7 @@ function RoteiroDetalhes() {
           <section aria-labelledby="titulo-paradas">
             <div className="cluster spread">
               <h2 id="titulo-paradas" className="section__title">
-                Pontos do roteiro
+                Dia a dia
               </h2>
 
               <div className="cluster">
@@ -679,22 +736,29 @@ function RoteiroDetalhes() {
                 <div className="empty__icon">
                   <Icone nome="pin" />
                 </div>
-                <p className="empty__title">Este roteiro ainda não tem pontos</p>
-                <p>Use o formulário abaixo para adicionar a primeira parada.</p>
+                <p className="empty__title">Este roteiro ainda não tem paradas</p>
+                <p>Use o formulário abaixo para adicionar pontos, atividades e onde dormir.</p>
               </div>
             )}
 
             <div className="stack stack--lg">
               {dias.map((grupo) => {
                 const total = totalDoDia(grupo.itens);
+                const paradas = grupo.itens.filter((item) => !item.pernoite);
+                const pernoite = grupo.itens.find((item) => item.pernoite);
+                const cidades = cidadesDoDia(grupo.itens);
+                const viagem = roteiro?.viagensEntreDias?.find((v) => v.dia === grupo.dia);
 
                 return (
                   <div key={grupo.dia} className="dia" style={{ ["--cor-dia" as string]: corDoDia(grupo.dia) }}>
                     <div className="dia__cabecalho">
-                      <h3 className="dia__titulo">{rotuloDoDia(grupo.dia, roteiro?.dataInicio ?? null)}</h3>
+                      <h3 className="dia__titulo">
+                        {rotuloDoDia(grupo.dia, roteiro?.dataInicio ?? null)}
+                        {cidades.length > 0 && <span className="dia__cidades"> · {cidades.join(", ")}</span>}
+                      </h3>
 
                       <span className="muted small">
-                        {grupo.itens.length} {grupo.itens.length === 1 ? "parada" : "paradas"}
+                        {paradas.length} {paradas.length === 1 ? "parada" : "paradas"}
                         {total.metros > 0 && ` · ${descreverTrecho(total)} de deslocamento`}
                         {roteiro?.orcamento?.porDia[grupo.dia] !== undefined &&
                           ` · ${formatarMoeda(roteiro.orcamento.porDia[grupo.dia])} previstos`}
@@ -720,12 +784,19 @@ function RoteiroDetalhes() {
                       </div>
                     )}
 
-                    {grupo.itens.length === 0 ? (
+                    {viagem && (
+                      <p className="dia__viagem">
+                        <Icone nome="avancar" />
+                        Viagem de {viagem.de} para {viagem.para}: {descreverTrecho(viagem)} pela estrada (estimativa)
+                      </p>
+                    )}
+
+                    {paradas.length === 0 ? (
                       <p className="dia__vazio muted">Nenhuma parada neste dia. Adicione abaixo ou mova uma de outro dia.</p>
                     ) : (
                       <ol className="paradas">
-                        {grupo.itens.map((item, indice) => (
-                          <li key={item.id} className="parada">
+                        {paradas.map((item, indice) => (
+                          <li key={item.id} className={item.ponto ? "parada" : "parada parada--atividade"}>
                             <span className="parada__num" style={{ background: corDoDia(grupo.dia) }}>
                               {indice + 1}
                             </span>
@@ -741,11 +812,18 @@ function RoteiroDetalhes() {
                               <div className="parada__topo">
                                 <div className="stack stack--sm">
                                   <h3>
-                                    <Link to={`/pontos/${item.ponto.id}`}>{item.ponto.nome}</Link>
+                                    {item.ponto ? <Link to={`/pontos/${item.ponto.id}`}>{item.ponto.nome}</Link> : item.titulo}
                                   </h3>
                                   <div className="cluster">
-                                    <span className="badge badge--primary">{item.ponto.categoria}</span>
-                                    <span className="muted small">{item.ponto.cidade}</span>
+                                    {item.periodo && <span className="badge badge--accent">{ROTULO_PERIODO[item.periodo]}</span>}
+                                    {item.ponto ? (
+                                      <>
+                                        <span className="badge badge--primary">{item.ponto.categoria}</span>
+                                        <span className="muted small">{item.ponto.cidade}</span>
+                                      </>
+                                    ) : (
+                                      <span className="badge">Atividade livre</span>
+                                    )}
                                   </div>
                                 </div>
 
@@ -765,7 +843,7 @@ function RoteiroDetalhes() {
                                     type="button"
                                     className="btn btn--ghost btn--icon"
                                     onClick={() => aoMoverItem(grupo.dia, indice, 1)}
-                                    disabled={indice === grupo.itens.length - 1 || reordenando}
+                                    disabled={indice === paradas.length - 1 || reordenando}
                                     title="Mover para baixo"
                                     aria-label="Mover para baixo"
                                   >
@@ -777,7 +855,7 @@ function RoteiroDetalhes() {
                                       value={grupo.dia}
                                       onChange={(e) => aoMoverParaDia(item, Number(e.target.value))}
                                       disabled={reordenando}
-                                      aria-label={`Dia de ${item.ponto.nome}`}
+                                      aria-label={`Dia de ${nomeDoItem(item)}`}
                                     >
                                       {dias.map((opcao) => (
                                         <option key={opcao.dia} value={opcao.dia}>
@@ -789,10 +867,10 @@ function RoteiroDetalhes() {
                                   <button
                                     type="button"
                                     className="btn btn--danger-outline btn--sm"
-                                    onClick={() => aoRemoverPonto(item.ponto.id)}
-                                    disabled={removendoId === item.ponto.id}
+                                    onClick={() => aoRemoverParada(item)}
+                                    disabled={removendoId === item.id}
                                   >
-                                    {removendoId === item.ponto.id ? "Removendo..." : "Remover"}
+                                    {removendoId === item.id ? "Removendo..." : "Remover"}
                                   </button>
                                 </div>
                                 )}
@@ -809,6 +887,40 @@ function RoteiroDetalhes() {
                         ))}
                       </ol>
                     )}
+
+                    {pernoite && (
+                      <div className="card pernoite">
+                        <div className="parada__topo">
+                          <div className="stack stack--sm">
+                            <span className="pernoite__rotulo">Onde dormir</span>
+                            <h3>
+                              {pernoite.ponto ? (
+                                <Link to={`/pontos/${pernoite.ponto.id}`}>{pernoite.ponto.nome}</Link>
+                              ) : (
+                                pernoite.titulo
+                              )}
+                            </h3>
+                            {pernoite.ponto && <span className="muted small">{pernoite.ponto.cidade}</span>}
+                          </div>
+                          {podeEditar && (
+                            <button
+                              type="button"
+                              className="btn btn--danger-outline btn--sm"
+                              onClick={() => aoRemoverParada(pernoite)}
+                              disabled={removendoId === pernoite.id}
+                            >
+                              {removendoId === pernoite.id ? "Removendo..." : "Remover"}
+                            </button>
+                          )}
+                        </div>
+                        <DetalhesDaParada
+                          idRoteiro={roteiro!.id}
+                          item={pernoite}
+                          aoSalvar={buscarRoteiro}
+                          somenteLeitura={!podeEditar}
+                        />
+                      </div>
+                    )}
                   </div>
                 );
               })}
@@ -818,25 +930,104 @@ function RoteiroDetalhes() {
           {podeEditar && (
           <section aria-labelledby="titulo-adicionar">
             <h2 id="titulo-adicionar" className="section__title">
-              Adicionar ponto ao roteiro
+              Adicionar ao roteiro
             </h2>
 
-            <form onSubmit={aoAdicionarPonto} className="card form-card form">
-              <div className="form-grid">
-                <label className="field">
-                  <span>Ponto turístico *</span>
-                  <select
-                    value={idPontoSelecionado}
-                    onChange={(e) => setIdPontoSelecionado(e.target.value)}
+            <form onSubmit={aoAdicionarParada} className="card form-card form">
+              <div className="segmented" role="group" aria-label="O que adicionar">
+                {(
+                  [
+                    ["ponto", "Ponto turístico"],
+                    ["atividade", "Atividade livre"],
+                    ["pernoite", "Onde dormir"],
+                  ] as const
+                ).map(([tipo, rotulo]) => (
+                  <button
+                    key={tipo}
+                    type="button"
+                    aria-pressed={tipoNovaParada === tipo}
+                    onClick={() => {
+                      setTipoNovaParada(tipo);
+                      setIdPontoSelecionado("");
+                      setErroPonto(null);
+                    }}
                   >
-                    <option value="">Selecione um ponto</option>
-                    {pontosDisponiveis.map((ponto) => (
-                      <option key={ponto.id} value={ponto.id}>
-                        {ponto.nome} - {ponto.cidade}
+                    {rotulo}
+                  </button>
+                ))}
+              </div>
+
+              <div className="form-grid">
+                {tipoNovaParada !== "atividade" && (
+                  <label className="field">
+                    <span>Cidade</span>
+                    <input
+                      type="text"
+                      value={cidadeDaBusca}
+                      onChange={(e) => {
+                        setCidadeDaBusca(e.target.value);
+                        setIdPontoSelecionado("");
+                      }}
+                      list="cidades-da-parada"
+                      placeholder="Todas as cidades"
+                    />
+                    <SugestoesDeCidade id="cidades-da-parada" />
+                    {cidadeDaBusca.trim() !== "" && !cidadeEscolhida && cidadesDisponiveis.length > 0 && (
+                      <span className="field__hint">Ainda não há pontos nessa cidade. Escolha uma da lista.</span>
+                    )}
+                  </label>
+                )}
+
+                {tipoNovaParada !== "atividade" && (
+                  <label className="field">
+                    <span>{tipoNovaParada === "pernoite" ? "Hospedagem" : "Ponto turístico *"}</span>
+                    <select
+                      value={idPontoSelecionado}
+                      onChange={(e) => setIdPontoSelecionado(e.target.value)}
+                      aria-label={tipoNovaParada === "pernoite" ? "Hospedagem" : "Ponto turístico *"}
+                    >
+                      <option value="">
+                        {tipoNovaParada === "pernoite" ? "Outro lugar (escrever abaixo)" : "Selecione um ponto"}
                       </option>
-                    ))}
-                  </select>
-                </label>
+                      {pontosDisponiveis.map((ponto) => (
+                        <option key={ponto.id} value={ponto.id}>
+                          {ponto.nome} - {ponto.cidade}
+                        </option>
+                      ))}
+                    </select>
+                  </label>
+                )}
+
+                {(tipoNovaParada === "atividade" || (tipoNovaParada === "pernoite" && !idPontoSelecionado)) && (
+                  <label className="field">
+                    <span>{tipoNovaParada === "atividade" ? "O que fazer *" : "Onde vai dormir"}</span>
+                    <input
+                      type="text"
+                      maxLength={160}
+                      value={tituloAtividade}
+                      onChange={(e) => setTituloAtividade(e.target.value)}
+                      placeholder={
+                        tipoNovaParada === "atividade" ? "Ex.: Rolê pelo centro histórico, Dia livre" : "Ex.: Acampamento na serra"
+                      }
+                    />
+                  </label>
+                )}
+
+                {tipoNovaParada !== "pernoite" && (
+                  <label className="field">
+                    <span>
+                      Período <span className="field__optional">(opcional)</span>
+                    </span>
+                    <select value={periodoNovo} onChange={(e) => setPeriodoNovo(e.target.value as PeriodoDoDia | "")}>
+                      <option value="">Sem período</option>
+                      {(Object.keys(ROTULO_PERIODO) as PeriodoDoDia[]).map((periodo) => (
+                        <option key={periodo} value={periodo}>
+                          {ROTULO_PERIODO[periodo]}
+                        </option>
+                      ))}
+                    </select>
+                  </label>
+                )}
 
                 {totalDias > 1 && (
                   <label className="field">
@@ -878,7 +1069,13 @@ function RoteiroDetalhes() {
               <div className="form-actions">
                 <button type="submit" className="btn btn--primary" disabled={enviandoPonto}>
                   <Icone nome="mais" />
-                  {enviandoPonto ? "Adicionando..." : "Adicionar ponto"}
+                  {enviandoPonto
+                    ? "Adicionando..."
+                    : tipoNovaParada === "ponto"
+                      ? "Adicionar ponto"
+                      : tipoNovaParada === "atividade"
+                        ? "Adicionar atividade"
+                        : "Definir onde dormir"}
                 </button>
               </div>
             </form>

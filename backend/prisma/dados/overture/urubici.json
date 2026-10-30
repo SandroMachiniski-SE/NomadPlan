@@ -1,0 +1,2814 @@
+{
+ "fonte": "Overture Maps Foundation, tema places, versão 2026-10-21.0",
+ "licenca": "CDLA Permissive 2.0 (https://cdla.dev/permissive-2-0/); algumas fontes em Apache 2.0 ou CC0, indicadas em cada lugar",
+ "cidade": "Urubici",
+ "baixadoEm": "2026-10-30T03:03:45.369756+00:00",
+ "lugares": [
+  {
+   "idOverture": "96aa7966-962e-4141-835c-03be8a3497db",
+   "nome": "Casa Brognoli Hospedaria",
+   "categoriaOverture": "hotel",
+   "confianca": 0.899,
+   "sites": [
+    "http://www.casabrognoli.blogspot.com/"
+   ],
+   "telefones": [
+    "+554991220395"
+   ],
+   "redesSociais": [
+    "https://www.facebook.com/198539106975052"
+   ],
+   "endereco": "SC110 km 395",
+   "localidade": "Urubici",
+   "latitude": -28.124721593958,
+   "longitude": -49.655,
+   "fontes": [
+    "meta (CDLA-Permissive-2.0)",
+    "Overture (CDLA-Permissive-2.0)"
+   ]
+  },
+  {
+   "idOverture": "dc9a5d28-df8f-43a0-a56f-ed4150efc005",
+   "nome": "Vale da Geada Hospedagem e Camping",
+   "categoriaOverture": "hotel",
+   "confianca": 0.986,
+   "sites": [],
+   "telefones": [
+    "+5549998281323"
+   ],
+   "redesSociais": [
+    "https://www.facebook.com/748644195170609"
+   ],
+   "endereco": "Estrada Geral - Baiano - bairro Nossa Senhora de Fátima",
+   "localidade": "Urubici",
+   "latitude": -28.027522448347977,
+   "longitude": -49.5876341131202,
+   "fontes": [
+    "meta (CDLA-Permissive-2.0)",
+    "Overture (CDLA-Permissive-2.0)"
+   ]
+  },
+  {
+   "idOverture": "f225db7d-530d-427e-a4cb-f81a3e4dde65",
+   "nome": "Pousada Rural Pavão",
+   "categoriaOverture": "bed_and_breakfast",
+   "confianca": 0.992,
+   "sites": [
+    "http://www.pousadapavaourubici.com.br/"
+   ],
+   "telefones": [
+    "+5549998404199"
+   ],
+   "redesSociais": [
+    "https://www.facebook.com/1111937285556322"
+   ],
+   "endereco": "R. Boanerges Pereira de Medeiros",
+   "localidade": "Urubici",
+   "latitude": -28.02999763,
+   "longitude": -49.57542818,
+   "fontes": [
+    "meta (CDLA-Permissive-2.0)",
+    "Overture (CDLA-Permissive-2.0)"
+   ]
+  },
+  {
+   "idOverture": "c52677e3-8414-4089-a936-4c1c1ff69f9d",
+   "nome": "Sítio Encanto da Natureza",
+   "categoriaOverture": "hotel",
+   "confianca": 0.939,
+   "sites": [
+    "http://acolhida.com.br/propriedades/serra-catarinens/urubici/pousada-encanto-da-natureza/"
+   ],
+   "telefones": [
+    "+5549991120278"
+   ],
+   "redesSociais": [
+    "https://www.facebook.com/197924497221131"
+   ],
+   "endereco": "Estrada geral do Baiano",
+   "localidade": "Urubici",
+   "latitude": -28.070684469103114,
+   "longitude": -49.56529969021525,
+   "fontes": [
+    "meta (CDLA-Permissive-2.0)",
+    "Overture (CDLA-Permissive-2.0)"
+   ]
+  },
+  {
+   "idOverture": "8f491c34-a1eb-4912-bafb-7d8045d90b0b",
+   "nome": "Pousada Chuá Chuá - Urubici - SC Pousada Boutique",
+   "categoriaOverture": "hotel",
+   "confianca": 0.915,
+   "sites": [
+    "http://www.pousadachuachua.com.br/"
+   ],
+   "telefones": [
+    "+554932785488"
+   ],
+   "redesSociais": [
+    "https://www.facebook.com/904695462930439"
+   ],
+   "endereco": "Rua Pedro Custódio 2225",
+   "localidade": "Urubici",
+   "latitude": -28.02081906873655,
+   "longitude": -49.567293588880304,
+   "fontes": [
+    "meta (CDLA-Permissive-2.0)",
+    "Overture (CDLA-Permissive-2.0)"
+   ]
+  },
+  {
+   "idOverture": "effd3c0c-8ea9-4b8d-8634-3bbd81f840a3",
+   "nome": "Pousada Boa Vista",
+   "categoriaOverture": "hotel",
+   "confianca": 0.887,
+   "sites": [
+    "https://www.booking.com/hotel/br/pousada-boa-vista-urubici.pt-br.html?aid=376377"
+   ],
+   "telefones": [
+    "+5549999351512"
+   ],
+   "redesSociais": [
+    "https://www.facebook.com/470105420076179"
+   ],
+   "endereco": "Avenida Rodolfo Anderman, 370",
+   "localidade": "Urubici",
+   "latitude": -27.99311,
+   "longitude": -49.57245,
+   "fontes": [
+    "meta (CDLA-Permissive-2.0)",
+    "Overture (CDLA-Permissive-2.0)"
+   ]
+  },
+  {
+   "idOverture": "b21be806-dda3-472f-9635-0d4eade10f25",
+   "nome": "Pousada Abraço Serrano",
+   "categoriaOverture": "hotel",
+   "confianca": 0.993,
+   "sites": [
+    "https://www.instagram.com/pousada_abraco_serrano/"
+   ],
+   "telefones": [
+    "+554932784903"
+   ],
+   "redesSociais": [
+    "https://www.facebook.com/599357883819857"
+   ],
+   "endereco": "Av. Rodolfo Anderman, 2288",
+   "localidade": "Urubici",
+   "latitude": -27.99567069,
+   "longitude": -49.56540785,
+   "fontes": [
+    "meta (CDLA-Permissive-2.0)",
+    "Overture (CDLA-Permissive-2.0)"
+   ]
+  },
+  {
+   "idOverture": "b3b4bd57-9774-4157-9db3-536d32c72ef4",
+   "nome": "Serra Bela Hospedaria Rural",
+   "categoriaOverture": "lodge",
+   "confianca": 1.0,
+   "sites": [
+    "https://www.serrabela.com.br/"
+   ],
+   "telefones": [
+    "+554932785113"
+   ],
+   "redesSociais": [
+    "https://www.facebook.com/286826861407229"
+   ],
+   "endereco": "SC 370 Highway, km 79.7, No. 44, Santo Antônio, Urubici - Santa Catarina, Postal Code:",
+   "localidade": "Urubici",
+   "latitude": -28.00361199,
+   "longitude": -49.54778054,
+   "fontes": [
+    "meta (CDLA-Permissive-2.0)",
+    "Overture (CDLA-Permissive-2.0)"
+   ]
+  },
+  {
+   "idOverture": "4d2c41c3-c798-46f9-b688-7ae1cb4de5f2",
+   "nome": "Paradouro Santo Antônio",
+   "categoriaOverture": "restaurant",
+   "confianca": 0.991,
+   "sites": [
+    "http://estalagemsantoantonio.com.br/"
+   ],
+   "telefones": [
+    "+5549999831803"
+   ],
+   "redesSociais": [
+    "https://www.facebook.com/1577671462253534"
+   ],
+   "endereco": "SC-370, Km 78",
+   "localidade": "Urubici",
+   "latitude": -27.99925159,
+   "longitude": -49.55285042,
+   "fontes": [
+    "meta (CDLA-Permissive-2.0)",
+    "Overture (CDLA-Permissive-2.0)"
+   ]
+  },
+  {
+   "idOverture": "1e4641de-5e95-47af-8b46-d904a34879a8",
+   "nome": "Hospedaria Refúgio Do Invernador",
+   "categoriaOverture": "hotel",
+   "confianca": 0.888,
+   "sites": [
+    "http://www.refugiodoinvernador.com.br/"
+   ],
+   "telefones": [
+    "+5547992351327"
+   ],
+   "redesSociais": [
+    "https://www.facebook.com/1605774372770990"
+   ],
+   "endereco": "Estrada Geral do Invernador",
+   "localidade": "Urubici",
+   "latitude": -27.982187445502355,
+   "longitude": -49.554931654044445,
+   "fontes": [
+    "meta (CDLA-Permissive-2.0)",
+    "Overture (CDLA-Permissive-2.0)"
+   ]
+  },
+  {
+   "idOverture": "d7b0417c-fc39-4133-90a5-e4eb1b91dd60",
+   "nome": "Pousada Recanto Da Neve",
+   "categoriaOverture": "hotel",
+   "confianca": 0.991,
+   "sites": [
+    "https://recantodaneve.bukly.com/"
+   ],
+   "telefones": [
+    "+5549991750627"
+   ],
+   "redesSociais": [
+    "https://www.facebook.com/108622111890167"
+   ],
+   "endereco": "R. José Rabêlo Flôres",
+   "localidade": "Urubici",
+   "latitude": -27.94373119,
+   "longitude": -49.558818,
+   "fontes": [
+    "meta (CDLA-Permissive-2.0)",
+    "Overture (CDLA-Permissive-2.0)"
+   ]
+  },
+  {
+   "idOverture": "ac50a115-48da-4221-b515-82864b1beff1",
+   "nome": "Quinta do Invernador",
+   "categoriaOverture": "holiday_rental_home",
+   "confianca": 0.879,
+   "sites": [],
+   "telefones": [
+    "+5549998179973"
+   ],
+   "redesSociais": [
+    "https://www.facebook.com/104401711280186"
+   ],
+   "endereco": "",
+   "localidade": "Urubici",
+   "latitude": -27.97608297,
+   "longitude": -49.57091364,
+   "fontes": [
+    "meta (CDLA-Permissive-2.0)",
+    "Overture (CDLA-Permissive-2.0)"
+   ]
+  },
+  {
+   "idOverture": "7675bf73-c840-4a85-9cc1-bbc50a399af7",
+   "nome": "Recanto das Araucárias",
+   "categoriaOverture": "hotel",
+   "confianca": 0.912,
+   "sites": [],
+   "telefones": [
+    "+5547997648354"
+   ],
+   "redesSociais": [
+    "https://www.facebook.com/731258267227366"
+   ],
+   "endereco": "Pousada Recanto da Serra, Avenida Adolfo Konder, 180",
+   "localidade": "Urubici",
+   "latitude": -27.953822545667947,
+   "longitude": -49.57387204569116,
+   "fontes": [
+    "meta (CDLA-Permissive-2.0)",
+    "Overture (CDLA-Permissive-2.0)"
+   ]
+  },
+  {
+   "idOverture": "5d01bc3a-625f-4ca5-bab6-a86f25e8921e",
+   "nome": "Chateau Blanc Urubici",
+   "categoriaOverture": "holiday_rental_home",
+   "confianca": 0.978,
+   "sites": [
+    "https://api.whatsapp.com/send?phone=5549999983221&text=Ola+quero+informacoes"
+   ],
+   "telefones": [
+    "+5548991904227"
+   ],
+   "redesSociais": [
+    "https://www.facebook.com/240185006476967"
+   ],
+   "endereco": "Rua José Rabelo Flores, 158",
+   "localidade": "Urubici",
+   "latitude": -27.95274363,
+   "longitude": -49.57538595,
+   "fontes": [
+    "meta (CDLA-Permissive-2.0)",
+    "Overture (CDLA-Permissive-2.0)"
+   ]
+  },
+  {
+   "idOverture": "f101238f-ad17-4dd8-a7bf-3da71b79e4e5",
+   "nome": "Cabanas Cold Mountain",
+   "categoriaOverture": "hotel",
+   "confianca": 0.968,
+   "sites": [
+    "https://www.cabanascoldmountain.com/"
+   ],
+   "telefones": [
+    "+5541999031598"
+   ],
+   "redesSociais": [
+    "https://www.facebook.com/101161825626602"
+   ],
+   "endereco": "Rua Otávio Franca, 250",
+   "localidade": "Urubici",
+   "latitude": -27.95376,
+   "longitude": -49.57828,
+   "fontes": [
+    "meta (CDLA-Permissive-2.0)",
+    "Overture (CDLA-Permissive-2.0)"
+   ]
+  },
+  {
+   "idOverture": "33b6af41-ebd0-4e5e-9b5a-c2e568c6029b",
+   "nome": "Arapy Cabana",
+   "categoriaOverture": "resort",
+   "confianca": 0.882,
+   "sites": [],
+   "telefones": [
+    "+5549999091184"
+   ],
+   "redesSociais": [
+    "https://www.facebook.com/182610351612348"
+   ],
+   "endereco": "Avenida Natal Zilli, 2",
+   "localidade": "Urubici",
+   "latitude": -27.95371,
+   "longitude": -49.57862,
+   "fontes": [
+    "meta (CDLA-Permissive-2.0)",
+    "Overture (CDLA-Permissive-2.0)"
+   ]
+  },
+  {
+   "idOverture": "3ab8f4e7-9f8f-4296-b7c8-a613efa53194",
+   "nome": "Eco Pousada Invernador",
+   "categoriaOverture": "inn",
+   "confianca": 0.904,
+   "sites": [],
+   "telefones": [
+    "+5547992021560"
+   ],
+   "redesSociais": [
+    "https://www.facebook.com/100776134820482"
+   ],
+   "endereco": "Estrada do Invernador, s/n",
+   "localidade": "Urubici",
+   "latitude": -27.97253205,
+   "longitude": -49.58045542,
+   "fontes": [
+    "meta (CDLA-Permissive-2.0)",
+    "Overture (CDLA-Permissive-2.0)"
+   ]
+  },
+  {
+   "idOverture": "945e7532-7236-4d9e-8738-8b2532c1846f",
+   "nome": "Pousada Vo Julia",
+   "categoriaOverture": "bed_and_breakfast",
+   "confianca": 0.985,
+   "sites": [],
+   "telefones": [
+    "+5549999959440"
+   ],
+   "redesSociais": [
+    "https://www.facebook.com/679684435553778"
+   ],
+   "endereco": "Avenida Prefeito Natal Zilli, 3488",
+   "localidade": "Urubici",
+   "latitude": -27.98364138,
+   "longitude": -49.58159307,
+   "fontes": [
+    "meta (CDLA-Permissive-2.0)",
+    "Overture (CDLA-Permissive-2.0)"
+   ]
+  },
+  {
+   "idOverture": "a06e57d0-fd93-47dd-9edc-b5f655303323",
+   "nome": "Pousada da Célia",
+   "categoriaOverture": "hotel",
+   "confianca": 0.964,
+   "sites": [
+    "http://www.pousadadacelia.com.br/"
+   ],
+   "telefones": [
+    "+554932784323"
+   ],
+   "redesSociais": [
+    "https://www.facebook.com/253279175021286"
+   ],
+   "endereco": "",
+   "localidade": "Urubici",
+   "latitude": -27.99110263,
+   "longitude": -49.58099527,
+   "fontes": [
+    "meta (CDLA-Permissive-2.0)",
+    "Overture (CDLA-Permissive-2.0)"
+   ]
+  },
+  {
+   "idOverture": "fa1ead12-eabc-483e-8642-5a6b06931ba5",
+   "nome": "Pousada do Coqueiro",
+   "categoriaOverture": "hotel",
+   "confianca": 0.976,
+   "sites": [
+    "http://www.pousadadocoqueiro.net/"
+   ],
+   "telefones": [
+    "+554932784272"
+   ],
+   "redesSociais": [
+    "https://www.facebook.com/279798345472226"
+   ],
+   "endereco": "Avenida Rodolfo Anderman, 986",
+   "localidade": "Urubici",
+   "latitude": -27.99120874,
+   "longitude": -49.58128566,
+   "fontes": [
+    "meta (CDLA-Permissive-2.0)",
+    "Overture (CDLA-Permissive-2.0)"
+   ]
+  },
+  {
+   "idOverture": "96ecc9c1-4b2e-4abf-8fde-f76b9538d545",
+   "nome": "Pousada Aconchego",
+   "categoriaOverture": "hotel",
+   "confianca": 0.926,
+   "sites": [
+    "http://www.hotelaconchegosc.com.br/"
+   ],
+   "telefones": [
+    "+554932784127"
+   ],
+   "redesSociais": [
+    "https://www.facebook.com/517199984988329"
+   ],
+   "endereco": "Avenida Pedro B. Warmiling, 1586",
+   "localidade": "Urubici",
+   "latitude": -27.99189899,
+   "longitude": -49.58202917,
+   "fontes": [
+    "meta (CDLA-Permissive-2.0)",
+    "Overture (CDLA-Permissive-2.0)"
+   ]
+  },
+  {
+   "idOverture": "bb5209c5-0e61-428c-963f-731c9d340a7a",
+   "nome": "Moto Garagem",
+   "categoriaOverture": "automotive_storage_facility",
+   "confianca": 0.969,
+   "sites": [
+    "http://www.motogaragem.com/"
+   ],
+   "telefones": [
+    "+5549991098337"
+   ],
+   "redesSociais": [
+    "https://www.facebook.com/1596087493961474"
+   ],
+   "endereco": "R. Manoel Pinto de Souza, 250",
+   "localidade": "Urubici",
+   "latitude": -27.99462325,
+   "longitude": -49.58214498,
+   "fontes": [
+    "meta (CDLA-Permissive-2.0)",
+    "Overture (CDLA-Permissive-2.0)"
+   ]
+  },
+  {
+   "idOverture": "40a1f1eb-0272-42d0-ad58-36ce44c93237",
+   "nome": "Refúgio em Urubici",
+   "categoriaOverture": "cottage",
+   "confianca": 0.877,
+   "sites": [],
+   "telefones": [
+    "+5549991737422"
+   ],
+   "redesSociais": [
+    "https://www.facebook.com/303115093645538"
+   ],
+   "endereco": "R. Pedro Custódio, 167",
+   "localidade": "Urubici",
+   "latitude": -28.01749229,
+   "longitude": -49.58913258,
+   "fontes": [
+    "meta (CDLA-Permissive-2.0)",
+    "Overture (CDLA-Permissive-2.0)"
+   ]
+  },
+  {
+   "idOverture": "9f378ed1-4317-4bbc-8b4f-b5a649cbd10b",
+   "nome": "Hospedaria Refúgio Do Invernador",
+   "categoriaOverture": "hotel",
+   "confianca": 0.892,
+   "sites": [
+    "http://www.refugiodoinvernador.com.br/"
+   ],
+   "telefones": [
+    "+5547992351327"
+   ],
+   "redesSociais": [
+    "https://www.facebook.com/1605774372770990"
+   ],
+   "endereco": "Estrada Geral do Invernador",
+   "localidade": "Urubici",
+   "latitude": -28.00381925688789,
+   "longitude": -49.58880416456364,
+   "fontes": [
+    "meta (CDLA-Permissive-2.0)",
+    "Overture (CDLA-Permissive-2.0)"
+   ]
+  },
+  {
+   "idOverture": "4ac164c3-1365-4ac8-b8ae-42d57e1c2f7e",
+   "nome": "CISNE NEGRO Villarejo",
+   "categoriaOverture": "inn",
+   "confianca": 0.866,
+   "sites": [
+    "http://www.cisnenegrovillarejo.com.br/"
+   ],
+   "telefones": [
+    "+5548996962248"
+   ],
+   "redesSociais": [
+    "https://www.facebook.com/370464112822519"
+   ],
+   "endereco": "Estrada geral santa tereza, S/N",
+   "localidade": "Urubici",
+   "latitude": -28.00381925688789,
+   "longitude": -49.58880416456364,
+   "fontes": [
+    "meta (CDLA-Permissive-2.0)",
+    "Overture (CDLA-Permissive-2.0)"
+   ]
+  },
+  {
+   "idOverture": "6c718c6a-ec1c-494d-8235-a681bb91e5fc",
+   "nome": "Green Barn Hotel",
+   "categoriaOverture": "hotel",
+   "confianca": 0.877,
+   "sites": [
+    "https://www.greenbarn.com.br/"
+   ],
+   "telefones": [
+    "+5549936186588"
+   ],
+   "redesSociais": [
+    "https://www.facebook.com/114314578290352"
+   ],
+   "endereco": " Estrada Geral do Invernador, 1700",
+   "localidade": "Urubici",
+   "latitude": -28.00381925688789,
+   "longitude": -49.58880416456364,
+   "fontes": [
+    "meta (CDLA-Permissive-2.0)",
+    "Overture (CDLA-Permissive-2.0)"
+   ]
+  },
+  {
+   "idOverture": "ab6753f5-6bf5-4ed4-91cf-0691c4a410e2",
+   "nome": "Estalagem Villa Serrana",
+   "categoriaOverture": "hotel",
+   "confianca": 0.955,
+   "sites": [
+    "https://estalagemvillaserrana.com/"
+   ],
+   "telefones": [
+    "+5548984512696"
+   ],
+   "redesSociais": [
+    "https://www.facebook.com/486323315152725"
+   ],
+   "endereco": "Estrada Geral Vacas Gordas",
+   "localidade": "Urubici",
+   "latitude": -28.00387,
+   "longitude": -49.58882,
+   "fontes": [
+    "meta (CDLA-Permissive-2.0)",
+    "Overture (CDLA-Permissive-2.0)"
+   ]
+  },
+  {
+   "idOverture": "27544e48-b1cc-4585-9566-656ac2507dc9",
+   "nome": "Hospedagem Família Martins",
+   "categoriaOverture": "hotel",
+   "confianca": 0.924,
+   "sites": [
+    "https://www.booking.com/hotel/br/casa-da-familia-martins.pt-br.html?aid=376377"
+   ],
+   "telefones": [
+    "+5549999646462"
+   ],
+   "redesSociais": [
+    "https://www.facebook.com/557921497900651"
+   ],
+   "endereco": "Avenida Adolfo Konder, 1113",
+   "localidade": "Urubici",
+   "latitude": -28.0054944,
+   "longitude": -49.5889985,
+   "fontes": [
+    "meta (CDLA-Permissive-2.0)",
+    "Overture (CDLA-Permissive-2.0)"
+   ]
+  },
+  {
+   "idOverture": "b44ad8eb-675a-4ea8-8cea-90da08bb46fd",
+   "nome": "Manali Bistrô",
+   "categoriaOverture": "restaurant",
+   "confianca": 0.997,
+   "sites": [],
+   "telefones": [
+    "+554930162312"
+   ],
+   "redesSociais": [
+    "https://www.facebook.com/1522249451423994"
+   ],
+   "endereco": "Av. Adolfo Konder, 763",
+   "localidade": "Urubici",
+   "latitude": -28.00772575,
+   "longitude": -49.58977235,
+   "fontes": [
+    "meta (CDLA-Permissive-2.0)",
+    "Overture (CDLA-Permissive-2.0)"
+   ]
+  },
+  {
+   "idOverture": "3a46b788-9d4a-4983-bb53-558d56100fe0",
+   "nome": "Pousada Cantinho na Serra",
+   "categoriaOverture": "hotel",
+   "confianca": 0.986,
+   "sites": [
+    "https://www.booking.com/hotel/br/cantinho-na-serra-urubici.pt-br.html?label=cantinho-na-serra-urubici"
+   ],
+   "telefones": [
+    "+5549991940685"
+   ],
+   "redesSociais": [
+    "https://www.facebook.com/269067130635899"
+   ],
+   "endereco": "Av. Antônio Francisco Ghizoni, 1623",
+   "localidade": "Urubici",
+   "latitude": -27.99965005,
+   "longitude": -49.58791844,
+   "fontes": [
+    "meta (CDLA-Permissive-2.0)",
+    "Overture (CDLA-Permissive-2.0)"
+   ]
+  },
+  {
+   "idOverture": "b5adb5f1-8196-4858-9e00-8ed0806cbd5a",
+   "nome": "Pousada Márcia Costa",
+   "categoriaOverture": "bed_and_breakfast",
+   "confianca": 0.96,
+   "sites": [],
+   "telefones": [
+    "+5549999646385"
+   ],
+   "redesSociais": [
+    "https://www.facebook.com/649529515114688"
+   ],
+   "endereco": "Av. Antônio Francisco Ghizoni, 233",
+   "localidade": "Urubici",
+   "latitude": -27.99871522,
+   "longitude": -49.58775745,
+   "fontes": [
+    "meta (CDLA-Permissive-2.0)",
+    "Overture (CDLA-Permissive-2.0)"
+   ]
+  },
+  {
+   "idOverture": "9eefe44e-486e-4e29-85fd-e3c19136aab4",
+   "nome": "Casa temporada familiaar",
+   "categoriaOverture": "hotel",
+   "confianca": 0.921,
+   "sites": [],
+   "telefones": [
+    "+5549999195807"
+   ],
+   "redesSociais": [
+    "https://www.facebook.com/851208638316504"
+   ],
+   "endereco": "Avenida Antônio Francisco Ghizoni, 1507",
+   "localidade": "Urubici",
+   "latitude": -28.000493668726786,
+   "longitude": -49.588247409150256,
+   "fontes": [
+    "meta (CDLA-Permissive-2.0)",
+    "Overture (CDLA-Permissive-2.0)"
+   ]
+  },
+  {
+   "idOverture": "b335c78e-29a9-48fa-b257-4e48e0d5707b",
+   "nome": "Semola Restaurante e Pizzaria Italiana",
+   "categoriaOverture": "italian_restaurant",
+   "confianca": 0.99,
+   "sites": [],
+   "telefones": [
+    "+5549999974911"
+   ],
+   "redesSociais": [
+    "https://www.facebook.com/170735270295201"
+   ],
+   "endereco": "Av. Adolfo Konder, 1597",
+   "localidade": "Urubici",
+   "latitude": -28.00007951,
+   "longitude": -49.58690385,
+   "fontes": [
+    "meta (CDLA-Permissive-2.0)",
+    "Overture (CDLA-Permissive-2.0)"
+   ]
+  },
+  {
+   "idOverture": "57a47a52-4ae1-4a82-bb80-355c443ebb2c",
+   "nome": "Pousada Alternativa Angela",
+   "categoriaOverture": "bed_and_breakfast",
+   "confianca": 0.971,
+   "sites": [
+    "http://ecoviagem.uol.com.br/brasil/santa-catarina/urubici/pousada/casa-alternativa-angela/"
+   ],
+   "telefones": [
+    "+5549999991635"
+   ],
+   "redesSociais": [
+    "https://www.facebook.com/960926860601032"
+   ],
+   "endereco": "Avenida Adolfo Konder, 1607",
+   "localidade": "Urubici",
+   "latitude": -27.99994448,
+   "longitude": -49.58680048,
+   "fontes": [
+    "meta (CDLA-Permissive-2.0)",
+    "Overture (CDLA-Permissive-2.0)"
+   ]
+  },
+  {
+   "idOverture": "e3b66dac-24e8-4066-a294-99c27bf8606a",
+   "nome": "Pousada Café no Bule",
+   "categoriaOverture": "cafe",
+   "confianca": 0.966,
+   "sites": [
+    "http://pousadacafenobule.com.br/"
+   ],
+   "telefones": [
+    "+554932784805"
+   ],
+   "redesSociais": [
+    "https://www.facebook.com/1755191471466135"
+   ],
+   "endereco": "Rua Hercílio Matos Oliveira, 73",
+   "localidade": "Urubici",
+   "latitude": -27.99777433,
+   "longitude": -49.58494247,
+   "fontes": [
+    "meta (CDLA-Permissive-2.0)",
+    "Overture (CDLA-Permissive-2.0)"
+   ]
+  },
+  {
+   "idOverture": "d866ef2b-5842-4d0b-adcd-1d9a7ecc2550",
+   "nome": "Pousada Chalés no Lago",
+   "categoriaOverture": "hotel",
+   "confianca": 0.908,
+   "sites": [
+    "http://www.pousadachalesnolago.com.br"
+   ],
+   "telefones": [
+    "+5549984066099"
+   ],
+   "redesSociais": [
+    "https://www.facebook.com/100810435026043"
+   ],
+   "endereco": "Avenida Felíssimo Rodrigues Sobrinho, Urubici - SC, 88650-000, Brasil",
+   "localidade": "Urubici",
+   "latitude": -27.998554,
+   "longitude": -49.584576,
+   "fontes": [
+    "meta (CDLA-Permissive-2.0)",
+    "Overture (CDLA-Permissive-2.0)"
+   ]
+  },
+  {
+   "idOverture": "61b567e9-8492-424a-bdb2-8d90832c9df3",
+   "nome": "Pousada Boutique Dom Pietro",
+   "categoriaOverture": "hotel",
+   "confianca": 0.891,
+   "sites": [
+    "https://boutiquedompietro.com.br/whatsapp-fb"
+   ],
+   "telefones": [
+    "+5549991285228"
+   ],
+   "redesSociais": [
+    "https://www.facebook.com/183776824813653"
+   ],
+   "endereco": "Av. Felicissimo Rodrigues Sobrinho, 185",
+   "localidade": "Urubici",
+   "latitude": -27.99865277,
+   "longitude": -49.58421126,
+   "fontes": [
+    "meta (CDLA-Permissive-2.0)",
+    "Overture (CDLA-Permissive-2.0)"
+   ]
+  },
+  {
+   "idOverture": "e7ad409c-95d6-4022-85aa-bff50fd36f81",
+   "nome": "Império Restaurante e Café",
+   "categoriaOverture": "cafe",
+   "confianca": 0.961,
+   "sites": [
+    "https://www.instagram.com/imperiourubici/"
+   ],
+   "telefones": [
+    "+5549991060733"
+   ],
+   "redesSociais": [
+    "https://www.facebook.com/103789058754369"
+   ],
+   "endereco": "Av. Adolfo Konder, 2575",
+   "localidade": "Urubici",
+   "latitude": -27.99176669,
+   "longitude": -49.58357475,
+   "fontes": [
+    "meta (CDLA-Permissive-2.0)",
+    "Overture (CDLA-Permissive-2.0)"
+   ]
+  },
+  {
+   "idOverture": "57ee3ccf-83f2-4606-9f72-23962ef90957",
+   "nome": "Grimpa Hospedagem Urubici",
+   "categoriaOverture": "hostel",
+   "confianca": 0.985,
+   "sites": [],
+   "telefones": [
+    "+5549999054464"
+   ],
+   "redesSociais": [
+    "https://www.facebook.com/1739352142759537"
+   ],
+   "endereco": "Av. Adolfo Konder, 2443",
+   "localidade": "Urubici",
+   "latitude": -27.99276997,
+   "longitude": -49.58398798,
+   "fontes": [
+    "meta (CDLA-Permissive-2.0)",
+    "Overture (CDLA-Permissive-2.0)"
+   ]
+  },
+  {
+   "idOverture": "f5b77e24-7028-4287-a7eb-a2fc45eb5a5c",
+   "nome": "Pousada Amelia",
+   "categoriaOverture": "hotel",
+   "confianca": 0.985,
+   "sites": [
+    "http://www.pousadaameliaurubici.com.br/"
+   ],
+   "telefones": [
+    "+554832785453"
+   ],
+   "redesSociais": [
+    "https://www.facebook.com/1816348511924780"
+   ],
+   "endereco": "Avenida Adolfo Konder, 2256",
+   "localidade": "Urubici",
+   "latitude": -27.99463022,
+   "longitude": -49.58430802,
+   "fontes": [
+    "meta (CDLA-Permissive-2.0)",
+    "Overture (CDLA-Permissive-2.0)"
+   ]
+  },
+  {
+   "idOverture": "89edf0a0-321a-46c9-b33a-50d0d7c5d6a7",
+   "nome": "Urubici Park Hotel",
+   "categoriaOverture": "hotel",
+   "confianca": 0.999,
+   "sites": [
+    "https://urubiciparkhotel.portalurubici.com.br/"
+   ],
+   "telefones": [
+    "+554932785300"
+   ],
+   "redesSociais": [
+    "https://www.facebook.com/379843648755631"
+   ],
+   "endereco": "Av. Adolfo Konder, 2278",
+   "localidade": "Urubici",
+   "latitude": -27.9946644,
+   "longitude": -49.58439122,
+   "fontes": [
+    "meta (CDLA-Permissive-2.0)",
+    "Overture (CDLA-Permissive-2.0)"
+   ]
+  },
+  {
+   "idOverture": "66757c48-a7ec-48e6-8e27-1fd34935cd14",
+   "nome": "Pousada Flor de Tuna",
+   "categoriaOverture": "hotel",
+   "confianca": 0.985,
+   "sites": [
+    "http://www.pousadaflordetuna.com.br/"
+   ],
+   "telefones": [
+    "+5549991235636"
+   ],
+   "redesSociais": [
+    "https://www.facebook.com/1533984580226843"
+   ],
+   "endereco": "Av. Adolfo Konder, 2038",
+   "localidade": "Urubici",
+   "latitude": -27.99623236,
+   "longitude": -49.58506211,
+   "fontes": [
+    "meta (CDLA-Permissive-2.0)",
+    "Overture (CDLA-Permissive-2.0)"
+   ]
+  },
+  {
+   "idOverture": "831f8038-93ea-4268-b321-63a83bda5868",
+   "nome": "Pousadatioladi",
+   "categoriaOverture": "bed_and_breakfast",
+   "confianca": 0.947,
+   "sites": [
+    "http://tioladiurub.wixsite.com/pousadatioladi"
+   ],
+   "telefones": [
+    "+49984163004"
+   ],
+   "redesSociais": [
+    "https://www.facebook.com/259951964485771"
+   ],
+   "endereco": "Avenida Adolfo Konder, 2057",
+   "localidade": "Urubici",
+   "latitude": -27.99600279333464,
+   "longitude": -49.585406331666235,
+   "fontes": [
+    "meta (CDLA-Permissive-2.0)",
+    "Overture (CDLA-Permissive-2.0)"
+   ]
+  },
+  {
+   "idOverture": "623bd7c5-7911-4024-8065-999b21a048e0",
+   "nome": "Pousada Avenida",
+   "categoriaOverture": "service_apartment",
+   "confianca": 0.961,
+   "sites": [],
+   "telefones": [
+    "+554932785278"
+   ],
+   "redesSociais": [
+    "https://www.facebook.com/181628968697006"
+   ],
+   "endereco": "Av. Adolfo Konder, 1973",
+   "localidade": "Urubici",
+   "latitude": -27.99669556,
+   "longitude": -49.5854803,
+   "fontes": [
+    "meta (CDLA-Permissive-2.0)",
+    "Overture (CDLA-Permissive-2.0)"
+   ]
+  },
+  {
+   "idOverture": "620998ce-cea3-4bca-9fce-2c30c8dbe050",
+   "nome": "Serra do Panelão",
+   "categoriaOverture": "hotel",
+   "confianca": 0.966,
+   "sites": [
+    "http://www.serradopanelao.com.br/"
+   ],
+   "telefones": [
+    "+554932784566"
+   ],
+   "redesSociais": [
+    "https://www.facebook.com/223665267721323"
+   ],
+   "endereco": "Avenida Natal Zilli, 11",
+   "localidade": "Urubici",
+   "latitude": -27.99017,
+   "longitude": -49.58298,
+   "fontes": [
+    "meta (CDLA-Permissive-2.0)",
+    "Overture (CDLA-Permissive-2.0)"
+   ]
+  },
+  {
+   "idOverture": "6a7b0f98-6cc8-4b8b-8d5c-1c4e2a42fb6e",
+   "nome": "Kiriri-Etê Pousada Na Serra",
+   "categoriaOverture": "bed_and_breakfast",
+   "confianca": 0.94,
+   "sites": [],
+   "telefones": [
+    "+5548991240011"
+   ],
+   "redesSociais": [
+    "https://www.facebook.com/236194680087618"
+   ],
+   "endereco": "Avenida Natal Zilli, 15",
+   "localidade": "Urubici",
+   "latitude": -27.99014,
+   "longitude": -49.58296,
+   "fontes": [
+    "meta (CDLA-Permissive-2.0)",
+    "Overture (CDLA-Permissive-2.0)"
+   ]
+  },
+  {
+   "idOverture": "03c430f2-b4a2-4be0-bfb6-d501aa1d204f",
+   "nome": "Hospedaria Rural Nossa Senhora das Graças",
+   "categoriaOverture": "hostel",
+   "confianca": 0.959,
+   "sites": [],
+   "telefones": [
+    "+554932784040"
+   ],
+   "redesSociais": [
+    "https://www.facebook.com/282223738638014"
+   ],
+   "endereco": "Avenida Rodolfo Andermann, 2238",
+   "localidade": "Urubici",
+   "latitude": -27.98811076,
+   "longitude": -49.59017582,
+   "fontes": [
+    "meta (CDLA-Permissive-2.0)",
+    "Overture (CDLA-Permissive-2.0)"
+   ]
+  },
+  {
+   "idOverture": "a2c5906d-c004-4bbf-86f3-b795316fcb2d",
+   "nome": "Pousada Serra Azul",
+   "categoriaOverture": "hotel",
+   "confianca": 0.963,
+   "sites": [
+    "http://www.pousadaserraazul.com"
+   ],
+   "telefones": [
+    "+5549991392810"
+   ],
+   "redesSociais": [
+    "https://www.facebook.com/249409132283659"
+   ],
+   "endereco": "Av. Adolfo Konder, 101",
+   "localidade": "Urubici",
+   "latitude": -28.01336578,
+   "longitude": -49.59209511,
+   "fontes": [
+    "meta (CDLA-Permissive-2.0)",
+    "Overture (CDLA-Permissive-2.0)"
+   ]
+  },
+  {
+   "idOverture": "8a7d0d46-b582-4c5e-a826-2f43a5b91d61",
+   "nome": "Pousada Recanto da Serra",
+   "categoriaOverture": "bed_and_breakfast",
+   "confianca": 0.997,
+   "sites": [
+    "http://recantodaserraurubici.com.br/"
+   ],
+   "telefones": [
+    "+5549991283465"
+   ],
+   "redesSociais": [
+    "https://www.facebook.com/583018228417737"
+   ],
+   "endereco": "Av. Adolfo Konder, 180",
+   "localidade": "Urubici",
+   "latitude": -28.01271445,
+   "longitude": -49.59151253,
+   "fontes": [
+    "meta (CDLA-Permissive-2.0)",
+    "Overture (CDLA-Permissive-2.0)"
+   ]
+  },
+  {
+   "idOverture": "33f33cc7-5639-4b4a-98fb-f9256c00785f",
+   "nome": "Parque Nacional Ecoresort - Urubici",
+   "categoriaOverture": "inn",
+   "confianca": 0.945,
+   "sites": [
+    "https://parnaecoresort.com.br/"
+   ],
+   "telefones": [
+    "+5549998090335"
+   ],
+   "redesSociais": [
+    "https://www.facebook.com/233132836540696"
+   ],
+   "endereco": "Estrada da Santa Bárbara, Fazenda Santa Bárbara, s/n.",
+   "localidade": "Urubici",
+   "latitude": -28.01249,
+   "longitude": -49.59175,
+   "fontes": [
+    "meta (CDLA-Permissive-2.0)",
+    "Overture (CDLA-Permissive-2.0)"
+   ]
+  },
+  {
+   "idOverture": "a8f07427-0845-486a-856a-ace72fa4fd7b",
+   "nome": "Pousada Caminhos do Mel",
+   "categoriaOverture": "hotel",
+   "confianca": 0.911,
+   "sites": [],
+   "telefones": [
+    "+5549991549630"
+   ],
+   "redesSociais": [
+    "https://www.facebook.com/1764482223827194"
+   ],
+   "endereco": "Avenida Antônio Francisco Ghizoni, 370",
+   "localidade": "Urubici",
+   "latitude": -28.01005,
+   "longitude": -49.59184,
+   "fontes": [
+    "meta (CDLA-Permissive-2.0)",
+    "Overture (CDLA-Permissive-2.0)"
+   ]
+  },
+  {
+   "idOverture": "37aa7aa1-1741-4291-acd7-ed9f6b6a9fca",
+   "nome": "Armazém Vale das Montanhas",
+   "categoriaOverture": "coffee_shop",
+   "confianca": 0.892,
+   "sites": [
+    "https://cutt.ly/RurDTpC"
+   ],
+   "telefones": [
+    "+554932785052"
+   ],
+   "redesSociais": [
+    "https://www.facebook.com/691331314343496"
+   ],
+   "endereco": "Avenida Adolfo Konder, 351",
+   "localidade": "Urubici",
+   "latitude": -28.0112099,
+   "longitude": -49.59120436,
+   "fontes": [
+    "meta (CDLA-Permissive-2.0)",
+    "Overture (CDLA-Permissive-2.0)"
+   ]
+  },
+  {
+   "idOverture": "e1cfb0ad-f530-4660-8f39-aefd7d1de083",
+   "nome": "Zeca's Hotel",
+   "categoriaOverture": "hotel",
+   "confianca": 0.986,
+   "sites": [
+    "http://zecasbar2.placeweb.site/"
+   ],
+   "telefones": [
+    "+554932784501"
+   ],
+   "redesSociais": [
+    "https://www.facebook.com/1130087483707488"
+   ],
+   "endereco": "Av. Adolfo Konder, 522",
+   "localidade": "Urubici",
+   "latitude": -28.01088942,
+   "longitude": -49.5908332,
+   "fontes": [
+    "meta (CDLA-Permissive-2.0)",
+    "Overture (CDLA-Permissive-2.0)"
+   ]
+  },
+  {
+   "idOverture": "9a434d94-ed1b-42c2-979e-5ec5f19e23ab",
+   "nome": "Pousada Contos e Sonhos",
+   "categoriaOverture": "inn",
+   "confianca": 0.93,
+   "sites": [
+    "https://contosesonhos.com/"
+   ],
+   "telefones": [
+    "+5549991506000"
+   ],
+   "redesSociais": [
+    "https://www.facebook.com/316124084924264"
+   ],
+   "endereco": "Avenida Adolfo Konder, 370",
+   "localidade": "Urubici",
+   "latitude": -28.01185,
+   "longitude": -49.59106,
+   "fontes": [
+    "meta (CDLA-Permissive-2.0)",
+    "Overture (CDLA-Permissive-2.0)"
+   ]
+  },
+  {
+   "idOverture": "1d2cf579-96f4-44c3-94db-6c846bd4295c",
+   "nome": "Montês Restaurante Urubici SC",
+   "categoriaOverture": "restaurant",
+   "confianca": 0.969,
+   "sites": [],
+   "telefones": [
+    "+554932784005"
+   ],
+   "redesSociais": [
+    "https://www.facebook.com/537545986589153"
+   ],
+   "endereco": "Rua Oliveira S. de Souza, 1",
+   "localidade": "Urubici",
+   "latitude": -28.014560112492248,
+   "longitude": -49.590999605864596,
+   "fontes": [
+    "meta (CDLA-Permissive-2.0)",
+    "Overture (CDLA-Permissive-2.0)"
+   ]
+  },
+  {
+   "idOverture": "a32ec428-9d05-4186-b3e3-ce8f2418eccc",
+   "nome": "Casa Alternativa Adriana",
+   "categoriaOverture": "holiday_rental_home",
+   "confianca": 0.866,
+   "sites": [],
+   "telefones": [
+    "+5549991383543"
+   ],
+   "redesSociais": [
+    "https://www.facebook.com/103575191711158"
+   ],
+   "endereco": "",
+   "localidade": "Urubici",
+   "latitude": -28.01668002,
+   "longitude": -49.59143558,
+   "fontes": [
+    "meta (CDLA-Permissive-2.0)",
+    "Overture (CDLA-Permissive-2.0)"
+   ]
+  },
+  {
+   "idOverture": "8fece2bd-5fc6-40af-a3d5-1fec215877c9",
+   "nome": "Pousada Kaluana",
+   "categoriaOverture": "hotel",
+   "confianca": 0.971,
+   "sites": [
+    "http://www.kaluanaurubici.com/"
+   ],
+   "telefones": [
+    "+5549998122725"
+   ],
+   "redesSociais": [
+    "https://www.facebook.com/195040053990565"
+   ],
+   "endereco": "Rua Policarpo Souza Costa, 737",
+   "localidade": "Urubici",
+   "latitude": -28.01901246,
+   "longitude": -49.5913181,
+   "fontes": [
+    "meta (CDLA-Permissive-2.0)",
+    "Overture (CDLA-Permissive-2.0)"
+   ]
+  },
+  {
+   "idOverture": "43ecae29-f339-4eb9-b1a7-1124d6269907",
+   "nome": "Pousada Alternativa Viva Serra",
+   "categoriaOverture": "bed_and_breakfast",
+   "confianca": 0.924,
+   "sites": [],
+   "telefones": [
+    "+5549991457293"
+   ],
+   "redesSociais": [
+    "https://www.facebook.com/375047592560816"
+   ],
+   "endereco": "R. José Gáspar Fernandes, 382",
+   "localidade": "Urubici",
+   "latitude": -28.01817,
+   "longitude": -49.59190807,
+   "fontes": [
+    "meta (CDLA-Permissive-2.0)",
+    "Overture (CDLA-Permissive-2.0)"
+   ]
+  },
+  {
+   "idOverture": "4bb9fe11-81b5-49b0-ae27-6c99ab96bcfd",
+   "nome": "Aconchego do Sereno Exclusive Chalés",
+   "categoriaOverture": "hotel",
+   "confianca": 0.905,
+   "sites": [
+    "http://Instagram.com/aconchegodosereno"
+   ],
+   "telefones": [
+    "+5548999914156"
+   ],
+   "redesSociais": [
+    "https://www.facebook.com/195066371123127"
+   ],
+   "endereco": "R. Manoel Estevis de Souza, 270",
+   "localidade": "Urubici",
+   "latitude": -28.02314565,
+   "longitude": -49.59031684,
+   "fontes": [
+    "meta (CDLA-Permissive-2.0)",
+    "Overture (CDLA-Permissive-2.0)"
+   ]
+  },
+  {
+   "idOverture": "a0d29034-8109-4b22-bff8-cbc8296b5767",
+   "nome": "Pousada Alternativa Vo Bibi",
+   "categoriaOverture": "bed_and_breakfast",
+   "confianca": 0.986,
+   "sites": [],
+   "telefones": [
+    "+5549998185072"
+   ],
+   "redesSociais": [
+    "https://www.facebook.com/908283559560043"
+   ],
+   "endereco": "Rua Boanerges Pereira de Medeiros, 958",
+   "localidade": "Urubici",
+   "latitude": -28.02355787,
+   "longitude": -49.59227274,
+   "fontes": [
+    "meta (CDLA-Permissive-2.0)",
+    "Overture (CDLA-Permissive-2.0)"
+   ]
+  },
+  {
+   "idOverture": "2fb8bd10-aa82-4d6b-816f-263e2b5cc033",
+   "nome": "Pousada Sentiero",
+   "categoriaOverture": "cottage",
+   "confianca": 0.981,
+   "sites": [],
+   "telefones": [
+    "+5549991980342"
+   ],
+   "redesSociais": [
+    "https://www.facebook.com/106939001762562"
+   ],
+   "endereco": "R. Boanerges Pereira de Medeiros, 749",
+   "localidade": "Urubici",
+   "latitude": -28.02125032,
+   "longitude": -49.59261943,
+   "fontes": [
+    "meta (CDLA-Permissive-2.0)",
+    "Overture (CDLA-Permissive-2.0)"
+   ]
+  },
+  {
+   "idOverture": "7ce189e9-d249-48ff-abea-e263ea25f72e",
+   "nome": "Pousada Figueredo",
+   "categoriaOverture": "hotel",
+   "confianca": 0.892,
+   "sites": [],
+   "telefones": [
+    "+5549991640175"
+   ],
+   "redesSociais": [
+    "https://www.facebook.com/578367129291777"
+   ],
+   "endereco": "Rua Boanerges Pereira de Medeiros, 749",
+   "localidade": "Urubici",
+   "latitude": -28.021255,
+   "longitude": -49.592876,
+   "fontes": [
+    "meta (CDLA-Permissive-2.0)",
+    "Overture (CDLA-Permissive-2.0)"
+   ]
+  },
+  {
+   "idOverture": "3ca9271b-72c3-432f-8b0c-e6c859d522dc",
+   "nome": "Pousada Cachoeira da Neve",
+   "categoriaOverture": "hotel",
+   "confianca": 0.99,
+   "sites": [
+    "http://www.anfitrioesdaserra.com/"
+   ],
+   "telefones": [
+    "+5548999940328"
+   ],
+   "redesSociais": [
+    "https://www.facebook.com/102760375214338"
+   ],
+   "endereco": "Baiano - Estrada geral para Arroio do engenho S/n",
+   "localidade": "Urubici",
+   "latitude": -28.02629463,
+   "longitude": -49.59383623,
+   "fontes": [
+    "meta (CDLA-Permissive-2.0)",
+    "Overture (CDLA-Permissive-2.0)"
+   ]
+  },
+  {
+   "idOverture": "1bbcc8c2-8445-4293-8cb0-5ca5b07b4cc1",
+   "nome": "Pousada Casa de Pedra",
+   "categoriaOverture": "bed_and_breakfast",
+   "confianca": 0.876,
+   "sites": [],
+   "telefones": [
+    "+554932784331"
+   ],
+   "redesSociais": [
+    "https://www.facebook.com/1169804073107609"
+   ],
+   "endereco": "SC 370",
+   "localidade": "Urubici",
+   "latitude": -28.017741567446,
+   "longitude": -49.593315124512,
+   "fontes": [
+    "meta (CDLA-Permissive-2.0)",
+    "Overture (CDLA-Permissive-2.0)"
+   ]
+  },
+  {
+   "idOverture": "c52cec5e-aaaa-4e69-bc63-a2ff70832cf4",
+   "nome": "Pousada 3 Irmaos",
+   "categoriaOverture": "bed_and_breakfast",
+   "confianca": 0.954,
+   "sites": [],
+   "telefones": [
+    "+5549991089634"
+   ],
+   "redesSociais": [
+    "https://www.facebook.com/1965748587023270"
+   ],
+   "endereco": "R. Fredolino Westfal, 222",
+   "localidade": "Urubici",
+   "latitude": -28.02054414,
+   "longitude": -49.593304,
+   "fontes": [
+    "meta (CDLA-Permissive-2.0)",
+    "Overture (CDLA-Permissive-2.0)"
+   ]
+  },
+  {
+   "idOverture": "4f3d0098-a0a0-4678-bb32-a934f0deae8d",
+   "nome": "UX Container Guesthouse",
+   "categoriaOverture": "inn",
+   "confianca": 0.944,
+   "sites": [
+    "http://www.uxurubici.com.br/"
+   ],
+   "telefones": [
+    "+5549991004004"
+   ],
+   "redesSociais": [
+    "https://www.facebook.com/149353944932418"
+   ],
+   "endereco": "Rua Boanerges Pereira de Medeiros, 978",
+   "localidade": "Urubici",
+   "latitude": -28.019597953655,
+   "longitude": -49.592413902283,
+   "fontes": [
+    "meta (CDLA-Permissive-2.0)",
+    "Overture (CDLA-Permissive-2.0)"
+   ]
+  },
+  {
+   "idOverture": "b9bb1a8d-58ae-4844-bc2c-27e65033058a",
+   "nome": "Pousada Refúgio das Araucárias",
+   "categoriaOverture": "hotel",
+   "confianca": 0.965,
+   "sites": [
+    "http://chalerefugiodasaraucarias.com.br/"
+   ],
+   "telefones": [
+    "+5547991587003"
+   ],
+   "redesSociais": [
+    "https://www.facebook.com/1334699463345180"
+   ],
+   "endereco": "R. Boanerges Pereira de Medeiros - Serra dos Bitús",
+   "localidade": "Urubici",
+   "latitude": -28.019181901661497,
+   "longitude": -49.59246003678309,
+   "fontes": [
+    "meta (CDLA-Permissive-2.0)",
+    "Overture (CDLA-Permissive-2.0)"
+   ]
+  },
+  {
+   "idOverture": "eb7264ab-4e27-45a7-a158-0076621c23b5",
+   "nome": "Pousada Casa Da Serra - Urubici",
+   "categoriaOverture": "hostel",
+   "confianca": 0.969,
+   "sites": [
+    "https://pousadacasadaserraurubici.com.br/"
+   ],
+   "telefones": [
+    "+554932784412"
+   ],
+   "redesSociais": [
+    "https://www.facebook.com/214152415323613"
+   ],
+   "endereco": "Rua Boanerges Pereira de Medeiros, 1078",
+   "localidade": "Urubici",
+   "latitude": -28.01838836,
+   "longitude": -49.59245404,
+   "fontes": [
+    "meta (CDLA-Permissive-2.0)",
+    "Overture (CDLA-Permissive-2.0)"
+   ]
+  },
+  {
+   "idOverture": "c42ab387-f203-40fe-b0d2-2f3c6d62ea3a",
+   "nome": "Hostel Armazém do Heyokah",
+   "categoriaOverture": "hostel",
+   "confianca": 0.972,
+   "sites": [
+    "http://armazemdoheyokah.com/"
+   ],
+   "telefones": [
+    "+554932785354"
+   ],
+   "redesSociais": [
+    "https://www.facebook.com/813360565350260"
+   ],
+   "endereco": "R. Boanerges Pereira de Medeiros, 1105",
+   "localidade": "Urubici",
+   "latitude": -28.01803884,
+   "longitude": -49.59274239,
+   "fontes": [
+    "meta (CDLA-Permissive-2.0)",
+    "Overture (CDLA-Permissive-2.0)"
+   ]
+  },
+  {
+   "idOverture": "55eb2e68-b618-43a2-8b6c-1ad3cee3dea4",
+   "nome": "Pousada Pedra Preta",
+   "categoriaOverture": "hotel",
+   "confianca": 0.985,
+   "sites": [
+    "https://www.pousadapedrapreta.com.br/"
+   ],
+   "telefones": [
+    "+554991999002"
+   ],
+   "redesSociais": [
+    "https://www.facebook.com/949787751835605"
+   ],
+   "endereco": "Rua Cezário Amarante, 29",
+   "localidade": "Urubici",
+   "latitude": -28.01512,
+   "longitude": -49.5928,
+   "fontes": [
+    "meta (CDLA-Permissive-2.0)",
+    "Overture (CDLA-Permissive-2.0)"
+   ]
+  },
+  {
+   "idOverture": "f3982ee0-76b5-4e64-aa1c-07e6d1c44959",
+   "nome": "Raiz da Serra Urubici",
+   "categoriaOverture": "bed_and_breakfast",
+   "confianca": 0.974,
+   "sites": [
+    "https://raiz-da-serra-urubici.negocio.site/?m=true"
+   ],
+   "telefones": [
+    "+5549991175980"
+   ],
+   "redesSociais": [
+    "https://www.facebook.com/115798307004548"
+   ],
+   "endereco": "Rua José Aguiar, R. Hipólito da Silva Matos",
+   "localidade": "Urubici",
+   "latitude": -28.01498537,
+   "longitude": -49.59339442,
+   "fontes": [
+    "meta (CDLA-Permissive-2.0)",
+    "Overture (CDLA-Permissive-2.0)"
+   ]
+  },
+  {
+   "idOverture": "afbc0bbd-e9f8-49c2-9789-3e40e061b074",
+   "nome": "Pousada Morada dos Sonhos",
+   "categoriaOverture": "hotel",
+   "confianca": 0.987,
+   "sites": [
+    "https://www.instagram.com/invites/contact/?i=2ejck0rkm1ah&utm_content=l8yxcpu"
+   ],
+   "telefones": [
+    "+5549999782535"
+   ],
+   "redesSociais": [
+    "https://www.facebook.com/104585241869680"
+   ],
+   "endereco": "R. Hipólito da Silva Matos, 458",
+   "localidade": "Urubici",
+   "latitude": -28.0169511,
+   "longitude": -49.59389718,
+   "fontes": [
+    "meta (CDLA-Permissive-2.0)",
+    "Overture (CDLA-Permissive-2.0)"
+   ]
+  },
+  {
+   "idOverture": "e7971306-9674-4600-b7ec-1441f42a81c6",
+   "nome": "Pousada Cristal De Gelo - Urubici - SC",
+   "categoriaOverture": "hotel",
+   "confianca": 0.896,
+   "sites": [
+    "http://www.booking.com/Share-VBap3pR"
+   ],
+   "telefones": [
+    "+5549999305631"
+   ],
+   "redesSociais": [
+    "https://www.facebook.com/477660485733129"
+   ],
+   "endereco": "Estrada Geral Sao Francisco",
+   "localidade": "Urubici",
+   "latitude": -28.015013758218,
+   "longitude": -49.59440946579,
+   "fontes": [
+    "meta (CDLA-Permissive-2.0)",
+    "Overture (CDLA-Permissive-2.0)"
+   ]
+  },
+  {
+   "idOverture": "83ffe664-eaea-4b41-8644-2f62c1710822",
+   "nome": "Cabana Casarão",
+   "categoriaOverture": "cabin",
+   "confianca": 0.764,
+   "sites": [
+    "https://www.airbnb.com.br/rooms/623729703433969094?viralityEntryPoint=1&s=76"
+   ],
+   "telefones": [
+    "+5549991912963"
+   ],
+   "redesSociais": [
+    "https://www.facebook.com/104305402268327"
+   ],
+   "endereco": "Atrás do restaurante Casarão da Serra - R. Cesário Amarante, s/n",
+   "localidade": "Urubici",
+   "latitude": -28.01634322,
+   "longitude": -49.59613623,
+   "fontes": [
+    "meta (CDLA-Permissive-2.0)",
+    "Overture (CDLA-Permissive-2.0)"
+   ]
+  },
+  {
+   "idOverture": "118b78e5-b1d1-4e7a-b5cc-e9c8c38fd45b",
+   "nome": "Casarao",
+   "categoriaOverture": "restaurant",
+   "confianca": 0.862,
+   "sites": [
+    "https://5fc58cba67d4a.site123.me/"
+   ],
+   "telefones": [
+    "+554932784990"
+   ],
+   "redesSociais": [
+    "https://www.facebook.com/102082261722058"
+   ],
+   "endereco": "Rua Cezario Amarante",
+   "localidade": "Urubici",
+   "latitude": -28.01574823,
+   "longitude": -49.59629381,
+   "fontes": [
+    "meta (CDLA-Permissive-2.0)",
+    "Overture (CDLA-Permissive-2.0)"
+   ]
+  },
+  {
+   "idOverture": "f40a35aa-ae6e-470c-a754-d343da1f4d3b",
+   "nome": "Mirante de Urubici",
+   "categoriaOverture": "historic_site",
+   "confianca": 0.91,
+   "sites": [],
+   "telefones": [
+    "+554932784211"
+   ],
+   "redesSociais": [
+    "https://www.facebook.com/1459640897671187"
+   ],
+   "endereco": "Rodovia SC-416 Proximo a saida de Urubici",
+   "localidade": "Urubici",
+   "latitude": -28.02448132,
+   "longitude": -49.60608734,
+   "fontes": [
+    "meta (CDLA-Permissive-2.0)",
+    "Overture (CDLA-Permissive-2.0)"
+   ]
+  },
+  {
+   "idOverture": "9c82368e-66e3-4386-99e9-26da628196a1",
+   "nome": "Pousada Final da Trilha",
+   "categoriaOverture": "hotel",
+   "confianca": 0.933,
+   "sites": [],
+   "telefones": [
+    "+5549991384320"
+   ],
+   "redesSociais": [
+    "https://www.facebook.com/106642674906324"
+   ],
+   "endereco": "Rua Ivo Lorenzetti Rio - Capoeiras",
+   "localidade": "Urubici",
+   "latitude": -28.014991736840514,
+   "longitude": -49.60584386862192,
+   "fontes": [
+    "meta (CDLA-Permissive-2.0)",
+    "Overture (CDLA-Permissive-2.0)"
+   ]
+  },
+  {
+   "idOverture": "eb06121f-056b-4793-a289-3a53fdf91ddf",
+   "nome": "Pousada Requinte Ponto Rural",
+   "categoriaOverture": "bed_and_breakfast",
+   "confianca": 0.966,
+   "sites": [
+    "https://www.instagram.com/requintepontorural/"
+   ],
+   "telefones": [
+    "+5549984025091"
+   ],
+   "redesSociais": [
+    "https://www.facebook.com/104453231401082"
+   ],
+   "endereco": "Rua Ivo Lorenzetti Rio",
+   "localidade": "Urubici",
+   "latitude": -28.01402798,
+   "longitude": -49.60568352,
+   "fontes": [
+    "meta (CDLA-Permissive-2.0)",
+    "Overture (CDLA-Permissive-2.0)"
+   ]
+  },
+  {
+   "idOverture": "070e5e9b-3562-4712-ad74-80a66f6c9964",
+   "nome": "Refúgio do sol campestre",
+   "categoriaOverture": "hotel",
+   "confianca": 0.86,
+   "sites": [],
+   "telefones": [
+    "+5547996269828"
+   ],
+   "redesSociais": [
+    "https://www.facebook.com/110600460371060"
+   ],
+   "endereco": "Rodovia BR-370 estrada geral do Campestte",
+   "localidade": "Urubici",
+   "latitude": -27.975661163623,
+   "longitude": -49.626551900996,
+   "fontes": [
+    "meta (CDLA-Permissive-2.0)",
+    "Overture (CDLA-Permissive-2.0)"
+   ]
+  },
+  {
+   "idOverture": "3dc98305-2cbf-4fdf-bfec-26750a77a261",
+   "nome": "Refúgio Thaiji",
+   "categoriaOverture": "hotel",
+   "confianca": 0.947,
+   "sites": [
+    "https://refugiothaiji.taplink.ws/"
+   ],
+   "telefones": [
+    "+5548998645189"
+   ],
+   "redesSociais": [
+    "https://www.facebook.com/112976408136988"
+   ],
+   "endereco": "Estrada Geral Campestre, Lt 07",
+   "localidade": "Urubici",
+   "latitude": -27.99698438,
+   "longitude": -49.63472104,
+   "fontes": [
+    "meta (CDLA-Permissive-2.0)",
+    "Overture (CDLA-Permissive-2.0)"
+   ]
+  },
+  {
+   "idOverture": "23a19a83-6363-43a3-8e44-1ffa337acb37",
+   "nome": "Pousada e Bistrô Encanto do Avencal",
+   "categoriaOverture": "hotel",
+   "confianca": 0.973,
+   "sites": [
+    "http://www.pousadaencantodoavencal.com.br/"
+   ],
+   "telefones": [
+    "+5549998037888"
+   ],
+   "redesSociais": [
+    "https://www.facebook.com/645371228988853"
+   ],
+   "endereco": "Estrada Rio Capoeiras, indo para trilha da Cascata do Avencal (parte baixa). ",
+   "localidade": "Urubici",
+   "latitude": -28.030925004485,
+   "longitude": -49.609987735748,
+   "fontes": [
+    "meta (CDLA-Permissive-2.0)",
+    "Overture (CDLA-Permissive-2.0)"
+   ]
+  },
+  {
+   "idOverture": "5d836a0c-6b5c-413a-af7a-1057e10be103",
+   "nome": "Guardião do Avencal BAR CAFÉ",
+   "categoriaOverture": "bar",
+   "confianca": 0.982,
+   "sites": [
+    "http://www.instagram.com/guardiaodoavencal"
+   ],
+   "telefones": [
+    "+5549991937192"
+   ],
+   "redesSociais": [
+    "https://www.facebook.com/748318485528475"
+   ],
+   "endereco": "SC-110, Km 380",
+   "localidade": "Urubici",
+   "latitude": -28.02791966,
+   "longitude": -49.61234678,
+   "fontes": [
+    "meta (CDLA-Permissive-2.0)",
+    "Overture (CDLA-Permissive-2.0)"
+   ]
+  },
+  {
+   "idOverture": "d5237ee4-e360-498f-9501-e2fd1890416f",
+   "nome": "Pousada Raio de Luz",
+   "categoriaOverture": "bed_and_breakfast",
+   "confianca": 0.928,
+   "sites": [],
+   "telefones": [
+    "+5548984211020"
+   ],
+   "redesSociais": [
+    "https://www.facebook.com/353372438578241"
+   ],
+   "endereco": "",
+   "localidade": "Urubici",
+   "latitude": -28.02663738,
+   "longitude": -49.61560656,
+   "fontes": [
+    "meta (CDLA-Permissive-2.0)",
+    "Overture (CDLA-Permissive-2.0)"
+   ]
+  },
+  {
+   "idOverture": "434a8451-45b1-4876-80b7-46f0578ff285",
+   "nome": "Pousada Jardim do Buda com Café e Piscina",
+   "categoriaOverture": "hotel",
+   "confianca": 0.934,
+   "sites": [],
+   "telefones": [],
+   "redesSociais": [
+    "https://www.facebook.com/110539050491217"
+   ],
+   "endereco": "",
+   "localidade": "Urubici",
+   "latitude": -28.03253886,
+   "longitude": -49.61455544,
+   "fontes": [
+    "meta (CDLA-Permissive-2.0)",
+    "Overture (CDLA-Permissive-2.0)"
+   ]
+  },
+  {
+   "idOverture": "1ec54fcd-31f4-4d9c-9557-76ead85b3852",
+   "nome": "Pousada e Bistrô Encanto do Avencal",
+   "categoriaOverture": "hotel",
+   "confianca": 0.973,
+   "sites": [
+    "http://www.pousadaencantodoavencal.com.br/"
+   ],
+   "telefones": [
+    "+5549998037888"
+   ],
+   "redesSociais": [
+    "https://www.facebook.com/645371228988853"
+   ],
+   "endereco": "Estrada Rio Capoeiras, indo para trilha da Cascata do Avencal (parte baixa). ",
+   "localidade": "Urubici",
+   "latitude": -28.03250782259962,
+   "longitude": -49.61443920955206,
+   "fontes": [
+    "meta (CDLA-Permissive-2.0)",
+    "Overture (CDLA-Permissive-2.0)"
+   ]
+  },
+  {
+   "idOverture": "c7a53344-1371-45f6-b71d-039e8938985a",
+   "nome": "Pousada Anjos da Serra",
+   "categoriaOverture": "hotel",
+   "confianca": 0.976,
+   "sites": [
+    "https://pousada-anjos-da-serra.business.site/"
+   ],
+   "telefones": [
+    "+5549999905845"
+   ],
+   "redesSociais": [
+    "https://www.facebook.com/152092102309402"
+   ],
+   "endereco": "Rua Rio Capoeiras",
+   "localidade": "Urubici",
+   "latitude": -28.033776870251984,
+   "longitude": -49.61497072040193,
+   "fontes": [
+    "meta (CDLA-Permissive-2.0)",
+    "Overture (CDLA-Permissive-2.0)"
+   ]
+  },
+  {
+   "idOverture": "fd5cb168-8f90-4922-bb54-572826270276",
+   "nome": "Pousada Valle do Avencal",
+   "categoriaOverture": "bed_and_breakfast",
+   "confianca": 0.983,
+   "sites": [
+    "http://pousadavalledoavencal.com.br/"
+   ],
+   "telefones": [
+    "+5549991186699"
+   ],
+   "redesSociais": [
+    "https://www.facebook.com/134946770402711"
+   ],
+   "endereco": "Estrada Rio Capoeiras, S/N, Parte Baixa da Cachoeira do Avencal.",
+   "localidade": "Urubici",
+   "latitude": -28.035533969203087,
+   "longitude": -49.61451745569702,
+   "fontes": [
+    "meta (CDLA-Permissive-2.0)",
+    "Overture (CDLA-Permissive-2.0)"
+   ]
+  },
+  {
+   "idOverture": "c387e62b-5f36-4d21-8f8d-603f61410ca9",
+   "nome": "Cascata Do Avencal .Urubici",
+   "categoriaOverture": "park",
+   "confianca": 0.76,
+   "sites": [],
+   "telefones": [],
+   "redesSociais": [
+    "https://www.facebook.com/269300936493958"
+   ],
+   "endereco": null,
+   "localidade": "Urubici",
+   "latitude": -28.047495109328697,
+   "longitude": -49.616994943025844,
+   "fontes": [
+    "meta (CDLA-Permissive-2.0)",
+    "Overture (CDLA-Permissive-2.0)"
+   ]
+  },
+  {
+   "idOverture": "cec3f0a4-e38a-4b7c-80a1-22adae5cdce1",
+   "nome": "Camping do Motochileiro",
+   "categoriaOverture": "hotel",
+   "confianca": 0.988,
+   "sites": [],
+   "telefones": [
+    "+554792739491"
+   ],
+   "redesSociais": [
+    "https://www.facebook.com/107183474888948"
+   ],
+   "endereco": "sc 110 ",
+   "localidade": "Urubici",
+   "latitude": -28.069128,
+   "longitude": -49.611407,
+   "fontes": [
+    "meta (CDLA-Permissive-2.0)",
+    "Overture (CDLA-Permissive-2.0)"
+   ]
+  },
+  {
+   "idOverture": "475405e3-d612-4048-9e7c-dc235f968ee3",
+   "nome": "Cabana Cheiro de Mato",
+   "categoriaOverture": "hotel",
+   "confianca": 0.927,
+   "sites": [],
+   "telefones": [
+    "+5549991628435"
+   ],
+   "redesSociais": [
+    "https://www.facebook.com/299823700889554"
+   ],
+   "endereco": "",
+   "localidade": "Urubici",
+   "latitude": -28.12027065,
+   "longitude": -49.61789895,
+   "fontes": [
+    "meta (CDLA-Permissive-2.0)",
+    "Overture (CDLA-Permissive-2.0)"
+   ]
+  },
+  {
+   "idOverture": "44c28783-45ad-40e4-b32d-1c524bd0c56d",
+   "nome": "Sombra das Araucárias",
+   "categoriaOverture": "hotel",
+   "confianca": 0.919,
+   "sites": [],
+   "telefones": [
+    "+5549991158916"
+   ],
+   "redesSociais": [
+    "https://www.facebook.com/1252201778265130"
+   ],
+   "endereco": "28°07'12.0S 49°37'04.5W",
+   "localidade": "Urubici",
+   "latitude": -28.11987194,
+   "longitude": -49.61796824,
+   "fontes": [
+    "meta (CDLA-Permissive-2.0)",
+    "Overture (CDLA-Permissive-2.0)"
+   ]
+  },
+  {
+   "idOverture": "2bcb1506-b68c-4f04-b90e-872ff544fb6f",
+   "nome": "Refugio Xaxim",
+   "categoriaOverture": "hotel",
+   "confianca": 0.887,
+   "sites": [
+    "http://www.refugioxaxim.com.br"
+   ],
+   "telefones": [
+    "+5549991147989"
+   ],
+   "redesSociais": [
+    "https://www.facebook.com/188743874917424"
+   ],
+   "endereco": "Rodovia Sc 110 Km 391",
+   "localidade": "Urubici",
+   "latitude": -28.091911,
+   "longitude": -49.635566,
+   "fontes": [
+    "meta (CDLA-Permissive-2.0)",
+    "Overture (CDLA-Permissive-2.0)"
+   ]
+  },
+  {
+   "idOverture": "cebe666b-44a4-4781-9b73-39d2e55cdc73",
+   "nome": "Guardião da Montanha",
+   "categoriaOverture": "bed_and_breakfast",
+   "confianca": 0.908,
+   "sites": [
+    "http://www.guardiaodamontanha.com.br/"
+   ],
+   "telefones": [
+    "+554832320654"
+   ],
+   "redesSociais": [
+    "https://www.facebook.com/186826931475243"
+   ],
+   "endereco": "Rod. SC 430, Km 42",
+   "localidade": "Urubici",
+   "latitude": -28.094379621164773,
+   "longitude": -49.63581242996335,
+   "fontes": [
+    "meta (CDLA-Permissive-2.0)",
+    "Overture (CDLA-Permissive-2.0)"
+   ]
+  },
+  {
+   "idOverture": "7cd37998-d621-47eb-8b74-cf8711ea8c8e",
+   "nome": "Plâto dos Ventos Pousada Boutique",
+   "categoriaOverture": "inn",
+   "confianca": 0.914,
+   "sites": [],
+   "telefones": [
+    "+5549998191374"
+   ],
+   "redesSociais": [
+    "https://www.facebook.com/103993605708857"
+   ],
+   "endereco": "SC-110, KM 388",
+   "localidade": "Urubici",
+   "latitude": -28.06926345,
+   "longitude": -49.63150542,
+   "fontes": [
+    "meta (CDLA-Permissive-2.0)",
+    "Overture (CDLA-Permissive-2.0)"
+   ]
+  },
+  {
+   "idOverture": "5d05728d-ae2d-467d-92d7-8bdd8f2d3144",
+   "nome": "Pousada Lago da Colina",
+   "categoriaOverture": "hotel",
+   "confianca": 0.98,
+   "sites": [
+    "http://www.pousadalagodacolina.com.br/"
+   ],
+   "telefones": [
+    "+5548991615566"
+   ],
+   "redesSociais": [
+    "https://www.facebook.com/363987670472443"
+   ],
+   "endereco": "Estrada da Jararaca",
+   "localidade": "Urubici",
+   "latitude": -28.09757,
+   "longitude": -49.645829,
+   "fontes": [
+    "meta (CDLA-Permissive-2.0)",
+    "Overture (CDLA-Permissive-2.0)"
+   ]
+  },
+  {
+   "idOverture": "22e5af99-cf32-4735-bdca-5e5d410e7efe",
+   "nome": "Pousada Fogo Eterno",
+   "categoriaOverture": "hotel",
+   "confianca": 0.986,
+   "sites": [
+    "http://www.fogoeterno.com.br/"
+   ],
+   "telefones": [
+    "+5549991169094"
+   ],
+   "redesSociais": [
+    "https://www.facebook.com/566694606762538"
+   ],
+   "endereco": "Rod. SC 110 Km 392",
+   "localidade": "Urubici",
+   "latitude": -28.094432883314,
+   "longitude": -49.638719558716,
+   "fontes": [
+    "meta (CDLA-Permissive-2.0)",
+    "Overture (CDLA-Permissive-2.0)"
+   ]
+  },
+  {
+   "idOverture": "1a5c809d-bd40-4460-817c-7bdd8d98f156",
+   "nome": "Pousada Pedra Preta",
+   "categoriaOverture": "hotel",
+   "confianca": 0.901,
+   "sites": [
+    "http://pousadapedrapreta.com.br/urubici"
+   ],
+   "telefones": [
+    "+554932784591"
+   ],
+   "redesSociais": [
+    "https://www.facebook.com/272919539715563"
+   ],
+   "endereco": "",
+   "localidade": "Urubici",
+   "latitude": -28.09972298,
+   "longitude": -49.6398035,
+   "fontes": [
+    "meta (CDLA-Permissive-2.0)",
+    "Overture (CDLA-Permissive-2.0)"
+   ]
+  },
+  {
+   "idOverture": "31a6f750-4e63-4938-acd5-2507a882994b",
+   "nome": "Pousada Cantos e Encantos",
+   "categoriaOverture": "hotel",
+   "confianca": 0.967,
+   "sites": [
+    "http://www.pousadacantoseencantos.com/"
+   ],
+   "telefones": [
+    "+554991462180"
+   ],
+   "redesSociais": [
+    "https://www.facebook.com/453072884726768"
+   ],
+   "endereco": "Rodovia SC-110 KM 391",
+   "localidade": "Urubici",
+   "latitude": -28.10941,
+   "longitude": -49.64712,
+   "fontes": [
+    "meta (CDLA-Permissive-2.0)",
+    "Overture (CDLA-Permissive-2.0)"
+   ]
+  },
+  {
+   "idOverture": "4253cc04-bd77-4f6a-b731-46565fe8a742",
+   "nome": "Casa Brognoli Hospedaria",
+   "categoriaOverture": "hotel",
+   "confianca": 0.903,
+   "sites": [
+    "http://www.casabrognoli.blogspot.com/"
+   ],
+   "telefones": [
+    "+554991220395"
+   ],
+   "redesSociais": [
+    "https://www.facebook.com/198539106975052"
+   ],
+   "endereco": "SC110 km 395",
+   "localidade": "Urubici",
+   "latitude": -28.10941,
+   "longitude": -49.64712,
+   "fontes": [
+    "meta (CDLA-Permissive-2.0)",
+    "Overture (CDLA-Permissive-2.0)"
+   ]
+  },
+  {
+   "idOverture": "8a79f9a0-19df-4f65-b62c-ed06b34e4063",
+   "nome": "Cascata dos Amores - Hospedagem e Trilha",
+   "categoriaOverture": "hotel",
+   "confianca": 0.994,
+   "sites": [
+    "http://www.cascatadosamores.com.br/"
+   ],
+   "telefones": [
+    "+5549999685888"
+   ],
+   "redesSociais": [
+    "https://www.facebook.com/110774623762289"
+   ],
+   "endereco": "SC 110 KM 394,9",
+   "localidade": "Urubici",
+   "latitude": -28.12113555,
+   "longitude": -49.65286486,
+   "fontes": [
+    "meta (CDLA-Permissive-2.0)",
+    "Overture (CDLA-Permissive-2.0)"
+   ]
+  },
+  {
+   "idOverture": "b8a123c4-0bba-4c76-a716-d7739fab95e4",
+   "nome": "Pousada Lago da Colina - Chalet",
+   "categoriaOverture": "holiday_rental_home",
+   "confianca": 0.988,
+   "sites": [
+    "http://www.pousadalagodacolina.com.br/"
+   ],
+   "telefones": [
+    "+5548991615566"
+   ],
+   "redesSociais": [
+    "https://www.facebook.com/363987670472443"
+   ],
+   "endereco": "",
+   "localidade": "Urubici",
+   "latitude": -28.09655239,
+   "longitude": -49.64994038,
+   "fontes": [
+    "meta (CDLA-Permissive-2.0)",
+    "Overture (CDLA-Permissive-2.0)"
+   ]
+  },
+  {
+   "idOverture": "ee963cfe-aed0-479b-aefd-512236ee81f7",
+   "nome": "Refúgio Altos do Campestre",
+   "categoriaOverture": "inn",
+   "confianca": 0.878,
+   "sites": [
+    "https://whats.link/refugioaltoscampestre?fbclid=PAAaY3JPxwGh9e12z9ewgucHMq5kh3GL-EJU5lHP_geGRtzGaUqRylXuwrvqk"
+   ],
+   "telefones": [
+    "+5547991943484"
+   ],
+   "redesSociais": [
+    "https://www.facebook.com/113278898503902"
+   ],
+   "endereco": "Estrada geral  Morro Azul",
+   "localidade": "Urubici",
+   "latitude": -27.993617334253,
+   "longitude": -49.66198,
+   "fontes": [
+    "meta (CDLA-Permissive-2.0)",
+    "Overture (CDLA-Permissive-2.0)"
+   ]
+  },
+  {
+   "idOverture": "5ae13c64-8eb3-4afe-81f9-faa64a2c3c94",
+   "nome": "Morro do Campestre",
+   "categoriaOverture": "park",
+   "confianca": 0.724,
+   "sites": [
+    "https://instagram.com/morro.docampestre"
+   ],
+   "telefones": [],
+   "redesSociais": [
+    "https://www.facebook.com/101712075771208"
+   ],
+   "endereco": "Estr. Geral",
+   "localidade": "Urubici",
+   "latitude": -27.97260993,
+   "longitude": -49.6496783,
+   "fontes": [
+    "meta (CDLA-Permissive-2.0)",
+    "Overture (CDLA-Permissive-2.0)"
+   ]
+  },
+  {
+   "idOverture": "f1d7dada-8288-4a5f-a229-37115e5e8548",
+   "nome": "Sítio Arroio da Serra",
+   "categoriaOverture": "hotel",
+   "confianca": 0.937,
+   "sites": [
+    "http://www.sitioarroiodaserra.com/"
+   ],
+   "telefones": [
+    "+554932784244"
+   ],
+   "redesSociais": [
+    "https://www.facebook.com/1482358448755254"
+   ],
+   "endereco": "São Francisco",
+   "localidade": "Urubici",
+   "latitude": -27.953538222931243,
+   "longitude": -49.65125996553243,
+   "fontes": [
+    "meta (CDLA-Permissive-2.0)",
+    "Overture (CDLA-Permissive-2.0)"
+   ]
+  },
+  {
+   "idOverture": "52ad0f6c-9b7b-4252-8ad9-80e8a56df474",
+   "nome": "Cabanas Brisa Serrana Urubici",
+   "categoriaOverture": "hotel",
+   "confianca": 0.85,
+   "sites": [
+    "https://www.multitemporada.com/pt/apartment/HL02H"
+   ],
+   "telefones": [
+    "48984842441"
+   ],
+   "redesSociais": [],
+   "endereco": "Rio Vacarianos Rodovia Sc 370",
+   "localidade": "Urubici",
+   "latitude": -27.958497,
+   "longitude": -49.6758782,
+   "fontes": [
+    "Microsoft (CDLA-Permissive-2.0)",
+    "Overture (CDLA-Permissive-2.0)"
+   ]
+  },
+  {
+   "idOverture": "e190cbc5-ab69-4597-be27-b04ab84597e4",
+   "nome": "Fazenda Rancho Alegre- Urubici",
+   "categoriaOverture": "hotel",
+   "confianca": 0.916,
+   "sites": [
+    "http://www.fazendaranchoalegre.tur.br/"
+   ],
+   "telefones": [
+    "+554896760169"
+   ],
+   "redesSociais": [
+    "https://www.facebook.com/101126274976596"
+   ],
+   "endereco": "Estrada Geral Jararaca, Km 3",
+   "localidade": "Urubici",
+   "latitude": -28.087772846533,
+   "longitude": -49.674820443082,
+   "fontes": [
+    "meta (CDLA-Permissive-2.0)",
+    "Overture (CDLA-Permissive-2.0)"
+   ]
+  },
+  {
+   "idOverture": "9ca5dced-c627-456d-8022-798358b9cb8b",
+   "nome": "Refúgio Terras do Sul",
+   "categoriaOverture": "campground",
+   "confianca": 0.967,
+   "sites": [
+    "http://www.terrasdosul.eco.br/"
+   ],
+   "telefones": [
+    "+5548999539953"
+   ],
+   "redesSociais": [
+    "https://www.facebook.com/424751540895323"
+   ],
+   "endereco": "Refúgio Terras do Sul - Camping e Hostel",
+   "localidade": "Urubici",
+   "latitude": -28.07385687337519,
+   "longitude": -49.41956760098803,
+   "fontes": [
+    "meta (CDLA-Permissive-2.0)",
+    "Overture (CDLA-Permissive-2.0)"
+   ]
+  },
+  {
+   "idOverture": "fb84c22b-ace1-47f1-b83d-0462aa398cda",
+   "nome": "Pousada Sabor da Roça",
+   "categoriaOverture": "bed_and_breakfast",
+   "confianca": 0.987,
+   "sites": [
+    "https://urubicipousadas.wixsite.com/sabordaroca"
+   ],
+   "telefones": [
+    "+5548999431943"
+   ],
+   "redesSociais": [
+    "https://www.facebook.com/697320413640288"
+   ],
+   "endereco": "SC-370",
+   "localidade": "Urubici",
+   "latitude": -28.05209781,
+   "longitude": -49.4398137,
+   "fontes": [
+    "meta (CDLA-Permissive-2.0)",
+    "Overture (CDLA-Permissive-2.0)"
+   ]
+  },
+  {
+   "idOverture": "b5cb6106-2860-4841-ae0a-b1791f82d3dc",
+   "nome": "Pousada Sítio do Trevo",
+   "categoriaOverture": "hotel",
+   "confianca": 0.917,
+   "sites": [
+    "http://pousadasitiodotrevo.placeweb.site"
+   ],
+   "telefones": [
+    "+554932782015"
+   ],
+   "redesSociais": [
+    "https://www.facebook.com/223069168126216"
+   ],
+   "endereco": "Rodovia SC-370 km 90",
+   "localidade": "Urubici",
+   "latitude": -28.04330236,
+   "longitude": -49.46738022,
+   "fontes": [
+    "meta (CDLA-Permissive-2.0)",
+    "Overture (CDLA-Permissive-2.0)"
+   ]
+  },
+  {
+   "idOverture": "f6cb11c8-9ee2-49f8-875f-2a3492c3ad83",
+   "nome": "Pousada Colina dos Ventos",
+   "categoriaOverture": "hotel",
+   "confianca": 0.863,
+   "sites": [],
+   "telefones": [
+    "+5547991711545"
+   ],
+   "redesSociais": [
+    "https://www.facebook.com/2316105495343302"
+   ],
+   "endereco": "Municipal Campo dos Padres - Estr. Geral São José",
+   "localidade": "Urubici",
+   "latitude": -28.02348571,
+   "longitude": -49.45216505,
+   "fontes": [
+    "meta (CDLA-Permissive-2.0)",
+    "Overture (CDLA-Permissive-2.0)"
+   ]
+  },
+  {
+   "idOverture": "91210c19-293d-40d0-a11e-0e0fe746b6c0",
+   "nome": "Corvo Branco Estalagem",
+   "categoriaOverture": "inn",
+   "confianca": 0.976,
+   "sites": [
+    "http://corvobranco.com.br/"
+   ],
+   "telefones": [
+    "+5549991508787"
+   ],
+   "redesSociais": [
+    "https://www.facebook.com/805374689580592"
+   ],
+   "endereco": "",
+   "localidade": "Urubici",
+   "latitude": -28.00935186,
+   "longitude": -49.48802863,
+   "fontes": [
+    "meta (CDLA-Permissive-2.0)",
+    "Overture (CDLA-Permissive-2.0)"
+   ]
+  },
+  {
+   "idOverture": "caa1c987-0a2d-4936-abc6-9e91f5b0cacb",
+   "nome": "Pousadaflocosdeneve",
+   "categoriaOverture": "hotel",
+   "confianca": 0.917,
+   "sites": [],
+   "telefones": [
+    "+5547988808918"
+   ],
+   "redesSociais": [
+    "https://www.facebook.com/227300141160436"
+   ],
+   "endereco": null,
+   "localidade": "Urubici",
+   "latitude": -27.991824590393,
+   "longitude": -49.497495889664,
+   "fontes": [
+    "meta (CDLA-Permissive-2.0)",
+    "Overture (CDLA-Permissive-2.0)"
+   ]
+  },
+  {
+   "idOverture": "031768f4-13ba-4a78-a06a-3242a6d0d730",
+   "nome": "Hope Valley Chalés",
+   "categoriaOverture": "cottage",
+   "confianca": 0.955,
+   "sites": [
+    "https://www.chaleemurubici.com.br/"
+   ],
+   "telefones": [
+    "+5547996968941"
+   ],
+   "redesSociais": [
+    "https://www.facebook.com/100165159231100"
+   ],
+   "endereco": "Estr. Corvo Branco",
+   "localidade": "Urubici",
+   "latitude": -28.01320244,
+   "longitude": -49.50061929,
+   "fontes": [
+    "meta (CDLA-Permissive-2.0)",
+    "Overture (CDLA-Permissive-2.0)"
+   ]
+  },
+  {
+   "idOverture": "b5571fea-457c-418c-8651-0c975d3da2d3",
+   "nome": "Pousada e Coloniais Beckhauser",
+   "categoriaOverture": "inn",
+   "confianca": 0.987,
+   "sites": [
+    "http://acolhida.com.br/propriedades/santa-catarina/serra-catarinens/urubici/pousada-e-produtos-coloniais-beckhauser/"
+   ],
+   "telefones": [
+    "+554932782019"
+   ],
+   "redesSociais": [
+    "https://www.facebook.com/367827739938208"
+   ],
+   "endereco": "Rodovia SC-430 Km 370, 85",
+   "localidade": "Urubici",
+   "latitude": -28.01963994,
+   "longitude": -49.50443136,
+   "fontes": [
+    "meta (CDLA-Permissive-2.0)",
+    "Overture (CDLA-Permissive-2.0)"
+   ]
+  },
+  {
+   "idOverture": "e05426cd-9d11-4371-96cc-f93300b7fbea",
+   "nome": "Pousada Cajuva",
+   "categoriaOverture": "inn",
+   "confianca": 0.984,
+   "sites": [
+    "http://www.pousadacajuva.com.br/"
+   ],
+   "telefones": [
+    "+5549999293331"
+   ],
+   "redesSociais": [
+    "https://www.facebook.com/449723781788560"
+   ],
+   "endereco": "SC-370, km 80 - 5 s/n",
+   "localidade": "Urubici",
+   "latitude": -28.00576177,
+   "longitude": -49.53790826,
+   "fontes": [
+    "meta (CDLA-Permissive-2.0)",
+    "Overture (CDLA-Permissive-2.0)"
+   ]
+  },
+  {
+   "idOverture": "ea0a4496-a957-4799-bd71-edc0f579bf39",
+   "nome": "Lenha no Fogo",
+   "categoriaOverture": "hotel",
+   "confianca": 0.996,
+   "sites": [
+    "http://www.lenhanofogo.com/"
+   ],
+   "telefones": [
+    "+554932782046"
+   ],
+   "redesSociais": [
+    "https://www.facebook.com/1407019162899430"
+   ],
+   "endereco": "SC-370",
+   "localidade": "Urubici",
+   "latitude": -28.01949375,
+   "longitude": -49.51178502,
+   "fontes": [
+    "meta (CDLA-Permissive-2.0)",
+    "Overture (CDLA-Permissive-2.0)"
+   ]
+  },
+  {
+   "idOverture": "709501f5-cd8a-48d4-bdb0-71032fa4d964",
+   "nome": "Cabana de Montanha Wolken Haus Urubici",
+   "categoriaOverture": "bed_and_breakfast",
+   "confianca": 0.85,
+   "sites": [
+    "https://linktr.ee/wolkenhausurubici"
+   ],
+   "telefones": [
+    "48999624747"
+   ],
+   "redesSociais": [],
+   "endereco": "Estr. Geral Morro da Igreja, km. 6,5 (Via das Nuvens)",
+   "localidade": "Urubici",
+   "latitude": -28.05689175819974,
+   "longitude": -49.51725141041792,
+   "fontes": [
+    "Microsoft (CDLA-Permissive-2.0)",
+    "Overture (CDLA-Permissive-2.0)"
+   ]
+  },
+  {
+   "idOverture": "472f68a9-e884-44de-9615-5e044377c6c4",
+   "nome": "La Cascata Chalés",
+   "categoriaOverture": "cabin",
+   "confianca": 0.61,
+   "sites": [],
+   "telefones": [
+    "+5547996891412"
+   ],
+   "redesSociais": [
+    "https://www.facebook.com/106436068014461"
+   ],
+   "endereco": "Unnamed Road",
+   "localidade": "Urubici",
+   "latitude": -28.06926942,
+   "longitude": -49.52290961,
+   "fontes": [
+    "meta (CDLA-Permissive-2.0)",
+    "Overture (CDLA-Permissive-2.0)"
+   ]
+  },
+  {
+   "idOverture": "c3c79565-ae36-4cb2-9ea8-61a7d1460586",
+   "nome": "Cascata Véu de Noiva",
+   "categoriaOverture": "park",
+   "confianca": 0.801,
+   "sites": [
+    "http://cascata-veu-de-noiva.placestars.com"
+   ],
+   "telefones": [],
+   "redesSociais": [
+    "https://www.facebook.com/271586929608066"
+   ],
+   "endereco": null,
+   "localidade": "Urubici",
+   "latitude": -28.075423350635486,
+   "longitude": -49.518346697742366,
+   "fontes": [
+    "meta (CDLA-Permissive-2.0)",
+    "Overture (CDLA-Permissive-2.0)"
+   ]
+  },
+  {
+   "idOverture": "df4c6cbd-7afa-4308-9a17-b8645179eb92",
+   "nome": "Il Rifugio Cabanas de Montanha",
+   "categoriaOverture": "hotel",
+   "confianca": 0.977,
+   "sites": [
+    "https://www.ilrifugio.com.br/"
+   ],
+   "telefones": [],
+   "redesSociais": [
+    "https://www.facebook.com/476518832497408"
+   ],
+   "endereco": "Rua Cezário Amarante, 370",
+   "localidade": "Urubici",
+   "latitude": -28.079553366583,
+   "longitude": -49.509887695312,
+   "fontes": [
+    "meta (CDLA-Permissive-2.0)",
+    "Overture (CDLA-Permissive-2.0)"
+   ]
+  },
+  {
+   "idOverture": "3a086a90-081c-441d-82a2-74a6c5995571",
+   "nome": "Pousada Landhaus",
+   "categoriaOverture": "hotel",
+   "confianca": 0.922,
+   "sites": [
+    "https://www.booking.com/hotel/br/pousada-landhaus.pt-br.html?aid=1726433&label=pousada-landhaus-5WprvHzQYYHAs6KYPeyXnASM456128101578%3Apl%3Ata%3Ap1%3Ap2%3Aac%3Aap%3Aneg%3Afi%3Atiaud-2007787596709%3Akwd-295211001816%3Alp1031576%3Ali%3Adem%3Adm%3Appccp%3DUmFuZG9tSVYkc2RlIyh9YbC4OlOULAnvcrFmvh1xnqM&sid=f29a8dd1ffc1629d3563404653d046e9&dest_id=-677760;dest_type=city;dist=0;group_adults=2;group_children=0;hapos=1;hpos=1;no_rooms=1;req_adults=2;req_children=0;room1=A%2CA;sb_price_type=total;sr_order=popularity;srepoch=1709401446;srpvid=88937cb0500c02d7;type=total;ucfs=1&"
+   ],
+   "telefones": [
+    "+554931910367"
+   ],
+   "redesSociais": [
+    "https://www.facebook.com/606426839450281"
+   ],
+   "endereco": "Rodovia SC 370   ( Pousada Landhaus)",
+   "localidade": "Urubici",
+   "latitude": -28.029404803,
+   "longitude": -49.496298786,
+   "fontes": [
+    "meta (CDLA-Permissive-2.0)",
+    "Overture (CDLA-Permissive-2.0)"
+   ]
+  },
+  {
+   "idOverture": "94631cb7-a1f5-4bd3-bf98-ef0db1a9f0d7",
+   "nome": "Recanto Plenitude",
+   "categoriaOverture": "tour_operator",
+   "confianca": 0.961,
+   "sites": [
+    "https://www.airbnb.com.br/rooms/12869598?fbclid=IwAR3rg07DUCf0oDDOG-xeoMQR2F02ZhcgVyCj28nx6BPPKNAYtfT_EDtA3CQ"
+   ],
+   "telefones": [
+    "+5548999717440"
+   ],
+   "redesSociais": [
+    "https://www.facebook.com/1645442382393304"
+   ],
+   "endereco": "Estr. Geral do Morro da Igreja, 2",
+   "localidade": "Urubici",
+   "latitude": -28.05743998,
+   "longitude": -49.48799428,
+   "fontes": [
+    "meta (CDLA-Permissive-2.0)",
+    "Overture (CDLA-Permissive-2.0)"
+   ]
+  },
+  {
+   "idOverture": "b0fac606-2812-4380-9c34-ed44e98054de",
+   "nome": "Restaurante Morro da Igreja",
+   "categoriaOverture": "restaurant",
+   "confianca": 0.927,
+   "sites": [],
+   "telefones": [
+    "+554932782074"
+   ],
+   "redesSociais": [
+    "https://www.facebook.com/100720738301270"
+   ],
+   "endereco": "",
+   "localidade": "Urubici",
+   "latitude": -28.04724929,
+   "longitude": -49.49257467,
+   "fontes": [
+    "meta (CDLA-Permissive-2.0)",
+    "Overture (CDLA-Permissive-2.0)"
+   ]
+  },
+  {
+   "idOverture": "6a355434-d5d6-4581-bf02-62a72abf2846",
+   "nome": "Ayllu Refugio Ecologico",
+   "categoriaOverture": "hotel",
+   "confianca": 0.881,
+   "sites": [
+    "http://www.ayllurefugio.com/"
+   ],
+   "telefones": [
+    "+5549991574675"
+   ],
+   "redesSociais": [
+    "https://www.facebook.com/189027761978683"
+   ],
+   "endereco": "Estrada Geral Rio Cachimbo",
+   "localidade": "Urubici",
+   "latitude": -28.06201797,
+   "longitude": -49.48589269,
+   "fontes": [
+    "meta (CDLA-Permissive-2.0)",
+    "Overture (CDLA-Permissive-2.0)"
+   ]
+  },
+  {
+   "idOverture": "8905827f-eb95-4cf9-99ce-06510eaca8a4",
+   "nome": "Morro da Igreja",
+   "categoriaOverture": "mountain",
+   "confianca": 0.905,
+   "sites": [],
+   "telefones": [
+    "+554932784994"
+   ],
+   "redesSociais": [
+    "https://www.facebook.com/103440866377261"
+   ],
+   "endereco": "Pq. Nacional de São Joaquim",
+   "localidade": "Orleans",
+   "latitude": -28.125,
+   "longitude": -49.4744444444,
+   "fontes": [
+    "meta (CDLA-Permissive-2.0)",
+    "Overture (CDLA-Permissive-2.0)"
+   ]
+  },
+  {
+   "idOverture": "45137088-a060-4181-a84b-dcbac2949409",
+   "nome": "Morro Da Igreja, Urubici",
+   "categoriaOverture": "christian_place_of_worship",
+   "confianca": 0.705,
+   "sites": [
+    "http://www.morrodaigreja.com.br/"
+   ],
+   "telefones": [
+    "+554999026901"
+   ],
+   "redesSociais": [
+    "https://www.facebook.com/356081027790733"
+   ],
+   "endereco": null,
+   "localidade": "Orleans",
+   "latitude": -28.127478,
+   "longitude": -49.473237,
+   "fontes": [
+    "meta (CDLA-Permissive-2.0)",
+    "Overture (CDLA-Permissive-2.0)"
+   ]
+  }
+ ]
+}

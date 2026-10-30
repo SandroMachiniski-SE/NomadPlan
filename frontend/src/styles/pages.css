@@ -1214,6 +1214,73 @@ fieldset.field {
   font-size: 0.9rem;
 }
 
+/* Roteiro como caderno de viagem: cidades do dia, estrada entre cidades, atividades livres e pernoite. */
+.dia__cidades {
+  font-weight: 600;
+  color: var(--text-muted);
+  text-transform: none;
+}
+
+.dia__viagem {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  margin-bottom: 1rem;
+  padding: 0.6rem 0.85rem;
+  border-radius: var(--radius-sm);
+  background: var(--primary-soft);
+  color: var(--primary-text);
+  font-size: 0.9rem;
+}
+
+.dia__viagem .icon {
+  flex-shrink: 0;
+}
+
+.parada--atividade .parada__card {
+  border-style: dashed;
+}
+
+.pernoite {
+  margin-top: 0.75rem;
+  margin-left: 2.75rem;
+  padding: 0.85rem 1rem;
+  border-left: 4px solid var(--cor-dia);
+}
+
+.pernoite__rotulo {
+  font-size: 0.75rem;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: var(--text-muted);
+}
+
+.etapas {
+  display: grid;
+  gap: 0.75rem;
+  margin: 0.5rem 0 0.75rem;
+  padding: 0;
+  list-style: none;
+}
+
+.etapa {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 7rem auto;
+  align-items: end;
+  gap: 0.75rem;
+}
+
+@media (max-width: 520px) {
+  .etapa {
+    grid-template-columns: minmax(0, 1fr) 5.5rem auto;
+  }
+
+  .pernoite {
+    margin-left: 0;
+  }
+}
+
 .marcador-numerado span {
   display: grid;
   place-items: center;

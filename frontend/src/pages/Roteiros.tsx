@@ -112,10 +112,10 @@ function Roteiros() {
                   De {roteiro.usuario?.nome} · {roteiro.meuPapel === "EDITOR" ? "você edita" : "você acompanha"}
                 </p>
               )}
-              {roteiro.cidade && (
+              {((roteiro.cidades?.length ?? 0) > 0 || roteiro.cidade) && (
                 <p className="roteiro-card__cidade">
                   <Icone nome="pin" />
-                  {roteiro.cidade}
+                  {roteiro.cidades?.length ? roteiro.cidades.join(" → ") : roteiro.cidade}
                 </p>
               )}
               {roteiro.descricao && <p className="roteiro-card__descricao">{roteiro.descricao}</p>}

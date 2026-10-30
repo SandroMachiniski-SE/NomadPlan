@@ -9,6 +9,7 @@ Banco PostgreSQL 16 com a extensão PostGIS. O esquema é definido em `backend/p
 | `TipoConta` | `VISITANTE`, `MORADOR`, `NEGOCIO`, `GESTOR`, `MODERADOR`, `ADMIN` |
 | `StatusPonto` | `RASCUNHO`, `PENDENTE_VERIFICACAO` (aguardando moderação), `PUBLICADO`, `REJEITADO` |
 | `OrigemRegistro` | `USUARIO` (cadastro pela tela), `IMPORTACAO` (arquivo CSV/GeoJSON), `API` (OpenStreetMap). RNF19. |
+| `PeriodoDoDia` | `MANHA`, `TARDE`, `NOITE`, `DIA_INTEIRO` (período de uma parada, para quem planeja sem horário) |
 | `PapelColaborador` | `EDITOR`, `LEITOR` (o dono é quem criou o roteiro, em `roteiro.id_usuario`) |
 | `StatusSolicitacao` | `PENDENTE`, `APROVADA`, `REJEITADA` (sugestões, verificações e avaliações) |
 
@@ -76,7 +77,7 @@ Histórico de alterações (RF26). `id`, `id_ponto`/`id_roteiro` (FK, cascata), 
 ### `roteiro` e `item_roteiro`
 
 `roteiro`: `id`, `nome`, `descricao`, `cidade`, `data_inicio`, `data_fim`, `id_usuario` (FK), `publico`, `slug_publico` (único; link de compartilhamento), `notas` (anotações livres, só do dono), `orcamento_centavos` (teto de gastos), `data_criacao`, `data_atualizacao`.
-`item_roteiro`: `id`, `id_roteiro` (FK, cascata), `id_ponto` (FK), `dia` (1 a 30; padrão 1), `ordem` (vale dentro de cada dia), `observacao`, `custo_centavos` (custo previsto; dinheiro em centavos inteiros), `data_criacao`. **Único por (`id_roteiro`, `id_ponto`)**.
+`item_roteiro`: `id`, `id_roteiro` (FK, cascata), `id_ponto` (FK, nulo nas atividades livres), `titulo` (nome da atividade livre), `dia` (1 a 30; padrão 1), `ordem` (vale dentro de cada dia), `periodo` (`PeriodoDoDia`), `pernoite` (onde se dorme naquela noite), `observacao`, `custo_centavos` (custo previsto; dinheiro em centavos inteiros), `data_criacao`. Regras no banco: toda parada tem ponto ou título (CHECK); uma pernoite por dia (índice único parcial); como visita, cada ponto entra uma vez por roteiro, mas o mesmo hotel pode ser a pernoite de várias noites (índice único parcial em (`id_roteiro`, `id_ponto`) onde não é pernoite).
 
 ### `item_checklist`
 

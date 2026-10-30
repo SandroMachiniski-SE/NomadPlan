@@ -25,7 +25,7 @@ test.describe("roteiros", () => {
     await criarRoteiro(page, "Fim de semana em Joinville");
 
     await expect(page.getByRole("heading", { name: "Fim de semana em Joinville", level: 1 })).toBeVisible();
-    await expect(page.getByText("Este roteiro ainda não tem pontos")).toBeVisible();
+    await expect(page.getByText("Este roteiro ainda não tem paradas")).toBeVisible();
 
     await adicionarPonto(page, MUSEU, "Chegar cedo");
     await adicionarPonto(page, PARQUE);
@@ -151,7 +151,7 @@ test.describe("roteiro sugerido", () => {
     await page.goto("/roteiros/gerar");
 
     await page.getByLabel("Cidade *").fill("Joinville");
-    await page.getByLabel("Tempo disponível (horas)").fill("8");
+    await page.getByLabel("Tempo disponível por dia (horas)").fill("8");
     await page.getByRole("button", { name: "Gerar roteiro" }).click();
 
     await expect(page.getByRole("heading", { name: "Roteiro sugerido", exact: true })).toBeVisible();

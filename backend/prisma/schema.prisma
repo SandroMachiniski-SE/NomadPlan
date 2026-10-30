@@ -275,10 +275,25 @@ model Roteiro {
   @@map("roteiro")
 }
 
+// Período do dia de uma parada, para quem planeja sem horário ("trilha à noite").
+enum PeriodoDoDia {
+  MANHA
+  TARDE
+  NOITE
+  DIA_INTEIRO
+}
+
+// Uma parada é um ponto cadastrado ou uma atividade livre (com título); a pernoite é onde se
+// dorme naquela noite. As migrations garantem "ponto ou título" (CHECK), uma pernoite por dia e
+// cada ponto uma vez só como visita, enquanto o mesmo hotel pode ser a pernoite de várias noites
+// (índices parciais, que o Prisma não modela).
 model ItemRoteiro {
   id          Int      @id @default(autoincrement())
   idRoteiro   Int      @map("id_roteiro")
-  idPonto     Int      @map("id_ponto")
+  idPonto     Int?     @map("id_ponto")
+  titulo      String?
+  periodo     PeriodoDoDia?
+  pernoite    Boolean  @default(false)
   // Dia do roteiro (1, 2, 3...) em que a parada acontece; a ordem vale dentro de cada dia.
   dia         Int      @default(1)
   ordem       Int      @default(0)
@@ -288,9 +303,8 @@ model ItemRoteiro {
   dataCriacao DateTime @default(now()) @map("data_criacao")
 
   roteiro Roteiro        @relation(fields: [idRoteiro], references: [id], onDelete: Cascade)
-  ponto   PontoTuristico @relation(fields: [idPonto], references: [id])
+  ponto   PontoTuristico? @relation(fields: [idPonto], references: [id])
 
-  @@unique([idRoteiro, idPonto])
   @@index([idRoteiro])
   @@map("item_roteiro")
 }

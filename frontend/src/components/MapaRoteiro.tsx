@@ -14,6 +14,8 @@ export interface ParadaNoMapa {
   numero: number;
   latitude: number | null;
   longitude: number | null;
+  /** Onde se dorme no fim do dia: marcador com uma cama, fechando o trajeto do dia. */
+  pernoite?: boolean;
 }
 
 export interface MapaRoteiroProps {
@@ -25,10 +27,10 @@ export interface MapaRoteiroProps {
   comLinks?: boolean;
 }
 
-function iconeNumerado(numero: number, cor: string) {
+function iconeNumerado(rotulo: number | string, cor: string) {
   return L.divIcon({
     className: "marcador-numerado",
-    html: `<span style="background:${cor}">${numero}</span>`,
+    html: `<span style="background:${cor}">${rotulo}</span>`,
     iconSize: [30, 30],
     iconAnchor: [15, 15],
     popupAnchor: [0, -14],
@@ -97,11 +99,12 @@ function MapaRoteiro({ paradas, altura = 420, dia = null, comLinks = true }: Map
           <Marker
             key={`${p.dia}-${p.idPonto}`}
             position={[p.latitude, p.longitude]}
-            icon={iconeNumerado(p.numero, corDoDia(p.dia))}
+            icon={iconeNumerado(p.pernoite ? "🛏" : p.numero, corDoDia(p.dia))}
           >
             <Popup>
               <strong>
-                {p.numero}. {p.nome}
+                {p.pernoite ? "Pernoite: " : `${p.numero}. `}
+                {p.nome}
               </strong>
               <br />
               Dia {p.dia} · {p.categoria}

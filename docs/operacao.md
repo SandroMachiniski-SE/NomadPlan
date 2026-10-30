@@ -84,6 +84,10 @@ cd backend && npm run overture:importar
 
 `backend/prisma/dados/curadoria.json` guarda os pontos que a equipe conferiu em fontes oficiais, como o guia de museus da Prefeitura de Joinville, com o endereço da fonte e a data. `npm run curadoria:aplicar` (o seed também aplica) troca o que veio das importações pelo valor conferido, porque o OpenStreetMap pode estar desatualizado, mas nunca o que a comunidade editou. O ponto conferido ganha o selo de verificado e uma versão no histórico. Para incluir um ponto, acrescente um item com `cidade`, `nome` (igual ao do banco), `fonte`, `conferidoEm` e os `campos`.
 
+### Roteiro de exemplo
+
+`npm run roteiro:exemplo [-- email]` cria o roteiro de demonstração "Caderno de viagem: Norte de SC, Serra e Ilha em 10 dias" (padrão: `morador@nomadplan.local`; o seed já cria). Cada parada aponta para um ponto real pelo nome; o que não existir no banco vira atividade livre com o mesmo nome.
+
 ### Google Places (opcional, consulta na hora)
 
 Com `GOOGLE_MAPS_API_KEY` no `backend/.env`, a página do ponto mostra nota, horário, acessibilidade e foto do Google Maps, e o gerador de roteiros consulta o horário dos pontos mais relevantes que não têm. Pelos termos do Google, só o `place_id` é guardado; o resto é consultado a cada uso e exibido com a atribuição ao Google.

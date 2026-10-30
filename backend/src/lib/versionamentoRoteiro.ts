@@ -14,8 +14,18 @@ export interface DadosVersaoRoteiro {
   cidade: string | null;
   dataInicio: string | null;
   dataFim: string | null;
-  // `dia` não existe nas versões gravadas antes do roteiro por dia: valem como dia 1.
-  itens: { idPonto: number; ordem: number; dia?: number; observacao: string | null; custoCentavos?: number | null }[];
+  // `dia` não existe nas versões gravadas antes do roteiro por dia: valem como dia 1. As
+  // atividades livres (sem idPonto), o período e a pernoite vieram depois e são opcionais.
+  itens: {
+    idPonto: number | null;
+    ordem: number;
+    dia?: number;
+    observacao: string | null;
+    custoCentavos?: number | null;
+    titulo?: string | null;
+    periodo?: "MANHA" | "TARDE" | "NOITE" | "DIA_INTEIRO" | null;
+    pernoite?: boolean;
+  }[];
 }
 
 export async function registrarVersaoRoteiro(
@@ -28,8 +38,17 @@ export async function registrarVersaoRoteiro(
     where: { id: idRoteiro },
     include: {
       itens: {
-        orderBy: [{ dia: "asc" }, { ordem: "asc" }],
-        select: { idPonto: true, ordem: true, dia: true, observacao: true, custoCentavos: true },
+        orderBy: [{ dia: "asc" }, { pernoite: "asc" }, { ordem: "asc" }],
+        select: {
+          idPonto: true,
+          ordem: true,
+          dia: true,
+          observacao: true,
+          custoCentavos: true,
+          titulo: true,
+          periodo: true,
+          pernoite: true,
+        },
       },
     },
   });
