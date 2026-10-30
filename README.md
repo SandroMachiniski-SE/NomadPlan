@@ -4,7 +4,7 @@ Plataforma de turismo inteligente que centraliza o inventário turístico das ci
 
 ## ✨ Funcionalidades
 
-- **Dados reais:** cerca de 2 mil lugares de Joinville, Florianópolis e Blumenau importados do OpenStreetMap, com fotos do Wikimedia Commons (com autor e licença). Novas cidades entram com dois comandos, e a comunidade completa o que falta, como horários e acessibilidade.
+- **Dados reais:** cerca de 2.600 lugares de Joinville, Florianópolis e Blumenau, vindos do OpenStreetMap, completados com telefones, sites e hospedagens do Overture Maps, fotos do Wikimedia Commons e uma curadoria com fontes oficiais. Opcionalmente, nota, horário e foto do Google Maps, consultados na hora. A comunidade completa o que falta.
 - **Explorar:** busca por cidade, categoria, texto, acessibilidade, faixa de preço, nota mínima, "aberto agora" e proximidade (raio a partir da localização), com ordenação por relevância, distância, nome ou avaliação; mapa interativo.
 - **Pontos salvos (favoritos)** e **recomendações** baseadas nos interesses do perfil e no gosto de usuários parecidos.
 - **Roteiros:** viagens de vários **dias** (com as datas e o dia da semana), mapa com paradas numeradas e trajeto de cada dia, **tempo e distância estimados entre as paradas**, botão para **otimizar a ordem** pelo caminho mais curto, **orçamento** (custo por parada, total por dia e teto de gastos), **checklist** e **notas** da viagem, **colaboração** (convites por e-mail com papéis de editor e leitor, atualização automática entre os participantes), compartilhamento por link público, histórico de versões com restauração e **geração automática** com horários estimados de chegada e saída, deslocamento e espera.
@@ -65,9 +65,9 @@ npm run osm:baixar -- Joinville Florianópolis Blumenau "Balneário Camboriú"
 npm run osm:importar
 ```
 
-A importação não duplica pontos e nunca sobrescreve o que a comunidade editou: só preenche campos vazios. Banco criado com uma versão antiga do seed? `npm run osm:importar -- --remover-ficticios` tira os 110 pontos fictícios de antes. Detalhes em [docs/operacao.md](docs/operacao.md#dados-reais-openstreetmap).
+A importação não duplica pontos e nunca sobrescreve o que a comunidade editou: só preenche campos vazios. Telefones, sites e hospedagens do [Overture Maps](https://overturemaps.org) entram com `python scripts/dados/baixar_overture.py <cidade>` e `npm run overture:importar`; a curadoria com fontes oficiais (`prisma/dados/curadoria.json`) entra com `npm run curadoria:aplicar`. Com `GOOGLE_MAPS_API_KEY` no `.env`, a página do ponto e o gerador de roteiros consultam o Google Maps na hora (nada do Google é gravado além do identificador do lugar). Banco criado com uma versão antiga do seed? `npm run osm:importar -- --remover-ficticios` tira os 110 pontos fictícios de antes. Detalhes em [docs/operacao.md](docs/operacao.md#dados-reais-openstreetmap).
 
-Dados © colaboradores do OpenStreetMap, sob a licença [ODbL](https://www.openstreetmap.org/copyright). Fotos do Wikimedia Commons, com autor e licença indicados em cada ponto.
+Dados © colaboradores do OpenStreetMap, sob a licença [ODbL](https://www.openstreetmap.org/copyright). Dados do Overture Maps sob a licença [CDLA Permissive 2.0](https://cdla.dev/permissive-2-0/). Fotos do Wikimedia Commons, com autor e licença indicados em cada ponto.
 
 ## 🧪 Testes
 

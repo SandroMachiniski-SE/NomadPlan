@@ -195,6 +195,19 @@ test.describe("roteiro sugerido", () => {
     await page.getByLabel("Cidade *").fill("Cidade Inexistente");
     await page.getByRole("button", { name: "Gerar roteiro" }).click();
 
-    await expect(page.getByRole("alert")).toContainText(/Nenhum ponto/);
+    await expect(page.getByRole("alert")).toContainText(
+      /Ainda não há pontos cadastrados em "Cidade Inexistente"\. Cidades disponíveis: .*Joinville/,
+    );
+  });
+
+  test("acha a cidade digitada sem maiúscula e com a UF", async ({ page }) => {
+    await cadastrar(page);
+    await page.goto("/roteiros/gerar");
+
+    await page.getByLabel("Cidade *").fill("joinville, sc");
+    await page.getByRole("button", { name: "Gerar roteiro" }).click();
+
+    await expect(page.locator(".parada").first()).toBeVisible();
+    await expect(page.getByRole("alert")).toHaveCount(0);
   });
 });

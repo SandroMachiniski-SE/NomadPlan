@@ -15,7 +15,7 @@ Este documento resume os controles de segurança do sistema, organizados pelo OW
 | A07 | Falhas de identificação e autenticação | Bloqueio após 3 senhas erradas por e-mail e 10 por IP (janela de 15 min) com alerta aos administradores quando há sequência de bloqueios; verificação em duas etapas (TOTP, RFC 6238) com proteção contra reutilização do código; tempo de resposta do login igual para e-mails existentes e inexistentes; recuperação de senha sem revelar quais e-mails existem; sessão expira e é renovada enquanto válida. |
 | A08 | Falhas de integridade | Uploads validados pelo **conteúdo** (assinatura do arquivo), não só pelo nome ou tipo informado; extensão gravada derivada do tipo real; limite de 5 MB (imagens) e 2 MB (importações). Nenhuma desserialização de dados não confiáveis; dependências travadas pelos arquivos de lock. |
 | A09 | Falhas de registro e monitoramento | Log de auditoria (RF20) para ações sensíveis: login, falhas e bloqueios, mudança de papel, desativação de conta, importação e exportação, moderação. O e-mail digitado em tentativas falhas **não** é gravado. Alerta automático de possível força bruta. Métricas de uso agregadas. |
-| A10 | SSRF | O servidor nunca busca URLs informadas por usuários (o campo "site oficial" é apenas armazenado e exibido como link). Só o script de linha de comando `osm:baixar` acessa a internet, e apenas endereços fixos (Overpass API, Wikidata e Wikimedia Commons). Sites vindos do OpenStreetMap só são aceitos com `http(s)`. |
+| A10 | SSRF | O servidor nunca busca URLs informadas por usuários (o campo "site oficial" é apenas armazenado e exibido como link). Os scripts de importação (`osm:baixar` e `baixar_overture.py`) e a integração opcional com o Google Places só acessam endereços fixos (Overpass API, Wikidata, Wikimedia Commons, armazenamento público do Overture e `places.googleapis.com`). Sites vindos dessas fontes só são aceitos com `http(s)`. |
 
 ## Privacidade (LGPD)
 
@@ -23,7 +23,7 @@ Este documento resume os controles de segurança do sistema, organizados pelo OW
 - Portabilidade: o próprio usuário baixa seus dados em JSON (Perfil → *Baixar meus dados*).
 - Exclusão: o usuário anonimiza a conta pelo Perfil, confirmando com a senha (e o código do 2FA). Detalhes no [dicionário de dados](dicionario-de-dados.md#dados-pessoais-lgpd).
 - Minimização: o e-mail nunca é exibido a outros usuários; a localização usada em buscas "perto de mim" não é gravada.
-- Serviços de terceiros carregados pelo navegador: as imagens do mapa (OpenStreetMap) e as fotos importadas do Wikimedia Commons vêm direto desses servidores, que recebem o endereço IP de quem visualiza a página, como em qualquer site que usa esses serviços. Nenhum dado da conta é enviado a eles.
+- Serviços de terceiros carregados pelo navegador: as imagens do mapa (OpenStreetMap), as fotos importadas do Wikimedia Commons e, com a integração ligada, as fotos do Google vêm direto desses servidores, que recebem o endereço IP de quem visualiza a página, como em qualquer site que usa esses serviços. Nenhum dado da conta é enviado a eles.
 
 ## Riscos aceitos
 
@@ -40,6 +40,7 @@ Decisões tomadas por serem adequadas ao escopo acadêmico ou por dependerem da 
 | **`prisma` (CLI) → `deepmerge-ts` com alerta no `npm audit`** | Vulnerabilidade de esgotamento de pilha ao mesclar objetos recursivos, apenas na ferramenta de linha de comando. | Só é executada em desenvolvimento e na implantação (`migrate deploy`), nunca em requisições, e sem entrada de usuários. A correção exige Prisma 7 (mudança de versão maior); revisar quando for planejada a atualização. |
 | **Chave do 2FA derivada do `JWT_SECRET`** | Sem `CHAVE_CRIPTOGRAFIA`, trocar o `JWT_SECRET` torna ilegíveis os segredos de 2FA já gravados. | Em produção, definir `CHAVE_CRIPTOGRAFIA` própria e guardá-la com o mesmo cuidado. |
 | **E-mail não verificado no cadastro** | Os convites de roteiro valem para quem usa o e-mail convidado, e a plataforma não confirma que o e-mail pertence a quem cadastra: alguém poderia criar uma conta com o e-mail de outra pessoa que ainda não tem conta e aceitar um convite feito a ela. | O convite só dá acesso ao roteiro daquele convite, nunca à conta; o dono vê quem aceitou e pode remover a pessoa na hora. Para produção, enviar um link de confirmação de e-mail no cadastro. |
+| **Chave do Google Places** | Com `GOOGLE_MAPS_API_KEY` configurada, quem abusar da página do ponto gasta a cota da conta do projeto. | A chave fica só no backend (nunca vai ao navegador; a foto é entregue por um endereço sem a chave), a rota tem limite por IP e a chave deve ser restrita à Places API (New) no console do Google, com alerta de orçamento. |
 | **Contas de demonstração do seed** | `npm run prisma:seed` cria `admin@`, `moderador@`, `negocio@` e `morador@nomadplan.local` com senha conhecida. | O seed **recusa rodar** com `NODE_ENV=production`. Se o banco de demonstração for reaproveitado, troque a senha ou remova essas contas antes de qualquer uso real. |
 
 ## Como reportar um problema de segurança

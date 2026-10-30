@@ -4,6 +4,7 @@ import { extrairMensagemErro } from "../utils/erro";
 import { CATEGORIAS_PONTOS, iconeDaCategoria } from "../constants/categorias";
 import type { Idioma, PreferenciaAcessibilidade } from "../types/usuario";
 import Icone from "../components/Icone";
+import SugestoesDeCidade from "../components/SugestoesDeCidade";
 import SecaoMfa from "../components/perfil/SecaoMfa";
 import SecaoPrivacidade from "../components/perfil/SecaoPrivacidade";
 
@@ -138,7 +139,9 @@ function Perfil() {
               maxLength={120}
               value={cidadeBase}
               onChange={(e) => setCidadeBase(e.target.value)}
+              list="cidades-do-perfil"
             />
+            <SugestoesDeCidade id="cidades-do-perfil" />
           </label>
 
           <label className="field">

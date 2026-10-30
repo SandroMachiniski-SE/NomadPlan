@@ -134,6 +134,8 @@ export interface PontoRecomendado extends PontoResumo {
   deslocamentoMin: number;
   esperaMin: number;
   duracaoVisitaMin: number;
+  /** O horário foi consultado agora no Google Maps (o cadastro não tem). */
+  horarioDoGoogle?: boolean;
 }
 
 export interface RespostaRecomendacao {

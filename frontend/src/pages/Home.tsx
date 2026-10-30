@@ -5,6 +5,7 @@ import type { Ordenacao, Ponto, RespostaPontos } from "../types/ponto";
 import MapaCarregavel from "../components/MapaCarregavel";
 import PontoCard from "../components/PontoCard";
 import Icone from "../components/Icone";
+import SugestoesDeCidade from "../components/SugestoesDeCidade";
 import { useAuth } from "../context/useAuth";
 import { CATEGORIAS_PONTOS, iconeDaCategoria } from "../constants/categorias";
 import { extrairMensagemErro } from "../utils/erro";
@@ -141,7 +142,9 @@ function Home() {
                   onChange={(event) => setCidade(event.target.value)}
                   placeholder="Para onde você vai?"
                   aria-label="Cidade"
+                  list="cidades-da-busca"
                 />
+                <SugestoesDeCidade id="cidades-da-busca" />
               </label>
 
               <label className="busca__campo busca__campo--grande">

@@ -29,6 +29,16 @@ export const limiteContribuicao = rateLimit({
   },
 });
 
+// Cada consulta ao Google Places conta na cota mensal da conta do projeto.
+export const limiteGoogle = rateLimit({
+  windowMs: 15 * 60 * 1000,
+  limit: 60,
+  standardHeaders: true,
+  skip: semLimite,
+  legacyHeaders: false,
+  message: { erro: "Muitas consultas ao Google em pouco tempo. Tente novamente mais tarde." },
+});
+
 // AF01: bloqueio temporário do login por excesso de tentativas. O limite por conta é
 // o do RFC (3 falhas); o limite por IP é mais folgado porque vários usuários podem
 // compartilhar o mesmo endereço (rede da faculdade, por exemplo).

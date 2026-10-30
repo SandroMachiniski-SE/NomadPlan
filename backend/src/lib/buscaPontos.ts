@@ -1,6 +1,7 @@
 import { Prisma } from "@prisma/client";
 import prisma from "./prisma";
 import { estaAbertoNoHorario } from "./horarios";
+import { variantesDaCidade } from "./cidades";
 
 // Busca de pontos turísticos (RF08/RF09). Uma única consulta cobre busca por texto,
 // filtros, proximidade (PostGIS) e média de avaliações.
@@ -112,7 +113,17 @@ export async function buscarPontos(filtros: FiltrosBusca): Promise<ResultadoBusc
     );
   }
 
-  if (filtros.cidade) condicoes.push(Prisma.sql`p.cidade ILIKE ${contem(filtros.cidade)}`);
+  if (filtros.cidade) {
+    // "Florianopolis" ou "Joinville, SC" acham a cidade certa; o que não corresponde a uma
+    // cidade inteira continua valendo como trecho do nome ("Florian").
+    const variantes = await variantesDaCidade(filtros.cidade);
+
+    condicoes.push(
+      variantes.length > 0
+        ? Prisma.sql`p.cidade IN (${Prisma.join(variantes)})`
+        : Prisma.sql`p.cidade ILIKE ${contem(filtros.cidade)}`,
+    );
+  }
   if (filtros.categoria) condicoes.push(Prisma.sql`p.categoria ILIKE ${contem(filtros.categoria)}`);
   if (filtros.acessibilidade) {
     condicoes.push(Prisma.sql`p.acessibilidade ILIKE ${contem(filtros.acessibilidade)}`);

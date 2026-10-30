@@ -108,6 +108,11 @@ model PontoTuristico {
   origem         OrigemRegistro @default(USUARIO)
   idOsm          String?        @unique @map("id_osm")
   sincronizadoEm DateTime?      @map("sincronizado_em")
+  // Overture Maps: lugar de onde vieram telefone/site (ou a hospedagem inteira).
+  idOverture     String?        @unique @map("id_overture")
+  // Google Places: só o place_id pode ser guardado; o resto é consultado na hora.
+  idGoogle        String?   @map("id_google")
+  googleBuscadoEm DateTime? @map("google_buscado_em")
   // Crédito e página de origem da foto quando ela não foi enviada por um usuário
   // (Wikimedia Commons: autor e licença precisam aparecer junto da imagem).
   imagemCredito String? @map("imagem_credito")

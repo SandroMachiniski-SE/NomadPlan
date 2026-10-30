@@ -6,6 +6,8 @@ import { useAuth } from "../context/useAuth";
 import { extrairMensagemErro } from "../utils/erro";
 import { CATEGORIAS_PONTOS, iconeDaCategoria } from "../constants/categorias";
 import Icone from "../components/Icone";
+import SugestoesDeCidade from "../components/SugestoesDeCidade";
+import { useCidadesDisponiveis } from "../services/cidades";
 import { formatarDistancia, formatarDuracao, formatarHora } from "../utils/formatar";
 
 function GerarRoteiro() {
@@ -24,6 +26,7 @@ function GerarRoteiro() {
   const [resultado, setResultado] = useState<RespostaRecomendacao | null>(null);
 
   const [salvando, setSalvando] = useState(false);
+  const cidadesDisponiveis = useCidadesDisponiveis();
 
   function alternarInteresse(categoria: string) {
     setInteresses((atual) =>
@@ -138,7 +141,14 @@ function GerarRoteiro() {
               value={cidade}
               onChange={(e) => setCidade(e.target.value)}
               maxLength={120}
+              list="cidades-do-roteiro"
             />
+            <SugestoesDeCidade id="cidades-do-roteiro" />
+            {cidadesDisponiveis.length > 0 && (
+              <span className="field__hint">
+                Com pontos cadastrados: {cidadesDisponiveis.map((c) => c.cidade).join(", ")}.
+              </span>
+            )}
           </label>
 
           <label className="field">
@@ -265,6 +275,13 @@ function GerarRoteiro() {
                           {ponto.deslocamentoMin > 0 && `, ${formatarDuracao(ponto.deslocamentoMin)} de deslocamento`}
                           {ponto.esperaMin > 0 && `, ${formatarDuracao(ponto.esperaMin)} de espera até abrir`}
                         </span>
+                      </p>
+                    )}
+
+                    {ponto.horarioFuncionamento && (
+                      <p className="muted small">
+                        Funcionamento: {ponto.horarioFuncionamento}
+                        {ponto.horarioDoGoogle && " (segundo o Google Maps)"}
                       </p>
                     )}
                   </div>

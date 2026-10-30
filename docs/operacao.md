@@ -66,6 +66,34 @@ npm run osm:importar                                     # leva todos os arquivo
 - **Pontos de exemplo antigos:** bancos criados com versões anteriores do seed têm 110 pontos fictícios ("Natureza Joinville #1"...). `npm run osm:importar -- --remover-ficticios` apaga esses pontos, junto com as avaliações, favoritos e sugestões ligados a eles. Os que estiverem em algum roteiro são mantidos.
 - Cada importação fica no log de auditoria (`importar_osm`, com o resumo).
 
+### Overture Maps (telefones, sites e hospedagens)
+
+O [Overture Maps](https://overturemaps.org) (Meta, Microsoft, AWS e outros) publica lugares com licença aberta (CDLA Permissive 2.0, e Apache 2.0 ou CC0 em algumas fontes). Ele não tem horário, mas tem telefone, site e redes sociais de muitos negócios. No NomadPlan ele completa os pontos que já existem e traz hospedagens, que o OpenStreetMap quase não tem. Os outros tipos de lugar do Overture são ruidosos (prédios residenciais marcados como "patrimônio", por exemplo) e ficam de fora.
+
+```bash
+pip install duckdb                                                  # uma vez
+python scripts/dados/baixar_overture.py Joinville Florianópolis Blumenau   # 3 a 5 min por cidade
+cd backend && npm run overture:importar
+```
+
+- A área de cada cidade é a dos pontos do OpenStreetMap já baixados, então baixe o OpenStreetMap antes.
+- O arquivo guarda só o que o importador usa: os lugares que correspondem a um ponto nosso (nome com as mesmas palavras, a até 200 m) e as hospedagens com confiança de 85% ou mais cujo endereço está na cidade.
+- Telefone e site só preenchem campos vazios. Praias, parques e mirantes não recebem contato do Overture, porque essas páginas raramente são oficiais.
+
+### Curadoria (fontes oficiais)
+
+`backend/prisma/dados/curadoria.json` guarda os pontos que a equipe conferiu em fontes oficiais, como o guia de museus da Prefeitura de Joinville, com o endereço da fonte e a data. `npm run curadoria:aplicar` (o seed também aplica) troca o que veio das importações pelo valor conferido, porque o OpenStreetMap pode estar desatualizado, mas nunca o que a comunidade editou. O ponto conferido ganha o selo de verificado e uma versão no histórico. Para incluir um ponto, acrescente um item com `cidade`, `nome` (igual ao do banco), `fonte`, `conferidoEm` e os `campos`.
+
+### Google Places (opcional, consulta na hora)
+
+Com `GOOGLE_MAPS_API_KEY` no `backend/.env`, a página do ponto mostra nota, horário, acessibilidade e foto do Google Maps, e o gerador de roteiros consulta o horário dos pontos mais relevantes que não têm. Pelos termos do Google, só o `place_id` é guardado; o resto é consultado a cada uso e exibido com a atribuição ao Google.
+
+1. Em https://console.cloud.google.com, crie um projeto e ative o faturamento (o Google pede cartão; dentro da cota gratuita mensal não há cobrança).
+2. Ative a **Places API (New)** e crie uma chave de API restrita a ela.
+3. Coloque a chave em `GOOGLE_MAPS_API_KEY` e reinicie o backend. `GOOGLE_PONTOS_POR_ROTEIRO` (padrão 8) limita quantos pontos cada geração de roteiro consulta.
+
+Cada consulta conta na cota do Google: a busca do `place_id` (uma vez por ponto, pedindo só o id), os detalhes e a foto. A rota `/pontos/:id/google` tem limite de 60 consultas por IP em 15 minutos. Sem a chave, nada disso é usado.
+
 ## Rollback (RNF24)
 
 A API é compilada e versionada pelo git, então voltar de versão é voltar o código:

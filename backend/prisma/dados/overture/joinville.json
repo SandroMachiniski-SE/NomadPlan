@@ -1,0 +1,3681 @@
+{
+ "fonte": "Overture Maps Foundation, tema places, versão 2026-10-21.0",
+ "licenca": "CDLA Permissive 2.0 (https://cdla.dev/permissive-2-0/); algumas fontes em Apache 2.0 ou CC0, indicadas em cada lugar",
+ "cidade": "Joinville",
+ "baixadoEm": "2026-10-30T01:38:44.874485+00:00",
+ "lugares": [
+  {
+   "idOverture": "aeabb404-e9e7-4a15-a351-6c864f5dc6ca",
+   "nome": "Serra Dona Francisca",
+   "categoriaOverture": "park",
+   "confianca": 0.852,
+   "sites": [
+    "http://www.campoalegre.sc.gov.br/turismo/item/detalhe/2327"
+   ],
+   "telefones": [],
+   "redesSociais": [
+    "https://www.facebook.com/590322544487093"
+   ],
+   "endereco": "SC-418, km 16",
+   "localidade": "Joinville",
+   "latitude": -26.19410488,
+   "longitude": -49.03351049,
+   "fontes": [
+    "meta (CDLA-Permissive-2.0)",
+    "Overture (CDLA-Permissive-2.0)"
+   ]
+  },
+  {
+   "idOverture": "ee1441e3-3477-42b1-8536-b4e09bfac3ce",
+   "nome": "Canela Preta",
+   "categoriaOverture": "farm",
+   "confianca": 0.953,
+   "sites": [],
+   "telefones": [
+    "+5547988515072"
+   ],
+   "redesSociais": [
+    "https://www.facebook.com/1837052199844737"
+   ],
+   "endereco": "SC-418, 18",
+   "localidade": "Joinville",
+   "latitude": -26.20370438,
+   "longitude": -49.04877485,
+   "fontes": [
+    "meta (CDLA-Permissive-2.0)",
+    "Overture (CDLA-Permissive-2.0)"
+   ]
+  },
+  {
+   "idOverture": "2ff0f770-6e13-4e3f-b61b-989e1ae8af93",
+   "nome": "Hotel Fazenda Dona Francisca",
+   "categoriaOverture": "hotel",
+   "confianca": 0.952,
+   "sites": [
+    "http://www.donafranciscafazenda.com.br"
+   ],
+   "telefones": [
+    "+554734223377"
+   ],
+   "redesSociais": [
+    "https://www.facebook.com/1223205517710926"
+   ],
+   "endereco": "Rodovia SC-418, Km 19",
+   "localidade": "Joinville",
+   "latitude": -26.21220894,
+   "longitude": -49.05191769,
+   "fontes": [
+    "meta (CDLA-Permissive-2.0)",
+    "Overture (CDLA-Permissive-2.0)"
+   ]
+  },
+  {
+   "idOverture": "0b13a315-4dd4-4f75-9ab8-7dec1900cdb5",
+   "nome": "Castelo dos Bugres",
+   "categoriaOverture": "sport_or_fitness_facility",
+   "confianca": 0.608,
+   "sites": [],
+   "telefones": [],
+   "redesSociais": [
+    "https://www.facebook.com/427041233992702"
+   ],
+   "endereco": "",
+   "localidade": null,
+   "latitude": -26.23447,
+   "longitude": -49.048158,
+   "fontes": [
+    "meta (CDLA-Permissive-2.0)",
+    "Overture (CDLA-Permissive-2.0)"
+   ]
+  },
+  {
+   "idOverture": "6317d552-b5c3-4cd8-9bbe-722b17b6abfc",
+   "nome": "Hotel Vale das Hortênsias",
+   "categoriaOverture": "hotel",
+   "confianca": 0.978,
+   "sites": [
+    "http://www.hotelvaledashortensias.com.br/"
+   ],
+   "telefones": [
+    "+554734222242"
+   ],
+   "redesSociais": [
+    "https://www.facebook.com/433579843430607"
+   ],
+   "endereco": "Serra da Dona Francisca Zona Rural - Estr. Rio do Júlio, 12500",
+   "localidade": "Joinville",
+   "latitude": -26.2834468,
+   "longitude": -49.10834805,
+   "fontes": [
+    "meta (CDLA-Permissive-2.0)",
+    "Overture (CDLA-Permissive-2.0)"
+   ]
+  },
+  {
+   "idOverture": "3983a468-c2d9-4056-9f3a-ae91463b8a57",
+   "nome": "Espaço Amorar",
+   "categoriaOverture": "cottage",
+   "confianca": 0.93,
+   "sites": [],
+   "telefones": [
+    "+5547999203763"
+   ],
+   "redesSociais": [
+    "https://www.facebook.com/101992642007782"
+   ],
+   "endereco": "Estrada do Salto I",
+   "localidade": "Joinville",
+   "latitude": -26.2946514,
+   "longitude": -48.97875322,
+   "fontes": [
+    "meta (CDLA-Permissive-2.0)",
+    "Overture (CDLA-Permissive-2.0)"
+   ]
+  },
+  {
+   "idOverture": "66c51a4e-eebc-45a9-bb5d-d1e7db3ad383",
+   "nome": "Pesque Pague Pirai",
+   "categoriaOverture": "fishing_club",
+   "confianca": 0.998,
+   "sites": [
+    "http://www.pesquepaguepirai.com.br/"
+   ],
+   "telefones": [
+    "+554734395180"
+   ],
+   "redesSociais": [
+    "https://www.facebook.com/660420644045621"
+   ],
+   "endereco": "Estr. do Atalho",
+   "localidade": "Joinville",
+   "latitude": -26.27704629,
+   "longitude": -48.936726,
+   "fontes": [
+    "meta (CDLA-Permissive-2.0)",
+    "Overture (CDLA-Permissive-2.0)"
+   ]
+  },
+  {
+   "idOverture": "91137904-b8ce-43a9-a93c-c9ac8c4d72b9",
+   "nome": "Water Valley Water Park",
+   "categoriaOverture": "water_park",
+   "confianca": 0.987,
+   "sites": [
+    "http://www.watervalley.com.br/"
+   ],
+   "telefones": [
+    "+554734395717"
+   ],
+   "redesSociais": [
+    "https://www.facebook.com/136793369760451"
+   ],
+   "endereco": "Estr. Motucas, 2900",
+   "localidade": "Joinville",
+   "latitude": -26.24877687,
+   "longitude": -48.94107905,
+   "fontes": [
+    "meta (CDLA-Permissive-2.0)",
+    "Overture (CDLA-Permissive-2.0)"
+   ]
+  },
+  {
+   "idOverture": "6549f16b-1784-4105-aa1e-1e71c91242ad",
+   "nome": "Max Moppi",
+   "categoriaOverture": "bakery",
+   "confianca": 0.995,
+   "sites": [
+    "http://www.maxmoppi.com.br/"
+   ],
+   "telefones": [
+    "+554734280062"
+   ],
+   "redesSociais": [
+    "https://www.facebook.com/122488507825194"
+   ],
+   "endereco": "Rodovia SC 418 Km 05, 5743",
+   "localidade": "Joinville",
+   "latitude": -26.17573349,
+   "longitude": -48.95406367,
+   "fontes": [
+    "meta (CDLA-Permissive-2.0)",
+    "Overture (CDLA-Permissive-2.0)"
+   ]
+  },
+  {
+   "idOverture": "59d6f65e-a69b-47c1-9e4b-4f1640bf0d84",
+   "nome": "Restaurante Hubener",
+   "categoriaOverture": "german_restaurant",
+   "confianca": 0.993,
+   "sites": [
+    "http://lanchonetehubener1.placeweb.site"
+   ],
+   "telefones": [
+    "+554734280275"
+   ],
+   "redesSociais": [
+    "https://www.facebook.com/564782216898066"
+   ],
+   "endereco": "SC-418, KM 08",
+   "localidade": "Joinville",
+   "latitude": -26.16826674,
+   "longitude": -48.98521574,
+   "fontes": [
+    "meta (CDLA-Permissive-2.0)",
+    "Overture (CDLA-Permissive-2.0)"
+   ]
+  },
+  {
+   "idOverture": "d517ebd5-abff-4234-9bac-27892edc69f9",
+   "nome": "Rancho dos Animais",
+   "categoriaOverture": "resort",
+   "confianca": 0.911,
+   "sites": [],
+   "telefones": [
+    "+5547997949716"
+   ],
+   "redesSociais": [
+    "https://www.facebook.com/2144676615768331"
+   ],
+   "endereco": "",
+   "localidade": "Joinville",
+   "latitude": -26.1433291,
+   "longitude": -49.00470718,
+   "fontes": [
+    "meta (CDLA-Permissive-2.0)",
+    "Overture (CDLA-Permissive-2.0)"
+   ]
+  },
+  {
+   "idOverture": "61523bc3-978b-48ba-9654-e1e6e4c4722e",
+   "nome": "Dona Zita",
+   "categoriaOverture": "cafe",
+   "confianca": 0.983,
+   "sites": [],
+   "telefones": [
+    "+5547991240373"
+   ],
+   "redesSociais": [
+    "https://www.facebook.com/104083788787966"
+   ],
+   "endereco": "Estr. Rio Bonito, 3233",
+   "localidade": "Joinville",
+   "latitude": -26.12610445,
+   "longitude": -48.92715389,
+   "fontes": [
+    "meta (CDLA-Permissive-2.0)",
+    "Overture (CDLA-Permissive-2.0)"
+   ]
+  },
+  {
+   "idOverture": "40229fd7-cd2a-45f7-ba79-403e3ff80ee3",
+   "nome": "Hotel Angler Hof",
+   "categoriaOverture": "hotel",
+   "confianca": 0.998,
+   "sites": [
+    "http://www.hotelanglerhof.com.br/"
+   ],
+   "telefones": [
+    "+554734241359"
+   ],
+   "redesSociais": [
+    "https://www.facebook.com/1606193492956156"
+   ],
+   "endereco": "SC-418, km 2 16635",
+   "localidade": "Joinville",
+   "latitude": -26.19128481,
+   "longitude": -48.93040949,
+   "fontes": [
+    "meta (CDLA-Permissive-2.0)",
+    "Overture (CDLA-Permissive-2.0)"
+   ]
+  },
+  {
+   "idOverture": "6dd0f5d1-636f-4aab-8558-b7379e08381e",
+   "nome": "Gute Kuche",
+   "categoriaOverture": "german_restaurant",
+   "confianca": 0.995,
+   "sites": [
+    "http://www.restaurantegutekuche.com.br"
+   ],
+   "telefones": [
+    "+554734241404"
+   ],
+   "redesSociais": [
+    "https://www.facebook.com/113222268766010"
+   ],
+   "endereco": "Rua Eugênio Ernesto Kunde, 1018-1198",
+   "localidade": "Joinville",
+   "latitude": -26.20483478,
+   "longitude": -48.91278046,
+   "fontes": [
+    "meta (CDLA-Permissive-2.0)",
+    "Overture (CDLA-Permissive-2.0)"
+   ]
+  },
+  {
+   "idOverture": "d230d6ff-aa75-48de-9e08-6ecc57061062",
+   "nome": "Restaurante Rudnick - Joinville",
+   "categoriaOverture": "buffet_restaurant",
+   "confianca": 0.99,
+   "sites": [
+    "http://www.restauranterudnick.com.br"
+   ],
+   "telefones": [
+    "+554734316070"
+   ],
+   "redesSociais": [
+    "https://www.facebook.com/153185948151185"
+   ],
+   "endereco": "BR-101, Km 25 - 24931",
+   "localidade": "Joinville",
+   "latitude": -26.18312685,
+   "longitude": -48.90916096,
+   "fontes": [
+    "meta (CDLA-Permissive-2.0)",
+    "Overture (CDLA-Permissive-2.0)"
+   ]
+  },
+  {
+   "idOverture": "7478998e-8adf-48b4-b623-53e334801cd6",
+   "nome": "Café Colonial Rudnick",
+   "categoriaOverture": "cafe",
+   "confianca": 0.76,
+   "sites": [],
+   "telefones": [],
+   "redesSociais": [
+    "https://www.facebook.com/107577028182632"
+   ],
+   "endereco": "Rodovia BR-101, km 25",
+   "localidade": "Joinville",
+   "latitude": -26.183371,
+   "longitude": -48.90925,
+   "fontes": [
+    "meta (CDLA-Permissive-2.0)",
+    "Overture (CDLA-Permissive-2.0)"
+   ]
+  },
+  {
+   "idOverture": "d06b6c6f-94b3-4c7f-a9e1-7b3b2a2bd9e0",
+   "nome": "Posto Rudnick",
+   "categoriaOverture": "gas_station",
+   "confianca": 0.982,
+   "sites": [
+    "http://www.postorudnick.com.br/"
+   ],
+   "telefones": [
+    "+554734316053"
+   ],
+   "redesSociais": [
+    "https://www.facebook.com/500640803343332"
+   ],
+   "endereco": "Rodovia BR , 101",
+   "localidade": "Joinville",
+   "latitude": -26.18437676,
+   "longitude": -48.91009798,
+   "fontes": [
+    "meta (CDLA-Permissive-2.0)",
+    "Overture (CDLA-Permissive-2.0)"
+   ]
+  },
+  {
+   "idOverture": "094171a5-ae9e-4f4f-ac23-4174f9d9e0dd",
+   "nome": "Estrada Bonita Propriedade Ango kersten",
+   "categoriaOverture": "tour_operator",
+   "confianca": 0.702,
+   "sites": [
+    "http://www.turismoruraljoinville.com.br/"
+   ],
+   "telefones": [
+    "+5547996912658"
+   ],
+   "redesSociais": [
+    "https://www.facebook.com/729969770375725"
+   ],
+   "endereco": "Estrada rio bonito n 555",
+   "localidade": "Joinville",
+   "latitude": -26.137175792353,
+   "longitude": -48.906127562941,
+   "fontes": [
+    "meta (CDLA-Permissive-2.0)",
+    "Overture (CDLA-Permissive-2.0)"
+   ]
+  },
+  {
+   "idOverture": "e76e4581-c040-4137-81b8-bf413e2fefc5",
+   "nome": "Grun Wald",
+   "categoriaOverture": "lodging",
+   "confianca": 0.846,
+   "sites": [],
+   "telefones": [
+    "+554734641271"
+   ],
+   "redesSociais": [
+    "https://www.facebook.com/223141767738737"
+   ],
+   "endereco": "",
+   "localidade": "Joinville",
+   "latitude": -26.13841705,
+   "longitude": -48.90179661,
+   "fontes": [
+    "meta (CDLA-Permissive-2.0)",
+    "Overture (CDLA-Permissive-2.0)"
+   ]
+  },
+  {
+   "idOverture": "b513ed4a-7c25-4e51-aad6-12624d61ee8e",
+   "nome": "Pórtico Opa Bier",
+   "categoriaOverture": "bar",
+   "confianca": 0.982,
+   "sites": [
+    "https://opabier.com.br/estabelecimentos-cervejas-especiais-opa-bier/portico-opa-bier-bar-restaurante/"
+   ],
+   "telefones": [
+    "+554734220200"
+   ],
+   "redesSociais": [
+    "https://www.facebook.com/555112097948427"
+   ],
+   "endereco": "Rua Quinze de Novembro, 4315",
+   "localidade": "Joinville",
+   "latitude": -26.2969658,
+   "longitude": -48.88324104,
+   "fontes": [
+    "meta (CDLA-Permissive-2.0)",
+    "Overture (CDLA-Permissive-2.0)"
+   ]
+  },
+  {
+   "idOverture": "cf979648-7c11-4ae1-996a-3e2da1c43cf7",
+   "nome": "Joinville",
+   "categoriaOverture": "travel_service",
+   "confianca": 0.639,
+   "sites": [
+    "http://www.joinville.sc.gov.br/"
+   ],
+   "telefones": [
+    "+554734532663"
+   ],
+   "redesSociais": [
+    "https://www.facebook.com/240278999493641"
+   ],
+   "endereco": null,
+   "localidade": "Joinville",
+   "latitude": -26.29666,
+   "longitude": -48.88349,
+   "fontes": [
+    "meta (CDLA-Permissive-2.0)",
+    "Overture (CDLA-Permissive-2.0)"
+   ]
+  },
+  {
+   "idOverture": "397c5a1e-43a0-4a95-a9b3-82d89fe6f19d",
+   "nome": "CHA Hotéis",
+   "categoriaOverture": "hotel",
+   "confianca": 0.88,
+   "sites": [
+    "http://chahoteis.com.br"
+   ],
+   "telefones": [
+    "+554734532454"
+   ],
+   "redesSociais": [
+    "https://www.facebook.com/100478551887598"
+   ],
+   "endereco": "Rua Quinze de Novembro, 4195",
+   "localidade": "Joinville",
+   "latitude": -26.29481,
+   "longitude": -48.88056,
+   "fontes": [
+    "meta (CDLA-Permissive-2.0)",
+    "Overture (CDLA-Permissive-2.0)"
+   ]
+  },
+  {
+   "idOverture": "dada06c8-59e2-4f8d-9b22-7a554745fa33",
+   "nome": "Holz Hotel",
+   "categoriaOverture": "hotel",
+   "confianca": 0.991,
+   "sites": [
+    "http://www.holzhotel.com.br"
+   ],
+   "telefones": [
+    "+554734530735"
+   ],
+   "redesSociais": [
+    "https://www.facebook.com/151895038557627"
+   ],
+   "endereco": "Rua Quinze de Novembro, 4195",
+   "localidade": "Joinville",
+   "latitude": -26.29481436,
+   "longitude": -48.88061034,
+   "fontes": [
+    "meta (CDLA-Permissive-2.0)",
+    "Overture (CDLA-Permissive-2.0)"
+   ]
+  },
+  {
+   "idOverture": "60b42413-ff4e-44c2-91e5-f5e9c8409da8",
+   "nome": "Naalt Hotel Joinville",
+   "categoriaOverture": "hotel",
+   "confianca": 0.983,
+   "sites": [
+    "http://www.naalt.com.br/"
+   ],
+   "telefones": [
+    "+554735123600"
+   ],
+   "redesSociais": [
+    "https://www.facebook.com/187217948838529"
+   ],
+   "endereco": "R. XV de Novembro, 3994",
+   "localidade": "Joinville",
+   "latitude": -26.29308638,
+   "longitude": -48.87993638,
+   "fontes": [
+    "meta (CDLA-Permissive-2.0)",
+    "Overture (CDLA-Permissive-2.0)"
+   ]
+  },
+  {
+   "idOverture": "ca51323a-7252-4b5f-8c87-5377cee3088b",
+   "nome": "Hotel Jope",
+   "categoriaOverture": "hotel",
+   "confianca": 0.972,
+   "sites": [
+    "http://hoteljope.com.br/"
+   ],
+   "telefones": [
+    "+554734225750"
+   ],
+   "redesSociais": [
+    "https://www.facebook.com/554508657947931"
+   ],
+   "endereco": "Rua XV de Novembro, 3622",
+   "localidade": "Joinville",
+   "latitude": -26.293722805528,
+   "longitude": -48.876070976257,
+   "fontes": [
+    "meta (CDLA-Permissive-2.0)",
+    "Overture (CDLA-Permissive-2.0)"
+   ]
+  },
+  {
+   "idOverture": "ab424faa-52e5-4064-b050-9015d4352d5b",
+   "nome": "Hotel Alpinus",
+   "categoriaOverture": "hotel",
+   "confianca": 0.984,
+   "sites": [
+    "http://www.hotelalpinus.com.br/"
+   ],
+   "telefones": [
+    "+554734531770"
+   ],
+   "redesSociais": [
+    "https://www.facebook.com/278992365444288"
+   ],
+   "endereco": "R. XV de Novembro, 3281",
+   "localidade": "Joinville",
+   "latitude": -26.2953436,
+   "longitude": -48.87462704,
+   "fontes": [
+    "meta (CDLA-Permissive-2.0)",
+    "Overture (CDLA-Permissive-2.0)"
+   ]
+  },
+  {
+   "idOverture": "fb74325e-db13-47b6-8876-3d5ce25218f6",
+   "nome": "Hotel 10 Joinville",
+   "categoriaOverture": "hotel",
+   "confianca": 0.996,
+   "sites": [
+    "https://book.omnibees.com/?c=2871&sid=994e04d3-c27f-4a70-ba00-90cd7e96c76e&version=MyReservation&mobile=true"
+   ],
+   "telefones": [
+    "+554731459510"
+   ],
+   "redesSociais": [
+    "https://www.facebook.com/666417099879209"
+   ],
+   "endereco": "R. Dona Francisca, 7173",
+   "localidade": "Joinville",
+   "latitude": -26.25232655,
+   "longitude": -48.87380387,
+   "fontes": [
+    "meta (CDLA-Permissive-2.0)",
+    "Overture (CDLA-Permissive-2.0)"
+   ]
+  },
+  {
+   "idOverture": "4f69f054-2fce-4e15-b4f8-4731fe307eaf",
+   "nome": "Hotel da Vila",
+   "categoriaOverture": "hotel",
+   "confianca": 0.996,
+   "sites": [
+    "http://www.hoteldavila.com.br/"
+   ],
+   "telefones": [
+    "+554734358012"
+   ],
+   "redesSociais": [
+    "https://www.facebook.com/852984051444053"
+   ],
+   "endereco": "R. Guilherme, 1375",
+   "localidade": "Joinville",
+   "latitude": -26.27433841,
+   "longitude": -48.86860672,
+   "fontes": [
+    "meta (CDLA-Permissive-2.0)",
+    "Overture (CDLA-Permissive-2.0)"
+   ]
+  },
+  {
+   "idOverture": "2c0d4d5c-f464-419c-acd1-7694a0c425cf",
+   "nome": "Pensão Classe A",
+   "categoriaOverture": "hostel",
+   "confianca": 0.927,
+   "sites": [
+    "https://instagram.com/pensaoclassea?igshid=j8kktr0yrwjm"
+   ],
+   "telefones": [
+    "+554734380385"
+   ],
+   "redesSociais": [
+    "https://www.facebook.com/1714591565441692"
+   ],
+   "endereco": "R. Nelson Torrens, 179",
+   "localidade": "Joinville",
+   "latitude": -26.3237606,
+   "longitude": -48.87217628,
+   "fontes": [
+    "meta (CDLA-Permissive-2.0)",
+    "Overture (CDLA-Permissive-2.0)"
+   ]
+  },
+  {
+   "idOverture": "f3386190-0e25-4acc-98c1-1d4b7fc0dba9",
+   "nome": "Hotéis XV",
+   "categoriaOverture": "hotel",
+   "confianca": 0.996,
+   "sites": [
+    "http://www.hoteisxv.com.br"
+   ],
+   "telefones": [
+    "+5547999771557"
+   ],
+   "redesSociais": [
+    "https://www.facebook.com/502482626511593"
+   ],
+   "endereco": "R. XV de Novembro, 2915",
+   "localidade": "Joinville",
+   "latitude": -26.29675232,
+   "longitude": -48.87081361,
+   "fontes": [
+    "meta (CDLA-Permissive-2.0)",
+    "Overture (CDLA-Permissive-2.0)"
+   ]
+  },
+  {
+   "idOverture": "9d58ade0-147a-423d-a4d0-2f52d3a68927",
+   "nome": "Naalt Hotel Joinville",
+   "categoriaOverture": "resort",
+   "confianca": 0.85,
+   "sites": [
+    "http://www.naalt.com.br/"
+   ],
+   "telefones": [
+    "4735123600"
+   ],
+   "redesSociais": [],
+   "endereco": "Rua XV de Novembro 3994",
+   "localidade": "Joinville",
+   "latitude": -26.29589,
+   "longitude": -48.87279,
+   "fontes": [
+    "Microsoft (CDLA-Permissive-2.0)",
+    "Overture (CDLA-Permissive-2.0)"
+   ]
+  },
+  {
+   "idOverture": "c728ff9e-5ddf-4163-94f2-72405720752c",
+   "nome": "Hotel Dois H",
+   "categoriaOverture": "hotel",
+   "confianca": 0.997,
+   "sites": [
+    "http://www.doishhotel.com.br/"
+   ],
+   "telefones": [
+    "+554734393777"
+   ],
+   "redesSociais": [
+    "https://www.facebook.com/230685827045941"
+   ],
+   "endereco": "R. Anita Garibaldi, 2131",
+   "localidade": "Joinville",
+   "latitude": -26.32529048,
+   "longitude": -48.86289909,
+   "fontes": [
+    "meta (CDLA-Permissive-2.0)",
+    "Overture (CDLA-Permissive-2.0)"
+   ]
+  },
+  {
+   "idOverture": "ba29d78d-a41c-4e4b-b1b1-4c1a05fab636",
+   "nome": "Dois H Hotel",
+   "categoriaOverture": "hotel",
+   "confianca": 0.987,
+   "sites": [
+    "http://www.doishhotel.com.br/"
+   ],
+   "telefones": [
+    "+554734393777"
+   ],
+   "redesSociais": [
+    "https://www.facebook.com/230685827045941"
+   ],
+   "endereco": "Rua Anita Garibaldi, 2131",
+   "localidade": "Joinville",
+   "latitude": -26.325300255654298,
+   "longitude": -48.862870373987484,
+   "fontes": [
+    "meta (CDLA-Permissive-2.0)",
+    "Overture (CDLA-Permissive-2.0)"
+   ]
+  },
+  {
+   "idOverture": "ba88fd84-d545-4506-8ae0-1276c0046181",
+   "nome": "Restaurante e Churrascaria Poial Tropeiro.",
+   "categoriaOverture": "brazilian_restaurant",
+   "confianca": 0.998,
+   "sites": [
+    "http://www.poialtropeiro.com.br"
+   ],
+   "telefones": [
+    "+554730286465"
+   ],
+   "redesSociais": [
+    "https://www.facebook.com/321134604678791"
+   ],
+   "endereco": "R. XV de Novembro, 1903",
+   "localidade": "Joinville",
+   "latitude": -26.29788459,
+   "longitude": -48.86056855,
+   "fontes": [
+    "meta (CDLA-Permissive-2.0)",
+    "Overture (CDLA-Permissive-2.0)"
+   ]
+  },
+  {
+   "idOverture": "d7297444-b3ee-4556-9996-a6ccca2b8b32",
+   "nome": "Hotel Le Canard Joinville",
+   "categoriaOverture": "hotel",
+   "confianca": 0.994,
+   "sites": [
+    "http://www.lecanard.com.br/"
+   ],
+   "telefones": [
+    "+554734335033"
+   ],
+   "redesSociais": [
+    "https://www.facebook.com/569504676412802"
+   ],
+   "endereco": "Rua Quinze de Novembro, 2075",
+   "localidade": "Joinville",
+   "latitude": -26.29698154,
+   "longitude": -48.86280559,
+   "fontes": [
+    "meta (CDLA-Permissive-2.0)",
+    "Overture (CDLA-Permissive-2.0)"
+   ]
+  },
+  {
+   "idOverture": "65a34196-9228-4469-9578-a2f0c519efd5",
+   "nome": "Pizzaria do Fritz",
+   "categoriaOverture": "pizza_restaurant",
+   "confianca": 0.77,
+   "sites": [
+    "http://www.pizzariadofritz.com.br"
+   ],
+   "telefones": [
+    "(47) 3028-9292"
+   ],
+   "redesSociais": [],
+   "endereco": "Rua Max Colin, 2560",
+   "localidade": "Joinville",
+   "latitude": -26.29351520838808,
+   "longitude": -48.86753422880189,
+   "fontes": [
+    "Foursquare (Apache-2.0)",
+    "Overture (CDLA-Permissive-2.0)"
+   ]
+  },
+  {
+   "idOverture": "5c2bf0e7-7e5b-4ea5-bd08-04a8b5d5d340",
+   "nome": "Restaurante Angélicos",
+   "categoriaOverture": "buffet_restaurant",
+   "confianca": 0.984,
+   "sites": [
+    "https://www.angelicos.com.br/"
+   ],
+   "telefones": [
+    "+554734350072"
+   ],
+   "redesSociais": [
+    "https://www.facebook.com/260204374493503"
+   ],
+   "endereco": "R. Luiz Delfino, 870",
+   "localidade": "Joinville",
+   "latitude": -26.2862472,
+   "longitude": -48.86596121,
+   "fontes": [
+    "meta (CDLA-Permissive-2.0)",
+    "Overture (CDLA-Permissive-2.0)"
+   ]
+  },
+  {
+   "idOverture": "525dfd13-3a84-4c83-92e5-58e05f49a3d2",
+   "nome": "Churrascaria Baby Bufalo",
+   "categoriaOverture": "brazilian_restaurant",
+   "confianca": 0.996,
+   "sites": [
+    "http://www.babybufalo.com.br/"
+   ],
+   "telefones": [
+    "+554730274496"
+   ],
+   "redesSociais": [
+    "https://www.facebook.com/739951252694939"
+   ],
+   "endereco": "Rua Iguaçu, 136",
+   "localidade": "Joinville",
+   "latitude": -26.26584506,
+   "longitude": -48.85791027,
+   "fontes": [
+    "meta (CDLA-Permissive-2.0)",
+    "Overture (CDLA-Permissive-2.0)"
+   ]
+  },
+  {
+   "idOverture": "362d3117-7035-449e-b890-5b903639bf92",
+   "nome": "Hotel Plaza Norte",
+   "categoriaOverture": "hotel",
+   "confianca": 0.996,
+   "sites": [
+    "http://www.hotelplazanorte.com.br/"
+   ],
+   "telefones": [
+    "+554730292222"
+   ],
+   "redesSociais": [
+    "https://www.facebook.com/229859527079174"
+   ],
+   "endereco": "R. Marte, 34",
+   "localidade": "Joinville",
+   "latitude": -26.26863569,
+   "longitude": -48.85784091,
+   "fontes": [
+    "meta (CDLA-Permissive-2.0)",
+    "Overture (CDLA-Permissive-2.0)"
+   ]
+  },
+  {
+   "idOverture": "94b10556-9c91-4786-a34d-d722b9b87888",
+   "nome": "Parque OPA Bier",
+   "categoriaOverture": "brewery",
+   "confianca": 0.986,
+   "sites": [
+    "https://opabier.com.br/estabelecimentos-cervejas-especiais-opa-bier/parque-opa-bier/"
+   ],
+   "telefones": [
+    "+554734531377"
+   ],
+   "redesSociais": [
+    "https://www.facebook.com/1508817606062686"
+   ],
+   "endereco": "R. Max Colin, 1589",
+   "localidade": "Joinville",
+   "latitude": -26.29438608,
+   "longitude": -48.85808077,
+   "fontes": [
+    "meta (CDLA-Permissive-2.0)",
+    "Overture (CDLA-Permissive-2.0)"
+   ]
+  },
+  {
+   "idOverture": "2fbad2c0-20c8-4bf8-8b81-8cc15e9f037b",
+   "nome": "Opa Bier",
+   "categoriaOverture": "bar",
+   "confianca": 0.885,
+   "sites": [
+    "https://opabier.com.br/estabelecimentos-cervejas-especiais-opa-bier/garagem-opa-bier-max-colin/"
+   ],
+   "telefones": [
+    "+554730294757"
+   ],
+   "redesSociais": [
+    "https://www.facebook.com/305448969802387"
+   ],
+   "endereco": "Rua Max Colin, 1195",
+   "localidade": "Joinville",
+   "latitude": -26.29462184,
+   "longitude": -48.8543173,
+   "fontes": [
+    "meta (CDLA-Permissive-2.0)",
+    "Overture (CDLA-Permissive-2.0)"
+   ]
+  },
+  {
+   "idOverture": "77bb14f0-06f8-4191-b778-37a95e49587d",
+   "nome": "Grêmio Esportivo 25 de Agosto",
+   "categoriaOverture": "sport_league",
+   "confianca": 0.869,
+   "sites": [],
+   "telefones": [
+    "+554730276903"
+   ],
+   "redesSociais": [
+    "https://www.facebook.com/204401842904081"
+   ],
+   "endereco": "Rua Iguaçu, 247",
+   "localidade": "Joinville",
+   "latitude": -26.26482101587733,
+   "longitude": -48.85668509476758,
+   "fontes": [
+    "meta (CDLA-Permissive-2.0)",
+    "Overture (CDLA-Permissive-2.0)"
+   ]
+  },
+  {
+   "idOverture": "d6abb506-6fd3-4a3c-a642-92e8ac81fd54",
+   "nome": "Restaurante 25 de Agosto",
+   "categoriaOverture": "brazilian_restaurant",
+   "confianca": 0.996,
+   "sites": [
+    "http://www.futebolveterano.com.br"
+   ],
+   "telefones": [
+    "+5547996632768"
+   ],
+   "redesSociais": [
+    "https://www.facebook.com/1616289078639463"
+   ],
+   "endereco": "R. Iguaçu, 271",
+   "localidade": "Joinville",
+   "latitude": -26.2647257,
+   "longitude": -48.85690863,
+   "fontes": [
+    "meta (CDLA-Permissive-2.0)",
+    "Overture (CDLA-Permissive-2.0)"
+   ]
+  },
+  {
+   "idOverture": "231ed266-3991-431b-a2e4-d1ab0ca8db31",
+   "nome": "Restaurante Mãos Peruanas",
+   "categoriaOverture": "peruvian_restaurant",
+   "confianca": 0.802,
+   "sites": [],
+   "telefones": [
+    "+554740097866"
+   ],
+   "redesSociais": [
+    "https://www.facebook.com/329878570525300"
+   ],
+   "endereco": "Centro de Convivência Harro Stamm - R. Paulo Malschitzki, 200",
+   "localidade": "Joinville",
+   "latitude": -26.25351396,
+   "longitude": -48.8558235,
+   "fontes": [
+    "meta (CDLA-Permissive-2.0)",
+    "Overture (CDLA-Permissive-2.0)"
+   ]
+  },
+  {
+   "idOverture": "fd321fdc-201f-4d02-bc13-48d2c4d6e66e",
+   "nome": "Daniela Arezzo Garten Shopping",
+   "categoriaOverture": null,
+   "confianca": 0.725,
+   "sites": [
+    "http://www.arezzo.com.br/"
+   ],
+   "telefones": [
+    "+5547996342885"
+   ],
+   "redesSociais": [
+    "https://www.facebook.com/108745380594790"
+   ],
+   "endereco": "Avenida Rolf Wiest, 333",
+   "localidade": "Joinville",
+   "latitude": -26.2542233,
+   "longitude": -48.8522446,
+   "fontes": [
+    "meta (CDLA-Permissive-2.0)",
+    "Overture (CDLA-Permissive-2.0)"
+   ]
+  },
+  {
+   "idOverture": "4f6ecfa5-fc7b-4f3f-828d-37dfe78b52c1",
+   "nome": "Tip Top Garten Shopping",
+   "categoriaOverture": "childrens_clothing_store",
+   "confianca": 0.85,
+   "sites": [
+    ""
+   ],
+   "telefones": [
+    "4730439191"
+   ],
+   "redesSociais": [],
+   "endereco": "Av. Rolf Wiest 333 Bom (Retiro)",
+   "localidade": "Joinville",
+   "latitude": -26.2542465,
+   "longitude": -48.8520997,
+   "fontes": [
+    "Microsoft (CDLA-Permissive-2.0)",
+    "Overture (CDLA-Permissive-2.0)"
+   ]
+  },
+  {
+   "idOverture": "53b098df-5a1f-474f-9176-a81ef8a103a3",
+   "nome": "Car Clinic Lavação - Garten Shopping",
+   "categoriaOverture": "car_wash",
+   "confianca": 0.66,
+   "sites": [
+    "https://www.instagram.com/carcliniclavacaoservicosgarten?utm_source=ig_web_button_share_sheet&igsh=ZDNlZDc0MzIxNw%3D%3D"
+   ],
+   "telefones": [
+    "+5547991117523"
+   ],
+   "redesSociais": [
+    "https://www.facebook.com/190453760827205"
+   ],
+   "endereco": "Avenida Rolf Wiest, 333",
+   "localidade": "Joinville",
+   "latitude": -26.2550391,
+   "longitude": -48.8517963,
+   "fontes": [
+    "meta (CDLA-Permissive-2.0)",
+    "Overture (CDLA-Permissive-2.0)"
+   ]
+  },
+  {
+   "idOverture": "f5f694fc-7a28-4806-982b-742179a28e43",
+   "nome": "Car Clinic Lavação - Garten Shopping",
+   "categoriaOverture": "car_wash",
+   "confianca": 0.642,
+   "sites": [
+    "https://www.instagram.com/carcliniclavacaoservicosgarten?utm_source=ig_web_button_share_sheet&igsh=ZDNlZDc0MzIxNw%3D%3D"
+   ],
+   "telefones": [
+    "+5547991117523"
+   ],
+   "redesSociais": [
+    "https://www.facebook.com/190453760827205"
+   ],
+   "endereco": "Av. Rolf Wiest, 333 - Bom Retiro, Joinville - SC, 89223-005",
+   "localidade": "Joinville",
+   "latitude": -26.2550391,
+   "longitude": -48.8517963,
+   "fontes": [
+    "meta (CDLA-Permissive-2.0)",
+    "Overture (CDLA-Permissive-2.0)"
+   ]
+  },
+  {
+   "idOverture": "568657ca-97bb-4de3-870c-455d73ae21db",
+   "nome": "Dudalina - Joinville Garten Shopping",
+   "categoriaOverture": "clothing_store",
+   "confianca": 0.77,
+   "sites": [
+    "http://www.dudalina.com.br"
+   ],
+   "telefones": [
+    "(47) 3043-9009"
+   ],
+   "redesSociais": [],
+   "endereco": "Joinville Garten Shopping",
+   "localidade": "Joinville",
+   "latitude": -26.25310153286496,
+   "longitude": -48.852798697932805,
+   "fontes": [
+    "Foursquare (Apache-2.0)",
+    "Overture (CDLA-Permissive-2.0)"
+   ]
+  },
+  {
+   "idOverture": "5aba26cb-23a8-4497-8d51-701c3060e8d3",
+   "nome": "Havan Joinville Garten Shopping",
+   "categoriaOverture": "department_store",
+   "confianca": 0.996,
+   "sites": [
+    "http://www.havan.com.br"
+   ],
+   "telefones": [
+    "+554740639655"
+   ],
+   "redesSociais": [
+    "https://www.facebook.com/526796554192476"
+   ],
+   "endereco": "Garten Shopping, Av. Rolf Wiest, 333",
+   "localidade": "Joinville",
+   "latitude": -26.25449804,
+   "longitude": -48.8527057,
+   "fontes": [
+    "meta (CDLA-Permissive-2.0)",
+    "Overture (CDLA-Permissive-2.0)"
+   ]
+  },
+  {
+   "idOverture": "66944a9d-8f39-4100-ba59-87bb0c5ff1f3",
+   "nome": "Vialaser Depilação a Laser Joinville - Garten Shopping",
+   "categoriaOverture": "laser_hair_removal",
+   "confianca": 0.956,
+   "sites": [
+    "http://vialaserdepilacao.com.br/"
+   ],
+   "telefones": [
+    "+558009422345"
+   ],
+   "redesSociais": [
+    "https://www.facebook.com/1788430304749014"
+   ],
+   "endereco": "Milon Garten Shopping, Avenida Rolf Wiest, 333",
+   "localidade": "Joinville",
+   "latitude": -26.25373554,
+   "longitude": -48.85290039,
+   "fontes": [
+    "meta (CDLA-Permissive-2.0)",
+    "Overture (CDLA-Permissive-2.0)"
+   ]
+  },
+  {
+   "idOverture": "bf14fd4c-3c92-47de-970d-fd4444513ba0",
+   "nome": "Sóbrancelhas Garten Shopping",
+   "categoriaOverture": "beauty_salon",
+   "confianca": 0.822,
+   "sites": [
+    "http://www.sobrancelhas.com.br/"
+   ],
+   "telefones": [
+    "+554730439151"
+   ],
+   "redesSociais": [
+    "https://www.facebook.com/547131668769915"
+   ],
+   "endereco": "Garten Shopping - Av. Rolf Wiest, 333 - Lj 74",
+   "localidade": "Joinville",
+   "latitude": -26.25373447,
+   "longitude": -48.85290795,
+   "fontes": [
+    "meta (CDLA-Permissive-2.0)",
+    "Overture (CDLA-Permissive-2.0)"
+   ]
+  },
+  {
+   "idOverture": "db217269-f961-422d-9dee-487336d92ecc",
+   "nome": "YouPlay Garten Shopping",
+   "categoriaOverture": "sports_and_recreation",
+   "confianca": 0.667,
+   "sites": [
+    "http://www.youplayclube.com.br/"
+   ],
+   "telefones": [],
+   "redesSociais": [
+    "https://www.facebook.com/107953662014611"
+   ],
+   "endereco": "Avenida Rolf Wiest, 333",
+   "localidade": "Joinville",
+   "latitude": -26.2537395,
+   "longitude": -48.85290151,
+   "fontes": [
+    "meta (CDLA-Permissive-2.0)",
+    "Overture (CDLA-Permissive-2.0)"
+   ]
+  },
+  {
+   "idOverture": "179e2101-d119-4e97-8287-8c6b2e0ece45",
+   "nome": "PEP Garten Shopping",
+   "categoriaOverture": "community_and_government",
+   "confianca": 0.928,
+   "sites": [
+    "http://www.pf.gov.br/"
+   ],
+   "telefones": [
+    "+554734316820"
+   ],
+   "redesSociais": [
+    "https://www.facebook.com/104330461998689"
+   ],
+   "endereco": "Joinville Garten Shopping, Avenida Rolf Wiest, 333",
+   "localidade": "Joinville",
+   "latitude": -26.253844247814815,
+   "longitude": -48.853180864666655,
+   "fontes": [
+    "meta (CDLA-Permissive-2.0)",
+    "Overture (CDLA-Permissive-2.0)"
+   ]
+  },
+  {
+   "idOverture": "b2f3e84a-a696-4b54-9ae8-5344b7173e6a",
+   "nome": "Botoclinic Garten Shopping",
+   "categoriaOverture": "skin_care_and_makeup",
+   "confianca": 0.998,
+   "sites": [
+    "http://www.botoclinic.com/"
+   ],
+   "telefones": [
+    "+5547991363895"
+   ],
+   "redesSociais": [
+    "https://www.facebook.com/100156965047206"
+   ],
+   "endereco": "Avenida Rolf Wiest, 333",
+   "localidade": "Joinville",
+   "latitude": -26.25378710664,
+   "longitude": -48.85316687779999,
+   "fontes": [
+    "meta (CDLA-Permissive-2.0)",
+    "Overture (CDLA-Permissive-2.0)"
+   ]
+  },
+  {
+   "idOverture": "a410c5a7-1846-44c8-bf9d-b6ba0bd14046",
+   "nome": "Audithorium Garten Shopping",
+   "categoriaOverture": "mens_clothing_store",
+   "confianca": 0.894,
+   "sites": [],
+   "telefones": [
+    "+5547988906309"
+   ],
+   "redesSociais": [
+    "https://www.facebook.com/2215023341883463"
+   ],
+   "endereco": "Avenida Rolf Wiest, Ac. Garten Shopping, 333",
+   "localidade": "Joinville",
+   "latitude": -26.25380679,
+   "longitude": -48.8532348,
+   "fontes": [
+    "meta (CDLA-Permissive-2.0)",
+    "Overture (CDLA-Permissive-2.0)"
+   ]
+  },
+  {
+   "idOverture": "cd483fce-c692-4ca2-a64d-b08c11b3a42e",
+   "nome": "Galeto Mamma Mia | Garten Shopping",
+   "categoriaOverture": "italian_restaurant",
+   "confianca": 0.866,
+   "sites": [],
+   "telefones": [
+    "+554730439220"
+   ],
+   "redesSociais": [
+    "https://www.facebook.com/853291641208419"
+   ],
+   "endereco": "Av. Rolf Wiest, 333",
+   "localidade": "Joinville",
+   "latitude": -26.25369024,
+   "longitude": -48.85323117,
+   "fontes": [
+    "meta (CDLA-Permissive-2.0)",
+    "Overture (CDLA-Permissive-2.0)"
+   ]
+  },
+  {
+   "idOverture": "93557ca1-229b-426b-897f-487ff9bdb2b9",
+   "nome": "Léo Cosméticos Garten Shopping",
+   "categoriaOverture": "beauty_supply_store",
+   "confianca": 0.92,
+   "sites": [],
+   "telefones": [
+    "+554735110886"
+   ],
+   "redesSociais": [
+    "https://www.facebook.com/107893272021310"
+   ],
+   "endereco": "Shopping Garten - Av. Rolf Wiest, 333",
+   "localidade": "Joinville",
+   "latitude": -26.25376272,
+   "longitude": -48.85329799,
+   "fontes": [
+    "meta (CDLA-Permissive-2.0)",
+    "Overture (CDLA-Permissive-2.0)"
+   ]
+  },
+  {
+   "idOverture": "c6cc44d5-a64f-4262-b10d-93e577df89c3",
+   "nome": "Garten Shopping",
+   "categoriaOverture": "shopping_mall",
+   "confianca": 1.0,
+   "sites": [
+    "http://www.gartenshopping.com.br/"
+   ],
+   "telefones": [
+    "+554730439481"
+   ],
+   "redesSociais": [
+    "https://www.facebook.com/112651068809521"
+   ],
+   "endereco": "Av. Rolf Wiest, 333",
+   "localidade": "Joinville",
+   "latitude": -26.25370237,
+   "longitude": -48.85312557,
+   "fontes": [
+    "meta (CDLA-Permissive-2.0)",
+    "Overture (CDLA-Permissive-2.0)"
+   ]
+  },
+  {
+   "idOverture": "282f477d-09ca-4e51-a0fe-db314c18dd53",
+   "nome": "Óticas Via Visão - Garten Shopping",
+   "categoriaOverture": "professional_service",
+   "confianca": 0.638,
+   "sites": [
+    "https://oticasviavisao.com.br/"
+   ],
+   "telefones": [
+    "+5547989234477"
+   ],
+   "redesSociais": [
+    "https://www.facebook.com/113475861811102"
+   ],
+   "endereco": "Avenida Rolf Wiest, 333",
+   "localidade": "Joinville",
+   "latitude": -26.25512830428724,
+   "longitude": -48.853113110534466,
+   "fontes": [
+    "meta (CDLA-Permissive-2.0)",
+    "Overture (CDLA-Permissive-2.0)"
+   ]
+  },
+  {
+   "idOverture": "ee7bd8ef-3a54-4ede-9fa1-358daf0ab29d",
+   "nome": "Brincar Locações - Joinville Garten Shopping",
+   "categoriaOverture": "amusement_park",
+   "confianca": 0.619,
+   "sites": [],
+   "telefones": [
+    "+554730439005"
+   ],
+   "redesSociais": [
+    "https://www.facebook.com/413456565426265"
+   ],
+   "endereco": "Avenida Rolf Wiest, 333",
+   "localidade": "Joinville",
+   "latitude": -26.253910576969,
+   "longitude": -48.85389482317,
+   "fontes": [
+    "meta (CDLA-Permissive-2.0)",
+    "Overture (CDLA-Permissive-2.0)"
+   ]
+  },
+  {
+   "idOverture": "807e1aba-8fff-493c-a075-a849f0f347bd",
+   "nome": "Uplay Garten Shopping",
+   "categoriaOverture": "gym",
+   "confianca": 0.975,
+   "sites": [
+    "http://www.uplayfit.com/"
+   ],
+   "telefones": [
+    "+554730439436"
+   ],
+   "redesSociais": [
+    "https://www.facebook.com/1543299255776401"
+   ],
+   "endereco": "Avenida Rolf Wiest, 333 - Bom Retiro, Joinville - SC",
+   "localidade": "Joinville",
+   "latitude": -26.25400217,
+   "longitude": -48.85412017,
+   "fontes": [
+    "meta (CDLA-Permissive-2.0)",
+    "Overture (CDLA-Permissive-2.0)"
+   ]
+  },
+  {
+   "idOverture": "ee58cf92-5446-4d9a-9dd8-286acd29ab94",
+   "nome": "Lanchonete Tillmann",
+   "categoriaOverture": "restaurant",
+   "confianca": 0.642,
+   "sites": [],
+   "telefones": [],
+   "redesSociais": [
+    "https://www.facebook.com/395064504449611"
+   ],
+   "endereco": "",
+   "localidade": "Joinville",
+   "latitude": -26.253576,
+   "longitude": -48.850417,
+   "fontes": [
+    "meta (CDLA-Permissive-2.0)",
+    "Overture (CDLA-Permissive-2.0)"
+   ]
+  },
+  {
+   "idOverture": "87df1520-729a-4767-8eed-de12416e10be",
+   "nome": "Joinville Square Garden",
+   "categoriaOverture": "party_and_event_planning",
+   "confianca": 0.996,
+   "sites": [
+    "http://www.joinvillesquaregarden.com.br/"
+   ],
+   "telefones": [
+    "+554734258060"
+   ],
+   "redesSociais": [
+    "https://www.facebook.com/164820180212481"
+   ],
+   "endereco": "Av. Santos Dumont",
+   "localidade": "Joinville",
+   "latitude": -26.24935105,
+   "longitude": -48.84701082,
+   "fontes": [
+    "meta (CDLA-Permissive-2.0)",
+    "Overture (CDLA-Permissive-2.0)"
+   ]
+  },
+  {
+   "idOverture": "5bc4a75a-c1d9-4a5c-95bf-4401409c37a0",
+   "nome": "Estação América Restaurante",
+   "categoriaOverture": "italian_restaurant",
+   "confianca": 0.901,
+   "sites": [
+    "http://estacaoamericarestaurante1.placeweb.site"
+   ],
+   "telefones": [
+    "+5547988499876"
+   ],
+   "redesSociais": [
+    "https://www.facebook.com/336901966868393"
+   ],
+   "endereco": "R. Dr. João Colin, 2933",
+   "localidade": "Joinville",
+   "latitude": -26.27447564,
+   "longitude": -48.85018853,
+   "fontes": [
+    "meta (CDLA-Permissive-2.0)",
+    "Overture (CDLA-Permissive-2.0)"
+   ]
+  },
+  {
+   "idOverture": "69b9637f-a168-4ded-a003-ce1e4568fd44",
+   "nome": "Sorveteria Paviloche",
+   "categoriaOverture": "ice_cream_shop",
+   "confianca": 0.975,
+   "sites": [
+    "http://www.paviloche.com.br/"
+   ],
+   "telefones": [
+    "+554730262103"
+   ],
+   "redesSociais": [
+    "https://www.facebook.com/103035607857617"
+   ],
+   "endereco": "Rua Dr João Colin, 1911",
+   "localidade": "Joinville",
+   "latitude": -26.2835719,
+   "longitude": -48.84938603,
+   "fontes": [
+    "meta (CDLA-Permissive-2.0)",
+    "Overture (CDLA-Permissive-2.0)"
+   ]
+  },
+  {
+   "idOverture": "4c986e27-fb38-4e99-a5b3-628964d49597",
+   "nome": "Bar Copa 70",
+   "categoriaOverture": "bar",
+   "confianca": 0.94,
+   "sites": [
+    "http://barcopa701.placeweb.site"
+   ],
+   "telefones": [
+    "+554730251573"
+   ],
+   "redesSociais": [
+    "https://www.facebook.com/105602721109179"
+   ],
+   "endereco": "R. Dr. João Colin, 1810",
+   "localidade": "Joinville",
+   "latitude": -26.28441218,
+   "longitude": -48.84903043,
+   "fontes": [
+    "meta (CDLA-Permissive-2.0)",
+    "Overture (CDLA-Permissive-2.0)"
+   ]
+  },
+  {
+   "idOverture": "af8fe714-3033-4c18-8c59-ac33642eb9ac",
+   "nome": "ZUFFA - Cervejas Especiais",
+   "categoriaOverture": "beer_bar",
+   "confianca": 0.98,
+   "sites": [],
+   "telefones": [
+    "+554731459000"
+   ],
+   "redesSociais": [
+    "https://www.facebook.com/356391801149055"
+   ],
+   "endereco": "Rua Blumenau, 1728",
+   "localidade": "Joinville",
+   "latitude": -26.286061376752556,
+   "longitude": -48.84968595899576,
+   "fontes": [
+    "meta (CDLA-Permissive-2.0)",
+    "Overture (CDLA-Permissive-2.0)"
+   ]
+  },
+  {
+   "idOverture": "b87f0732-1c38-425b-99dc-5c8df2a6fb3d",
+   "nome": "Toscana's Restaurante",
+   "categoriaOverture": "restaurant",
+   "confianca": 0.865,
+   "sites": [],
+   "telefones": [
+    "+554734396810"
+   ],
+   "redesSociais": [
+    "https://www.facebook.com/106207097722827"
+   ],
+   "endereco": "Rua Doutor João Colin, 762",
+   "localidade": "Joinville",
+   "latitude": -26.29445526,
+   "longitude": -48.84801061,
+   "fontes": [
+    "meta (CDLA-Permissive-2.0)",
+    "Overture (CDLA-Permissive-2.0)"
+   ]
+  },
+  {
+   "idOverture": "4c03fd7f-99a9-43c3-8179-9ccb1d7cb35f",
+   "nome": "Hotel Bavarium",
+   "categoriaOverture": "hotel",
+   "confianca": 0.997,
+   "sites": [
+    "http://hotelbavarium.com.br/"
+   ],
+   "telefones": [
+    "+554734226652"
+   ],
+   "redesSociais": [
+    "https://www.facebook.com/137740350068993"
+   ],
+   "endereco": "R. Dr. João Colin, 1317",
+   "localidade": "Joinville",
+   "latitude": -26.28920446,
+   "longitude": -48.84871186,
+   "fontes": [
+    "meta (CDLA-Permissive-2.0)",
+    "Overture (CDLA-Permissive-2.0)"
+   ]
+  },
+  {
+   "idOverture": "96eaf0ec-71ec-414b-8266-0845c585723b",
+   "nome": "Pousada Schulz",
+   "categoriaOverture": "hotel",
+   "confianca": 0.993,
+   "sites": [
+    "http://www.schulzpousada.com.br"
+   ],
+   "telefones": [
+    "+554734333318"
+   ],
+   "redesSociais": [
+    "https://www.facebook.com/129777627190454"
+   ],
+   "endereco": "R. Itaiópolis 258",
+   "localidade": "Joinville",
+   "latitude": -26.287217,
+   "longitude": -48.846148,
+   "fontes": [
+    "meta (CDLA-Permissive-2.0)",
+    "Overture (CDLA-Permissive-2.0)"
+   ]
+  },
+  {
+   "idOverture": "7fc23602-9488-4601-9d95-a710b4b4c248",
+   "nome": "Barão",
+   "categoriaOverture": "bar_and_grill_restaurant",
+   "confianca": 0.991,
+   "sites": [
+    "https://www.ifood.com.br/delivery/joinville-sc/barao---alles-centro/681ab881-dd31-42fa-ad52-e26321038c76"
+   ],
+   "telefones": [
+    "+554734346150"
+   ],
+   "redesSociais": [
+    "https://www.facebook.com/199083020128728"
+   ],
+   "endereco": "R. Max Colin, 441",
+   "localidade": "Joinville",
+   "latitude": -26.29506504,
+   "longitude": -48.84653373,
+   "fontes": [
+    "meta (CDLA-Permissive-2.0)",
+    "Overture (CDLA-Permissive-2.0)"
+   ]
+  },
+  {
+   "idOverture": "9d0ae4d0-6996-4dcf-882f-88e110018437",
+   "nome": "Smânia Restaurante e Eventos",
+   "categoriaOverture": "brazilian_restaurant",
+   "confianca": 0.999,
+   "sites": [
+    "http://www.smania.com.br/"
+   ],
+   "telefones": [
+    "+554738013591"
+   ],
+   "redesSociais": [
+    "https://www.facebook.com/356669151086753"
+   ],
+   "endereco": "R. dos Ginásticos, 96 - Fundos",
+   "localidade": "Joinville",
+   "latitude": -26.29761432,
+   "longitude": -48.84872082,
+   "fontes": [
+    "meta (CDLA-Permissive-2.0)",
+    "Overture (CDLA-Permissive-2.0)"
+   ]
+  },
+  {
+   "idOverture": "f043045f-5363-47b4-8deb-7a5f8d640c9f",
+   "nome": "Shopping Cidade das Flores",
+   "categoriaOverture": "shopping_mall",
+   "confianca": 0.999,
+   "sites": [
+    "http://www.shoppingcidadedasflores.com.br"
+   ],
+   "telefones": [
+    "+554734330758"
+   ],
+   "redesSociais": [
+    "https://www.facebook.com/456263304554970"
+   ],
+   "endereco": "R. Mário Lobo, 106",
+   "localidade": "Joinville",
+   "latitude": -26.29897336,
+   "longitude": -48.84852989,
+   "fontes": [
+    "meta (CDLA-Permissive-2.0)",
+    "Overture (CDLA-Permissive-2.0)"
+   ]
+  },
+  {
+   "idOverture": "ac5eebaa-9320-4949-8ddf-ab5cca28b3f5",
+   "nome": "Cine Uniplex Shopping Cidade das Flores - Joinville",
+   "categoriaOverture": "movie_theater",
+   "confianca": 0.972,
+   "sites": [
+    "http://www.cineuniplex.com.br/"
+   ],
+   "telefones": [
+    "+551732227578"
+   ],
+   "redesSociais": [
+    "https://www.facebook.com/121283395220588"
+   ],
+   "endereco": "R. Mário Lobo, 106",
+   "localidade": "Joinville",
+   "latitude": -26.29843812,
+   "longitude": -48.84826624,
+   "fontes": [
+    "meta (CDLA-Permissive-2.0)",
+    "Overture (CDLA-Permissive-2.0)"
+   ]
+  },
+  {
+   "idOverture": "e1afdc59-8e6a-441e-b28f-420940d44645",
+   "nome": "Restaurante Colombo",
+   "categoriaOverture": "brazilian_restaurant",
+   "confianca": 0.84,
+   "sites": [],
+   "telefones": [
+    "+554734339889"
+   ],
+   "redesSociais": [
+    "https://www.facebook.com/239164929826460"
+   ],
+   "endereco": "Rua XV de Novembro 651",
+   "localidade": "Joinville",
+   "latitude": -26.3006,
+   "longitude": -48.84879,
+   "fontes": [
+    "meta (CDLA-Permissive-2.0)",
+    "Overture (CDLA-Permissive-2.0)"
+   ]
+  },
+  {
+   "idOverture": "73917b76-3bb1-454e-976a-d624b3a5cf75",
+   "nome": "Alven Hotel by Slaviero Hotéis",
+   "categoriaOverture": "hotel",
+   "confianca": 0.996,
+   "sites": [
+    "http://www.hotelalven.com.br/"
+   ],
+   "telefones": [
+    "+554738029999"
+   ],
+   "redesSociais": [
+    "https://www.facebook.com/1853092824927805"
+   ],
+   "endereco": "Rua Engenheiro Niemeyer, 215",
+   "localidade": "Joinville",
+   "latitude": -26.3029589,
+   "longitude": -48.84766077,
+   "fontes": [
+    "meta (CDLA-Permissive-2.0)",
+    "Overture (CDLA-Permissive-2.0)"
+   ]
+  },
+  {
+   "idOverture": "0b170a71-0902-4c8f-87f4-31b9dbe9d60f",
+   "nome": "Kodashi Sushi Bar",
+   "categoriaOverture": "sushi_restaurant",
+   "confianca": 0.985,
+   "sites": [
+    "https://bio.site/kodashisushibar"
+   ],
+   "telefones": [
+    "+5547997732986"
+   ],
+   "redesSociais": [
+    "https://www.facebook.com/485218154865397"
+   ],
+   "endereco": "R. Conselheiro Mafra, 93",
+   "localidade": "Joinville",
+   "latitude": -26.30679562,
+   "longitude": -48.84842741,
+   "fontes": [
+    "meta (CDLA-Permissive-2.0)",
+    "Overture (CDLA-Permissive-2.0)"
+   ]
+  },
+  {
+   "idOverture": "33cc4d67-7db2-4a9a-a033-09e9757b16e5",
+   "nome": "Kodashi Sushi Bar",
+   "categoriaOverture": "sushi_restaurant",
+   "confianca": 0.845,
+   "sites": [
+    "http://www.kodashi.com.br"
+   ],
+   "telefones": [
+    "+554730255181"
+   ],
+   "redesSociais": [
+    "https://www.facebook.com/141475836030072"
+   ],
+   "endereco": "Rua Ministro Calógeras, 815",
+   "localidade": "Joinville",
+   "latitude": -26.30759972,
+   "longitude": -48.84796822,
+   "fontes": [
+    "meta (CDLA-Permissive-2.0)",
+    "Overture (CDLA-Permissive-2.0)"
+   ]
+  },
+  {
+   "idOverture": "f0d01256-f951-4c3f-8f36-3817352ff5bc",
+   "nome": "Blue Tree Towers Joinville",
+   "categoriaOverture": "hotel",
+   "confianca": 0.991,
+   "sites": [
+    "https://www.bluetree.com.br/hotel/blue-tree-towers-joinville/"
+   ],
+   "telefones": [
+    "+554734618000"
+   ],
+   "redesSociais": [
+    "https://www.facebook.com/116568564795889"
+   ],
+   "endereco": "Avenida Juscelino Kubitschek, 300",
+   "localidade": "Joinville",
+   "latitude": -26.30390563,
+   "longitude": -48.84671453,
+   "fontes": [
+    "meta (CDLA-Permissive-2.0)",
+    "Overture (CDLA-Permissive-2.0)"
+   ]
+  },
+  {
+   "idOverture": "f0a8e7c8-b4e5-4e02-9f0e-c12cc8fc3d09",
+   "nome": "Museu da Bicicleta",
+   "categoriaOverture": "museum",
+   "confianca": 0.975,
+   "sites": [
+    "http://www.museudabicicleta.com.br"
+   ],
+   "telefones": [
+    "+554734550372"
+   ],
+   "redesSociais": [
+    "https://www.facebook.com/1399101513667453"
+   ],
+   "endereco": "Praça Monte Castelo, S/N",
+   "localidade": "Joinville",
+   "latitude": -26.32206654,
+   "longitude": -48.84628808,
+   "fontes": [
+    "meta (CDLA-Permissive-2.0)",
+    "Overture (CDLA-Permissive-2.0)"
+   ]
+  },
+  {
+   "idOverture": "52a6b3ad-667c-4879-a7e2-43d9910ddac0",
+   "nome": "Comfort Hotel Joinville",
+   "categoriaOverture": "hotel",
+   "confianca": 1.0,
+   "sites": [
+    "http://www.atlanticahotels.com.br/hotel/joinville/comfort-hotel-joinville"
+   ],
+   "telefones": [
+    "+554720181403"
+   ],
+   "redesSociais": [
+    "https://www.facebook.com/590970557592160"
+   ],
+   "endereco": "Rua Senador Felipe Schmidt, 460",
+   "localidade": "Joinville",
+   "latitude": -26.30635108,
+   "longitude": -48.85144389,
+   "fontes": [
+    "meta (CDLA-Permissive-2.0)",
+    "Overture (CDLA-Permissive-2.0)"
+   ]
+  },
+  {
+   "idOverture": "2f2f889b-13bf-48e3-a5b3-9b61177db9f0",
+   "nome": "Delicatesse Viktoria",
+   "categoriaOverture": "delicatessen",
+   "confianca": 0.77,
+   "sites": [
+    "http://delicatesseviktoria.com.br"
+   ],
+   "telefones": [
+    "(47) 3422-0570"
+   ],
+   "redesSociais": [],
+   "endereco": "R. Sen. Felipe Schmidt, 400",
+   "localidade": "Joinville",
+   "latitude": -26.306086623275924,
+   "longitude": -48.85090838865419,
+   "fontes": [
+    "Foursquare (Apache-2.0)",
+    "Overture (CDLA-Permissive-2.0)"
+   ]
+  },
+  {
+   "idOverture": "71a87963-0a9c-4477-9bd3-3e0a3ce217d5",
+   "nome": "Didge Steakhouse Pub",
+   "categoriaOverture": "steakhouse",
+   "confianca": 0.943,
+   "sites": [
+    "http://www.didge.com.br"
+   ],
+   "telefones": [
+    "+554730137704"
+   ],
+   "redesSociais": [
+    "https://www.facebook.com/176118805920553"
+   ],
+   "endereco": "R. Visc. de Taunay, 368",
+   "localidade": "Joinville",
+   "latitude": -26.30390506,
+   "longitude": -48.85087445,
+   "fontes": [
+    "meta (CDLA-Permissive-2.0)",
+    "Overture (CDLA-Permissive-2.0)"
+   ]
+  },
+  {
+   "idOverture": "b2e04859-2fa1-4734-b9d2-5b0ae916abe4",
+   "nome": "Hotel Tannenhof",
+   "categoriaOverture": "hotel",
+   "confianca": 0.997,
+   "sites": [
+    "http://www.tannenhof.com.br"
+   ],
+   "telefones": [
+    "+554731456700"
+   ],
+   "redesSociais": [
+    "https://www.facebook.com/279061225455040"
+   ],
+   "endereco": "Rua Henrique Meyer, 340",
+   "localidade": "Joinville",
+   "latitude": -26.30332104,
+   "longitude": -48.85089175,
+   "fontes": [
+    "meta (CDLA-Permissive-2.0)",
+    "Overture (CDLA-Permissive-2.0)"
+   ]
+  },
+  {
+   "idOverture": "ff2940b8-ef56-4a2a-84cc-a1b12e40af4a",
+   "nome": "Chimarrão Churrascaria",
+   "categoriaOverture": "steakhouse",
+   "confianca": 0.997,
+   "sites": [
+    "http://www.chimarraochurrascaria.com.br/"
+   ],
+   "telefones": [
+    "+554730277632"
+   ],
+   "redesSociais": [
+    "https://www.facebook.com/200559363304458"
+   ],
+   "endereco": "Rua Visconde de Taunay, 343",
+   "localidade": "Joinville",
+   "latitude": -26.30385816,
+   "longitude": -48.85051084,
+   "fontes": [
+    "meta (CDLA-Permissive-2.0)",
+    "Overture (CDLA-Permissive-2.0)"
+   ]
+  },
+  {
+   "idOverture": "12f541e7-7da3-493c-9024-57d26024016d",
+   "nome": "Cantina Italiana Primo Fratelli",
+   "categoriaOverture": "italian_restaurant",
+   "confianca": 0.99,
+   "sites": [],
+   "telefones": [
+    "+554730295615"
+   ],
+   "redesSociais": [
+    "https://www.facebook.com/195089437241833"
+   ],
+   "endereco": "R. Visc. de Taunay, 343",
+   "localidade": "Joinville",
+   "latitude": -26.30369662,
+   "longitude": -48.85035331,
+   "fontes": [
+    "meta (CDLA-Permissive-2.0)",
+    "Overture (CDLA-Permissive-2.0)"
+   ]
+  },
+  {
+   "idOverture": "c011a25d-a833-4ae5-bd02-75d2803fdca4",
+   "nome": "Marisa Shopping Mueller",
+   "categoriaOverture": "shopping_mall",
+   "confianca": 0.851,
+   "sites": [],
+   "telefones": [
+    "+554732474238"
+   ],
+   "redesSociais": [
+    "https://www.facebook.com/308348612521063"
+   ],
+   "endereco": "",
+   "localidade": "Joinville",
+   "latitude": -26.303878,
+   "longitude": -48.849025,
+   "fontes": [
+    "meta (CDLA-Permissive-2.0)",
+    "Overture (CDLA-Permissive-2.0)"
+   ]
+  },
+  {
+   "idOverture": "345443e3-06c5-4432-b16c-db4222d2fb2a",
+   "nome": "Capitão Batata & Space Pizza - Shopping Mueller",
+   "categoriaOverture": "pizza_restaurant",
+   "confianca": 0.728,
+   "sites": [],
+   "telefones": [
+    "+554734222255"
+   ],
+   "redesSociais": [
+    "https://www.facebook.com/1353812244677671"
+   ],
+   "endereco": "Rua Senador Felipe Schmidt, 235",
+   "localidade": "Joinville",
+   "latitude": -26.304315381128973,
+   "longitude": -48.84940653149475,
+   "fontes": [
+    "meta (CDLA-Permissive-2.0)",
+    "Overture (CDLA-Permissive-2.0)"
+   ]
+  },
+  {
+   "idOverture": "9f5b3561-a2a1-4c94-919b-7acea7c82124",
+   "nome": "Samsung Experience Store Shopping Mueller Joinville",
+   "categoriaOverture": "electronics_store",
+   "confianca": 0.872,
+   "sites": [
+    "www.samsung.com.br"
+   ],
+   "telefones": [
+    "+5547996667137"
+   ],
+   "redesSociais": [
+    "https://www.facebook.com/428533944156196"
+   ],
+   "endereco": "R. Visc. de Taunay, 235 - 2º Andar, Loja 85",
+   "localidade": "Joinville",
+   "latitude": -26.30337989,
+   "longitude": -48.84946839,
+   "fontes": [
+    "meta (CDLA-Permissive-2.0)",
+    "Overture (CDLA-Permissive-2.0)"
+   ]
+  },
+  {
+   "idOverture": "2f2480cb-23d6-4551-9c6a-7ea2484ca84b",
+   "nome": "Bourbon Joinville Business Hotel",
+   "categoriaOverture": "hotel",
+   "confianca": 0.955,
+   "sites": [
+    "http://www.bourbon.com.br"
+   ],
+   "telefones": [
+    "+554721059000"
+   ],
+   "redesSociais": [
+    "https://www.facebook.com/230027990675203"
+   ],
+   "endereco": "Rua Visconde de Taunay, 275",
+   "localidade": "Joinville",
+   "latitude": -26.30342335,
+   "longitude": -48.84994104,
+   "fontes": [
+    "meta (CDLA-Permissive-2.0)",
+    "Overture (CDLA-Permissive-2.0)"
+   ]
+  },
+  {
+   "idOverture": "07862e53-4526-4943-9917-af29e9c371f8",
+   "nome": "ibis Joinville",
+   "categoriaOverture": "hotel",
+   "confianca": 1.0,
+   "sites": [
+    "http://www.accorhotels.com/pt-br/hotel-5633-ibis-joinville/index.shtml"
+   ],
+   "telefones": [
+    "+554734899000"
+   ],
+   "redesSociais": [
+    "https://www.facebook.com/358177617953133"
+   ],
+   "endereco": "R. 9 de Março, 806",
+   "localidade": "Joinville",
+   "latitude": -26.30116681,
+   "longitude": -48.84972048,
+   "fontes": [
+    "meta (CDLA-Permissive-2.0)",
+    "Overture (CDLA-Permissive-2.0)"
+   ]
+  },
+  {
+   "idOverture": "fd3198b3-7db6-4455-8aa5-afbc1c27e992",
+   "nome": "Hotel Trocadero",
+   "categoriaOverture": "hotel",
+   "confianca": 0.986,
+   "sites": [
+    "http://www.chahoteis.com.br/hoteis/hotel-trocadero"
+   ],
+   "telefones": [
+    "+554734221469"
+   ],
+   "redesSociais": [
+    "https://www.facebook.com/1397793480493701"
+   ],
+   "endereco": "R. Visc. de Taunay, 185",
+   "localidade": "Joinville",
+   "latitude": -26.30276684,
+   "longitude": -48.84928594,
+   "fontes": [
+    "meta (CDLA-Permissive-2.0)",
+    "Overture (CDLA-Permissive-2.0)"
+   ]
+  },
+  {
+   "idOverture": "5c241d3a-66b4-4b97-a371-4ef23c02df32",
+   "nome": "Hotel Mattes",
+   "categoriaOverture": "hotel",
+   "confianca": 0.995,
+   "sites": [
+    "http://www.hotelmattes.com.br/"
+   ],
+   "telefones": [
+    "+554734223582"
+   ],
+   "redesSociais": [
+    "https://www.facebook.com/1536837293274709"
+   ],
+   "endereco": "R. XV de Novembro, 801",
+   "localidade": "Joinville",
+   "latitude": -26.30052924,
+   "longitude": -48.85028152,
+   "fontes": [
+    "meta (CDLA-Permissive-2.0)",
+    "Overture (CDLA-Permissive-2.0)"
+   ]
+  },
+  {
+   "idOverture": "22e61a8a-169b-4f83-bfbd-bafc69146589",
+   "nome": "Zum Schlauch",
+   "categoriaOverture": "german_restaurant",
+   "confianca": 0.997,
+   "sites": [
+    "http://www.zumschlauch.com.br/"
+   ],
+   "telefones": [
+    "+554734222909"
+   ],
+   "redesSociais": [
+    "https://www.facebook.com/199503570072562"
+   ],
+   "endereco": "R. Visc. de Taunay, 555",
+   "localidade": "Joinville",
+   "latitude": -26.30515886,
+   "longitude": -48.85206002,
+   "fontes": [
+    "meta (CDLA-Permissive-2.0)",
+    "Overture (CDLA-Permissive-2.0)"
+   ]
+  },
+  {
+   "idOverture": "b91f2c97-5bf5-44c1-9552-03dfb96d0abd",
+   "nome": "Parque das águas",
+   "categoriaOverture": "park",
+   "confianca": 0.788,
+   "sites": [],
+   "telefones": [
+    "+554796925728"
+   ],
+   "redesSociais": [
+    "https://www.facebook.com/134112046772485"
+   ],
+   "endereco": "",
+   "localidade": "Joinville",
+   "latitude": -26.29903638,
+   "longitude": -48.85679885,
+   "fontes": [
+    "meta (CDLA-Permissive-2.0)",
+    "Overture (CDLA-Permissive-2.0)"
+   ]
+  },
+  {
+   "idOverture": "b7c9ef02-3e86-40d9-a291-a716be3582fd",
+   "nome": "Castelo do Monte Café",
+   "categoriaOverture": "cafe",
+   "confianca": 0.958,
+   "sites": [
+    "https://instagram.com/castelodomontecafe"
+   ],
+   "telefones": [
+    "+5547996219682"
+   ],
+   "redesSociais": [
+    "https://www.facebook.com/1773940939531503"
+   ],
+   "endereco": "R. Otto Boehm, 578",
+   "localidade": "Joinville",
+   "latitude": -26.3025421,
+   "longitude": -48.85640307,
+   "fontes": [
+    "meta (CDLA-Permissive-2.0)",
+    "Overture (CDLA-Permissive-2.0)"
+   ]
+  },
+  {
+   "idOverture": "2227f0f1-7a38-4c90-b4b4-c4f02b50cca5",
+   "nome": "Mercure Joinville Prinz",
+   "categoriaOverture": "hotel",
+   "confianca": 0.999,
+   "sites": [
+    "http://www.mercure.com/pt/hotel-0768-mercure-joinville-prinz-hotel/index.shtml"
+   ],
+   "telefones": [
+    "+554734819111"
+   ],
+   "redesSociais": [
+    "https://www.facebook.com/785937674776293"
+   ],
+   "endereco": "R. Otto Boehm, 525",
+   "localidade": "Joinville",
+   "latitude": -26.30271626,
+   "longitude": -48.85573358,
+   "fontes": [
+    "meta (CDLA-Permissive-2.0)",
+    "Overture (CDLA-Permissive-2.0)"
+   ]
+  },
+  {
+   "idOverture": "f831cdfd-f3a5-42ac-9e25-6f71ee377203",
+   "nome": "Biergarten",
+   "categoriaOverture": "german_restaurant",
+   "confianca": 0.997,
+   "sites": [
+    "http://www.biergarten.com.br"
+   ],
+   "telefones": [
+    "+554730283771"
+   ],
+   "redesSociais": [
+    "https://www.facebook.com/166677063381376"
+   ],
+   "endereco": "Rua Visconde de Taunay, 1183",
+   "localidade": "Joinville",
+   "latitude": -26.30937685,
+   "longitude": -48.85458831,
+   "fontes": [
+    "meta (CDLA-Permissive-2.0)",
+    "Overture (CDLA-Permissive-2.0)"
+   ]
+  },
+  {
+   "idOverture": "eb91ed02-3ae3-4bf2-be58-823a5a5364a6",
+   "nome": "Hotel Paraíso das Flores",
+   "categoriaOverture": "hotel",
+   "confianca": 0.969,
+   "sites": [],
+   "telefones": [
+    "+554734334707"
+   ],
+   "redesSociais": [
+    "https://www.facebook.com/1435594963407578"
+   ],
+   "endereco": "R. Min. Calógeras, 1576",
+   "localidade": "Joinville",
+   "latitude": -26.310486,
+   "longitude": -48.8547524,
+   "fontes": [
+    "meta (CDLA-Permissive-2.0)",
+    "Overture (CDLA-Permissive-2.0)"
+   ]
+  },
+  {
+   "idOverture": "18184071-e599-40e3-9e1b-214a4b98269f",
+   "nome": "Hotel Novo Horizonte",
+   "categoriaOverture": "hotel",
+   "confianca": 0.939,
+   "sites": [
+    "http://hotelnovohorizonte4.placeweb.site"
+   ],
+   "telefones": [
+    "+554734227269"
+   ],
+   "redesSociais": [
+    "https://www.facebook.com/210027382540770"
+   ],
+   "endereco": "Rua Paraiba, 766",
+   "localidade": "Joinville",
+   "latitude": -26.31469059,
+   "longitude": -48.8566631,
+   "fontes": [
+    "meta (CDLA-Permissive-2.0)",
+    "Overture (CDLA-Permissive-2.0)"
+   ]
+  },
+  {
+   "idOverture": "34c55077-41f7-4b83-be6b-f73ec75c8141",
+   "nome": "Pousada Joinvilense",
+   "categoriaOverture": "hostel",
+   "confianca": 0.979,
+   "sites": [],
+   "telefones": [
+    "+5547988162760"
+   ],
+   "redesSociais": [
+    "https://www.facebook.com/1532331190323088"
+   ],
+   "endereco": "R. Corupá, 267",
+   "localidade": "Joinville",
+   "latitude": -26.31385672,
+   "longitude": -48.85611083,
+   "fontes": [
+    "meta (CDLA-Permissive-2.0)",
+    "Overture (CDLA-Permissive-2.0)"
+   ]
+  },
+  {
+   "idOverture": "0136b64d-66d8-44a8-a368-50aa88c56ee9",
+   "nome": "Escola de Gastronomia Carême",
+   "categoriaOverture": "cooking_school",
+   "confianca": 0.841,
+   "sites": [],
+   "telefones": [
+    "+5541991273372"
+   ],
+   "redesSociais": [
+    "https://www.facebook.com/162573537178847"
+   ],
+   "endereco": null,
+   "localidade": "Joinville",
+   "latitude": -26.32126964673971,
+   "longitude": -48.85392817997317,
+   "fontes": [
+    "meta (CDLA-Permissive-2.0)",
+    "Overture (CDLA-Permissive-2.0)"
+   ]
+  },
+  {
+   "idOverture": "978baae3-930d-4523-a8d6-7b8f092b2f86",
+   "nome": "Churrascaria Buzzi",
+   "categoriaOverture": "steakhouse",
+   "confianca": 0.968,
+   "sites": [
+    "https://www.instagram.com/churrascariabuzzi?igsh=cTZmaDl5Znoxa250"
+   ],
+   "telefones": [
+    "+5547999571622"
+   ],
+   "redesSociais": [
+    "https://www.facebook.com/207838153426185"
+   ],
+   "endereco": "Rua Santa Catarina, 1735",
+   "localidade": "Joinville",
+   "latitude": -26.33882896,
+   "longitude": -48.84722752,
+   "fontes": [
+    "meta (CDLA-Permissive-2.0)",
+    "Overture (CDLA-Permissive-2.0)"
+   ]
+  },
+  {
+   "idOverture": "6877e9ad-a3ce-4824-89cb-89a6f3582c5d",
+   "nome": "Hotel Cheri Ami",
+   "categoriaOverture": "hotel",
+   "confianca": 0.997,
+   "sites": [
+    "http://www.cheriami.com.br/"
+   ],
+   "telefones": [
+    "+554734362269"
+   ],
+   "redesSociais": [
+    "https://www.facebook.com/391738170916504"
+   ],
+   "endereco": "R. Santa Catarina, 2702",
+   "localidade": "Joinville",
+   "latitude": -26.34784167,
+   "longitude": -48.84711547,
+   "fontes": [
+    "meta (CDLA-Permissive-2.0)",
+    "Overture (CDLA-Permissive-2.0)"
+   ]
+  },
+  {
+   "idOverture": "0d8835c4-6aa1-41a7-9b75-7b3ddcb1310d",
+   "nome": "Hotel Zandoná",
+   "categoriaOverture": "hotel",
+   "confianca": 0.951,
+   "sites": [],
+   "telefones": [
+    "+554734380004"
+   ],
+   "redesSociais": [
+    "https://www.facebook.com/1417291261638467"
+   ],
+   "endereco": "Rodovia BR-101, Km 47 Anexo ao Posto Zandona, 5",
+   "localidade": "Joinville",
+   "latitude": -26.35549039,
+   "longitude": -48.85931535,
+   "fontes": [
+    "meta (CDLA-Permissive-2.0)",
+    "Overture (CDLA-Permissive-2.0)"
+   ]
+  },
+  {
+   "idOverture": "86e95c55-4fec-41d3-9bc0-979cfe846004",
+   "nome": "Restaurante Zandona",
+   "categoriaOverture": "brazilian_restaurant",
+   "confianca": 0.995,
+   "sites": [
+    "http://www.redezandona.com.br"
+   ],
+   "telefones": [
+    "+554734361016"
+   ],
+   "redesSociais": [
+    "https://www.facebook.com/277020242344586"
+   ],
+   "endereco": "Rodovia BR-101 - km 47",
+   "localidade": "Joinville",
+   "latitude": -26.3573883,
+   "longitude": -48.85929874,
+   "fontes": [
+    "meta (CDLA-Permissive-2.0)",
+    "Overture (CDLA-Permissive-2.0)"
+   ]
+  },
+  {
+   "idOverture": "ddddfd8d-3446-4b58-a430-439e325526e4",
+   "nome": "Engenho",
+   "categoriaOverture": "restaurant",
+   "confianca": 0.979,
+   "sites": [],
+   "telefones": [
+    "+554734367451"
+   ],
+   "redesSociais": [
+    "https://www.facebook.com/1336968683068528"
+   ],
+   "endereco": "R. Julião Favre, 45",
+   "localidade": "Joinville",
+   "latitude": -26.35681227,
+   "longitude": -48.84546593,
+   "fontes": [
+    "meta (CDLA-Permissive-2.0)",
+    "Overture (CDLA-Permissive-2.0)"
+   ]
+  },
+  {
+   "idOverture": "9225f48c-b49a-4f1c-8501-528d5d08b028",
+   "nome": "Hotel Palugi",
+   "categoriaOverture": "hotel",
+   "confianca": 0.991,
+   "sites": [
+    "http://www.hotelpalugi.com.br/"
+   ],
+   "telefones": [
+    "+554734650090"
+   ],
+   "redesSociais": [
+    "https://www.facebook.com/184988238203014"
+   ],
+   "endereco": "Rua Waldemiro José Borges, 3831",
+   "localidade": "Joinville",
+   "latitude": -26.38241234,
+   "longitude": -48.82272764,
+   "fontes": [
+    "meta (CDLA-Permissive-2.0)",
+    "Overture (CDLA-Permissive-2.0)"
+   ]
+  },
+  {
+   "idOverture": "5f1fdc47-b731-4f8d-9b37-5fa73d33a6dc",
+   "nome": "Estação Ferroviária",
+   "categoriaOverture": "train_station",
+   "confianca": 0.686,
+   "sites": [],
+   "telefones": [],
+   "redesSociais": [
+    "https://www.facebook.com/2252575304753497"
+   ],
+   "endereco": null,
+   "localidade": "Joinville",
+   "latitude": -26.321920635969,
+   "longitude": -48.84583938313,
+   "fontes": [
+    "meta (CDLA-Permissive-2.0)",
+    "Overture (CDLA-Permissive-2.0)"
+   ]
+  },
+  {
+   "idOverture": "435f4e87-f988-491c-a10e-1999a7eb1681",
+   "nome": "Pousada São José",
+   "categoriaOverture": "bed_and_breakfast",
+   "confianca": 0.77,
+   "sites": [
+    "https://www.pousadasaojose.com"
+   ],
+   "telefones": [
+    "(47) 3305-0120"
+   ],
+   "redesSociais": [
+    "https://www.instagram.com/pousadasaojose.joinville"
+   ],
+   "endereco": "R. Américo Matrangola, 38",
+   "localidade": "Joinville",
+   "latitude": -26.309609,
+   "longitude": -48.845158,
+   "fontes": [
+    "Foursquare (Apache-2.0)",
+    "Overture (CDLA-Permissive-2.0)"
+   ]
+  },
+  {
+   "idOverture": "4922232b-75cb-4741-aa84-ac55e77de9d0",
+   "nome": "Avenida Palace Hotel",
+   "categoriaOverture": "hotel",
+   "confianca": 0.998,
+   "sites": [
+    "http://www.avenidapalacehotel.com.br/"
+   ],
+   "telefones": [
+    "+554734338070"
+   ],
+   "redesSociais": [
+    "https://www.facebook.com/732594770138113"
+   ],
+   "endereco": "Avenida Getúlio Vargas, 75",
+   "localidade": "Joinville",
+   "latitude": -26.30805223,
+   "longitude": -48.84551602,
+   "fontes": [
+    "meta (CDLA-Permissive-2.0)",
+    "Overture (CDLA-Permissive-2.0)"
+   ]
+  },
+  {
+   "idOverture": "b1032c22-d304-49e7-ba70-ad081b49732f",
+   "nome": "Hotel Germânia Joinville",
+   "categoriaOverture": "hotel",
+   "confianca": 0.997,
+   "sites": [
+    "http://hotelgermania.com.br/"
+   ],
+   "telefones": [
+    "+5547999264219"
+   ],
+   "redesSociais": [
+    "https://www.facebook.com/1425158881122883"
+   ],
+   "endereco": "germania@hotelgermania.com.br, R. Min. Calógeras, 612",
+   "localidade": "Joinville",
+   "latitude": -26.30724656,
+   "longitude": -48.8459454,
+   "fontes": [
+    "meta (CDLA-Permissive-2.0)",
+    "Overture (CDLA-Permissive-2.0)"
+   ]
+  },
+  {
+   "idOverture": "e8b75f68-8d6d-427c-9360-ca7b85e3a640",
+   "nome": "Shopping Direto Da Fabrica",
+   "categoriaOverture": "shopping_mall",
+   "confianca": 0.77,
+   "sites": [
+    "http://www.shoppingdireto.com.br"
+   ],
+   "telefones": [
+    "(47) 3433-4134"
+   ],
+   "redesSociais": [],
+   "endereco": "Rua do Príncipe, 315",
+   "localidade": "Joinville",
+   "latitude": -26.30219148029883,
+   "longitude": -48.84522819049501,
+   "fontes": [
+    "Foursquare (Apache-2.0)",
+    "Overture (CDLA-Permissive-2.0)"
+   ]
+  },
+  {
+   "idOverture": "0b93007b-f444-4f63-848f-1a93286ad868",
+   "nome": "Hotel Príncipe",
+   "categoriaOverture": "hotel",
+   "confianca": 0.997,
+   "sites": [
+    "http://www.hprincipe.com.br/"
+   ],
+   "telefones": [
+    "+554734334555"
+   ],
+   "redesSociais": [
+    "https://www.facebook.com/491165091234151"
+   ],
+   "endereco": "R. Jerônimo Coelho, 27 - Sl 06",
+   "localidade": "Joinville",
+   "latitude": -26.3024437,
+   "longitude": -48.84511988,
+   "fontes": [
+    "meta (CDLA-Permissive-2.0)",
+    "Overture (CDLA-Permissive-2.0)"
+   ]
+  },
+  {
+   "idOverture": "885b2880-7b79-4527-b9b2-37cdc4324fc3",
+   "nome": "Quinta de Olivares",
+   "categoriaOverture": "dessert_shop",
+   "confianca": 0.991,
+   "sites": [
+    "https://www.instagram.com/quintadeolivares/"
+   ],
+   "telefones": [
+    "+554730289109"
+   ],
+   "redesSociais": [
+    "https://www.facebook.com/874825376021986"
+   ],
+   "endereco": "R. Orestes Guimarães, 480 - sala 3",
+   "localidade": "Joinville",
+   "latitude": -26.29328437,
+   "longitude": -48.84536598,
+   "fontes": [
+    "meta (CDLA-Permissive-2.0)",
+    "Overture (CDLA-Permissive-2.0)"
+   ]
+  },
+  {
+   "idOverture": "22e27fef-e3fa-42dc-b9fb-9cc2cdcedfa9",
+   "nome": "Centreventos Cau Hansen",
+   "categoriaOverture": "party_and_event_planning",
+   "confianca": 0.996,
+   "sites": [
+    "https://fundacaocultural.joinville.sc.gov.br/conteudo/4-Complexo+Cau+Hansen.html"
+   ],
+   "telefones": [
+    "+554734231010"
+   ],
+   "redesSociais": [
+    "https://www.facebook.com/100629232186305"
+   ],
+   "endereco": "Avenida José Vieira, 315",
+   "localidade": "Joinville",
+   "latitude": -26.29264448,
+   "longitude": -48.84355245,
+   "fontes": [
+    "meta (CDLA-Permissive-2.0)",
+    "Overture (CDLA-Permissive-2.0)"
+   ]
+  },
+  {
+   "idOverture": "90244b87-caf4-4757-992a-790b967d1879",
+   "nome": "Le Village Apart Hotel",
+   "categoriaOverture": "hotel",
+   "confianca": 0.956,
+   "sites": [
+    "http://www.levillage.com.br"
+   ],
+   "telefones": [
+    "+554721018500"
+   ],
+   "redesSociais": [
+    "https://www.facebook.com/144161042313775"
+   ],
+   "endereco": "Rua Gustavo Grossembacher, 83",
+   "localidade": "Joinville",
+   "latitude": -26.29917437,
+   "longitude": -48.8433806,
+   "fontes": [
+    "meta (CDLA-Permissive-2.0)",
+    "Overture (CDLA-Permissive-2.0)"
+   ]
+  },
+  {
+   "idOverture": "46b80b61-5e42-40df-a0ca-184f889455db",
+   "nome": "Museu Nacional de Imigração e Colonização",
+   "categoriaOverture": "history_museum",
+   "confianca": 0.953,
+   "sites": [
+    "http://museudeimigracao.blogspot.com.br"
+   ],
+   "telefones": [
+    "+554734333736"
+   ],
+   "redesSociais": [
+    "https://www.facebook.com/159479054653418"
+   ],
+   "endereco": "R. Rio Branco, 229",
+   "localidade": "Joinville",
+   "latitude": -26.30369139,
+   "longitude": -48.84348073,
+   "fontes": [
+    "meta (CDLA-Permissive-2.0)",
+    "Overture (CDLA-Permissive-2.0)"
+   ]
+  },
+  {
+   "idOverture": "84eab47a-f3bc-4031-b02d-b729a57213f3",
+   "nome": "Slaviero Slim Joinville",
+   "categoriaOverture": "hotel",
+   "confianca": 0.987,
+   "sites": [
+    "https://www.slavierohoteis.com.br/hoteis/slim-joinville/"
+   ],
+   "telefones": [
+    "+554734331500"
+   ],
+   "redesSociais": [
+    "https://www.facebook.com/1591461107667420"
+   ],
+   "endereco": "Rua 7 de Setembro, 40",
+   "localidade": "Joinville",
+   "latitude": -26.30450852,
+   "longitude": -48.84337235,
+   "fontes": [
+    "meta (CDLA-Permissive-2.0)",
+    "Overture (CDLA-Permissive-2.0)"
+   ]
+  },
+  {
+   "idOverture": "7ad44625-3b1c-42f1-bcf6-24bcc162d5b4",
+   "nome": "Le Village Flats Hotel and Business",
+   "categoriaOverture": "hotel",
+   "confianca": 0.927,
+   "sites": [
+    "http://www.levillage.com.br"
+   ],
+   "telefones": [
+    "+554721018500"
+   ],
+   "redesSociais": [
+    "https://www.facebook.com/144161042313775"
+   ],
+   "endereco": "Travessa Chuí, 98",
+   "localidade": "Joinville",
+   "latitude": -26.29839942,
+   "longitude": -48.84291241,
+   "fontes": [
+    "meta (CDLA-Permissive-2.0)",
+    "Overture (CDLA-Permissive-2.0)"
+   ]
+  },
+  {
+   "idOverture": "23ffe5d8-a884-4fb6-92b9-f5acd8123a94",
+   "nome": "Museu Arqueológico de Sambaqui de Joinville",
+   "categoriaOverture": "archaeological_service",
+   "confianca": 0.991,
+   "sites": [
+    "http://museusambaqui.blogspot.com"
+   ],
+   "telefones": [
+    "+554734330114"
+   ],
+   "redesSociais": [
+    "https://www.facebook.com/1374883752797769"
+   ],
+   "endereco": "R. Dona Francisca, 600",
+   "localidade": "Joinville",
+   "latitude": -26.29630248,
+   "longitude": -48.84298457,
+   "fontes": [
+    "meta (CDLA-Permissive-2.0)",
+    "Overture (CDLA-Permissive-2.0)"
+   ]
+  },
+  {
+   "idOverture": "fe767611-b170-4921-b8c9-798a929baef1",
+   "nome": "Hotel Alfaville",
+   "categoriaOverture": "hotel",
+   "confianca": 0.948,
+   "sites": [
+    "http://www.hotelalfaville.com"
+   ],
+   "telefones": [
+    "+554734336121"
+   ],
+   "redesSociais": [
+    "https://www.facebook.com/201639273180721"
+   ],
+   "endereco": "Rua Dona Francisca, 791",
+   "localidade": "Joinville",
+   "latitude": -26.29540853,
+   "longitude": -48.84256409,
+   "fontes": [
+    "meta (CDLA-Permissive-2.0)",
+    "Overture (CDLA-Permissive-2.0)"
+   ]
+  },
+  {
+   "idOverture": "a5d99915-25da-47c8-a0ed-2f3331f249f8",
+   "nome": "Casa da Cultura Fausto Rocha Júnior",
+   "categoriaOverture": "cultural_center",
+   "confianca": 0.991,
+   "sites": [],
+   "telefones": [
+    "+554734332266"
+   ],
+   "redesSociais": [
+    "https://www.facebook.com/555881304581657"
+   ],
+   "endereco": "R. Dona Francisca, 800",
+   "localidade": "Joinville",
+   "latitude": -26.29544671,
+   "longitude": -48.84170443,
+   "fontes": [
+    "meta (CDLA-Permissive-2.0)",
+    "Overture (CDLA-Permissive-2.0)"
+   ]
+  },
+  {
+   "idOverture": "59137a6c-39db-45b8-af2f-f70a0d5d9202",
+   "nome": "Hotel Bella Júlia",
+   "categoriaOverture": "hotel",
+   "confianca": 0.976,
+   "sites": [
+    "http://www.hotelbellajulia.com.br/"
+   ],
+   "telefones": [
+    "+554738011200"
+   ],
+   "redesSociais": [
+    "https://www.facebook.com/1054150177938328"
+   ],
+   "endereco": "R. Dona Francisca, 791",
+   "localidade": "Joinville",
+   "latitude": -26.29517603,
+   "longitude": -48.84176087,
+   "fontes": [
+    "meta (CDLA-Permissive-2.0)",
+    "Overture (CDLA-Permissive-2.0)"
+   ]
+  },
+  {
+   "idOverture": "1c3d892b-8cdc-44bd-84e3-dd8f2dbe759d",
+   "nome": "Divina Gula",
+   "categoriaOverture": "bakery",
+   "confianca": 0.987,
+   "sites": [],
+   "telefones": [
+    "+554734223940"
+   ],
+   "redesSociais": [
+    "https://www.facebook.com/201959136502319"
+   ],
+   "endereco": "R. Dona Francisca, 1120",
+   "localidade": "Joinville",
+   "latitude": -26.2926932,
+   "longitude": -48.84056558,
+   "fontes": [
+    "meta (CDLA-Permissive-2.0)",
+    "Overture (CDLA-Permissive-2.0)"
+   ]
+  },
+  {
+   "idOverture": "49b7b185-3ab0-45e1-aea5-366c289ef167",
+   "nome": "Hotel Joinvillense",
+   "categoriaOverture": "hotel",
+   "confianca": 0.997,
+   "sites": [
+    "http://hoteljoinvillense.com.br/"
+   ],
+   "telefones": [
+    "+5547999148311"
+   ],
+   "redesSociais": [
+    "https://www.facebook.com/462689360476865"
+   ],
+   "endereco": "R. Sete de Setembro, 233",
+   "localidade": "Joinville",
+   "latitude": -26.30420551,
+   "longitude": -48.84133079,
+   "fontes": [
+    "meta (CDLA-Permissive-2.0)",
+    "Overture (CDLA-Permissive-2.0)"
+   ]
+  },
+  {
+   "idOverture": "9906abae-2ec6-4a4b-968a-d1c699c13e86",
+   "nome": "Pousada Emilly",
+   "categoriaOverture": "inn",
+   "confianca": 0.977,
+   "sites": [],
+   "telefones": [
+    "+5547996819119"
+   ],
+   "redesSociais": [
+    "https://www.facebook.com/208275956195044"
+   ],
+   "endereco": "Av. Cel. Procópio Gomes, 175",
+   "localidade": "Joinville",
+   "latitude": -26.30732213,
+   "longitude": -48.84049085,
+   "fontes": [
+    "meta (CDLA-Permissive-2.0)",
+    "Overture (CDLA-Permissive-2.0)"
+   ]
+  },
+  {
+   "idOverture": "a6bac5d7-df75-4bb3-b4dd-596f860a24e3",
+   "nome": "Hotel Sabrina",
+   "categoriaOverture": "hotel",
+   "confianca": 0.993,
+   "sites": [
+    "http://www.hotelsabrina.com.br"
+   ],
+   "telefones": [
+    "+554738019400"
+   ],
+   "redesSociais": [
+    "https://www.facebook.com/2013638265586789"
+   ],
+   "endereco": "Rua Ricardo Stamm Gomes, 234",
+   "localidade": "Joinville",
+   "latitude": -26.30620375,
+   "longitude": -48.84044671,
+   "fontes": [
+    "meta (CDLA-Permissive-2.0)",
+    "Overture (CDLA-Permissive-2.0)"
+   ]
+  },
+  {
+   "idOverture": "2639b07a-ac29-4136-8814-a04909432f14",
+   "nome": "Bristol Hotéis & Resorts",
+   "categoriaOverture": "hotel",
+   "confianca": 0.981,
+   "sites": [],
+   "telefones": [
+    "+554738019400"
+   ],
+   "redesSociais": [
+    "https://www.facebook.com/104389724862298"
+   ],
+   "endereco": "R. Ricardo Stamm Gomes, 234",
+   "localidade": "Joinville",
+   "latitude": -26.30623496,
+   "longitude": -48.84029568,
+   "fontes": [
+    "meta (CDLA-Permissive-2.0)",
+    "Overture (CDLA-Permissive-2.0)"
+   ]
+  },
+  {
+   "idOverture": "aebdc270-07ed-4fc9-8c2d-3cde61f2ec67",
+   "nome": "Yelo Stage",
+   "categoriaOverture": "party_and_event_planning",
+   "confianca": 0.614,
+   "sites": [
+    "http://www.yelostage.com.br/"
+   ],
+   "telefones": [
+    "+554734331233"
+   ],
+   "redesSociais": [
+    "https://www.facebook.com/1390958414479350"
+   ],
+   "endereco": "Rua Procópio Gomes - 358",
+   "localidade": "Joinville",
+   "latitude": -26.30902398,
+   "longitude": -48.84197474,
+   "fontes": [
+    "meta (CDLA-Permissive-2.0)",
+    "Overture (CDLA-Permissive-2.0)"
+   ]
+  },
+  {
+   "idOverture": "0f2e0279-9a8b-4d76-87f5-5f9888c8bdda",
+   "nome": "Ming Zhou",
+   "categoriaOverture": "vegetarian_restaurant",
+   "confianca": 0.981,
+   "sites": [],
+   "telefones": [
+    "+5547999585559"
+   ],
+   "redesSociais": [
+    "https://www.facebook.com/267396170283465"
+   ],
+   "endereco": "R. São Paulo, 651",
+   "localidade": "Joinville",
+   "latitude": -26.31342932,
+   "longitude": -48.84262291,
+   "fontes": [
+    "meta (CDLA-Permissive-2.0)",
+    "Overture (CDLA-Permissive-2.0)"
+   ]
+  },
+  {
+   "idOverture": "256e3a31-0c8a-44b3-83d7-5242d498395d",
+   "nome": "Hotel Pertutti",
+   "categoriaOverture": "hotel",
+   "confianca": 0.77,
+   "sites": [
+    "http://www.hotelpertutti.com.br"
+   ],
+   "telefones": [
+    "(55) 3455-3139"
+   ],
+   "redesSociais": [],
+   "endereco": "R. Inácio Bastos, 376 - Bucarein, Joinville - SC, 89202-310",
+   "localidade": "Joinville",
+   "latitude": -26.31639469844116,
+   "longitude": -48.84121170671124,
+   "fontes": [
+    "Foursquare (Apache-2.0)",
+    "Overture (CDLA-Permissive-2.0)"
+   ]
+  },
+  {
+   "idOverture": "d4e93c24-644a-4b43-99c5-e1e53b1098e9",
+   "nome": "RCM Vilas",
+   "categoriaOverture": "holiday_rental_home",
+   "confianca": 0.912,
+   "sites": [
+    "https://www.rcmvilas.com.br/"
+   ],
+   "telefones": [
+    "+554734630770"
+   ],
+   "redesSociais": [
+    "https://www.facebook.com/686670481188047"
+   ],
+   "endereco": "R. Urussanga, 687 - Sl 01",
+   "localidade": "Joinville",
+   "latitude": -26.31333354,
+   "longitude": -48.83910158,
+   "fontes": [
+    "meta (CDLA-Permissive-2.0)",
+    "Overture (CDLA-Permissive-2.0)"
+   ]
+  },
+  {
+   "idOverture": "4b3b770e-bff5-42f6-954e-2d337c90e90d",
+   "nome": "Texas Bar",
+   "categoriaOverture": "bar",
+   "confianca": 0.984,
+   "sites": [],
+   "telefones": [
+    "+554735110383"
+   ],
+   "redesSociais": [
+    "https://www.facebook.com/447398568646470"
+   ],
+   "endereco": "R. Ricardo Stamm Gomes, 4",
+   "localidade": "Joinville",
+   "latitude": -26.3058926,
+   "longitude": -48.83961848,
+   "fontes": [
+    "meta (CDLA-Permissive-2.0)",
+    "Overture (CDLA-Permissive-2.0)"
+   ]
+  },
+  {
+   "idOverture": "788a3a3c-635e-494c-8c67-8935248fbeaf",
+   "nome": "Casa do Capitão",
+   "categoriaOverture": "party_and_event_planning",
+   "confianca": 0.978,
+   "sites": [],
+   "telefones": [
+    "+554730290700"
+   ],
+   "redesSociais": [
+    "https://www.facebook.com/124968430989280"
+   ],
+   "endereco": "R. Saguaçu, 212",
+   "localidade": "Joinville",
+   "latitude": -26.29499611,
+   "longitude": -48.83902274,
+   "fontes": [
+    "meta (CDLA-Permissive-2.0)",
+    "Overture (CDLA-Permissive-2.0)"
+   ]
+  },
+  {
+   "idOverture": "6f868ce3-65bd-43e5-bccf-04cc75bd928f",
+   "nome": "Parque Zoobotânico",
+   "categoriaOverture": "botanical_garden",
+   "confianca": 0.933,
+   "sites": [
+    "http://deciogoes.blogspot.com.br/2010/01/parque-zoobotanico-em-joinville.html"
+   ],
+   "telefones": [
+    "+554734331230"
+   ],
+   "redesSociais": [
+    "https://www.facebook.com/434826729946966"
+   ],
+   "endereco": "Rua Pastor Guilherme Rau, 462",
+   "localidade": "Joinville",
+   "latitude": -26.2952855,
+   "longitude": -48.83583577,
+   "fontes": [
+    "meta (CDLA-Permissive-2.0)",
+    "Overture (CDLA-Permissive-2.0)"
+   ]
+  },
+  {
+   "idOverture": "20723bff-3a8e-4d4f-a0d4-4e67299e1a5d",
+   "nome": "Museu Fritz Alt",
+   "categoriaOverture": "museum",
+   "confianca": 0.779,
+   "sites": [],
+   "telefones": [
+    "+554734333811"
+   ],
+   "redesSociais": [
+    "https://www.facebook.com/905767626123861"
+   ],
+   "endereco": "",
+   "localidade": "Joinville",
+   "latitude": -26.308775,
+   "longitude": -48.834043,
+   "fontes": [
+    "meta (CDLA-Permissive-2.0)",
+    "Overture (CDLA-Permissive-2.0)"
+   ]
+  },
+  {
+   "idOverture": "27fc31db-3320-4f9b-872f-fa4222d27583",
+   "nome": "Gajah",
+   "categoriaOverture": "hostel",
+   "confianca": 0.954,
+   "sites": [
+    "https://gajahhostel.my.canva.site/"
+   ],
+   "telefones": [
+    "+5547988479312"
+   ],
+   "redesSociais": [
+    "https://www.facebook.com/644016185805759"
+   ],
+   "endereco": "",
+   "localidade": "Joinville",
+   "latitude": -26.30843794,
+   "longitude": -48.83475235,
+   "fontes": [
+    "meta (CDLA-Permissive-2.0)",
+    "Overture (CDLA-Permissive-2.0)"
+   ]
+  },
+  {
+   "idOverture": "2073770e-12a9-4204-8435-8b35d59b8590",
+   "nome": "Hotel Graciosa",
+   "categoriaOverture": "hotel",
+   "confianca": 0.995,
+   "sites": [
+    "http://www.hoteisgraciosa.com.br/"
+   ],
+   "telefones": [
+    "+554734361700"
+   ],
+   "redesSociais": [
+    "https://www.facebook.com/675313852587064"
+   ],
+   "endereco": "R. Florianópolis, 406",
+   "localidade": "Joinville",
+   "latitude": -26.32374825,
+   "longitude": -48.83783933,
+   "fontes": [
+    "meta (CDLA-Permissive-2.0)",
+    "Overture (CDLA-Permissive-2.0)"
+   ]
+  },
+  {
+   "idOverture": "ef333fa1-6aba-4cf4-8ea9-72c3b99e6b6a",
+   "nome": "Parque da Cidade",
+   "categoriaOverture": "arts_and_entertainment",
+   "confianca": 0.9,
+   "sites": [],
+   "telefones": [],
+   "redesSociais": [
+    "https://www.facebook.com/283221102511588"
+   ],
+   "endereco": "Inácio Bastos",
+   "localidade": "Joinville",
+   "latitude": -26.318104650256647,
+   "longitude": -48.83016821420232,
+   "fontes": [
+    "meta (CDLA-Permissive-2.0)",
+    "Overture (CDLA-Permissive-2.0)"
+   ]
+  },
+  {
+   "idOverture": "8cab584a-2b4a-4fda-9648-64d9609f6875",
+   "nome": "Parque da Cidade - Setor Bucarein",
+   "categoriaOverture": "park",
+   "confianca": 0.961,
+   "sites": [],
+   "telefones": [],
+   "redesSociais": [
+    "https://www.facebook.com/335812886858569"
+   ],
+   "endereco": "R. Inácio Bastos",
+   "localidade": "Joinville",
+   "latitude": -26.31635542,
+   "longitude": -48.83161447,
+   "fontes": [
+    "meta (CDLA-Permissive-2.0)",
+    "Overture (CDLA-Permissive-2.0)"
+   ]
+  },
+  {
+   "idOverture": "993349d2-978c-4b96-a0b4-941a695f2647",
+   "nome": "Mandallah Hostel",
+   "categoriaOverture": "hostel",
+   "confianca": 0.954,
+   "sites": [
+    "https://www.instagram.com/hostelmandallah/?hl=pt-br"
+   ],
+   "telefones": [
+    "+5547999312958"
+   ],
+   "redesSociais": [
+    "https://www.facebook.com/107758601421235"
+   ],
+   "endereco": "R. Cecílio Ferreira, 186p",
+   "localidade": "Joinville",
+   "latitude": -26.2633374,
+   "longitude": -48.82612832,
+   "fontes": [
+    "meta (CDLA-Permissive-2.0)",
+    "Overture (CDLA-Permissive-2.0)"
+   ]
+  },
+  {
+   "idOverture": "0712a871-7548-4bf2-ab18-789d6bc23d1d",
+   "nome": "Hostel Iririú",
+   "categoriaOverture": "hotel",
+   "confianca": 0.872,
+   "sites": [],
+   "telefones": [
+    "+5547999791951"
+   ],
+   "redesSociais": [
+    "https://www.facebook.com/172951326647533"
+   ],
+   "endereco": "R. Trajano, 52",
+   "localidade": "Joinville",
+   "latitude": -26.27114818,
+   "longitude": -48.83592978,
+   "fontes": [
+    "meta (CDLA-Permissive-2.0)",
+    "Overture (CDLA-Permissive-2.0)"
+   ]
+  },
+  {
+   "idOverture": "eef4f940-4ad4-4b25-bbf1-d039470907e5",
+   "nome": "Hostel Cidade das Flores",
+   "categoriaOverture": "hostel",
+   "confianca": 0.978,
+   "sites": [],
+   "telefones": [
+    "+5547991595829"
+   ],
+   "redesSociais": [
+    "https://www.facebook.com/1240846212717011"
+   ],
+   "endereco": "Rua Manaus, 185",
+   "localidade": "Joinville",
+   "latitude": -26.27674191,
+   "longitude": -48.83588235,
+   "fontes": [
+    "meta (CDLA-Permissive-2.0)",
+    "Overture (CDLA-Permissive-2.0)"
+   ]
+  },
+  {
+   "idOverture": "6d96fc31-64a7-4d1f-a8b7-fec3c687fad6",
+   "nome": "Império das Pizzas",
+   "categoriaOverture": "pizza_restaurant",
+   "confianca": 0.971,
+   "sites": [
+    "https://pedir.delivery/app/imperiodaspizzas/menu"
+   ],
+   "telefones": [
+    "+554734350292"
+   ],
+   "redesSociais": [
+    "https://www.facebook.com/1365434390159874"
+   ],
+   "endereco": "R. Piratuba, 437",
+   "localidade": "Joinville",
+   "latitude": -26.27039422,
+   "longitude": -48.8339089,
+   "fontes": [
+    "meta (CDLA-Permissive-2.0)",
+    "Overture (CDLA-Permissive-2.0)"
+   ]
+  },
+  {
+   "idOverture": "eec5b5ed-d922-48d4-96a2-e3ab586576ca",
+   "nome": "Saguaçú",
+   "categoriaOverture": "auto_dealer",
+   "confianca": 0.753,
+   "sites": [],
+   "telefones": [
+    "+5547996963221"
+   ],
+   "redesSociais": [
+    "https://www.facebook.com/101657438595970"
+   ],
+   "endereco": "Rua Ibirama, 173",
+   "localidade": "Joinville",
+   "latitude": -26.28323,
+   "longitude": -48.83796,
+   "fontes": [
+    "meta (CDLA-Permissive-2.0)",
+    "Overture (CDLA-Permissive-2.0)"
+   ]
+  },
+  {
+   "idOverture": "a544f682-4209-4549-b85d-8a4493d6050c",
+   "nome": "Chácara Saguaçu",
+   "categoriaOverture": "brazilian_restaurant",
+   "confianca": 0.998,
+   "sites": [
+    "http://www.chacarasaguacu.com.br/"
+   ],
+   "telefones": [
+    "+5547997405921"
+   ],
+   "redesSociais": [
+    "https://www.facebook.com/260323800745585"
+   ],
+   "endereco": "R. Carlos Benack, 70",
+   "localidade": "Joinville",
+   "latitude": -26.28349827,
+   "longitude": -48.83892532,
+   "fontes": [
+    "meta (CDLA-Permissive-2.0)",
+    "Overture (CDLA-Permissive-2.0)"
+   ]
+  },
+  {
+   "idOverture": "9a83ea51-06e2-434d-9be2-ab96f98c341b",
+   "nome": "Wood Bar",
+   "categoriaOverture": "bar",
+   "confianca": 0.998,
+   "sites": [
+    "http://www.woodbar.com.br/"
+   ],
+   "telefones": [
+    "+554734377865"
+   ],
+   "redesSociais": [
+    "https://www.facebook.com/315505215211610"
+   ],
+   "endereco": "R. Dona Francisca, 1495",
+   "localidade": "Joinville",
+   "latitude": -26.28923665,
+   "longitude": -48.84072308,
+   "fontes": [
+    "meta (CDLA-Permissive-2.0)",
+    "Overture (CDLA-Permissive-2.0)"
+   ]
+  },
+  {
+   "idOverture": "f24e1349-1db7-4d98-bd13-93afc12238b9",
+   "nome": "Sabor Pastel",
+   "categoriaOverture": "bakery",
+   "confianca": 0.651,
+   "sites": [
+    "https://instagram.com/marmitextemperoesabor"
+   ],
+   "telefones": [
+    "+5547996282228"
+   ],
+   "redesSociais": [
+    "https://www.facebook.com/1437227319853426"
+   ],
+   "endereco": "Rua Dona Francisca, 2440",
+   "localidade": "Joinville",
+   "latitude": -26.28242652,
+   "longitude": -48.84187501,
+   "fontes": [
+    "meta (CDLA-Permissive-2.0)",
+    "Overture (CDLA-Permissive-2.0)"
+   ]
+  },
+  {
+   "idOverture": "834c36cc-50e8-48a9-b7a0-ab66874dbd0d",
+   "nome": "Saguaçu Pousada Hotel",
+   "categoriaOverture": "hotel",
+   "confianca": 0.916,
+   "sites": [
+    "http://saguacupousadahotel.blogspot.com/"
+   ],
+   "telefones": [
+    "+5547988553191"
+   ],
+   "redesSociais": [
+    "https://www.facebook.com/224879074389220"
+   ],
+   "endereco": "Rua Guaratuba, 189",
+   "localidade": "Joinville",
+   "latitude": -26.27842347,
+   "longitude": -48.84392845,
+   "fontes": [
+    "meta (CDLA-Permissive-2.0)",
+    "Overture (CDLA-Permissive-2.0)"
+   ]
+  },
+  {
+   "idOverture": "bbb80694-8990-4154-8e4b-ac39a86fb99f",
+   "nome": "American Hostel e Pousada em Joinville",
+   "categoriaOverture": "hostel",
+   "confianca": 0.985,
+   "sites": [
+    "https://nobeds.app/OnePage/1508186526"
+   ],
+   "telefones": [
+    "+5547999188474"
+   ],
+   "redesSociais": [
+    "https://www.facebook.com/109412745224066"
+   ],
+   "endereco": "R. Capinzal, 584",
+   "localidade": "Joinville",
+   "latitude": -26.28641615,
+   "longitude": -48.84559943,
+   "fontes": [
+    "meta (CDLA-Permissive-2.0)",
+    "Overture (CDLA-Permissive-2.0)"
+   ]
+  },
+  {
+   "idOverture": "48dbf797-b382-4bcf-8859-a4f13bb6d090",
+   "nome": "Hostel O Sobrado",
+   "categoriaOverture": "hostel",
+   "confianca": 0.88,
+   "sites": [],
+   "telefones": [
+    "+5547997297740"
+   ],
+   "redesSociais": [
+    "https://www.facebook.com/1697070983740372"
+   ],
+   "endereco": "R. Otávio Mangabeira, 163",
+   "localidade": "Joinville",
+   "latitude": -26.26787341,
+   "longitude": -48.84306756,
+   "fontes": [
+    "meta (CDLA-Permissive-2.0)",
+    "Overture (CDLA-Permissive-2.0)"
+   ]
+  },
+  {
+   "idOverture": "34f05df9-ce6c-469a-ac7f-0ee3799a153e",
+   "nome": "Bar e Petisqueira do Janga",
+   "categoriaOverture": "seafood_restaurant",
+   "confianca": 0.984,
+   "sites": [
+    "https://bit.ly/3d6S1eO"
+   ],
+   "telefones": [
+    "+554734253809"
+   ],
+   "redesSociais": [
+    "https://www.facebook.com/891415354246693"
+   ],
+   "endereco": "Rua Tenente Antonio João, 952",
+   "localidade": "Joinville",
+   "latitude": -26.26768597,
+   "longitude": -48.84510441,
+   "fontes": [
+    "meta (CDLA-Permissive-2.0)",
+    "Overture (CDLA-Permissive-2.0)"
+   ]
+  },
+  {
+   "idOverture": "c729a894-f3c3-411d-baa2-22f86b4ac7f9",
+   "nome": "Hostel Mundo",
+   "categoriaOverture": "hostel",
+   "confianca": 0.938,
+   "sites": [
+    "https://www.instagram.com/hostel_mundo/"
+   ],
+   "telefones": [
+    "+5547988375992"
+   ],
+   "redesSociais": [
+    "https://www.facebook.com/289656291920176"
+   ],
+   "endereco": "R. Ten. Antônio João, 1047",
+   "localidade": "Joinville",
+   "latitude": -26.26693994,
+   "longitude": -48.84526049,
+   "fontes": [
+    "meta (CDLA-Permissive-2.0)",
+    "Overture (CDLA-Permissive-2.0)"
+   ]
+  },
+  {
+   "idOverture": "40b5f4b4-2e91-461e-87d9-c51ed086a549",
+   "nome": "Castelo Excalibur",
+   "categoriaOverture": "party_and_event_planning",
+   "confianca": 0.761,
+   "sites": [
+    "http://reidobailao.com/"
+   ],
+   "telefones": [
+    "+554734164137"
+   ],
+   "redesSociais": [
+    "https://www.facebook.com/1438266556475893"
+   ],
+   "endereco": "Rua Prefeito Baltazar Buschle, 212",
+   "localidade": "Joinville",
+   "latitude": -26.28441726,
+   "longitude": -48.80766648,
+   "fontes": [
+    "meta (CDLA-Permissive-2.0)",
+    "Overture (CDLA-Permissive-2.0)"
+   ]
+  },
+  {
+   "idOverture": "1ab285e1-21f6-48da-8d71-3b95ebf040a2",
+   "nome": "Unisociesc",
+   "categoriaOverture": "college_university",
+   "confianca": 0.979,
+   "sites": [
+    "http://www.sociesc.org.br/"
+   ],
+   "telefones": [
+    "+554735123100"
+   ],
+   "redesSociais": [
+    "https://www.facebook.com/104460294657009"
+   ],
+   "endereco": "Rua Albano Schmidt, 3333",
+   "localidade": "Joinville",
+   "latitude": -26.28794119,
+   "longitude": -48.81327519,
+   "fontes": [
+    "meta (CDLA-Permissive-2.0)",
+    "Overture (CDLA-Permissive-2.0)"
+   ]
+  },
+  {
+   "idOverture": "d527d0e1-5657-424c-9944-48e2281da212",
+   "nome": "Sociesc",
+   "categoriaOverture": "college_university",
+   "confianca": 0.684,
+   "sites": [
+    "http://www.sociesc.org.br/pt/joinville"
+   ],
+   "telefones": [
+    "+554734610172"
+   ],
+   "redesSociais": [
+    "https://www.facebook.com/112195915473899"
+   ],
+   "endereco": "Rua Albano Schmidt, 3333",
+   "localidade": "Joinville",
+   "latitude": -26.28836244,
+   "longitude": -48.81334723,
+   "fontes": [
+    "meta (CDLA-Permissive-2.0)",
+    "Overture (CDLA-Permissive-2.0)"
+   ]
+  },
+  {
+   "idOverture": "329f88ed-ff41-4f6b-b62d-ac5bceadde04",
+   "nome": "Pousada Alvora",
+   "categoriaOverture": "inn",
+   "confianca": 0.938,
+   "sites": [],
+   "telefones": [
+    "+554797854238"
+   ],
+   "redesSociais": [
+    "https://www.facebook.com/339771006124579"
+   ],
+   "endereco": "Rua Angela Loth n75, Nossa Sra. de Fatima",
+   "localidade": "Joinville",
+   "latitude": -26.34078595,
+   "longitude": -48.82056738,
+   "fontes": [
+    "meta (CDLA-Permissive-2.0)",
+    "Overture (CDLA-Permissive-2.0)"
+   ]
+  },
+  {
+   "idOverture": "138d90f2-ae25-470e-92bd-5bdcb8b6e457",
+   "nome": "Parque São Francisco",
+   "categoriaOverture": "park",
+   "confianca": 0.971,
+   "sites": [],
+   "telefones": [
+    "+5547996351826"
+   ],
+   "redesSociais": [
+    "https://www.facebook.com/647632462285173"
+   ],
+   "endereco": "R. Waslaw Andrzejewski, 10",
+   "localidade": "Joinville",
+   "latitude": -26.32071252,
+   "longitude": -48.80431231,
+   "fontes": [
+    "meta (CDLA-Permissive-2.0)",
+    "Overture (CDLA-Permissive-2.0)"
+   ]
+  },
+  {
+   "idOverture": "5466ce9a-20da-4634-a3bb-613cb0df110d",
+   "nome": "Restaurante Beira Mar",
+   "categoriaOverture": "restaurant",
+   "confianca": 0.986,
+   "sites": [
+    "http://restaurantebeiramar1.placeweb.site"
+   ],
+   "telefones": [
+    "+554734340517"
+   ],
+   "redesSociais": [
+    "https://www.facebook.com/1765788020307470"
+   ],
+   "endereco": "R. Pref. Baltasar Buschle, 3219",
+   "localidade": "Joinville",
+   "latitude": -26.29106727,
+   "longitude": -48.77526914,
+   "fontes": [
+    "meta (CDLA-Permissive-2.0)",
+    "Overture (CDLA-Permissive-2.0)"
+   ]
+  },
+  {
+   "idOverture": "8e789c96-6ee1-4562-b6ad-95b804895ed1",
+   "nome": "Frutos do Mar - Lagoa Pescados y Mariscos",
+   "categoriaOverture": "seafood_restaurant",
+   "confianca": 0.92,
+   "sites": [
+    "http://lagoapescadosymariscos.com.br/"
+   ],
+   "telefones": [
+    "+5547984650099"
+   ],
+   "redesSociais": [
+    "https://www.facebook.com/685205308011839"
+   ],
+   "endereco": "R. Pref. Baltasar Buschle, 3870",
+   "localidade": "Joinville",
+   "latitude": -26.29125788,
+   "longitude": -48.77462446,
+   "fontes": [
+    "meta (CDLA-Permissive-2.0)",
+    "Overture (CDLA-Permissive-2.0)"
+   ]
+  },
+  {
+   "idOverture": "7c00b8d0-b15a-41c0-9e42-bf44c92e9228",
+   "nome": "Restaurante Capitão do Mar",
+   "categoriaOverture": "brazilian_restaurant",
+   "confianca": 0.876,
+   "sites": [],
+   "telefones": [
+    "+554734346132"
+   ],
+   "redesSociais": [
+    "https://www.facebook.com/225305520934116"
+   ],
+   "endereco": "R. Antônio Gonçalves, 3773",
+   "localidade": "Joinville",
+   "latitude": -26.29074537,
+   "longitude": -48.77202757,
+   "fontes": [
+    "meta (CDLA-Permissive-2.0)",
+    "Overture (CDLA-Permissive-2.0)"
+   ]
+  },
+  {
+   "idOverture": "08d9ecc5-f8b8-4533-a3e3-4d9dec917158",
+   "nome": "Petisqueira Estrela do Mar Music Bar",
+   "categoriaOverture": null,
+   "confianca": 0.77,
+   "sites": [],
+   "telefones": [
+    "+5547999225466"
+   ],
+   "redesSociais": [
+    "https://www.facebook.com/921498028006739"
+   ],
+   "endereco": null,
+   "localidade": "Joinville",
+   "latitude": -26.224158341306,
+   "longitude": -48.767162,
+   "fontes": [
+    "meta (CDLA-Permissive-2.0)",
+    "Overture (CDLA-Permissive-2.0)"
+   ]
+  },
+  {
+   "idOverture": "41b25d29-6dd9-4e74-bc0e-28e2be41da36",
+   "nome": "Petisqueira Babitonga",
+   "categoriaOverture": "restaurant",
+   "confianca": 0.865,
+   "sites": [],
+   "telefones": [
+    "+5547997769781"
+   ],
+   "redesSociais": [
+    "https://www.facebook.com/101691635727237"
+   ],
+   "endereco": "Estr. Eng. João de Souza Mello e Alvim, 53",
+   "localidade": "Joinville",
+   "latitude": -26.2242768,
+   "longitude": -48.76710139,
+   "fontes": [
+    "meta (CDLA-Permissive-2.0)",
+    "Overture (CDLA-Permissive-2.0)"
+   ]
+  }
+ ]
+}

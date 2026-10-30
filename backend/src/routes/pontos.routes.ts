@@ -11,7 +11,8 @@ import { criarNotificacao, notificarModeradores } from "../lib/notificacoes";
 import { registrarVersaoPonto } from "../lib/versionamento";
 import { conteudoSuspeito } from "../lib/moderacaoTexto";
 import { ehUsuarioConfiavel, incrementarReputacao, PONTOS_REPUTACAO } from "../lib/reputacao";
-import { limiteContribuicao } from "../middleware/rateLimit";
+import { limiteContribuicao, limiteGoogle } from "../middleware/rateLimit";
+import { chaveGoogle, detalhesDoGoogle, idGoogleDoPonto } from "../lib/googlePlaces";
 import { analisarCsv, linhasParaObjetos, objetosParaCsv } from "../lib/csv";
 import { ErroGeoJson, linhasDeGeoJson, type LinhaImportacao } from "../lib/geojson";
 import {
@@ -29,6 +30,7 @@ import { removerArquivoLocal, removerArquivoPublico } from "../lib/arquivos";
 import { registrarEvento } from "../lib/metricasUso";
 import { pontosDeUsuariosSemelhantes } from "../lib/similaridade";
 import { bonusDeCadastro } from "../lib/recomendacao";
+import { cidadesComPontos, variantesDaCidade } from "../lib/cidades";
 import { preferenciasAtendidas } from "../lib/preferencias";
 
 const pontosRouter = Router();
@@ -680,6 +682,17 @@ pontosRouter.post(
   },
 );
 
+// Cidades com pontos publicados, para sugerir no campo de cidade da busca e do roteiro.
+pontosRouter.get("/cidades", async (_req: Request, res: Response) => {
+  try {
+    return res.json({ dados: await cidadesComPontos() });
+  } catch (error) {
+    console.error("Erro ao listar cidades:", error);
+
+    return res.status(500).json({ erro: "Erro interno ao listar cidades." });
+  }
+});
+
 // RF24: recomendações com base em usuários de gostos parecidos (pontos que eles salvaram,
 // avaliaram bem ou colocaram em roteiros) e, para completar, nos interesses do perfil,
 // priorizando o que atende às preferências de acessibilidade.
@@ -704,6 +717,9 @@ pontosRouter.get("/recomendados", autenticar, async (req: Request, res: Response
         })
       : [];
 
+    // Cidade base que ainda não tem pontos (ou escrita de outro jeito) não zera as sugestões.
+    const cidadesBase = usuario.cidadeBase ? await variantesDaCidade(usuario.cidadeBase) : [];
+
     const pontosPorInteresse =
       usuario.interesses.length > 0
         ? await prisma.pontoTuristico.findMany({
@@ -711,9 +727,7 @@ pontosRouter.get("/recomendados", autenticar, async (req: Request, res: Response
               status: StatusPonto.PUBLICADO,
               id: { notIn: idsSemelhantes },
               categoria: { in: usuario.interesses, mode: "insensitive" },
-              ...(usuario.cidadeBase
-                ? { cidade: { equals: usuario.cidadeBase, mode: "insensitive" } }
-                : {}),
+              ...(cidadesBase.length > 0 ? { cidade: { in: cidadesBase } } : {}),
             },
             // Os com foto primeiro; a ordem final (abaixo) pesa o cadastro completo.
             orderBy: [{ seloVerificado: "desc" }, { imagemUrl: { sort: "asc", nulls: "last" } }, { nome: "asc" }],
@@ -744,6 +758,37 @@ pontosRouter.get("/recomendados", autenticar, async (req: Request, res: Response
     console.error("Erro ao buscar pontos recomendados:", error);
 
     return res.status(500).json({ erro: "Erro interno ao buscar pontos recomendados." });
+  }
+});
+
+// Informações do Google Maps sobre o ponto, consultadas agora e nunca gravadas (só o place_id
+// fica guardado, como os termos do Google permitem). Sem chave configurada: { disponivel: false }.
+pontosRouter.get("/:id/google", limiteGoogle, async (req: Request, res: Response) => {
+  try {
+    const id = idSchema.safeParse(req.params.id);
+
+    if (!id.success) {
+      return res.status(400).json({ erro: "Identificador inválido." });
+    }
+
+    if (!chaveGoogle()) {
+      return res.json({ disponivel: false });
+    }
+
+    const ponto = await prisma.pontoTuristico.findFirst({ where: { id: id.data, status: StatusPonto.PUBLICADO } });
+
+    if (!ponto) {
+      return res.status(404).json({ erro: "Ponto turístico não encontrado." });
+    }
+
+    const idGoogle = await idGoogleDoPonto(ponto);
+    const informacoes = idGoogle ? await detalhesDoGoogle(idGoogle, { comFoto: !ponto.imagemUrl }) : null;
+
+    return res.json(informacoes ? { disponivel: true, ...informacoes } : { disponivel: false });
+  } catch (error) {
+    console.error("Erro ao consultar o Google Maps:", error);
+
+    return res.json({ disponivel: false });
   }
 });
 

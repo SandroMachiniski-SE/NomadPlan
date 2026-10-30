@@ -1,6 +1,7 @@
 import { describe, it } from "node:test";
 import assert from "node:assert/strict";
 import {
+  ajustarLocalizacao,
   bonusDeCadastro,
   calcularMaxPontos,
   DURACAO_VISITA_MIN,
@@ -228,6 +229,30 @@ describe("planejarRoteiro", () => {
 
     assert.equal(avisos.length, 5);
     assert.match(avisos[0], /^Museu fechado: estaria fechado às 10:00/);
+  });
+});
+
+describe("ajustarLocalizacao", () => {
+  const pontos = [candidato({ latitude: -26.3, longitude: -48.84 }), candidato({ latitude: -26.31, longitude: -48.85 })];
+
+  it("usa a localização de quem está na cidade", () => {
+    const { parametros, aviso } = ajustarLocalizacao(pontos, params({ latitude: -26.32, longitude: -48.86 }));
+
+    assert.equal(parametros.latitude, -26.32);
+    assert.equal(aviso, null);
+  });
+
+  it("ignora a localização de quem está em outra cidade e explica", () => {
+    // Curitiba, a uns 100 km dos pontos de Joinville.
+    const { parametros, aviso } = ajustarLocalizacao(pontos, params({ latitude: -25.43, longitude: -49.27 }));
+
+    assert.equal(parametros.latitude, undefined);
+    assert.equal(parametros.longitude, undefined);
+    assert.match(aviso ?? "", /^Você está a cerca de \d+ km de Joinville: o roteiro começa pelo centro da cidade/);
+  });
+
+  it("sem localização informada, não muda nada", () => {
+    assert.deepEqual(ajustarLocalizacao(pontos, params()), { parametros: params(), aviso: null });
   });
 });
 

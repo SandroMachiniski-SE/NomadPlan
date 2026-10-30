@@ -1,7 +1,7 @@
 import { useCallback, useEffect, useMemo, useRef, useState, type FormEvent } from "react";
 import { Link, useParams } from "react-router-dom";
 import api, { urlDoArquivo } from "../services/api";
-import type { Ponto, RespostaAvaliacoes, SugestaoCriada } from "../types/ponto";
+import type { InformacoesGoogle as DadosGoogle, Ponto, RespostaAvaliacoes, SugestaoCriada } from "../types/ponto";
 import type { RespostaRoteiros } from "../types/roteiro";
 import { useAuth } from "../context/useAuth";
 import { extrairMensagemErro } from "../utils/erro";
@@ -9,6 +9,7 @@ import MapaCarregavel from "../components/MapaCarregavel";
 import Icone from "../components/Icone";
 import Estrelas from "../components/Estrelas";
 import BotaoSalvar from "../components/BotaoSalvar";
+import InformacoesGoogle from "../components/InformacoesGoogle";
 import { iconeDaCategoria } from "../constants/categorias";
 
 const LIMITE_FOTO_BYTES = 5 * 1024 * 1024;
@@ -54,6 +55,8 @@ function PontoDetalhes() {
   const [enviandoSugestao, setEnviandoSugestao] = useState(false);
   const [sugestaoEnviada, setSugestaoEnviada] = useState<string | null>(null);
   const secaoSugestao = useRef<HTMLElement>(null);
+  // Foto do Google para pontos sem foto própria: exibida, nunca gravada.
+  const [fotoGoogle, setFotoGoogle] = useState<NonNullable<DadosGoogle["foto"]> | null>(null);
 
   const [solicitandoSelo, setSolicitandoSelo] = useState(false);
   const [seloSolicitado, setSeloSolicitado] = useState(false);
@@ -315,6 +318,18 @@ function PontoDetalhes() {
                       </a>
                     )}
                   </>
+                ) : fotoGoogle ? (
+                  <>
+                    <img src={fotoGoogle.url} alt={ponto.nome} />
+                    <a
+                      className="ponto-capa__credito"
+                      href={fotoGoogle.urlAutor ?? undefined}
+                      target="_blank"
+                      rel="noreferrer"
+                    >
+                      Foto{fotoGoogle.autor ? `: ${fotoGoogle.autor}` : ""} · Google Maps
+                    </a>
+                  </>
                 ) : (
                   <Icone nome={iconeDaCategoria(ponto.categoria)} className="ponto-capa__icone" />
                 )}
@@ -436,6 +451,20 @@ function PontoDetalhes() {
                   )}
                 </ul>
 
+                {ponto.idOverture && (
+                  <p className="ponto-fonte muted small">
+                    {ponto.idOsm ? "Telefone e site complementados pelo" : "Dados do"}{" "}
+                    <a href="https://overturemaps.org" target="_blank" rel="noreferrer">
+                      Overture Maps
+                    </a>{" "}
+                    (licença{" "}
+                    <a href="https://cdla.dev/permissive-2-0/" target="_blank" rel="noreferrer">
+                      CDLA Permissive 2.0
+                    </a>
+                    ).
+                  </p>
+                )}
+
                 {ponto.idOsm && (
                   <p className="ponto-fonte muted small">
                     Dados do{" "}
@@ -453,6 +482,8 @@ function PontoDetalhes() {
                   </p>
                 )}
               </section>
+
+              {ponto.status === "PUBLICADO" && <InformacoesGoogle ponto={ponto} aoReceberFoto={setFotoGoogle} />}
 
               {autenticado && ponto.status === "PUBLICADO" && (
                 <BotaoSalvar idPonto={ponto.id} variante="completo" />

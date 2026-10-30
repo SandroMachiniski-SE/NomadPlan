@@ -49,7 +49,9 @@ Banco PostgreSQL 16 com a extensão PostGIS. O esquema é definido em `backend/p
 | `id_responsavel` | FK → `usuario` | Dono do cadastro. Nulo nos pontos importados do OpenStreetMap. |
 | `origem` | `OrigemRegistro` | Como o registro entrou no sistema (RNF19). Junto com `data_criacao`, `data_atualizacao`, `versao` e o histórico em `versao_ponto`, permite rastrear cada ponto. |
 | `id_osm` | texto, único | Elemento do OpenStreetMap de onde vieram os dados (`node/123`, `way/456`). Impede que uma nova importação duplique o ponto. Um ponto cadastrado à mão também pode ter, quando a importação o reconheceu pelo nome. |
-| `sincronizado_em` | timestamp | Última importação do OpenStreetMap que passou por este ponto. |
+| `sincronizado_em` | timestamp | Última importação (OpenStreetMap ou Overture Maps) que passou por este ponto. |
+| `id_overture` | texto, único | Lugar do Overture Maps que completou telefone e site do ponto, ou de onde veio a hospedagem. |
+| `id_google`, `google_buscado_em` | texto, timestamp | Identificador do lugar no Google Places (`place_id`) e quando ele foi procurado. É o único dado do Google guardado, como os termos do Google permitem; horário, nota e foto do Google são consultados na hora e nunca gravados. Um lugar que o Google não achou só é procurado de novo depois de 30 dias. |
 | `imagem_credito`, `imagem_fonte` | texto | Autor, licença e página de origem da foto quando ela veio do Wikimedia Commons (a licença exige o crédito junto da imagem). Apagados quando alguém envia uma foto própria. |
 | `data_criacao`, `data_atualizacao` | timestamp | |
 
@@ -69,7 +71,7 @@ Banco PostgreSQL 16 com a extensão PostGIS. O esquema é definido em `backend/p
 
 ### `versao_ponto` e `versao_roteiro`
 
-Histórico de alterações (RF26). `id`, `id_ponto`/`id_roteiro` (FK, cascata), `dados` (JSON com o retrato completo antes da mudança), `id_autor`, `motivo` (pontos: `edicao`, `antes_de_restaurar`, os de sugestões aplicadas e `Complementado com dados do OpenStreetMap`; roteiros: `edicao`, `adicionar_ponto`, `remover_ponto`, `reordenar`, `organizar`, `otimizar`, `antes_de_restaurar`), `data_criacao`. O roteiro guarda até 50 versões.
+Histórico de alterações (RF26). `id`, `id_ponto`/`id_roteiro` (FK, cascata), `dados` (JSON com o retrato completo antes da mudança), `id_autor`, `motivo` (pontos: `edicao`, `antes_de_restaurar`, os de sugestões aplicadas, `Complementado com dados do OpenStreetMap`, `Complementado com dados do Overture Maps` e `Conferido na fonte oficial (<endereço>)`; roteiros: `edicao`, `adicionar_ponto`, `remover_ponto`, `reordenar`, `organizar`, `otimizar`, `antes_de_restaurar`), `data_criacao`. O roteiro guarda até 50 versões.
 
 ### `roteiro` e `item_roteiro`
 
@@ -94,7 +96,7 @@ Favoritos. `id`, `id_usuario` (FK, cascata), `id_ponto` (FK, cascata), `data_cri
 
 ### `log_auditoria`
 
-Trilha de auditoria (RF20): `id`, `id_usuario` (nulo para ações do sistema ou tentativas anônimas), `acao` (ex.: `login_ok`, `login_falhou`, `login_bloqueado`, `alerta_forca_bruta`, `alterar_papel`, `desativar_conta`, `exportar`, `importar`, `importar_osm`), `entidade`, `id_entidade`, `detalhes` (JSON; nunca guarda senhas nem e-mails digitados), `data_criacao`.
+Trilha de auditoria (RF20): `id`, `id_usuario` (nulo para ações do sistema ou tentativas anônimas), `acao` (ex.: `login_ok`, `login_falhou`, `login_bloqueado`, `alerta_forca_bruta`, `alterar_papel`, `desativar_conta`, `exportar`, `importar`, `importar_osm`, `importar_overture`, `aplicar_curadoria`), `entidade`, `id_entidade`, `detalhes` (JSON; nunca guarda senhas nem e-mails digitados), `data_criacao`.
 
 ### `metrica_diaria`
 

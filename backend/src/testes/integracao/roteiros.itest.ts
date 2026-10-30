@@ -349,6 +349,34 @@ describe("roteiros (RF11, RF12, RF13, RF25, RF26)", () => {
       assert.match(r.corpo.avisos[0], /Feira da tarde: estaria fechado/);
     });
 
+    it("acha a cidade escrita sem acento ou com a UF", async () => {
+      await criarPonto({ nome: "Mercado Público", cidade: "Florianópolis" });
+
+      for (const cidade of ["Florianopolis", "florianópolis, SC", "Florianópolis - SC"]) {
+        const r = await api("POST", "/roteiros/gerar", {
+          token: dono.token,
+          json: { cidade, horasDisponiveis: 1.5, dataHoraInicio: SEGUNDA_10H },
+        });
+
+        assert.deepEqual(r.corpo.pontos.map((p: { nome: string }) => p.nome), ["Mercado Público"], cidade);
+      }
+    });
+
+    it("diz quais cidades existem quando a pedida ainda não tem pontos", async () => {
+      await criarPonto({ cidade: "Joinville" });
+      await criarPonto({ cidade: "Blumenau" });
+      await criarPonto({ cidade: "Pomerode", status: StatusPonto.RASCUNHO });
+
+      const r = await api("POST", "/roteiros/gerar", {
+        token: dono.token,
+        json: { cidade: "Jaraguá do Sul", horasDisponiveis: 3, dataHoraInicio: SEGUNDA_10H },
+      });
+
+      assert.equal(r.status, 200);
+      assert.deepEqual(r.corpo.pontos, []);
+      assert.equal(r.corpo.avisos[0], 'Ainda não há pontos cadastrados em "Jaraguá do Sul". Cidades disponíveis: Blumenau, Joinville.');
+    });
+
     it("sem horário de início, não devolve roteiro vazio só porque agora é madrugada", async () => {
       await criarPonto({ nome: "Museu", horarioFuncionamento: "Seg-Dom 9h-23h" });
 

@@ -3,6 +3,8 @@ import prisma from "./prisma";
 import { distanciaMetros } from "./geo";
 import { estaAbertoNoHorario } from "./horarios";
 import { preferenciasAtendidas } from "./preferencias";
+import { cidadesComPontos, variantesDaCidade } from "./cidades";
+import { chaveGoogle, detalhesDoGoogle, idGoogleDoPonto } from "./googlePlaces";
 
 export const DURACAO_VISITA_MIN = 90;
 export const VELOCIDADE_MEDIA_KMH = 25;
@@ -19,6 +21,9 @@ const MINUTOS_POR_PONTO_DE_SCORE = 30;
 // Cada parada já escolhida da mesma categoria tira 1,5 ponto: cinco restaurantes seguidos
 // combinam com o interesse "Gastronomia", mas não fazem um bom passeio.
 const PENALIDADE_CATEGORIA_REPETIDA = 1.5;
+// Quem pede o roteiro de outra cidade (de casa, da faculdade) não deve gastar o passeio inteiro
+// na estrada: além dessa distância do centro dos pontos, a localização é ignorada.
+const DISTANCIA_MAXIMA_DA_LOCALIZACAO_M = 30_000;
 
 export interface CandidatoRoteiro {
   id: number;
@@ -35,6 +40,11 @@ export interface CandidatoRoteiro {
   imagemCredito: string | null;
   seloVerificado: boolean;
   mediaAvaliacao: number | null;
+  /** Só para consultar o Google; não volta na resposta. */
+  idGoogle?: string | null;
+  googleBuscadoEm?: Date | null;
+  /** O horário foi consultado agora no Google Maps (não está no cadastro). */
+  horarioDoGoogle?: boolean;
 }
 
 export interface ParametrosRecomendacao {
@@ -47,7 +57,7 @@ export interface ParametrosRecomendacao {
   longitude?: number;
 }
 
-export interface PontoRecomendado extends Omit<CandidatoRoteiro, "mediaAvaliacao"> {
+export interface PontoRecomendado extends Omit<CandidatoRoteiro, "mediaAvaliacao" | "idGoogle" | "googleBuscadoEm"> {
   distanciaMetros: number | null;
   ordem: number;
   chegadaEstimada: string;
@@ -264,7 +274,7 @@ export function planejarRoteiro(
 
     const [{ candidato }] = restantes.splice(melhor.indice, 1);
     const saida = new Date(melhor.chegada.getTime() + DURACAO_VISITA_MIN * 60_000);
-    const { mediaAvaliacao: _media, ...dadosDoPonto } = candidato;
+    const { mediaAvaliacao: _media, idGoogle: _idGoogle, googleBuscadoEm: _buscadoEm, ...dadosDoPonto } = candidato;
 
     escolhidos.push({
       ...dadosDoPonto,
@@ -298,10 +308,10 @@ export function planejarRoteiro(
   return { pontos: escolhidos, avisos };
 }
 
-async function buscarCandidatos(cidade: string): Promise<CandidatoRoteiro[]> {
+async function buscarCandidatos(cidades: string[]): Promise<CandidatoRoteiro[]> {
   const pontos = await prisma.pontoTuristico.findMany({
     where: {
-      cidade: { equals: cidade, mode: "insensitive" },
+      cidade: { in: cidades },
       status: StatusPonto.PUBLICADO,
     },
     select: {
@@ -318,6 +328,8 @@ async function buscarCandidatos(cidade: string): Promise<CandidatoRoteiro[]> {
       imagemUrl: true,
       imagemCredito: true,
       seloVerificado: true,
+      idGoogle: true,
+      googleBuscadoEm: true,
     },
   });
 
@@ -386,20 +398,100 @@ export function planejarPorProximidade(
   });
 }
 
+/**
+ * Com a chave do Google configurada, consulta agora o horário dos pontos mais relevantes que não
+ * têm horário no cadastro, para o roteiro não contar com um lugar fechado. O horário vale só para
+ * este roteiro: não é gravado (termos do Google). Devolve quantos pontos ganharam horário.
+ */
+export async function completarHorariosPeloGoogle(
+  candidatos: CandidatoRoteiro[],
+  params: ParametrosRecomendacao,
+): Promise<number> {
+  if (!chaveGoogle()) {
+    return 0;
+  }
+
+  const limite = Number(process.env.GOOGLE_PONTOS_POR_ROTEIRO ?? 8);
+  const preferencias = params.preferenciasAcessibilidade ?? [];
+  const escolhidos = candidatos
+    .filter((c) => !c.horarioFuncionamento?.trim())
+    .map((c) => ({ c, pontuacao: pontuarCandidato(c, params.interesses, preferencias) + bonusDeCadastro(c) }))
+    .sort((a, b) => b.pontuacao - a.pontuacao)
+    .slice(0, limite);
+
+  const completados = await Promise.all(
+    escolhidos.map(async ({ c }) => {
+      const idGoogle = await idGoogleDoPonto({ ...c, idGoogle: c.idGoogle ?? null, googleBuscadoEm: c.googleBuscadoEm ?? null });
+      const horario = idGoogle ? (await detalhesDoGoogle(idGoogle))?.horario : null;
+
+      if (!horario) return false;
+
+      c.horarioFuncionamento = horario;
+      c.horarioDoGoogle = true;
+      return true;
+    }),
+  );
+
+  return completados.filter(Boolean).length;
+}
+
+/** Ignora a localização de quem está longe da cidade do roteiro (e avisa por quê). */
+export function ajustarLocalizacao(
+  candidatos: CandidatoRoteiro[],
+  params: ParametrosRecomendacao,
+): { parametros: ParametrosRecomendacao; aviso: string | null } {
+  const centro = calcularCentroide(candidatos);
+
+  if (params.latitude === undefined || params.longitude === undefined || !centro) {
+    return { parametros: params, aviso: null };
+  }
+
+  const metros = distanciaMetros(params.latitude, params.longitude, centro.latitude, centro.longitude);
+
+  if (metros <= DISTANCIA_MAXIMA_DA_LOCALIZACAO_M) {
+    return { parametros: params, aviso: null };
+  }
+
+  const { latitude: _latitude, longitude: _longitude, ...semLocalizacao } = params;
+
+  return {
+    parametros: semLocalizacao,
+    aviso: `Você está a cerca de ${Math.round(metros / 1000)} km de ${params.cidade}: o roteiro começa pelo centro da cidade, sem contar a viagem até lá.`,
+  };
+}
+
 export async function gerarRoteiroSugerido(
   params: ParametrosRecomendacao,
 ): Promise<ResultadoRecomendacao> {
   const inicio = params.dataHoraInicio.toISOString();
+  const cidades = await variantesDaCidade(params.cidade);
+
+  // Sem nenhum ponto na cidade, o roteiro sairia vazio sem explicação: diz quais cidades existem.
+  if (cidades.length === 0) {
+    const disponiveis = (await cidadesComPontos()).map((c) => c.cidade);
+    const aviso =
+      disponiveis.length > 0
+        ? `Ainda não há pontos cadastrados em "${params.cidade}". Cidades disponíveis: ${disponiveis.join(", ")}.`
+        : "Ainda não há pontos publicados para montar um roteiro.";
+
+    return { pontos: [], avisos: [aviso], inicio, fallbackUsado: false };
+  }
 
   try {
-    const candidatos = await buscarCandidatos(params.cidade);
-    const { pontos, avisos } = planejarRoteiro(candidatos, params);
+    const candidatos = await buscarCandidatos(cidades);
+    const { parametros, aviso } = ajustarLocalizacao(candidatos, params);
+    const doGoogle = await completarHorariosPeloGoogle(candidatos, parametros);
+    const { pontos, avisos } = planejarRoteiro(candidatos, parametros);
+    const avisosIniciais = [
+      ...(aviso ? [aviso] : []),
+      ...(doGoogle > 0 ? [`Horário de ${doGoogle} ${doGoogle === 1 ? "ponto consultado" : "pontos consultados"} agora no Google Maps.`] : []),
+    ];
 
-    return { pontos, avisos, inicio, fallbackUsado: false };
+    return { pontos, avisos: [...avisosIniciais, ...avisos], inicio, fallbackUsado: false };
   } catch (erro) {
     console.error("Motor de recomendação falhou, aplicando fallback por proximidade:", erro);
 
-    const candidatos = await buscarCandidatos(params.cidade);
+    const candidatos = await buscarCandidatos(cidades);
 
     return { pontos: planejarPorProximidade(candidatos, params), avisos: [], inicio, fallbackUsado: true };
   }

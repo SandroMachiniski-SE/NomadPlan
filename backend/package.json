@@ -19,7 +19,9 @@
     "e2e:preparar": "tsx src/scripts/prepararE2e.ts",
     "email:testar": "tsx src/scripts/testarEmail.ts",
     "osm:baixar": "tsx src/scripts/baixarOsm.ts",
-    "osm:importar": "tsx src/scripts/importarOsm.ts"
+    "osm:importar": "tsx src/scripts/importarOsm.ts",
+    "overture:importar": "tsx src/scripts/importarOverture.ts",
+    "curadoria:aplicar": "tsx src/scripts/aplicarCuradoria.ts"
   },
   "dependencies": {
     "@prisma/client": "^6.19.3",

@@ -1,0 +1,6767 @@
+{
+ "fonte": "Overture Maps Foundation, tema places, versão 2026-10-21.0",
+ "licenca": "CDLA Permissive 2.0 (https://cdla.dev/permissive-2-0/); algumas fontes em Apache 2.0 ou CC0, indicadas em cada lugar",
+ "cidade": "Blumenau",
+ "baixadoEm": "2026-10-30T01:39:28.469196+00:00",
+ "lugares": [
+  {
+   "idOverture": "266f398f-d902-4557-8a7f-b39fc1aad1f1",
+   "nome": "Chalé Motel",
+   "categoriaOverture": "hotel",
+   "confianca": 0.978,
+   "sites": [
+    "https://linktr.ee/chalemotel"
+   ],
+   "telefones": [
+    "+554733341234"
+   ],
+   "redesSociais": [
+    "https://www.facebook.com/1193123804054661"
+   ],
+   "endereco": "Rua Wanda Zils 134 BR-470 Km 64",
+   "localidade": "Blumenau",
+   "latitude": -26.88098142,
+   "longitude": -49.16008815,
+   "fontes": [
+    "meta (CDLA-Permissive-2.0)",
+    "Overture (CDLA-Permissive-2.0)"
+   ]
+  },
+  {
+   "idOverture": "8af45bc2-e084-486c-88df-e61189457088",
+   "nome": "Arte e Estilo Presentes",
+   "categoriaOverture": "flowers_and_gifts_store",
+   "confianca": 0.93,
+   "sites": [],
+   "telefones": [
+    "+554733374322"
+   ],
+   "redesSociais": [
+    "https://www.facebook.com/476413002384919"
+   ],
+   "endereco": "Rua Christiano Karsten, 56 Em frente a padaria",
+   "localidade": "Blumenau",
+   "latitude": -26.85262296,
+   "longitude": -49.15022487,
+   "fontes": [
+    "meta (CDLA-Permissive-2.0)",
+    "Overture (CDLA-Permissive-2.0)"
+   ]
+  },
+  {
+   "idOverture": "7020f0fe-57d3-40e2-b1d2-0bbbeaf6a25f",
+   "nome": "Bar E Cancha Garcia",
+   "categoriaOverture": "bar",
+   "confianca": 0.864,
+   "sites": [],
+   "telefones": [
+    "+5547997581909"
+   ],
+   "redesSociais": [
+    "https://www.facebook.com/834025786661466"
+   ],
+   "endereco": "",
+   "localidade": "Blumenau",
+   "latitude": -26.86824179,
+   "longitude": -49.14254533,
+   "fontes": [
+    "meta (CDLA-Permissive-2.0)",
+    "Overture (CDLA-Permissive-2.0)"
+   ]
+  },
+  {
+   "idOverture": "614e00bb-2f7c-4955-96e4-4d44417da63b",
+   "nome": "Restaurante Panela de Barro bnu",
+   "categoriaOverture": "restaurant",
+   "confianca": 0.919,
+   "sites": [],
+   "telefones": [
+    "+5547991425604"
+   ],
+   "redesSociais": [
+    "https://www.facebook.com/1770873629831659"
+   ],
+   "endereco": "R. Werner Duwe, 1088",
+   "localidade": "Blumenau",
+   "latitude": -26.87308228,
+   "longitude": -49.14084714,
+   "fontes": [
+    "meta (CDLA-Permissive-2.0)",
+    "Overture (CDLA-Permissive-2.0)"
+   ]
+  },
+  {
+   "idOverture": "f745fb8a-d923-4bde-a22c-fbd00004dac6",
+   "nome": "Vô Ivo Restaurante",
+   "categoriaOverture": "brazilian_restaurant",
+   "confianca": 0.955,
+   "sites": [
+    "http://ivorestaurante1.placeweb.site"
+   ],
+   "telefones": [
+    "+554733302315"
+   ],
+   "redesSociais": [
+    "https://www.facebook.com/306357882789000"
+   ],
+   "endereco": "R. José Reuter, 1123",
+   "localidade": "Blumenau",
+   "latitude": -26.93230662,
+   "longitude": -49.13911717,
+   "fontes": [
+    "meta (CDLA-Permissive-2.0)",
+    "Overture (CDLA-Permissive-2.0)"
+   ]
+  },
+  {
+   "idOverture": "ade2e6f9-42ad-4886-b63f-78177bc8782b",
+   "nome": "Rope's Cafe",
+   "categoriaOverture": "cafe",
+   "confianca": 0.989,
+   "sites": [],
+   "telefones": [
+    "+554732880555"
+   ],
+   "redesSociais": [
+    "https://www.facebook.com/100172038093957"
+   ],
+   "endereco": "R. Guilherme Poerner, 1175",
+   "localidade": "Blumenau",
+   "latitude": -26.90886699,
+   "longitude": -49.14279605,
+   "fontes": [
+    "meta (CDLA-Permissive-2.0)",
+    "Overture (CDLA-Permissive-2.0)"
+   ]
+  },
+  {
+   "idOverture": "896b4b84-8868-4bd2-b561-32059ac18071",
+   "nome": "Jacó's Bar e Lanchonete",
+   "categoriaOverture": "restaurant",
+   "confianca": 0.958,
+   "sites": [],
+   "telefones": [
+    "+5547991632129"
+   ],
+   "redesSociais": [
+    "https://www.facebook.com/276631708877315"
+   ],
+   "endereco": "R. Lucie Herkenhoff, 48",
+   "localidade": "Blumenau",
+   "latitude": -26.93419898,
+   "longitude": -49.13144027,
+   "fontes": [
+    "meta (CDLA-Permissive-2.0)",
+    "Overture (CDLA-Permissive-2.0)"
+   ]
+  },
+  {
+   "idOverture": "c1ab2584-2742-464a-857e-8ed564cfddc0",
+   "nome": "Hotel Mime Blumenau",
+   "categoriaOverture": "hotel",
+   "confianca": 0.936,
+   "sites": [
+    "http://www.mimehotel.com.br"
+   ],
+   "telefones": [
+    "+554731448989"
+   ],
+   "redesSociais": [
+    "https://www.facebook.com/197725270388308"
+   ],
+   "endereco": "Rod. Br-470 1234 Km 58",
+   "localidade": "Blumenau",
+   "latitude": -26.87777587671981,
+   "longitude": -49.12998313953264,
+   "fontes": [
+    "meta (CDLA-Permissive-2.0)",
+    "Overture (CDLA-Permissive-2.0)"
+   ]
+  },
+  {
+   "idOverture": "a4e4cb1c-0442-438e-86eb-a1b5f4f10007",
+   "nome": "The Family's Burger & Pizza",
+   "categoriaOverture": "burger_restaurant",
+   "confianca": 0.961,
+   "sites": [],
+   "telefones": [
+    "+5547999363101"
+   ],
+   "redesSociais": [
+    "https://www.facebook.com/120174854352927"
+   ],
+   "endereco": "R. Bahia, 5683",
+   "localidade": "Blumenau",
+   "latitude": -26.89370652,
+   "longitude": -49.13011861,
+   "fontes": [
+    "meta (CDLA-Permissive-2.0)",
+    "Overture (CDLA-Permissive-2.0)"
+   ]
+  },
+  {
+   "idOverture": "b56e0c19-b2b3-4a95-bb98-fed9ad35efba",
+   "nome": "Glas Park",
+   "categoriaOverture": "manufacturer",
+   "confianca": 0.961,
+   "sites": [
+    "http://glaspark1.placeweb.site"
+   ],
+   "telefones": [
+    "+554733271261"
+   ],
+   "redesSociais": [
+    "https://www.facebook.com/188542011238449"
+   ],
+   "endereco": "R. Rudolf Roedel, 233",
+   "localidade": "Blumenau",
+   "latitude": -26.89264431,
+   "longitude": -49.12119159,
+   "fontes": [
+    "meta (CDLA-Permissive-2.0)",
+    "Overture (CDLA-Permissive-2.0)"
+   ]
+  },
+  {
+   "idOverture": "357b5c26-884a-4333-8522-62a82d6fb4d5",
+   "nome": "Fina Flor Presentes e Decoracoes",
+   "categoriaOverture": "flowers_and_gifts_store",
+   "confianca": 0.977,
+   "sites": [],
+   "telefones": [
+    "+554733280889"
+   ],
+   "redesSociais": [
+    "https://www.facebook.com/305014586307531"
+   ],
+   "endereco": "R. Gen. Osório, 3072",
+   "localidade": "Blumenau",
+   "latitude": -26.90872794,
+   "longitude": -49.12376751,
+   "fontes": [
+    "meta (CDLA-Permissive-2.0)",
+    "Overture (CDLA-Permissive-2.0)"
+   ]
+  },
+  {
+   "idOverture": "0d67d1d9-cbc0-4484-ae91-57f05679c034",
+   "nome": "Morro do Cego",
+   "categoriaOverture": "geographic_entities",
+   "confianca": 0.801,
+   "sites": [],
+   "telefones": [],
+   "redesSociais": [
+    "https://www.facebook.com/1653226418270746"
+   ],
+   "endereco": "",
+   "localidade": "Blumenau",
+   "latitude": -26.98805875,
+   "longitude": -49.12750423,
+   "fontes": [
+    "meta (CDLA-Permissive-2.0)",
+    "Overture (CDLA-Permissive-2.0)"
+   ]
+  },
+  {
+   "idOverture": "ed307481-044d-4d2e-883a-a65dd8092291",
+   "nome": "Vida Bella Presentes",
+   "categoriaOverture": "flowers_and_gifts_store",
+   "confianca": 0.924,
+   "sites": [],
+   "telefones": [
+    "+554730413269"
+   ],
+   "redesSociais": [
+    "https://www.facebook.com/139606849478483"
+   ],
+   "endereco": "Rua General Osório, 1899",
+   "localidade": "Blumenau",
+   "latitude": -26.91181449,
+   "longitude": -49.11296274,
+   "fontes": [
+    "meta (CDLA-Permissive-2.0)",
+    "Overture (CDLA-Permissive-2.0)"
+   ]
+  },
+  {
+   "idOverture": "bfb5891f-2438-4c69-b469-20d1069c6954",
+   "nome": "Aromatta Sorvetes - Agua Verde",
+   "categoriaOverture": "ice_cream_shop",
+   "confianca": 0.982,
+   "sites": [],
+   "telefones": [
+    "+5547996021763"
+   ],
+   "redesSociais": [
+    "https://www.facebook.com/267232680420331"
+   ],
+   "endereco": "R. Gen. Osório, 2299",
+   "localidade": "Blumenau",
+   "latitude": -26.9110466,
+   "longitude": -49.11686611,
+   "fontes": [
+    "meta (CDLA-Permissive-2.0)",
+    "Overture (CDLA-Permissive-2.0)"
+   ]
+  },
+  {
+   "idOverture": "64cff6c7-e946-449d-8356-81a454e973cd",
+   "nome": "Museu do Cristal de Blumenau",
+   "categoriaOverture": "state_museum",
+   "confianca": 0.85,
+   "sites": [
+    "https://ingressos.mozartcrystal.com/"
+   ],
+   "telefones": [
+    "4732091813"
+   ],
+   "redesSociais": [],
+   "endereco": "Rua Bahia 4253",
+   "localidade": "Blumenau",
+   "latitude": -26.888098867043695,
+   "longitude": -49.11950446783699,
+   "fontes": [
+    "Microsoft (CDLA-Permissive-2.0)",
+    "Overture (CDLA-Permissive-2.0)"
+   ]
+  },
+  {
+   "idOverture": "07103ee1-86d3-4f0a-8533-e0501d65b6a1",
+   "nome": "Alaide's Platz",
+   "categoriaOverture": "holiday_rental_home",
+   "confianca": 0.928,
+   "sites": [],
+   "telefones": [
+    "+5547997958722"
+   ],
+   "redesSociais": [
+    "https://www.facebook.com/355681129081966"
+   ],
+   "endereco": "Morada - R. Prof. Jacob Ineichen, N 1000",
+   "localidade": "Blumenau",
+   "latitude": -26.84612129,
+   "longitude": -49.11525472,
+   "fontes": [
+    "meta (CDLA-Permissive-2.0)",
+    "Overture (CDLA-Permissive-2.0)"
+   ]
+  },
+  {
+   "idOverture": "21157c64-a142-4f2c-9595-ab632f7ae5d5",
+   "nome": "Hotel Salto do Norte",
+   "categoriaOverture": "hotel",
+   "confianca": 0.923,
+   "sites": [
+    "http://www.hotelsaltodonorte.com.br"
+   ],
+   "telefones": [
+    "+554733340443"
+   ],
+   "redesSociais": [
+    "https://www.facebook.com/102886256184986"
+   ],
+   "endereco": "R. Eng. Udo Deeke, 1839",
+   "localidade": "Blumenau",
+   "latitude": -26.8749425,
+   "longitude": -49.10836064,
+   "fontes": [
+    "meta (CDLA-Permissive-2.0)",
+    "Overture (CDLA-Permissive-2.0)"
+   ]
+  },
+  {
+   "idOverture": "f2451389-0a9c-4098-b2ba-e06295d3d704",
+   "nome": "Museu Haas",
+   "categoriaOverture": "history_museum",
+   "confianca": 0.99,
+   "sites": [
+    "http://linktr.ee/museuhaas"
+   ],
+   "telefones": [
+    "+554732229918"
+   ],
+   "redesSociais": [
+    "https://www.facebook.com/587388554735473"
+   ],
+   "endereco": "R. José Deeke, 751",
+   "localidade": "Blumenau",
+   "latitude": -26.89026628,
+   "longitude": -49.1054393,
+   "fontes": [
+    "meta (CDLA-Permissive-2.0)",
+    "Overture (CDLA-Permissive-2.0)"
+   ]
+  },
+  {
+   "idOverture": "3c8ab790-0b2a-4f43-a058-14952c51b3cd",
+   "nome": "Buffalo's Grill",
+   "categoriaOverture": "steakhouse",
+   "confianca": 0.966,
+   "sites": [],
+   "telefones": [
+    "+554732341920"
+   ],
+   "redesSociais": [
+    "https://www.facebook.com/1599594136922942"
+   ],
+   "endereco": "R. Joaquim Nabuco, 45",
+   "localidade": "Blumenau",
+   "latitude": -26.91667582,
+   "longitude": -49.10789629,
+   "fontes": [
+    "meta (CDLA-Permissive-2.0)",
+    "Overture (CDLA-Permissive-2.0)"
+   ]
+  },
+  {
+   "idOverture": "7f715b4b-f02c-451b-98ad-84693f7cf611",
+   "nome": "República Barriga Verde Blumenau",
+   "categoriaOverture": "hostel",
+   "confianca": 0.871,
+   "sites": [],
+   "telefones": [
+    "+5547991111160"
+   ],
+   "redesSociais": [
+    "https://www.facebook.com/1715397082084881"
+   ],
+   "endereco": "Rua Leopoldo Wilhelm ",
+   "localidade": "Blumenau",
+   "latitude": -26.92381,
+   "longitude": -49.11101,
+   "fontes": [
+    "meta (CDLA-Permissive-2.0)",
+    "Overture (CDLA-Permissive-2.0)"
+   ]
+  },
+  {
+   "idOverture": "65104d73-e188-4cf9-a3fc-0d5f116ad574",
+   "nome": "Morro dos Porcos",
+   "categoriaOverture": "mountain",
+   "confianca": 0.776,
+   "sites": [],
+   "telefones": [],
+   "redesSociais": [
+    "https://www.facebook.com/448711195339403"
+   ],
+   "endereco": "",
+   "localidade": "Blumenau",
+   "latitude": -26.94722888,
+   "longitude": -49.09694356,
+   "fontes": [
+    "meta (CDLA-Permissive-2.0)",
+    "Overture (CDLA-Permissive-2.0)"
+   ]
+  },
+  {
+   "idOverture": "329e4c71-1b50-4209-a7cc-d0134bfb0f53",
+   "nome": "Due Fratelli Pizzaria bnu",
+   "categoriaOverture": "pizza_restaurant",
+   "confianca": 0.982,
+   "sites": [
+    "http://duefratellipizzaria.com.br/"
+   ],
+   "telefones": [
+    "+554734886628"
+   ],
+   "redesSociais": [
+    "https://www.facebook.com/100598238615804"
+   ],
+   "endereco": "R. Bahia, 2052",
+   "localidade": "Blumenau",
+   "latitude": -26.88355078,
+   "longitude": -49.10170732,
+   "fontes": [
+    "meta (CDLA-Permissive-2.0)",
+    "Overture (CDLA-Permissive-2.0)"
+   ]
+  },
+  {
+   "idOverture": "418cf086-9026-404c-9465-688c533d419d",
+   "nome": "Papicori",
+   "categoriaOverture": "bakery",
+   "confianca": 0.953,
+   "sites": [
+    "http://papicori1.placeweb.site"
+   ],
+   "telefones": [
+    "+554733343339"
+   ],
+   "redesSociais": [
+    "https://www.facebook.com/264226110424438"
+   ],
+   "endereco": "R. Mal. Rondon, 70",
+   "localidade": "Blumenau",
+   "latitude": -26.87702016,
+   "longitude": -49.10119658,
+   "fontes": [
+    "meta (CDLA-Permissive-2.0)",
+    "Overture (CDLA-Permissive-2.0)"
+   ]
+  },
+  {
+   "idOverture": "49b942ce-a901-4b2b-be3b-e23ad8f76f62",
+   "nome": "Hostel Sil Cardoso",
+   "categoriaOverture": "hostel",
+   "confianca": 0.982,
+   "sites": [],
+   "telefones": [
+    "+5547999768555"
+   ],
+   "redesSociais": [
+    "https://www.facebook.com/818252051673709"
+   ],
+   "endereco": "R. Walter Schwantz, 173",
+   "localidade": "Blumenau",
+   "latitude": -26.87648219,
+   "longitude": -49.10386726,
+   "fontes": [
+    "meta (CDLA-Permissive-2.0)",
+    "Overture (CDLA-Permissive-2.0)"
+   ]
+  },
+  {
+   "idOverture": "11fb6a66-cd39-4415-8b45-b0619bdd439e",
+   "nome": "Hotel SESC Blumenau",
+   "categoriaOverture": "hotel",
+   "confianca": 0.992,
+   "sites": [
+    "http://www.sesc-sc.com.br"
+   ],
+   "telefones": [
+    "+554733348100"
+   ],
+   "redesSociais": [
+    "https://www.facebook.com/194288634355931"
+   ],
+   "endereco": "R. Eng. Udo Deeke, 1330",
+   "localidade": "Blumenau",
+   "latitude": -26.87294558,
+   "longitude": -49.10343899,
+   "fontes": [
+    "meta (CDLA-Permissive-2.0)",
+    "Overture (CDLA-Permissive-2.0)"
+   ]
+  },
+  {
+   "idOverture": "7915af0c-5dbd-4cee-a904-160f75dd926e",
+   "nome": "Verdant",
+   "categoriaOverture": "bar",
+   "confianca": 0.979,
+   "sites": [
+    "https://linktr.ee/verdant.blu"
+   ],
+   "telefones": [
+    "+5547992168299"
+   ],
+   "redesSociais": [
+    "https://www.facebook.com/100770428114144"
+   ],
+   "endereco": "Rua: Engenheiro Udo Deeke 1221",
+   "localidade": "Blumenau",
+   "latitude": -26.87324766,
+   "longitude": -49.10235263,
+   "fontes": [
+    "meta (CDLA-Permissive-2.0)",
+    "Overture (CDLA-Permissive-2.0)"
+   ]
+  },
+  {
+   "idOverture": "79a34a1a-7bb1-4df4-9e7f-7501de1cd628",
+   "nome": "Botané Deli e Café",
+   "categoriaOverture": "cafe",
+   "confianca": 0.976,
+   "sites": [
+    "http://www.botanedeliecafe.com.br/"
+   ],
+   "telefones": [
+    "+5547999105033"
+   ],
+   "redesSociais": [
+    "https://www.facebook.com/102824442471746"
+   ],
+   "endereco": "R. Frederico Jensen, 1030",
+   "localidade": "Blumenau",
+   "latitude": -26.85998266,
+   "longitude": -49.09619869,
+   "fontes": [
+    "meta (CDLA-Permissive-2.0)",
+    "Overture (CDLA-Permissive-2.0)"
+   ]
+  },
+  {
+   "idOverture": "7ebd2692-404b-4455-98f9-97172ac1771b",
+   "nome": "Galeria Kaufhaus",
+   "categoriaOverture": "shopping_mall",
+   "confianca": 0.927,
+   "sites": [
+    "http://www.galeriakaufhaus.com.br/"
+   ],
+   "telefones": [
+    "+5547991491103"
+   ],
+   "redesSociais": [
+    "https://www.facebook.com/116513381051940"
+   ],
+   "endereco": "R. Frederico Jensen, 1030",
+   "localidade": "Blumenau",
+   "latitude": -26.86019669,
+   "longitude": -49.09620679,
+   "fontes": [
+    "meta (CDLA-Permissive-2.0)",
+    "Overture (CDLA-Permissive-2.0)"
+   ]
+  },
+  {
+   "idOverture": "e0d7ce6a-c873-410c-a649-0590bb0c0188",
+   "nome": "Novilho Grill",
+   "categoriaOverture": "barbecue_restaurant",
+   "confianca": 0.997,
+   "sites": [],
+   "telefones": [
+    "+554732374770"
+   ],
+   "redesSociais": [
+    "https://www.facebook.com/817869131570228"
+   ],
+   "endereco": "R. Benjamin Constant, 1631",
+   "localidade": "Blumenau",
+   "latitude": -26.9007057,
+   "longitude": -49.09786047,
+   "fontes": [
+    "meta (CDLA-Permissive-2.0)",
+    "Overture (CDLA-Permissive-2.0)"
+   ]
+  },
+  {
+   "idOverture": "ef1a0ed8-5fb5-442a-92d1-4ffce07c8ec0",
+   "nome": "Saint Peter Restaurante",
+   "categoriaOverture": "buffet_restaurant",
+   "confianca": 0.985,
+   "sites": [
+    "http://restaurante-saint-peter.placestars.com/"
+   ],
+   "telefones": [
+    "+5547996020568"
+   ],
+   "redesSociais": [
+    "https://www.facebook.com/456904164333541"
+   ],
+   "endereco": "R. Benjamin Constant, 2469",
+   "localidade": "Blumenau",
+   "latitude": -26.90433499,
+   "longitude": -49.09379111,
+   "fontes": [
+    "meta (CDLA-Permissive-2.0)",
+    "Overture (CDLA-Permissive-2.0)"
+   ]
+  },
+  {
+   "idOverture": "0e492078-1208-44c4-8483-37ac81e8d0b1",
+   "nome": "Sushi da Vila",
+   "categoriaOverture": "sushi_restaurant",
+   "confianca": 0.968,
+   "sites": [],
+   "telefones": [
+    "+5547999410484"
+   ],
+   "redesSociais": [
+    "https://www.facebook.com/416804635407420"
+   ],
+   "endereco": "R. Benjamin Constant, 2597",
+   "localidade": "Blumenau",
+   "latitude": -26.90434387,
+   "longitude": -49.09323654,
+   "fontes": [
+    "meta (CDLA-Permissive-2.0)",
+    "Overture (CDLA-Permissive-2.0)"
+   ]
+  },
+  {
+   "idOverture": "8fc3d711-3b3e-4d84-89a4-d3fabddd0183",
+   "nome": "Elô Gastronomia - Restaurante",
+   "categoriaOverture": "restaurant",
+   "confianca": 0.874,
+   "sites": [
+    "http://www.instagram.com/elogastronomiablu/"
+   ],
+   "telefones": [
+    "+554733044993"
+   ],
+   "redesSociais": [
+    "https://www.facebook.com/260278235837773"
+   ],
+   "endereco": "R. Benjamin Constant, 2597",
+   "localidade": "Blumenau",
+   "latitude": -26.90435127,
+   "longitude": -49.0928156,
+   "fontes": [
+    "meta (CDLA-Permissive-2.0)",
+    "Overture (CDLA-Permissive-2.0)"
+   ]
+  },
+  {
+   "idOverture": "c437ad29-04ef-4dd8-97ce-f8ab4a912261",
+   "nome": "Bazar Tuim",
+   "categoriaOverture": "grocery_store",
+   "confianca": 0.921,
+   "sites": [
+    "https://www.instagram.com/bazartuim/"
+   ],
+   "telefones": [
+    "+5547996364517"
+   ],
+   "redesSociais": [
+    "https://www.facebook.com/117423608126205"
+   ],
+   "endereco": "R. Alm. Barroso, 1491",
+   "localidade": "Blumenau",
+   "latitude": -26.90455178,
+   "longitude": -49.09254233,
+   "fontes": [
+    "meta (CDLA-Permissive-2.0)",
+    "Overture (CDLA-Permissive-2.0)"
+   ]
+  },
+  {
+   "idOverture": "b4d2dddf-0cc2-4119-9ddb-5a0e80ca47f8",
+   "nome": "Badok Grill",
+   "categoriaOverture": "barbecue_restaurant",
+   "confianca": 0.971,
+   "sites": [],
+   "telefones": [
+    "+554732884501"
+   ],
+   "redesSociais": [
+    "https://www.facebook.com/617157705033348"
+   ],
+   "endereco": "R. Alm. Barroso, 1450",
+   "localidade": "Blumenau",
+   "latitude": -26.9041578,
+   "longitude": -49.09239879,
+   "fontes": [
+    "meta (CDLA-Permissive-2.0)",
+    "Overture (CDLA-Permissive-2.0)"
+   ]
+  },
+  {
+   "idOverture": "a964669a-f84a-4ca3-aa4d-47631d2bdba2",
+   "nome": "Restaurante Donna Yolannda",
+   "categoriaOverture": "buffet_restaurant",
+   "confianca": 0.996,
+   "sites": [
+    "https://linktr.ee/donnayolannda"
+   ],
+   "telefones": [
+    "+554732328364"
+   ],
+   "redesSociais": [
+    "https://www.facebook.com/641714922693086"
+   ],
+   "endereco": "R. Bahia, 819",
+   "localidade": "Blumenau",
+   "latitude": -26.88781768,
+   "longitude": -49.09303696,
+   "fontes": [
+    "meta (CDLA-Permissive-2.0)",
+    "Overture (CDLA-Permissive-2.0)"
+   ]
+  },
+  {
+   "idOverture": "c1b09814-331d-4954-b61e-b9086d53ebf8",
+   "nome": "Teatro Michelangelo",
+   "categoriaOverture": "music_venue",
+   "confianca": 0.99,
+   "sites": [],
+   "telefones": [
+    "+554732219595"
+   ],
+   "redesSociais": [
+    "https://www.facebook.com/752207804646555"
+   ],
+   "endereco": "Rua Engenheiro Udo Deeke, 531",
+   "localidade": "Blumenau",
+   "latitude": -26.87278988,
+   "longitude": -49.09462598,
+   "fontes": [
+    "meta (CDLA-Permissive-2.0)",
+    "Overture (CDLA-Permissive-2.0)"
+   ]
+  },
+  {
+   "idOverture": "bc8203ff-dcde-46b3-aa71-bcf12ae9f6e0",
+   "nome": "Hotel 10 Blumenau",
+   "categoriaOverture": "hotel",
+   "confianca": 0.994,
+   "sites": [
+    "http://www.hotel10.com.br"
+   ],
+   "telefones": [
+    "+554737021010"
+   ],
+   "redesSociais": [
+    "https://www.facebook.com/116200756737331"
+   ],
+   "endereco": "KM52, BR-470, 2653",
+   "localidade": "Blumenau",
+   "latitude": -26.86172322,
+   "longitude": -49.09410344,
+   "fontes": [
+    "meta (CDLA-Permissive-2.0)",
+    "Overture (CDLA-Permissive-2.0)"
+   ]
+  },
+  {
+   "idOverture": "7eadfea9-7aab-4fbc-bdff-6bcb66e5a410",
+   "nome": "Estação Choperia",
+   "categoriaOverture": "restaurant",
+   "confianca": 0.972,
+   "sites": [],
+   "telefones": [
+    "+5547992609095"
+   ],
+   "redesSociais": [
+    "https://www.facebook.com/866168697063087"
+   ],
+   "endereco": "BR-470, 3000",
+   "localidade": "Blumenau",
+   "latitude": -26.86346328,
+   "longitude": -49.09245039,
+   "fontes": [
+    "meta (CDLA-Permissive-2.0)",
+    "Overture (CDLA-Permissive-2.0)"
+   ]
+  },
+  {
+   "idOverture": "a2371029-93a9-4579-ae17-9c6a520be987",
+   "nome": "Zamban Grill Restaurante",
+   "categoriaOverture": "barbecue_restaurant",
+   "confianca": 0.997,
+   "sites": [
+    "https://www.ifood.com.br/delivery/blumenau-sc/zamban-grill-restaurante-salto-do-norte/319afd3f-f9c1-4185-98a7-dda0f2ac70c4?utm_medium=share"
+   ],
+   "telefones": [
+    "+5547992587521"
+   ],
+   "redesSociais": [
+    "https://www.facebook.com/105059238077108"
+   ],
+   "endereco": "Br 470, 3000 (Blumenau Norte Shopping",
+   "localidade": "Blumenau",
+   "latitude": -26.86347348,
+   "longitude": -49.09267731,
+   "fontes": [
+    "meta (CDLA-Permissive-2.0)",
+    "Overture (CDLA-Permissive-2.0)"
+   ]
+  },
+  {
+   "idOverture": "4b6419b2-921a-45c5-9222-7642afcba23f",
+   "nome": "BLUMENAU NORTE SHOPPING - BNS",
+   "categoriaOverture": "fast_food_restaurant",
+   "confianca": 0.8,
+   "sites": [],
+   "telefones": [],
+   "redesSociais": [],
+   "endereco": null,
+   "localidade": "Blumenau",
+   "latitude": -26.863558,
+   "longitude": -49.092638,
+   "fontes": [
+    "AllThePlaces (CC0-1.0)",
+    "Overture (CDLA-Permissive-2.0)"
+   ]
+  },
+  {
+   "idOverture": "40811714-b9e4-45aa-9ea3-138b39eff051",
+   "nome": "Sabor Brasileiro",
+   "categoriaOverture": "brazilian_restaurant",
+   "confianca": 0.992,
+   "sites": [],
+   "telefones": [
+    "+5547988268639"
+   ],
+   "redesSociais": [
+    "https://www.facebook.com/1223483017725076"
+   ],
+   "endereco": "R. Vasco da Gama, 176",
+   "localidade": "Blumenau",
+   "latitude": -26.86354117,
+   "longitude": -49.09258256,
+   "fontes": [
+    "meta (CDLA-Permissive-2.0)",
+    "Overture (CDLA-Permissive-2.0)"
+   ]
+  },
+  {
+   "idOverture": "7b6a771a-fdca-4079-a4b2-c7b3d039f626",
+   "nome": "Norte Shopping",
+   "categoriaOverture": "shopping_mall",
+   "confianca": 0.999,
+   "sites": [
+    "http://www.blumenaunorteshopping.com.br/"
+   ],
+   "telefones": [
+    "+554730572020"
+   ],
+   "redesSociais": [
+    "https://www.facebook.com/229061303794762"
+   ],
+   "endereco": "Rodovia, BR-470, 3000",
+   "localidade": "Blumenau",
+   "latitude": -26.86358116,
+   "longitude": -49.09251077,
+   "fontes": [
+    "meta (CDLA-Permissive-2.0)",
+    "Overture (CDLA-Permissive-2.0)"
+   ]
+  },
+  {
+   "idOverture": "3be7e410-7400-400d-be34-32ef26e3974c",
+   "nome": "Burger King",
+   "categoriaOverture": "fast_food_restaurant",
+   "confianca": 0.77,
+   "sites": [
+    "http://www.burgerking.com.br/"
+   ],
+   "telefones": [
+    "(47) 3057-2197"
+   ],
+   "redesSociais": [
+    "https://www.twitter.com/burgerkingbr",
+    "https://www.facebook.com/209999859022356"
+   ],
+   "endereco": "Norte Shopping",
+   "localidade": "Blumenau",
+   "latitude": -26.863818123519106,
+   "longitude": -49.0928114495591,
+   "fontes": [
+    "Foursquare (Apache-2.0)",
+    "Overture (CDLA-Permissive-2.0)"
+   ]
+  },
+  {
+   "idOverture": "9f64cb45-6a84-49c5-9234-7e937a98d094",
+   "nome": "Bob's Burgers",
+   "categoriaOverture": "dessert_shop",
+   "confianca": 0.956,
+   "sites": [
+    "https://www.bobs.com.br/"
+   ],
+   "telefones": [
+    "+554730572010"
+   ],
+   "redesSociais": [
+    "https://www.facebook.com/2207751282791886"
+   ],
+   "endereco": "BR-470, 3000 - Loja A037",
+   "localidade": "Blumenau",
+   "latitude": -26.86342632,
+   "longitude": -49.09277262,
+   "fontes": [
+    "meta (CDLA-Permissive-2.0)",
+    "Overture (CDLA-Permissive-2.0)"
+   ]
+  },
+  {
+   "idOverture": "ae63538a-886a-4d36-9992-3a1741bf0de4",
+   "nome": "Hotel Norte Blu",
+   "categoriaOverture": "hotel",
+   "confianca": 0.968,
+   "sites": [
+    "http://www.hotelnorteblu.com.br/"
+   ],
+   "telefones": [
+    "+554732098639"
+   ],
+   "redesSociais": [
+    "https://www.facebook.com/192305271222306"
+   ],
+   "endereco": "R. Victor Voigt, 35",
+   "localidade": "Blumenau",
+   "latitude": -26.85962012,
+   "longitude": -49.09100039,
+   "fontes": [
+    "meta (CDLA-Permissive-2.0)",
+    "Overture (CDLA-Permissive-2.0)"
+   ]
+  },
+  {
+   "idOverture": "56ade167-f758-4cf5-a539-50df1cbdda46",
+   "nome": "Bob's Shake",
+   "categoriaOverture": "fast_food_restaurant",
+   "confianca": 0.77,
+   "sites": [
+    "https://bobs.com.br"
+   ],
+   "telefones": [],
+   "redesSociais": [
+    "https://www.facebook.com/226077797402540",
+    "https://www.instagram.com/bobsbrasil"
+   ],
+   "endereco": "Rodovia, BR-470, 3000",
+   "localidade": "Blumenau",
+   "latitude": -26.86378151099781,
+   "longitude": -49.09151029588429,
+   "fontes": [
+    "Foursquare (Apache-2.0)",
+    "Overture (CDLA-Permissive-2.0)"
+   ]
+  },
+  {
+   "idOverture": "fc6a618f-59d4-4a90-833e-20112c7333ae",
+   "nome": "Dudalina - Blumenau Norte Shopping",
+   "categoriaOverture": "womens_clothing_store",
+   "confianca": 0.77,
+   "sites": [
+    "http://www.dudalina.com.br"
+   ],
+   "telefones": [
+    "(47) 3057-2121"
+   ],
+   "redesSociais": [],
+   "endereco": "Blumenau Norte Shopping",
+   "localidade": "Blumenau",
+   "latitude": -26.863570080374334,
+   "longitude": -49.09179657421785,
+   "fontes": [
+    "Foursquare (Apache-2.0)",
+    "Overture (CDLA-Permissive-2.0)"
+   ]
+  },
+  {
+   "idOverture": "a701fd88-f450-4e51-9b1a-d13545ba2833",
+   "nome": "Star Sorvetes Itoupava Norte",
+   "categoriaOverture": "ice_cream_shop",
+   "confianca": 0.995,
+   "sites": [
+    "https://www.instagram.com/starsorvetes_itoupavanorte/"
+   ],
+   "telefones": [
+    "+554732341987"
+   ],
+   "redesSociais": [
+    "https://www.facebook.com/104714388449081"
+   ],
+   "endereco": "Rua Dois de Setembro, 4599",
+   "localidade": "Blumenau",
+   "latitude": -26.87343215,
+   "longitude": -49.08904058,
+   "fontes": [
+    "meta (CDLA-Permissive-2.0)",
+    "Overture (CDLA-Permissive-2.0)"
+   ]
+  },
+  {
+   "idOverture": "7682c790-694f-4245-a0ba-7dbfb7be8b88",
+   "nome": "Salvador Cozinha",
+   "categoriaOverture": "brazilian_restaurant",
+   "confianca": 0.911,
+   "sites": [],
+   "telefones": [
+    "+5547997797839"
+   ],
+   "redesSociais": [
+    "https://www.facebook.com/112358571501218"
+   ],
+   "endereco": "R. Hans Lorenz, 67",
+   "localidade": "Blumenau",
+   "latitude": -26.8853926,
+   "longitude": -49.08845827,
+   "fontes": [
+    "meta (CDLA-Permissive-2.0)",
+    "Overture (CDLA-Permissive-2.0)"
+   ]
+  },
+  {
+   "idOverture": "5d6be752-76eb-4101-bcda-0a5bfed50035",
+   "nome": "Pousada Do Russo",
+   "categoriaOverture": "hotel",
+   "confianca": 0.974,
+   "sites": [],
+   "telefones": [
+    "+554784311616"
+   ],
+   "redesSociais": [
+    "https://www.facebook.com/265114187172585"
+   ],
+   "endereco": "",
+   "localidade": "Blumenau",
+   "latitude": -26.87441662,
+   "longitude": -49.09149008,
+   "fontes": [
+    "meta (CDLA-Permissive-2.0)",
+    "Overture (CDLA-Permissive-2.0)"
+   ]
+  },
+  {
+   "idOverture": "bed89330-9d49-49c7-8188-f951c8209d88",
+   "nome": "Ambrosia Gastro Pizza Bar - ( Buffet,, Marmitas e Eventos)",
+   "categoriaOverture": "buffet_restaurant",
+   "confianca": 0.99,
+   "sites": [
+    "http://voamenu.com/ambrosiagastropizzabar"
+   ],
+   "telefones": [
+    "+554730351867"
+   ],
+   "redesSociais": [
+    "https://www.facebook.com/110375023791217"
+   ],
+   "endereco": "R. Alm. Barroso, 1051",
+   "localidade": "Blumenau",
+   "latitude": -26.90247284,
+   "longitude": -49.08907809,
+   "fontes": [
+    "meta (CDLA-Permissive-2.0)",
+    "Overture (CDLA-Permissive-2.0)"
+   ]
+  },
+  {
+   "idOverture": "7e78c30e-b221-47c1-a360-6263103c3f5a",
+   "nome": "Restaurante Kamer em Vila Nova",
+   "categoriaOverture": "buffet_restaurant",
+   "confianca": 0.984,
+   "sites": [
+    "https://bit.ly/KamerDeliveryifood"
+   ],
+   "telefones": [
+    "+554733231423"
+   ],
+   "redesSociais": [
+    "https://www.facebook.com/159258624234940"
+   ],
+   "endereco": "R. Alm. Barroso, 1087",
+   "localidade": "Blumenau",
+   "latitude": -26.9026145,
+   "longitude": -49.08918496,
+   "fontes": [
+    "meta (CDLA-Permissive-2.0)",
+    "Overture (CDLA-Permissive-2.0)"
+   ]
+  },
+  {
+   "idOverture": "fab861c6-a724-45bd-82f2-4702cdf2a781",
+   "nome": "Macarronada Bonassoli",
+   "categoriaOverture": "italian_restaurant",
+   "confianca": 0.998,
+   "sites": [
+    "http://www.bonassoli.com.br"
+   ],
+   "telefones": [
+    "+554730352662"
+   ],
+   "redesSociais": [
+    "https://www.facebook.com/181619135222103"
+   ],
+   "endereco": "R. Princesa Izabel, 245",
+   "localidade": "Blumenau",
+   "latitude": -26.91612787,
+   "longitude": -49.08920524,
+   "fontes": [
+    "meta (CDLA-Permissive-2.0)",
+    "Overture (CDLA-Permissive-2.0)"
+   ]
+  },
+  {
+   "idOverture": "45fb9a6b-87a4-4ce4-bfc5-7000c16382e4",
+   "nome": "Espaço Plural",
+   "categoriaOverture": "performing_arts_venue",
+   "confianca": 0.853,
+   "sites": [
+    "http://www.espacoplural.art.br/"
+   ],
+   "telefones": [
+    "+554730411005"
+   ],
+   "redesSociais": [
+    "https://www.facebook.com/128997370521635"
+   ],
+   "endereco": "R. Mal. Deodoro, 46",
+   "localidade": "Blumenau",
+   "latitude": -26.91837486,
+   "longitude": -49.08984121,
+   "fontes": [
+    "meta (CDLA-Permissive-2.0)",
+    "Overture (CDLA-Permissive-2.0)"
+   ]
+  },
+  {
+   "idOverture": "0a37f39f-28a9-4198-870f-fe2c2b77e833",
+   "nome": "Pouse Bem - Standard Apartment",
+   "categoriaOverture": "holiday_rental_home",
+   "confianca": 0.666,
+   "sites": [],
+   "telefones": [],
+   "redesSociais": [
+    "https://www.facebook.com/1870138123104981"
+   ],
+   "endereco": "",
+   "localidade": "Blumenau",
+   "latitude": -26.91968679,
+   "longitude": -49.0881315,
+   "fontes": [
+    "meta (CDLA-Permissive-2.0)",
+    "Overture (CDLA-Permissive-2.0)"
+   ]
+  },
+  {
+   "idOverture": "02834902-5573-479a-b9a3-2e36ac59bc78",
+   "nome": "Moto gourmet",
+   "categoriaOverture": "bar",
+   "confianca": 0.937,
+   "sites": [],
+   "telefones": [
+    "+5547996020500"
+   ],
+   "redesSociais": [
+    "https://www.facebook.com/564097247127383"
+   ],
+   "endereco": "",
+   "localidade": "Blumenau",
+   "latitude": -26.91580816,
+   "longitude": -49.09020772,
+   "fontes": [
+    "meta (CDLA-Permissive-2.0)",
+    "Overture (CDLA-Permissive-2.0)"
+   ]
+  },
+  {
+   "idOverture": "e3a7b7e2-61ef-43cf-87f8-27ca48c90efd",
+   "nome": "Boteco São Jorge",
+   "categoriaOverture": "beer_garden",
+   "confianca": 0.617,
+   "sites": [],
+   "telefones": [
+    "+554733283633"
+   ],
+   "redesSociais": [
+    "https://www.facebook.com/588804931215142"
+   ],
+   "endereco": "Rua Coelho Neto, 2",
+   "localidade": "Blumenau",
+   "latitude": -26.914977,
+   "longitude": -49.090613,
+   "fontes": [
+    "meta (CDLA-Permissive-2.0)",
+    "Overture (CDLA-Permissive-2.0)"
+   ]
+  },
+  {
+   "idOverture": "07b66d8c-45e6-43dc-ab92-0ac71e2973b1",
+   "nome": "Confeitaria Cafehaus Glória",
+   "categoriaOverture": "coffee_shop",
+   "confianca": 0.998,
+   "sites": [
+    "http://cafehaus.com.br"
+   ],
+   "telefones": [
+    "+554733290000"
+   ],
+   "redesSociais": [
+    "https://www.facebook.com/1894388550814255"
+   ],
+   "endereco": "R. Humberto de Campos, 1091",
+   "localidade": "Blumenau",
+   "latitude": -26.91571627,
+   "longitude": -49.09047299,
+   "fontes": [
+    "meta (CDLA-Permissive-2.0)",
+    "Overture (CDLA-Permissive-2.0)"
+   ]
+  },
+  {
+   "idOverture": "b7bdd99f-7f7b-4830-a856-d857658ac64c",
+   "nome": "Restaurante Gutes Essen",
+   "categoriaOverture": "italian_restaurant",
+   "confianca": 0.989,
+   "sites": [
+    "http://www.gutesessen.com.br"
+   ],
+   "telefones": [
+    "+554733290691"
+   ],
+   "redesSociais": [
+    "https://www.facebook.com/184987598020281"
+   ],
+   "endereco": "R. Mal. Deodoro, 202",
+   "localidade": "Blumenau",
+   "latitude": -26.91705098,
+   "longitude": -49.09051207,
+   "fontes": [
+    "meta (CDLA-Permissive-2.0)",
+    "Overture (CDLA-Permissive-2.0)"
+   ]
+  },
+  {
+   "idOverture": "12f3a3b1-7bad-4158-a3ec-01cfcb5128da",
+   "nome": "Alek Bar",
+   "categoriaOverture": "bar",
+   "confianca": 0.964,
+   "sites": [
+    "https://bit.ly/3sfFZN4"
+   ],
+   "telefones": [
+    "+5547992057895"
+   ],
+   "redesSociais": [
+    "https://www.facebook.com/152175677981961"
+   ],
+   "endereco": "R. Henrique Dias, 32 - sala 11",
+   "localidade": "Blumenau",
+   "latitude": -26.91451478,
+   "longitude": -49.09085904,
+   "fontes": [
+    "meta (CDLA-Permissive-2.0)",
+    "Overture (CDLA-Permissive-2.0)"
+   ]
+  },
+  {
+   "idOverture": "19fd3eee-82d1-48aa-bde8-9168c62e7ea7",
+   "nome": "Garten Boulevard",
+   "categoriaOverture": "shopping_mall",
+   "confianca": 0.928,
+   "sites": [],
+   "telefones": [
+    "+5547984078944"
+   ],
+   "redesSociais": [
+    "https://www.facebook.com/108987465094364"
+   ],
+   "endereco": "R. Henrique Dias, 32 - Sl 4",
+   "localidade": "Blumenau",
+   "latitude": -26.91452318,
+   "longitude": -49.09082294,
+   "fontes": [
+    "meta (CDLA-Permissive-2.0)",
+    "Overture (CDLA-Permissive-2.0)"
+   ]
+  },
+  {
+   "idOverture": "75454bba-0f90-4a95-b0ca-349757a43369",
+   "nome": "Maria Mole Doces",
+   "categoriaOverture": "dessert_shop",
+   "confianca": 0.893,
+   "sites": [
+    "http://www.mariamoledoces.com.br/"
+   ],
+   "telefones": [
+    "+5547988540051"
+   ],
+   "redesSociais": [
+    "https://www.facebook.com/431643400230567"
+   ],
+   "endereco": "R. Coelho Neto, 01",
+   "localidade": "Blumenau",
+   "latitude": -26.91508772,
+   "longitude": -49.09082707,
+   "fontes": [
+    "meta (CDLA-Permissive-2.0)",
+    "Overture (CDLA-Permissive-2.0)"
+   ]
+  },
+  {
+   "idOverture": "8ced28af-2fc5-4e85-a555-436a5c07e0c7",
+   "nome": "Poby Presentes",
+   "categoriaOverture": "flowers_and_gifts_store",
+   "confianca": 0.957,
+   "sites": [],
+   "telefones": [
+    "+5547992426985"
+   ],
+   "redesSociais": [
+    "https://www.facebook.com/965982423462995"
+   ],
+   "endereco": "R. Promotor Ribeiro de Carvalho, 16",
+   "localidade": "Blumenau",
+   "latitude": -26.9063733,
+   "longitude": -49.09148245,
+   "fontes": [
+    "meta (CDLA-Permissive-2.0)",
+    "Overture (CDLA-Permissive-2.0)"
+   ]
+  },
+  {
+   "idOverture": "63916251-810f-4378-81fa-e68acfa240b4",
+   "nome": "Empório do Pão",
+   "categoriaOverture": "bakery",
+   "confianca": 0.977,
+   "sites": [],
+   "telefones": [
+    "+554730377695"
+   ],
+   "redesSociais": [
+    "https://www.facebook.com/197007350324298"
+   ],
+   "endereco": "Rua Benjamin Constant, 2818",
+   "localidade": "Blumenau",
+   "latitude": -26.90615574,
+   "longitude": -49.09217328,
+   "fontes": [
+    "meta (CDLA-Permissive-2.0)",
+    "Overture (CDLA-Permissive-2.0)"
+   ]
+  },
+  {
+   "idOverture": "3e6410b1-33da-490d-992a-9630af3ce0e9",
+   "nome": "Airblunb",
+   "categoriaOverture": "hostel",
+   "confianca": 0.966,
+   "sites": [
+    "https://www.airblunb.com.br/"
+   ],
+   "telefones": [
+    "4732882644"
+   ],
+   "redesSociais": [],
+   "endereco": "288 R. Júlio Baumgarten",
+   "localidade": "Blumenau",
+   "latitude": -26.9086704,
+   "longitude": -49.0953561,
+   "fontes": [
+    "Microsoft (CDLA-Permissive-2.0)",
+    "Overture (CDLA-Permissive-2.0)"
+   ]
+  },
+  {
+   "idOverture": "c61fac6c-87af-4fca-be5f-e603417e182a",
+   "nome": "Pousada Dilocare",
+   "categoriaOverture": "hotel",
+   "confianca": 0.993,
+   "sites": [
+    "http://www.dilocare.com.br/"
+   ],
+   "telefones": [
+    "+554732372691"
+   ],
+   "redesSociais": [
+    "https://www.facebook.com/433925829981127"
+   ],
+   "endereco": "Rua Júlio Baumgarten, 450",
+   "localidade": "Blumenau",
+   "latitude": -26.90733,
+   "longitude": -49.095586,
+   "fontes": [
+    "meta (CDLA-Permissive-2.0)",
+    "Overture (CDLA-Permissive-2.0)"
+   ]
+  },
+  {
+   "idOverture": "4bf6aa51-4a05-47f5-b834-29cd95263fcf",
+   "nome": "Restaurante Permita Ser",
+   "categoriaOverture": "restaurant",
+   "confianca": 0.907,
+   "sites": [],
+   "telefones": [
+    "+5547991850568"
+   ],
+   "redesSociais": [
+    "https://www.facebook.com/1615357615445766"
+   ],
+   "endereco": "R. Minas da Prata, 170",
+   "localidade": "Blumenau",
+   "latitude": -27.02798091,
+   "longitude": -49.09427123,
+   "fontes": [
+    "meta (CDLA-Permissive-2.0)",
+    "Overture (CDLA-Permissive-2.0)"
+   ]
+  },
+  {
+   "idOverture": "fbe9a362-6d0f-483d-b052-9f1a16981772",
+   "nome": "Pousada Rio da Prata Eco",
+   "categoriaOverture": "lodge",
+   "confianca": 0.977,
+   "sites": [
+    "http://www.pousadariodaprataeco.com.br/"
+   ],
+   "telefones": [
+    "+5547996644825"
+   ],
+   "redesSociais": [
+    "https://www.facebook.com/156059714522345"
+   ],
+   "endereco": "R. Minas da Prata, 170",
+   "localidade": "Blumenau",
+   "latitude": -27.028564,
+   "longitude": -49.09419151,
+   "fontes": [
+    "meta (CDLA-Permissive-2.0)",
+    "Overture (CDLA-Permissive-2.0)"
+   ]
+  },
+  {
+   "idOverture": "3972c4d4-c5ca-4eef-b96a-dcb6239a2b8b",
+   "nome": "Recanto Silvestre",
+   "categoriaOverture": "restaurant",
+   "confianca": 0.986,
+   "sites": [
+    "http://portal.macamp.com.br/guia-conteudo.php?varId=32"
+   ],
+   "telefones": [
+    "+554733365447"
+   ],
+   "redesSociais": [
+    "https://www.facebook.com/526253317402569"
+   ],
+   "endereco": "R. Santa Maria, 4269",
+   "localidade": "Blumenau",
+   "latitude": -27.00349975,
+   "longitude": -49.09728053,
+   "fontes": [
+    "meta (CDLA-Permissive-2.0)",
+    "Overture (CDLA-Permissive-2.0)"
+   ]
+  },
+  {
+   "idOverture": "4e330b5d-ed83-4936-9e2e-5b4a7c351d59",
+   "nome": "Paraíso do Miguel",
+   "categoriaOverture": "restaurant",
+   "confianca": 0.95,
+   "sites": [],
+   "telefones": [
+    "+554730532077"
+   ],
+   "redesSociais": [
+    "https://www.facebook.com/1596824790554351"
+   ],
+   "endereco": "R. Anna Denonti Smaniotto",
+   "localidade": "Blumenau",
+   "latitude": -27.0362788,
+   "longitude": -49.09110631,
+   "fontes": [
+    "meta (CDLA-Permissive-2.0)",
+    "Overture (CDLA-Permissive-2.0)"
+   ]
+  },
+  {
+   "idOverture": "c38add46-181c-4863-b91f-0eb5cba44b9b",
+   "nome": "Museu Hering",
+   "categoriaOverture": "museum",
+   "confianca": 0.996,
+   "sites": [
+    "http://www.museuhering.com.br"
+   ],
+   "telefones": [
+    "+554733213340"
+   ],
+   "redesSociais": [
+    "https://www.facebook.com/1768384419841122"
+   ],
+   "endereco": "R. Hermann Hering, 1740",
+   "localidade": "Blumenau",
+   "latitude": -26.92551091,
+   "longitude": -49.08231781,
+   "fontes": [
+    "meta (CDLA-Permissive-2.0)",
+    "Overture (CDLA-Permissive-2.0)"
+   ]
+  },
+  {
+   "idOverture": "141aa64a-0469-4ea4-85fc-1679893fd478",
+   "nome": "Hotel Steinhausen",
+   "categoriaOverture": "hotel",
+   "confianca": 0.996,
+   "sites": [
+    "http://www.hotelsteinhausen.com.br"
+   ],
+   "telefones": [
+    "+554733290160"
+   ],
+   "redesSociais": [
+    "https://www.facebook.com/205081016173220"
+   ],
+   "endereco": "Estacionamento fundos - Rua Minas Gerais, 53 - recepção, R. Prof. Luís Schwartz, 50",
+   "localidade": "Blumenau",
+   "latitude": -26.91477187,
+   "longitude": -49.08103436,
+   "fontes": [
+    "meta (CDLA-Permissive-2.0)",
+    "Overture (CDLA-Permissive-2.0)"
+   ]
+  },
+  {
+   "idOverture": "f629f6d7-7f03-46c4-971c-b7b14ffea9b7",
+   "nome": "Balburdia Cervejeira",
+   "categoriaOverture": "brewery",
+   "confianca": 0.997,
+   "sites": [
+    "http://balburdia.com.br/"
+   ],
+   "telefones": [
+    "+554730805020"
+   ],
+   "redesSociais": [
+    "https://www.facebook.com/745122549196293"
+   ],
+   "endereco": "R. Antônio da Veiga, 464",
+   "localidade": "Blumenau",
+   "latitude": -26.90779892,
+   "longitude": -49.08000008,
+   "fontes": [
+    "meta (CDLA-Permissive-2.0)",
+    "Overture (CDLA-Permissive-2.0)"
+   ]
+  },
+  {
+   "idOverture": "cb94608c-b347-4cd5-9a2f-8a1484172708",
+   "nome": "The Best Açaí",
+   "categoriaOverture": "smoothie_juice_bar",
+   "confianca": 0.989,
+   "sites": [],
+   "telefones": [
+    "+5547999451485"
+   ],
+   "redesSociais": [
+    "https://www.facebook.com/100372402081818"
+   ],
+   "endereco": "R. Antônio da Veiga",
+   "localidade": "Blumenau",
+   "latitude": -26.90794962,
+   "longitude": -49.07982368,
+   "fontes": [
+    "meta (CDLA-Permissive-2.0)",
+    "Overture (CDLA-Permissive-2.0)"
+   ]
+  },
+  {
+   "idOverture": "27bbac03-65d6-4bfe-a252-4a459723194e",
+   "nome": "Bierstelle",
+   "categoriaOverture": "liquor_store",
+   "confianca": 0.993,
+   "sites": [
+    "https://www.bierstelle.com.Br/"
+   ],
+   "telefones": [
+    "+5547992611278"
+   ],
+   "redesSociais": [
+    "https://www.facebook.com/104452527618548"
+   ],
+   "endereco": "R. Eduardo Santos, 43 - Sl 10",
+   "localidade": "Blumenau",
+   "latitude": -26.90840281,
+   "longitude": -49.07979873,
+   "fontes": [
+    "meta (CDLA-Permissive-2.0)",
+    "Overture (CDLA-Permissive-2.0)"
+   ]
+  },
+  {
+   "idOverture": "0700aca1-4a0c-4ed3-89f7-bb817215d246",
+   "nome": "Casa de Ruter",
+   "categoriaOverture": "hobby_shop",
+   "confianca": 0.985,
+   "sites": [
+    "https://www.casaderuter.com.br/"
+   ],
+   "telefones": [
+    "+554730372112"
+   ],
+   "redesSociais": [
+    "https://www.facebook.com/485310341492803"
+   ],
+   "endereco": "R. Antônio da Veiga, 589 - 02",
+   "localidade": "Blumenau",
+   "latitude": -26.90899341,
+   "longitude": -49.08100977,
+   "fontes": [
+    "meta (CDLA-Permissive-2.0)",
+    "Overture (CDLA-Permissive-2.0)"
+   ]
+  },
+  {
+   "idOverture": "06c9602a-0330-43d3-8855-f28599d6081b",
+   "nome": "Okto's Bar",
+   "categoriaOverture": "bar",
+   "confianca": 0.997,
+   "sites": [
+    "https://l.instagram.com/?u=https%3A%2F%2Foktosbar.chefware.com.br%2F%3Futm_source%3Dig%26utm_medium%3Dsocial%26utm_content%3Dlink_in_bio%26fbclid%3DPAcGRvZgJleHRuA2FlbQIxMQBzcnRjBmFwcF9pZA85MzY2MTk3NDMzOTI0NTkAAaegiMgpplyAdbbrzaYwzaxjToHzR_oYQP3UyJ2LVUHCjqcDsxLfCsdcnzbecg_aem_ZusYbNKjZj2Bfswab5Nubg&e=AUAyk47PCmQeK9vrs3vW05z1tIApfVql8EZgiUbEOTu8mQyW7WlTOvoYFvHmulO2T9kngzjbGib8blqfEob-qPOVkMlCYYL60YbERVPovAazZO3KNbPJ6-ZRvWzVl_g5rgBoU34"
+   ],
+   "telefones": [
+    "+554732373040"
+   ],
+   "redesSociais": [
+    "https://www.facebook.com/470023829685406"
+   ],
+   "endereco": "Rua Antônio da Veiga 552 Vl Nova",
+   "localidade": "Blumenau",
+   "latitude": -26.908372,
+   "longitude": -49.0806529,
+   "fontes": [
+    "meta (CDLA-Permissive-2.0)",
+    "Overture (CDLA-Permissive-2.0)"
+   ]
+  },
+  {
+   "idOverture": "6c73a925-870a-4c7b-bd66-5f88db3cd29f",
+   "nome": "Pepper Jack",
+   "categoriaOverture": "american_restaurant",
+   "confianca": 0.997,
+   "sites": [
+    "http://www.pepperjack.com.br/"
+   ],
+   "telefones": [
+    "+5547996920253"
+   ],
+   "redesSociais": [
+    "https://www.facebook.com/144085685642754"
+   ],
+   "endereco": "R. Joinville, 148",
+   "localidade": "Blumenau",
+   "latitude": -26.90802125,
+   "longitude": -49.08262491,
+   "fontes": [
+    "meta (CDLA-Permissive-2.0)",
+    "Overture (CDLA-Permissive-2.0)"
+   ]
+  },
+  {
+   "idOverture": "5832b018-dc63-4f64-8275-41011ba343bb",
+   "nome": "Vila Germânica",
+   "categoriaOverture": "historic_site",
+   "confianca": 0.809,
+   "sites": [],
+   "telefones": [
+    "+554730415100"
+   ],
+   "redesSociais": [
+    "https://www.facebook.com/191353591251279"
+   ],
+   "endereco": "Rua Almirante Tamandaré, 1220",
+   "localidade": "Blumenau",
+   "latitude": -26.91387701,
+   "longitude": -49.08284866,
+   "fontes": [
+    "meta (CDLA-Permissive-2.0)",
+    "Overture (CDLA-Permissive-2.0)"
+   ]
+  },
+  {
+   "idOverture": "9fe962a0-cd86-4113-abe8-3b93e36a2d75",
+   "nome": "HANGOO Restaurante e Pizzaria",
+   "categoriaOverture": "buffet_restaurant",
+   "confianca": 0.997,
+   "sites": [
+    "http://bio.site/hangoorestaurante"
+   ],
+   "telefones": [
+    "+554732340122"
+   ],
+   "redesSociais": [
+    "https://www.facebook.com/418008265436555"
+   ],
+   "endereco": "R. Humberto de Campos, 337",
+   "localidade": "Blumenau",
+   "latitude": -26.91397835,
+   "longitude": -49.08309128,
+   "fontes": [
+    "meta (CDLA-Permissive-2.0)",
+    "Overture (CDLA-Permissive-2.0)"
+   ]
+  },
+  {
+   "idOverture": "c92104da-744f-4663-a52b-bdb85e05b58a",
+   "nome": "Granbalaio Hostel",
+   "categoriaOverture": "hostel",
+   "confianca": 0.916,
+   "sites": [
+    "https://booking.hqbeds.com.br/granbalaio"
+   ],
+   "telefones": [
+    "+5547991811977"
+   ],
+   "redesSociais": [
+    "https://www.facebook.com/768980619629016"
+   ],
+   "endereco": "R. Mariana Bronnemann, 116",
+   "localidade": "Blumenau",
+   "latitude": -26.91514829,
+   "longitude": -49.08328543,
+   "fontes": [
+    "meta (CDLA-Permissive-2.0)",
+    "Overture (CDLA-Permissive-2.0)"
+   ]
+  },
+  {
+   "idOverture": "e102a50d-c067-413f-a60e-f64e8fa7e6d0",
+   "nome": "Pizzaria Pizzamia",
+   "categoriaOverture": "pizza_restaurant",
+   "confianca": 0.982,
+   "sites": [
+    "http://www.pizzamiabnu.com.br/"
+   ],
+   "telefones": [
+    "+554730410594"
+   ],
+   "redesSociais": [
+    "https://www.facebook.com/323646194357656"
+   ],
+   "endereco": "Rua Theodoro Holtrup, 86",
+   "localidade": "Blumenau",
+   "latitude": -26.90899147,
+   "longitude": -49.08297121,
+   "fontes": [
+    "meta (CDLA-Permissive-2.0)",
+    "Overture (CDLA-Permissive-2.0)"
+   ]
+  },
+  {
+   "idOverture": "bc4ead69-f7a5-4c35-a6e3-605bd04886f5",
+   "nome": "Zamami Island Sushi",
+   "categoriaOverture": "sushi_restaurant",
+   "confianca": 0.958,
+   "sites": [
+    "https://www.instagram.com/zamami_blumenau/"
+   ],
+   "telefones": [
+    "+5547992772233"
+   ],
+   "redesSociais": [
+    "https://www.facebook.com/313131848553719"
+   ],
+   "endereco": "R. Joinville, 288",
+   "localidade": "Blumenau",
+   "latitude": -26.90697527,
+   "longitude": -49.0836056,
+   "fontes": [
+    "meta (CDLA-Permissive-2.0)",
+    "Overture (CDLA-Permissive-2.0)"
+   ]
+  },
+  {
+   "idOverture": "e44267a1-6b34-470b-a085-5e8e10939b5a",
+   "nome": "Figueira Restaurante",
+   "categoriaOverture": "restaurant",
+   "confianca": 0.998,
+   "sites": [
+    "http://www.figueirarestaurante.com.br/"
+   ],
+   "telefones": [
+    "+554732856020"
+   ],
+   "redesSociais": [
+    "https://www.facebook.com/137083919690441"
+   ],
+   "endereco": "R. Mariana Bronnemann, 527",
+   "localidade": "Blumenau",
+   "latitude": -26.91202236,
+   "longitude": -49.08534031,
+   "fontes": [
+    "meta (CDLA-Permissive-2.0)",
+    "Overture (CDLA-Permissive-2.0)"
+   ]
+  },
+  {
+   "idOverture": "47d289b3-450d-4f7a-8758-e1d51a4686e7",
+   "nome": "Pousada Villa Dom Carlos",
+   "categoriaOverture": "hostel",
+   "confianca": 0.963,
+   "sites": [],
+   "telefones": [
+    "+5547999268702"
+   ],
+   "redesSociais": [
+    "https://www.facebook.com/107383574037286"
+   ],
+   "endereco": "",
+   "localidade": "Blumenau",
+   "latitude": -26.91300145,
+   "longitude": -49.08534605,
+   "fontes": [
+    "meta (CDLA-Permissive-2.0)",
+    "Overture (CDLA-Permissive-2.0)"
+   ]
+  },
+  {
+   "idOverture": "21ed6fe7-6019-41d1-83b4-ccb36522ca0c",
+   "nome": "Radical - Luggage Storage Parque Ramiro Ruediger",
+   "categoriaOverture": "luggage_storage",
+   "confianca": 0.95,
+   "sites": [
+    "https://radicalstorage.com/luggage-storage/blumenau/city-center/luggage-storage-parque-ramiro-ruediger"
+   ],
+   "telefones": [
+    "+44 7782 218080"
+   ],
+   "redesSociais": [
+    "https://www.instagram.com/radicalstorage/",
+    "https://www.facebook.com/radicalstorage/",
+    "https://www.twitter.com/RadicalStorage",
+    "https://www.linkedin.com/company/radicalstorage"
+   ],
+   "endereco": "474 Rua Alberto Stein",
+   "localidade": "Blumenau",
+   "latitude": -26.91294716,
+   "longitude": -49.08525797,
+   "fontes": [
+    "Uberall (CDLA-Permissive-2.0)",
+    "Uberall (CDLA-Permissive-2.0)",
+    "Overture (CDLA-Permissive-2.0)"
+   ]
+  },
+  {
+   "idOverture": "251b17e7-d474-4ce6-bf94-940063fa68e2",
+   "nome": "Estação Vila Bar",
+   "categoriaOverture": "bar_and_grill_restaurant",
+   "confianca": 0.976,
+   "sites": [
+    "http://www.estacaovila.com.br/"
+   ],
+   "telefones": [
+    "+554733292121"
+   ],
+   "redesSociais": [
+    "https://www.facebook.com/187834551325459"
+   ],
+   "endereco": "Rua Henrique Dias, 186",
+   "localidade": "Blumenau",
+   "latitude": -26.91515567,
+   "longitude": -49.08482569,
+   "fontes": [
+    "meta (CDLA-Permissive-2.0)",
+    "Overture (CDLA-Permissive-2.0)"
+   ]
+  },
+  {
+   "idOverture": "04255d25-f5a1-4bee-9422-5ec85adc4a19",
+   "nome": "Butike do Turista",
+   "categoriaOverture": "flowers_and_gifts_store",
+   "confianca": 0.699,
+   "sites": [
+    "http://www.butikedoturistapresentes.com.br/"
+   ],
+   "telefones": [
+    "+554733350021"
+   ],
+   "redesSociais": [
+    "https://www.facebook.com/102796194886880"
+   ],
+   "endereco": "Rua Alberto Stein, 199",
+   "localidade": "Blumenau",
+   "latitude": -26.91532487,
+   "longitude": -49.08495609,
+   "fontes": [
+    "meta (CDLA-Permissive-2.0)",
+    "Overture (CDLA-Permissive-2.0)"
+   ]
+  },
+  {
+   "idOverture": "9c1e2c9c-e34e-42bf-8201-16bcdfcd8b70",
+   "nome": "Villa Store Trajes Típicos",
+   "categoriaOverture": "clothing_store",
+   "confianca": 0.656,
+   "sites": [
+    "http://www.villastore.com.br/"
+   ],
+   "telefones": [
+    "+554730410010"
+   ],
+   "redesSociais": [
+    "https://www.facebook.com/111846245639472"
+   ],
+   "endereco": "Parque Vila Germânica, R. Alberto Stein, 199 - Loja 03",
+   "localidade": "Blumenau",
+   "latitude": -26.91580869,
+   "longitude": -49.08525194,
+   "fontes": [
+    "meta (CDLA-Permissive-2.0)",
+    "Overture (CDLA-Permissive-2.0)"
+   ]
+  },
+  {
+   "idOverture": "55cabd6d-48e8-4d45-bacd-2a1f357422c6",
+   "nome": "Parque Ramiro Ruediger",
+   "categoriaOverture": "park",
+   "confianca": 0.974,
+   "sites": [
+    "http://wikimapia.org/476109/pt/Parque-Ramiro-Ruediger"
+   ],
+   "telefones": [
+    "+554733817988"
+   ],
+   "redesSociais": [
+    "https://www.facebook.com/120507368024498"
+   ],
+   "endereco": "R. Alberto Stein, 416",
+   "localidade": "Blumenau",
+   "latitude": -26.91339453,
+   "longitude": -49.08547459,
+   "fontes": [
+    "meta (CDLA-Permissive-2.0)",
+    "Overture (CDLA-Permissive-2.0)"
+   ]
+  },
+  {
+   "idOverture": "70c89abf-6c60-4b17-bf28-ede7db243c39",
+   "nome": "Pousada Vila Germânica Bnu",
+   "categoriaOverture": "hotel",
+   "confianca": 0.852,
+   "sites": [
+    "http://www.pousadavilagermanica.com.br"
+   ],
+   "telefones": [
+    "+554733298985"
+   ],
+   "redesSociais": [
+    "https://www.facebook.com/557439320793512"
+   ],
+   "endereco": "Rua João Pessoa, 1171",
+   "localidade": "Blumenau",
+   "latitude": -26.917666535275075,
+   "longitude": -49.08502304706252,
+   "fontes": [
+    "meta (CDLA-Permissive-2.0)",
+    "Overture (CDLA-Permissive-2.0)"
+   ]
+  },
+  {
+   "idOverture": "5cbeb4a3-8366-4784-922b-4346aaef2512",
+   "nome": "Espaço Herlang",
+   "categoriaOverture": "hotel",
+   "confianca": 0.964,
+   "sites": [],
+   "telefones": [
+    "+5547999831493"
+   ],
+   "redesSociais": [
+    "https://www.facebook.com/164294010435591"
+   ],
+   "endereco": "R. Reinoldo Koffke, 40",
+   "localidade": "Blumenau",
+   "latitude": -26.91753164,
+   "longitude": -49.08493875,
+   "fontes": [
+    "meta (CDLA-Permissive-2.0)",
+    "Overture (CDLA-Permissive-2.0)"
+   ]
+  },
+  {
+   "idOverture": "5af4cd41-aa52-404c-a4d1-abd2dcfe2035",
+   "nome": "Hostel Vila Germânica",
+   "categoriaOverture": "hostel",
+   "confianca": 0.865,
+   "sites": [],
+   "telefones": [],
+   "redesSociais": [
+    "https://www.facebook.com/904445889684408"
+   ],
+   "endereco": "Rua Reinoldo Koffke, 106",
+   "localidade": "Blumenau",
+   "latitude": -26.9180468,
+   "longitude": -49.0844338,
+   "fontes": [
+    "meta (CDLA-Permissive-2.0)",
+    "Overture (CDLA-Permissive-2.0)"
+   ]
+  },
+  {
+   "idOverture": "d47210df-3afd-44e2-827b-1ef355b8442d",
+   "nome": "Eisenbahn Bierhaus",
+   "categoriaOverture": "german_restaurant",
+   "confianca": 0.996,
+   "sites": [
+    "http://www.eisenbahn.com.br"
+   ],
+   "telefones": [
+    "+554733353169"
+   ],
+   "redesSociais": [
+    "https://www.facebook.com/264151760953188"
+   ],
+   "endereco": "Rua Alberto Stein, 199",
+   "localidade": "Blumenau",
+   "latitude": -26.91676772091468,
+   "longitude": -49.084501493425805,
+   "fontes": [
+    "meta (CDLA-Permissive-2.0)",
+    "Overture (CDLA-Permissive-2.0)"
+   ]
+  },
+  {
+   "idOverture": "ac40a3d8-338c-495b-96dc-8875486ae690",
+   "nome": "Bier Vila",
+   "categoriaOverture": "brazilian_restaurant",
+   "confianca": 0.996,
+   "sites": [
+    "http://www.biervila.com.br"
+   ],
+   "telefones": [
+    "+554733290808"
+   ],
+   "redesSociais": [
+    "https://www.facebook.com/146126912139997"
+   ],
+   "endereco": "Rua Alberto Stein, 199",
+   "localidade": "Blumenau",
+   "latitude": -26.91564805,
+   "longitude": -49.08459933,
+   "fontes": [
+    "meta (CDLA-Permissive-2.0)",
+    "Overture (CDLA-Permissive-2.0)"
+   ]
+  },
+  {
+   "idOverture": "3137d872-5826-41a1-82d3-26a8d1accb39",
+   "nome": "Avatim",
+   "categoriaOverture": "gift_shop",
+   "confianca": 0.77,
+   "sites": [
+    "http://www.avatim.com.br"
+   ],
+   "telefones": [
+    "(47) 3035-4817"
+   ],
+   "redesSociais": [],
+   "endereco": null,
+   "localidade": null,
+   "latitude": -26.91527734189276,
+   "longitude": -49.08470253395914,
+   "fontes": [
+    "Foursquare (Apache-2.0)",
+    "Overture (CDLA-Permissive-2.0)"
+   ]
+  },
+  {
+   "idOverture": "788e3b14-1504-41a1-a13f-04ac2487b944",
+   "nome": "Choperia e Restaurante Vila Germânica",
+   "categoriaOverture": "german_restaurant",
+   "confianca": 0.991,
+   "sites": [
+    "http://www.instagram.com/restaurantevilagermanica"
+   ],
+   "telefones": [
+    "+5547996035872"
+   ],
+   "redesSociais": [
+    "https://www.facebook.com/259557974123400"
+   ],
+   "endereco": "R. Alberto Stein, 215",
+   "localidade": "Blumenau",
+   "latitude": -26.91548267,
+   "longitude": -49.0843687,
+   "fontes": [
+    "meta (CDLA-Permissive-2.0)",
+    "Overture (CDLA-Permissive-2.0)"
+   ]
+  },
+  {
+   "idOverture": "fc437847-69af-4e84-b947-98bbfbaa2d1e",
+   "nome": "Estação Vila",
+   "categoriaOverture": "restaurant",
+   "confianca": 0.954,
+   "sites": [
+    "http://www.eisenbahn.com.br/"
+   ],
+   "telefones": [
+    "+554733292121"
+   ],
+   "redesSociais": [
+    "https://www.facebook.com/368532613216031"
+   ],
+   "endereco": "R. Alberto Stein, 199",
+   "localidade": "Blumenau",
+   "latitude": -26.91535481,
+   "longitude": -49.08440435,
+   "fontes": [
+    "meta (CDLA-Permissive-2.0)",
+    "Overture (CDLA-Permissive-2.0)"
+   ]
+  },
+  {
+   "idOverture": "2ada7321-bdc2-486e-820d-6a738b2d08d9",
+   "nome": "Kunst haus",
+   "categoriaOverture": "social_or_community_service",
+   "confianca": 0.976,
+   "sites": [],
+   "telefones": [
+    "+5547991446844"
+   ],
+   "redesSociais": [
+    "https://www.facebook.com/337932373288860"
+   ],
+   "endereco": "R. Alberto Stein, 199",
+   "localidade": "Blumenau",
+   "latitude": -26.915354,
+   "longitude": -49.08440083,
+   "fontes": [
+    "meta (CDLA-Permissive-2.0)",
+    "Overture (CDLA-Permissive-2.0)"
+   ]
+  },
+  {
+   "idOverture": "cf695921-a4b7-4a6f-8511-80c150b8d9ca",
+   "nome": "Francis Blu",
+   "categoriaOverture": "clothing_store",
+   "confianca": 0.965,
+   "sites": [
+    "http://www.francisblu.com.br/"
+   ],
+   "telefones": [
+    "+554733223373"
+   ],
+   "redesSociais": [
+    "https://www.facebook.com/251527558301747"
+   ],
+   "endereco": "R. Herbert Wehmuth",
+   "localidade": "Blumenau",
+   "latitude": -26.91703562,
+   "longitude": -49.08408223,
+   "fontes": [
+    "meta (CDLA-Permissive-2.0)",
+    "Overture (CDLA-Permissive-2.0)"
+   ]
+  },
+  {
+   "idOverture": "8074b274-f4d1-48ac-a726-31d2617f5480",
+   "nome": "Eisenbahn Biergarten",
+   "categoriaOverture": "beer_garden",
+   "confianca": 0.997,
+   "sites": [],
+   "telefones": [
+    "+5547991170584"
+   ],
+   "redesSociais": [
+    "https://www.facebook.com/110808083872531"
+   ],
+   "endereco": "R. Mariana Bronnemann, 230",
+   "localidade": "Blumenau",
+   "latitude": -26.91435098,
+   "longitude": -49.0837364,
+   "fontes": [
+    "meta (CDLA-Permissive-2.0)",
+    "Overture (CDLA-Permissive-2.0)"
+   ]
+  },
+  {
+   "idOverture": "e2e7b748-f69e-454d-870f-25e7471c54a6",
+   "nome": "Blu Terrace Hotel",
+   "categoriaOverture": "hotel",
+   "confianca": 0.998,
+   "sites": [
+    "http://www.bluterracehotel.com.br/"
+   ],
+   "telefones": [
+    "+554730371012"
+   ],
+   "redesSociais": [
+    "https://www.facebook.com/120192444740891"
+   ],
+   "endereco": "R. Mariana Bronnemann, 230",
+   "localidade": "Blumenau",
+   "latitude": -26.91439559,
+   "longitude": -49.08374331,
+   "fontes": [
+    "meta (CDLA-Permissive-2.0)",
+    "Overture (CDLA-Permissive-2.0)"
+   ]
+  },
+  {
+   "idOverture": "16ebedfe-b7e0-43d3-b552-de87f2b8c4e5",
+   "nome": "Blu Hostel, Blumenau-SC",
+   "categoriaOverture": "hotel",
+   "confianca": 0.951,
+   "sites": [],
+   "telefones": [
+    "+5547991512226"
+   ],
+   "redesSociais": [
+    "https://www.facebook.com/103322331580005"
+   ],
+   "endereco": "Rua Guilherme Butzke Sênior, 56",
+   "localidade": "Blumenau",
+   "latitude": -26.91889,
+   "longitude": -49.0865,
+   "fontes": [
+    "meta (CDLA-Permissive-2.0)",
+    "Overture (CDLA-Permissive-2.0)"
+   ]
+  },
+  {
+   "idOverture": "e39c6906-4e60-4869-ace9-0cc04a91b541",
+   "nome": "Winch",
+   "categoriaOverture": "bar",
+   "confianca": 0.943,
+   "sites": [
+    "http://wa.me/554799843901"
+   ],
+   "telefones": [
+    "+551139320343"
+   ],
+   "redesSociais": [
+    "https://www.facebook.com/221865174553588"
+   ],
+   "endereco": "End Rua Santa Ângela, 105",
+   "localidade": "Blumenau",
+   "latitude": -26.90659288,
+   "longitude": -49.08597151,
+   "fontes": [
+    "meta (CDLA-Permissive-2.0)",
+    "Overture (CDLA-Permissive-2.0)"
+   ]
+  },
+  {
+   "idOverture": "7cdd520b-af28-4aa7-aa15-7070a48d5a69",
+   "nome": "Winchester Pub",
+   "categoriaOverture": "pub",
+   "confianca": 0.77,
+   "sites": [
+    "http://winchesterpub.com"
+   ],
+   "telefones": [
+    "(47) 3035-1559"
+   ],
+   "redesSociais": [
+    "https://www.twitter.com/winpub",
+    "https://www.facebook.com/221865174553588"
+   ],
+   "endereco": "R. Theodoro Holtrup, 492",
+   "localidade": "Blumenau",
+   "latitude": -26.90653698511026,
+   "longitude": -49.085841717225165,
+   "fontes": [
+    "Foursquare (Apache-2.0)",
+    "Overture (CDLA-Permissive-2.0)"
+   ]
+  },
+  {
+   "idOverture": "de79b82c-a9f3-4c4c-a0cd-08d21e1bde5e",
+   "nome": "Churrascaria Antoninho",
+   "categoriaOverture": "steakhouse",
+   "confianca": 0.887,
+   "sites": [],
+   "telefones": [
+    "+554733291781"
+   ],
+   "redesSociais": [
+    "https://www.facebook.com/268675476335735"
+   ],
+   "endereco": "R. Alm. Tamandaré, 1397",
+   "localidade": "Blumenau",
+   "latitude": -26.91179395,
+   "longitude": -49.0873362,
+   "fontes": [
+    "meta (CDLA-Permissive-2.0)",
+    "Overture (CDLA-Permissive-2.0)"
+   ]
+  },
+  {
+   "idOverture": "7b582c44-1168-4fcc-ac34-7c74d8063b7b",
+   "nome": "Nacho Man Blumenau",
+   "categoriaOverture": "mexican_restaurant",
+   "confianca": 0.939,
+   "sites": [
+    "http://www.nachomanmexicanfood.com.br/"
+   ],
+   "telefones": [
+    "+554732884668"
+   ],
+   "redesSociais": [
+    "https://www.facebook.com/377329446071659"
+   ],
+   "endereco": "Rua Joinville, 861",
+   "localidade": "Blumenau",
+   "latitude": -26.90332456,
+   "longitude": -49.08738346,
+   "fontes": [
+    "meta (CDLA-Permissive-2.0)",
+    "Overture (CDLA-Permissive-2.0)"
+   ]
+  },
+  {
+   "idOverture": "90aecfea-efed-4eaf-bbd9-3d6d02377bc9",
+   "nome": "Restaurante Staloch",
+   "categoriaOverture": "brazilian_restaurant",
+   "confianca": 0.981,
+   "sites": [],
+   "telefones": [
+    "+554730421167"
+   ],
+   "redesSociais": [
+    "https://www.facebook.com/102531617920807"
+   ],
+   "endereco": "R. Joinville, 849",
+   "localidade": "Blumenau",
+   "latitude": -26.90346447,
+   "longitude": -49.08732054,
+   "fontes": [
+    "meta (CDLA-Permissive-2.0)",
+    "Overture (CDLA-Permissive-2.0)"
+   ]
+  },
+  {
+   "idOverture": "6b6139c3-fe2d-4933-b22a-9e145fb586ff",
+   "nome": "Saporito Pizza",
+   "categoriaOverture": "pizza_restaurant",
+   "confianca": 0.77,
+   "sites": [
+    "http://www.saporitopizza.com.br/site"
+   ],
+   "telefones": [
+    "(47) 3080-0030"
+   ],
+   "redesSociais": [],
+   "endereco": "Rua Gustavo Salinger, 719",
+   "localidade": "Blumenau",
+   "latitude": -26.896582358133983,
+   "longitude": -49.08760071837961,
+   "fontes": [
+    "Foursquare (Apache-2.0)",
+    "Overture (CDLA-Permissive-2.0)"
+   ]
+  },
+  {
+   "idOverture": "acc62203-0f2f-466f-af24-3f468a932291",
+   "nome": "Panificadora Styllo e Sabor",
+   "categoriaOverture": "bakery",
+   "confianca": 0.814,
+   "sites": [],
+   "telefones": [
+    "+554733262202"
+   ],
+   "redesSociais": [
+    "https://www.facebook.com/961202334012226"
+   ],
+   "endereco": "Rua Almirante Barroso, 358",
+   "localidade": "Blumenau",
+   "latitude": -26.89632007,
+   "longitude": -49.08721585,
+   "fontes": [
+    "meta (CDLA-Permissive-2.0)",
+    "Overture (CDLA-Permissive-2.0)"
+   ]
+  },
+  {
+   "idOverture": "063e6564-94d4-4d24-b0cf-fd44636ceb4c",
+   "nome": "Catedral da Pizza",
+   "categoriaOverture": "pizza_restaurant",
+   "confianca": 0.991,
+   "sites": [
+    "https://dire.to/catedraldapizzacatedraldapizza"
+   ],
+   "telefones": [
+    "+554733239325"
+   ],
+   "redesSociais": [
+    "https://www.facebook.com/200343926645306"
+   ],
+   "endereco": "R. Cel. Feddersen, 20",
+   "localidade": "Blumenau",
+   "latitude": -26.89002981,
+   "longitude": -49.08660007,
+   "fontes": [
+    "meta (CDLA-Permissive-2.0)",
+    "Overture (CDLA-Permissive-2.0)"
+   ]
+  },
+  {
+   "idOverture": "ab059504-fcbb-4c96-afda-c7d9516e388d",
+   "nome": "Pousada Casa da Pedra",
+   "categoriaOverture": "inn",
+   "confianca": 0.999,
+   "sites": [
+    "http://www.pousadacasadapedra.com.br/"
+   ],
+   "telefones": [
+    "+554734886460"
+   ],
+   "redesSociais": [
+    "https://www.facebook.com/416566355113642"
+   ],
+   "endereco": "Rua Professor João Boos, 258",
+   "localidade": "Blumenau",
+   "latitude": -26.901144570675,
+   "longitude": -49.085194766521,
+   "fontes": [
+    "meta (CDLA-Permissive-2.0)",
+    "Overture (CDLA-Permissive-2.0)"
+   ]
+  },
+  {
+   "idOverture": "5ea0e3b3-9bab-4336-97e4-6b349855bf13",
+   "nome": "Cybercafé Istambul",
+   "categoriaOverture": "cafe",
+   "confianca": 0.747,
+   "sites": [],
+   "telefones": [
+    "+554732320840"
+   ],
+   "redesSociais": [
+    "https://www.facebook.com/276464729538099"
+   ],
+   "endereco": "Rua São Paulo, 3168",
+   "localidade": "Blumenau",
+   "latitude": -26.89211484,
+   "longitude": -49.08451547,
+   "fontes": [
+    "meta (CDLA-Permissive-2.0)",
+    "Overture (CDLA-Permissive-2.0)"
+   ]
+  },
+  {
+   "idOverture": "e10c8100-b848-42ae-9b23-7ce8d85c0b3d",
+   "nome": "Hotel St. John",
+   "categoriaOverture": "hotel",
+   "confianca": 0.996,
+   "sites": [
+    "http://www.hotelstjohn.com.br"
+   ],
+   "telefones": [
+    "+554733234944"
+   ],
+   "redesSociais": [
+    "https://www.facebook.com/195830523780122"
+   ],
+   "endereco": "R. São Paulo, 3191",
+   "localidade": "Blumenau",
+   "latitude": -26.8920465,
+   "longitude": -49.08471668,
+   "fontes": [
+    "meta (CDLA-Permissive-2.0)",
+    "Overture (CDLA-Permissive-2.0)"
+   ]
+  },
+  {
+   "idOverture": "d98efa27-41cb-402a-a493-3fc8ec7ccb93",
+   "nome": "Mukifo Decorações",
+   "categoriaOverture": "arts_crafts_and_hobby_store",
+   "confianca": 0.994,
+   "sites": [
+    "http://www.mukifodecoracoes.com.br"
+   ],
+   "telefones": [
+    "+554733095900"
+   ],
+   "redesSociais": [
+    "https://www.facebook.com/719029361445625"
+   ],
+   "endereco": "R. Cidade do Salvador, 118",
+   "localidade": "Blumenau",
+   "latitude": -26.87528025,
+   "longitude": -49.08683004,
+   "fontes": [
+    "meta (CDLA-Permissive-2.0)",
+    "Overture (CDLA-Permissive-2.0)"
+   ]
+  },
+  {
+   "idOverture": "cd059da0-c150-41d3-8668-a9b3e2903d12",
+   "nome": "Flamboyant Grill e Chopperia",
+   "categoriaOverture": "restaurant",
+   "confianca": 0.628,
+   "sites": [],
+   "telefones": [
+    "+554733382378"
+   ],
+   "redesSociais": [
+    "https://www.facebook.com/928275973953200"
+   ],
+   "endereco": "Rua Vereador Romario da Conceicao Badia, 45",
+   "localidade": "Blumenau",
+   "latitude": -26.87450688,
+   "longitude": -49.08745274,
+   "fontes": [
+    "meta (CDLA-Permissive-2.0)",
+    "Overture (CDLA-Permissive-2.0)"
+   ]
+  },
+  {
+   "idOverture": "9b37f573-328f-450a-8259-ebeec76a5184",
+   "nome": "Bar São Roque Kaiser",
+   "categoriaOverture": "bar",
+   "confianca": 0.613,
+   "sites": [],
+   "telefones": [],
+   "redesSociais": [
+    "https://www.facebook.com/379800039190605"
+   ],
+   "endereco": "",
+   "localidade": "Blumenau",
+   "latitude": -26.87241048,
+   "longitude": -49.08707172,
+   "fontes": [
+    "meta (CDLA-Permissive-2.0)",
+    "Overture (CDLA-Permissive-2.0)"
+   ]
+  },
+  {
+   "idOverture": "0aa18ea3-d27e-42b1-8898-2f9b24ae8aa4",
+   "nome": "Pizzaria Toscana Park",
+   "categoriaOverture": "italian_restaurant",
+   "confianca": 0.982,
+   "sites": [
+    "https://instagram.com/pizzariatoscanapark"
+   ],
+   "telefones": [
+    "+554733801670"
+   ],
+   "redesSociais": [
+    "https://www.facebook.com/111972223608612"
+   ],
+   "endereco": "Rua Dr. Pedro Zimmermann, 2371",
+   "localidade": "Blumenau",
+   "latitude": -26.85473522,
+   "longitude": -49.08682888,
+   "fontes": [
+    "meta (CDLA-Permissive-2.0)",
+    "Overture (CDLA-Permissive-2.0)"
+   ]
+  },
+  {
+   "idOverture": "f8f927d5-bbc8-44f3-a852-97c1e18f6564",
+   "nome": "Hotel, Pizzaria & Restaurante Zandoná - H2",
+   "categoriaOverture": "restaurant",
+   "confianca": 0.938,
+   "sites": [],
+   "telefones": [],
+   "redesSociais": [
+    "https://www.facebook.com/117634346307249"
+   ],
+   "endereco": "Rua Dr. Pedro Zimmermann, 2600",
+   "localidade": "Blumenau",
+   "latitude": -26.85151133,
+   "longitude": -49.08718718,
+   "fontes": [
+    "meta (CDLA-Permissive-2.0)",
+    "Overture (CDLA-Permissive-2.0)"
+   ]
+  },
+  {
+   "idOverture": "188104bd-3df0-4513-bad7-e571dc52e3e8",
+   "nome": "Nutrar Restaurantes Empresariais",
+   "categoriaOverture": "caterer",
+   "confianca": 0.87,
+   "sites": [
+    "https://nutrar.com.br/"
+   ],
+   "telefones": [
+    "+5547996771111"
+   ],
+   "redesSociais": [
+    "https://www.facebook.com/137232483377530"
+   ],
+   "endereco": "Rua Dr. Pedro Zimmermann, 2599",
+   "localidade": "Blumenau",
+   "latitude": -26.85254307,
+   "longitude": -49.08767339,
+   "fontes": [
+    "meta (CDLA-Permissive-2.0)",
+    "Overture (CDLA-Permissive-2.0)"
+   ]
+  },
+  {
+   "idOverture": "ba3e81a0-980b-4f65-ba20-068c6f9d7688",
+   "nome": "Golden Sushi Delivery",
+   "categoriaOverture": "sushi_restaurant",
+   "confianca": 0.867,
+   "sites": [],
+   "telefones": [
+    "+5547996346952"
+   ],
+   "redesSociais": [
+    "https://www.facebook.com/605632983178528"
+   ],
+   "endereco": "R. Dois de Setembro, 2771",
+   "localidade": "Blumenau",
+   "latitude": -26.88888768,
+   "longitude": -49.08277949,
+   "fontes": [
+    "meta (CDLA-Permissive-2.0)",
+    "Overture (CDLA-Permissive-2.0)"
+   ]
+  },
+  {
+   "idOverture": "18cb7f1f-12bb-4252-93c6-869cd40fd3d7",
+   "nome": "Boiler Café",
+   "categoriaOverture": "cafe",
+   "confianca": 0.929,
+   "sites": [
+    "https://www.instagram.com/boilercafesespeciais/"
+   ],
+   "telefones": [
+    "+5547999161021"
+   ],
+   "redesSociais": [
+    "https://www.facebook.com/109420914320540"
+   ],
+   "endereco": "R. Dois de Setembro, 2673",
+   "localidade": "Blumenau",
+   "latitude": -26.88937692,
+   "longitude": -49.08225266,
+   "fontes": [
+    "meta (CDLA-Permissive-2.0)",
+    "Overture (CDLA-Permissive-2.0)"
+   ]
+  },
+  {
+   "idOverture": "9bce5a2b-c1e9-4c9f-8471-07b5682ed9b0",
+   "nome": "Restaurante Zanoni",
+   "categoriaOverture": "restaurant",
+   "confianca": 0.852,
+   "sites": [
+    "http://restaurantezanoni1.placeweb.site/"
+   ],
+   "telefones": [
+    "+554732327632"
+   ],
+   "redesSociais": [
+    "https://www.facebook.com/587523987968717"
+   ],
+   "endereco": "R. Paris, 119",
+   "localidade": "Blumenau",
+   "latitude": -26.88555672,
+   "longitude": -49.08220712,
+   "fontes": [
+    "meta (CDLA-Permissive-2.0)",
+    "Overture (CDLA-Permissive-2.0)"
+   ]
+  },
+  {
+   "idOverture": "fefffdd4-f4f9-42ab-870f-f3f39592c4cc",
+   "nome": "Hostel Feel Home",
+   "categoriaOverture": "hostel",
+   "confianca": 0.915,
+   "sites": [],
+   "telefones": [
+    "+5547996499051"
+   ],
+   "redesSociais": [
+    "https://www.facebook.com/561319267563524"
+   ],
+   "endereco": "R. Teresópolis, 356",
+   "localidade": "Blumenau",
+   "latitude": -26.90391893,
+   "longitude": -49.08067598,
+   "fontes": [
+    "meta (CDLA-Permissive-2.0)",
+    "Overture (CDLA-Permissive-2.0)"
+   ]
+  },
+  {
+   "idOverture": "e25d41b3-58bc-48f0-8173-46928cd25fd2",
+   "nome": "Aromata Pizzaria Blumenau",
+   "categoriaOverture": "pizza_restaurant",
+   "confianca": 0.94,
+   "sites": [],
+   "telefones": [
+    "+5547992109153"
+   ],
+   "redesSociais": [
+    "https://www.facebook.com/104039514879395"
+   ],
+   "endereco": "R. Otto Hennings, 133",
+   "localidade": "Blumenau",
+   "latitude": -26.89675517,
+   "longitude": -49.08088568,
+   "fontes": [
+    "meta (CDLA-Permissive-2.0)",
+    "Overture (CDLA-Permissive-2.0)"
+   ]
+  },
+  {
+   "idOverture": "d2395aef-911f-48a5-9b63-026d5c71f24a",
+   "nome": "Ahoy Tavern Club",
+   "categoriaOverture": "bar",
+   "confianca": 0.996,
+   "sites": [
+    "http://www.ahoyblumenau.com.br/"
+   ],
+   "telefones": [
+    "+554732090970"
+   ],
+   "redesSociais": [
+    "https://www.facebook.com/252806188140374"
+   ],
+   "endereco": "R. São Paulo, 2083",
+   "localidade": "Blumenau",
+   "latitude": -26.89935121,
+   "longitude": -49.07713829,
+   "fontes": [
+    "meta (CDLA-Permissive-2.0)",
+    "Overture (CDLA-Permissive-2.0)"
+   ]
+  },
+  {
+   "idOverture": "3aa1c0c3-6ad4-47f6-9b81-f2b63c748777",
+   "nome": "Vida Nova Flores e Cestas",
+   "categoriaOverture": "flowers_and_gifts_store",
+   "confianca": 0.857,
+   "sites": [
+    "http://www.floriculturavidanova.com.br/"
+   ],
+   "telefones": [
+    "+5547988880123"
+   ],
+   "redesSociais": [
+    "https://www.facebook.com/790690471038809"
+   ],
+   "endereco": "Rua São Paulo, 1380",
+   "localidade": "Blumenau",
+   "latitude": -26.90498,
+   "longitude": -49.07691,
+   "fontes": [
+    "meta (CDLA-Permissive-2.0)",
+    "Overture (CDLA-Permissive-2.0)"
+   ]
+  },
+  {
+   "idOverture": "5238420a-c296-44ac-9264-5b8a45afd7d8",
+   "nome": "Pousada Coutinho",
+   "categoriaOverture": "hotel",
+   "confianca": 0.863,
+   "sites": [],
+   "telefones": [
+    "+5547991196572"
+   ],
+   "redesSociais": [
+    "https://www.facebook.com/104091148612524"
+   ],
+   "endereco": "Rua Mediterrâneo",
+   "localidade": "Blumenau",
+   "latitude": -26.872953397640433,
+   "longitude": -49.077915898317634,
+   "fontes": [
+    "meta (CDLA-Permissive-2.0)",
+    "Overture (CDLA-Permissive-2.0)"
+   ]
+  },
+  {
+   "idOverture": "00a0b03f-e280-4b5a-8157-d10821bab36d",
+   "nome": "Konciny Confecções - CIC Blumenau",
+   "categoriaOverture": "clothing_store",
+   "confianca": 0.988,
+   "sites": [
+    "http://www.konciny.com.br/"
+   ],
+   "telefones": [
+    "+554733214637"
+   ],
+   "redesSociais": [
+    "https://www.facebook.com/104714524239629"
+   ],
+   "endereco": "R. Dois de Setembro, 1395 - 2 ° Andar",
+   "localidade": "Blumenau",
+   "latitude": -26.89748734,
+   "longitude": -49.07255185,
+   "fontes": [
+    "meta (CDLA-Permissive-2.0)",
+    "Overture (CDLA-Permissive-2.0)"
+   ]
+  },
+  {
+   "idOverture": "40d67481-c989-4792-a8ff-80a61f166a81",
+   "nome": "CIC Blumenau",
+   "categoriaOverture": "shopping_mall",
+   "confianca": 0.998,
+   "sites": [
+    "http://www.cicblumenau.com.br"
+   ],
+   "telefones": [
+    "+554733214600"
+   ],
+   "redesSociais": [
+    "https://www.facebook.com/379850628697965"
+   ],
+   "endereco": "R. Dois de Setembro, Nº1395",
+   "localidade": "Blumenau",
+   "latitude": -26.89748223,
+   "longitude": -49.07287709,
+   "fontes": [
+    "meta (CDLA-Permissive-2.0)",
+    "Overture (CDLA-Permissive-2.0)"
+   ]
+  },
+  {
+   "idOverture": "5096a0bc-4bd9-4a97-a478-2d6d079dde7e",
+   "nome": "La Fioleta - Cic Blumenau",
+   "categoriaOverture": "shoe_store",
+   "confianca": 0.92,
+   "sites": [],
+   "telefones": [
+    "+5547996779598"
+   ],
+   "redesSociais": [
+    "https://www.facebook.com/1268822419870227"
+   ],
+   "endereco": "Rua Dois de Setembro, 1395",
+   "localidade": "Blumenau",
+   "latitude": -26.897576943027474,
+   "longitude": -49.07299392552705,
+   "fontes": [
+    "meta (CDLA-Permissive-2.0)",
+    "Overture (CDLA-Permissive-2.0)"
+   ]
+  },
+  {
+   "idOverture": "c31194a6-3433-4eee-975e-252e858868ad",
+   "nome": "La Fioleta - Cic Blumenau",
+   "categoriaOverture": "shoe_store",
+   "confianca": 0.937,
+   "sites": [],
+   "telefones": [
+    "+5547996779598"
+   ],
+   "redesSociais": [
+    "https://www.facebook.com/1268822419870227"
+   ],
+   "endereco": "Rua Dois de Setembro, 1395",
+   "localidade": "Blumenau",
+   "latitude": -26.89742,
+   "longitude": -49.07309,
+   "fontes": [
+    "meta (CDLA-Permissive-2.0)",
+    "Overture (CDLA-Permissive-2.0)"
+   ]
+  },
+  {
+   "idOverture": "ba3290ca-0f99-4a96-a1ba-b730daacf4d4",
+   "nome": "Rota do Vale Hostel",
+   "categoriaOverture": "hostel",
+   "confianca": 0.878,
+   "sites": [
+    "http://www.rotadovalehostel.com.br/"
+   ],
+   "telefones": [],
+   "redesSociais": [
+    "https://www.facebook.com/105466424274830"
+   ],
+   "endereco": "Rua Sorocada",
+   "localidade": "Blumenau",
+   "latitude": -26.9126553,
+   "longitude": -49.0722786,
+   "fontes": [
+    "meta (CDLA-Permissive-2.0)",
+    "Overture (CDLA-Permissive-2.0)"
+   ]
+  },
+  {
+   "idOverture": "cc638630-a6a8-4084-a3b6-699e2058ba75",
+   "nome": "Praça Dr. Fritz Müller",
+   "categoriaOverture": "park",
+   "confianca": 0.915,
+   "sites": [],
+   "telefones": [],
+   "redesSociais": [
+    "https://www.facebook.com/921190001268390"
+   ],
+   "endereco": "870, R. São Paulo, 812",
+   "localidade": "Blumenau",
+   "latitude": -26.90880457,
+   "longitude": -49.07303241,
+   "fontes": [
+    "meta (CDLA-Permissive-2.0)",
+    "Overture (CDLA-Permissive-2.0)"
+   ]
+  },
+  {
+   "idOverture": "9a7426f6-6995-4d22-9261-94e3f9918e3c",
+   "nome": "Rosa Mexicano",
+   "categoriaOverture": "mexican_restaurant",
+   "confianca": 0.995,
+   "sites": [
+    "http://www.rosamexicano.com.br/"
+   ],
+   "telefones": [
+    "+554732883096"
+   ],
+   "redesSociais": [
+    "https://www.facebook.com/1552812324948212"
+   ],
+   "endereco": "R. Carlos Rischbieter, 61",
+   "localidade": "Blumenau",
+   "latitude": -26.90737357,
+   "longitude": -49.07306032,
+   "fontes": [
+    "meta (CDLA-Permissive-2.0)",
+    "Overture (CDLA-Permissive-2.0)"
+   ]
+  },
+  {
+   "idOverture": "37b7cac9-cc20-4605-be32-348ba1ecdb02",
+   "nome": "Cafeteria Especial",
+   "categoriaOverture": null,
+   "confianca": 0.999,
+   "sites": [
+    "http://youtube.com/@sabordasemana"
+   ],
+   "telefones": [
+    "+554730420057"
+   ],
+   "redesSociais": [
+    "https://www.facebook.com/1987516038155729"
+   ],
+   "endereco": "R. Paraíba, 60",
+   "localidade": "Blumenau",
+   "latitude": -26.91164061,
+   "longitude": -49.07282465,
+   "fontes": [
+    "meta (CDLA-Permissive-2.0)",
+    "Overture (CDLA-Permissive-2.0)"
+   ]
+  },
+  {
+   "idOverture": "27f2a76a-9ca9-4853-ae5e-8be440ad8c3d",
+   "nome": "Pousada Jardim Alameda",
+   "categoriaOverture": "hotel",
+   "confianca": 0.954,
+   "sites": [],
+   "telefones": [
+    "+554733044559"
+   ],
+   "redesSociais": [
+    "https://www.facebook.com/2297228990560814"
+   ],
+   "endereco": "R. São Paulo, 688",
+   "localidade": "Blumenau",
+   "latitude": -26.90982102,
+   "longitude": -49.07266796,
+   "fontes": [
+    "meta (CDLA-Permissive-2.0)",
+    "Overture (CDLA-Permissive-2.0)"
+   ]
+  },
+  {
+   "idOverture": "1e3b4d98-e29a-416e-8aee-3a7a0dc20b7d",
+   "nome": "Casa Da Rafa",
+   "categoriaOverture": "bed_and_breakfast",
+   "confianca": 0.875,
+   "sites": [],
+   "telefones": [
+    "+554732377409"
+   ],
+   "redesSociais": [
+    "https://www.facebook.com/100411298307344"
+   ],
+   "endereco": "Rua Gaspar, 81",
+   "localidade": "Blumenau",
+   "latitude": -26.91006363891724,
+   "longitude": -49.07240368077847,
+   "fontes": [
+    "meta (CDLA-Permissive-2.0)",
+    "Overture (CDLA-Permissive-2.0)"
+   ]
+  },
+  {
+   "idOverture": "ef2549cb-dae3-4abe-8b02-f75d7fcc2332",
+   "nome": "Blu Pizza",
+   "categoriaOverture": "pizza_restaurant",
+   "confianca": 0.864,
+   "sites": [],
+   "telefones": [
+    "+554730377712"
+   ],
+   "redesSociais": [
+    "https://www.facebook.com/477034429155067"
+   ],
+   "endereco": "Rua 7 Setembro, 1884",
+   "localidade": "Blumenau",
+   "latitude": -26.91534961,
+   "longitude": -49.07286629,
+   "fontes": [
+    "meta (CDLA-Permissive-2.0)",
+    "Overture (CDLA-Permissive-2.0)"
+   ]
+  },
+  {
+   "idOverture": "217328bd-0138-45f9-9957-a903ae13cb5e",
+   "nome": "Sushiaki",
+   "categoriaOverture": "sushi_restaurant",
+   "confianca": 0.925,
+   "sites": [],
+   "telefones": [
+    "+5547996980647"
+   ],
+   "redesSociais": [
+    "https://www.facebook.com/1750346875291973"
+   ],
+   "endereco": "Rua Paulo Zimmermann, 213",
+   "localidade": "Blumenau",
+   "latitude": -26.91590433,
+   "longitude": -49.071907,
+   "fontes": [
+    "meta (CDLA-Permissive-2.0)",
+    "Overture (CDLA-Permissive-2.0)"
+   ]
+  },
+  {
+   "idOverture": "9cd8816c-e811-4681-9008-71be7f43e070",
+   "nome": "EVEREST",
+   "categoriaOverture": "restaurant",
+   "confianca": 0.863,
+   "sites": [],
+   "telefones": [],
+   "redesSociais": [
+    "https://www.facebook.com/351416611639033"
+   ],
+   "endereco": "R. Paulo Zimmermann, 214",
+   "localidade": "Blumenau",
+   "latitude": -26.91577465,
+   "longitude": -49.07204003,
+   "fontes": [
+    "meta (CDLA-Permissive-2.0)",
+    "Overture (CDLA-Permissive-2.0)"
+   ]
+  },
+  {
+   "idOverture": "f7e19c21-2df8-440d-8de8-6abca858456d",
+   "nome": "Hotel ibis Budget Blumenau",
+   "categoriaOverture": "hotel",
+   "confianca": 1.0,
+   "sites": [
+    "http://www.ibis.com/pt-br/hotel-9382-ibis-budget-blumenau-opening-march-2017/index.shtml"
+   ],
+   "telefones": [
+    "+554733081040"
+   ],
+   "redesSociais": [
+    "https://www.facebook.com/727332197437820"
+   ],
+   "endereco": "R. Paulo Zimmermann, 142",
+   "localidade": "Blumenau",
+   "latitude": -26.9152692,
+   "longitude": -49.07148565,
+   "fontes": [
+    "meta (CDLA-Permissive-2.0)",
+    "Overture (CDLA-Permissive-2.0)"
+   ]
+  },
+  {
+   "idOverture": "65521a13-c19a-4600-ac85-2b9ee4ba24c7",
+   "nome": "Hotel Caiuá Blumenau",
+   "categoriaOverture": "hotel",
+   "confianca": 0.756,
+   "sites": [],
+   "telefones": [
+    "+5547991073977"
+   ],
+   "redesSociais": [
+    "https://www.facebook.com/767987939740510"
+   ],
+   "endereco": "R. 7 de Setembro, 1685",
+   "localidade": "Blumenau",
+   "latitude": -26.9170578,
+   "longitude": -49.07150302,
+   "fontes": [
+    "meta (CDLA-Permissive-2.0)",
+    "Overture (CDLA-Permissive-2.0)"
+   ]
+  },
+  {
+   "idOverture": "91f17aee-a509-4cb3-a849-bd59a5512e62",
+   "nome": "Restaurante Green Smell",
+   "categoriaOverture": "restaurant",
+   "confianca": 0.793,
+   "sites": [
+    "https://app.menudino.com/greensmell"
+   ],
+   "telefones": [
+    "+5547999801318"
+   ],
+   "redesSociais": [
+    "https://www.facebook.com/109307184243501"
+   ],
+   "endereco": "R. João Pessoa, 01",
+   "localidade": "Blumenau",
+   "latitude": -26.91448592,
+   "longitude": -49.0751505,
+   "fontes": [
+    "meta (CDLA-Permissive-2.0)",
+    "Overture (CDLA-Permissive-2.0)"
+   ]
+  },
+  {
+   "idOverture": "49c9c6c9-8194-4fbf-a0ec-86964925368f",
+   "nome": "Don Peppone Ristorante e Pizzeria",
+   "categoriaOverture": "italian_restaurant",
+   "confianca": 0.998,
+   "sites": [
+    "https://donpeppone.com.br/"
+   ],
+   "telefones": [
+    "+554733229090"
+   ],
+   "redesSociais": [
+    "https://www.facebook.com/106094929481358"
+   ],
+   "endereco": "Rua Sete de Setembro, 2013",
+   "localidade": "Blumenau",
+   "latitude": -26.91503489,
+   "longitude": -49.07383728,
+   "fontes": [
+    "meta (CDLA-Permissive-2.0)",
+    "Overture (CDLA-Permissive-2.0)"
+   ]
+  },
+  {
+   "idOverture": "d88e1213-7bc1-4aab-a7d3-298d9ce57eea",
+   "nome": "Senhora Farinha Bakery",
+   "categoriaOverture": "bakery",
+   "confianca": 0.986,
+   "sites": [],
+   "telefones": [
+    "+5547991525852"
+   ],
+   "redesSociais": [
+    "https://www.facebook.com/113635142564899"
+   ],
+   "endereco": "R. Paraíba, 256 D",
+   "localidade": "Blumenau",
+   "latitude": -26.91270979,
+   "longitude": -49.07417879,
+   "fontes": [
+    "meta (CDLA-Permissive-2.0)",
+    "Overture (CDLA-Permissive-2.0)"
+   ]
+  },
+  {
+   "idOverture": "4a5cb731-4f15-4f0a-973b-044c274e048f",
+   "nome": "Sushi Garden",
+   "categoriaOverture": "sushi_restaurant",
+   "confianca": 0.987,
+   "sites": [
+    "http://www.sushigardenbnu.com.br/"
+   ],
+   "telefones": [
+    "+554733261335"
+   ],
+   "redesSociais": [
+    "https://www.facebook.com/167635003288417"
+   ],
+   "endereco": "Av. Martin Luther, 900",
+   "localidade": "Blumenau",
+   "latitude": -26.90642892,
+   "longitude": -49.07369178,
+   "fontes": [
+    "meta (CDLA-Permissive-2.0)",
+    "Overture (CDLA-Permissive-2.0)"
+   ]
+  },
+  {
+   "idOverture": "1e438ecb-0103-4901-98c8-bb31fcf4eab8",
+   "nome": "Clube da Sinuca",
+   "categoriaOverture": "pool_billiards",
+   "confianca": 0.92,
+   "sites": [
+    "http://sinuca.com/"
+   ],
+   "telefones": [
+    "+5547992289245"
+   ],
+   "redesSociais": [
+    "https://www.facebook.com/368204986976168"
+   ],
+   "endereco": "R. São Paulo, 1166",
+   "localidade": "Blumenau",
+   "latitude": -26.90611684,
+   "longitude": -49.07530988,
+   "fontes": [
+    "meta (CDLA-Permissive-2.0)",
+    "Overture (CDLA-Permissive-2.0)"
+   ]
+  },
+  {
+   "idOverture": "5c609d47-e16d-43a5-bb21-cab120a35fb9",
+   "nome": "Pizzaria Toscana",
+   "categoriaOverture": "pizza_restaurant",
+   "confianca": 0.62,
+   "sites": [],
+   "telefones": [
+    "+554732221212"
+   ],
+   "redesSociais": [
+    "https://www.facebook.com/220382611311917"
+   ],
+   "endereco": "Rua Paraíba, 456",
+   "localidade": "Blumenau",
+   "latitude": -26.91397341,
+   "longitude": -49.07543176,
+   "fontes": [
+    "meta (CDLA-Permissive-2.0)",
+    "Overture (CDLA-Permissive-2.0)"
+   ]
+  },
+  {
+   "idOverture": "2351f472-a010-47ac-a5b5-c5d5e122cf58",
+   "nome": "Villa do Vale Boutique Hotel",
+   "categoriaOverture": "hotel",
+   "confianca": 0.991,
+   "sites": [
+    "http://villadovalehotel.com.br/"
+   ],
+   "telefones": [
+    "+554732344941"
+   ],
+   "redesSociais": [
+    "https://www.facebook.com/400875860293862"
+   ],
+   "endereco": "R. Petrópolis, 342",
+   "localidade": "Blumenau",
+   "latitude": -26.91840807,
+   "longitude": -49.07589727,
+   "fontes": [
+    "meta (CDLA-Permissive-2.0)",
+    "Overture (CDLA-Permissive-2.0)"
+   ]
+  },
+  {
+   "idOverture": "7969d12f-3e87-4f38-87da-0e50951c6e83",
+   "nome": "Pousada Bonatti",
+   "categoriaOverture": "hostel",
+   "confianca": 0.947,
+   "sites": [],
+   "telefones": [
+    "+5547991915490"
+   ],
+   "redesSociais": [
+    "https://www.facebook.com/103090301677455"
+   ],
+   "endereco": "R. João Pessoa, 77",
+   "localidade": "Blumenau",
+   "latitude": -26.91464987,
+   "longitude": -49.07614403,
+   "fontes": [
+    "meta (CDLA-Permissive-2.0)",
+    "Overture (CDLA-Permissive-2.0)"
+   ]
+  },
+  {
+   "idOverture": "5477c99a-bbf2-4c2a-843e-095383ce994e",
+   "nome": "Hookah Beer Lounge Bar",
+   "categoriaOverture": "hookah_bar",
+   "confianca": 0.919,
+   "sites": [
+    "https://instagram.com/hookahbeer_bnu"
+   ],
+   "telefones": [
+    "+5547991672103"
+   ],
+   "redesSociais": [
+    "https://www.facebook.com/706781099192349"
+   ],
+   "endereco": "R. São Paulo, 1338",
+   "localidade": "Blumenau",
+   "latitude": -26.9053368,
+   "longitude": -49.07670792,
+   "fontes": [
+    "meta (CDLA-Permissive-2.0)",
+    "Overture (CDLA-Permissive-2.0)"
+   ]
+  },
+  {
+   "idOverture": "d6c1e84f-dc90-4881-8402-0c5e59d1c248",
+   "nome": "Ana Maria Restaurante e Café Colonial",
+   "categoriaOverture": "buffet_restaurant",
+   "confianca": 0.997,
+   "sites": [
+    "http://www.giassi.com.br/ana-maria"
+   ],
+   "telefones": [
+    "+554730420200"
+   ],
+   "redesSociais": [
+    "https://www.facebook.com/1423405874580567"
+   ],
+   "endereco": "R. São Paulo, 1277",
+   "localidade": "Blumenau",
+   "latitude": -26.90567458,
+   "longitude": -49.07676978,
+   "fontes": [
+    "meta (CDLA-Permissive-2.0)",
+    "Overture (CDLA-Permissive-2.0)"
+   ]
+  },
+  {
+   "idOverture": "491c8136-a1d6-411a-80d4-7676630c26fd",
+   "nome": "Gourmet Universitário",
+   "categoriaOverture": "buffet_restaurant",
+   "confianca": 0.84,
+   "sites": [],
+   "telefones": [
+    "+554732373766"
+   ],
+   "redesSociais": [
+    "https://www.facebook.com/221691131843208"
+   ],
+   "endereco": "Giassi Supermercado, Rua Antônio da Veiga, 340",
+   "localidade": "Blumenau",
+   "latitude": -26.90580403048932,
+   "longitude": -49.076875972322085,
+   "fontes": [
+    "meta (CDLA-Permissive-2.0)",
+    "Overture (CDLA-Permissive-2.0)"
+   ]
+  },
+  {
+   "idOverture": "bbc471fb-293b-4f96-8bbe-8d80af519152",
+   "nome": "Factory Antônio da Veiga",
+   "categoriaOverture": null,
+   "confianca": 0.77,
+   "sites": [
+    "http://factorybnu.com.br"
+   ],
+   "telefones": [
+    "(47) 3037-3113"
+   ],
+   "redesSociais": [],
+   "endereco": "Rua Antônio Da Veiga, 69",
+   "localidade": "Blumenau",
+   "latitude": -26.905922242457365,
+   "longitude": -49.077210134321774,
+   "fontes": [
+    "Foursquare (Apache-2.0)",
+    "Overture (CDLA-Permissive-2.0)"
+   ]
+  },
+  {
+   "idOverture": "14a17962-2cce-41f9-bc17-eccd2e1e5fba",
+   "nome": "Factory Blumenau",
+   "categoriaOverture": "dance_club",
+   "confianca": 0.987,
+   "sites": [
+    "https://www.sympla.com.br/produtor/factorybnu"
+   ],
+   "telefones": [
+    "+554730373113"
+   ],
+   "redesSociais": [
+    "https://www.facebook.com/1544895692489247"
+   ],
+   "endereco": "R. Antônio da Veiga, 69",
+   "localidade": "Blumenau",
+   "latitude": -26.90595016,
+   "longitude": -49.07716072,
+   "fontes": [
+    "meta (CDLA-Permissive-2.0)",
+    "Overture (CDLA-Permissive-2.0)"
+   ]
+  },
+  {
+   "idOverture": "58df8aaf-4a3b-4824-8f18-06c8fd2fb1b3",
+   "nome": "Nonno Nico Restobar",
+   "categoriaOverture": "italian_restaurant",
+   "confianca": 0.991,
+   "sites": [
+    "http://Instagram.com/nicorestobar"
+   ],
+   "telefones": [
+    "+554735131376"
+   ],
+   "redesSociais": [
+    "https://www.facebook.com/217712495764299"
+   ],
+   "endereco": "R. Antônio da Veiga, 213",
+   "localidade": "Blumenau",
+   "latitude": -26.9069513,
+   "longitude": -49.07843628,
+   "fontes": [
+    "meta (CDLA-Permissive-2.0)",
+    "Overture (CDLA-Permissive-2.0)"
+   ]
+  },
+  {
+   "idOverture": "451e7494-4382-4df8-98df-7f01c79991bd",
+   "nome": "Pizza Gran Cheff",
+   "categoriaOverture": "pizza_restaurant",
+   "confianca": 0.937,
+   "sites": [
+    "http://www.pizzagrancheff.com.br"
+   ],
+   "telefones": [
+    "+554730375566"
+   ],
+   "redesSociais": [
+    "https://www.facebook.com/368039639884354"
+   ],
+   "endereco": "Rua Antônio da Veiga, 390 / Próximo à Furb",
+   "localidade": "Blumenau",
+   "latitude": -26.90708011,
+   "longitude": -49.07862725,
+   "fontes": [
+    "meta (CDLA-Permissive-2.0)",
+    "Overture (CDLA-Permissive-2.0)"
+   ]
+  },
+  {
+   "idOverture": "246e3682-7f07-4398-a766-3e9d53f5738a",
+   "nome": "Casa Feijuca Restaurante e Pizzaria",
+   "categoriaOverture": "pizza_restaurant",
+   "confianca": 0.997,
+   "sites": [
+    "https://bit.ly/CasaFeijucaBlumenau"
+   ],
+   "telefones": [
+    "+554730373036"
+   ],
+   "redesSociais": [
+    "https://www.facebook.com/310282649497365"
+   ],
+   "endereco": "R. Antônio da Veiga, 390",
+   "localidade": "Blumenau",
+   "latitude": -26.90737888,
+   "longitude": -49.07946884,
+   "fontes": [
+    "meta (CDLA-Permissive-2.0)",
+    "Overture (CDLA-Permissive-2.0)"
+   ]
+  },
+  {
+   "idOverture": "9da0c356-8ff7-4d8c-ac67-5785fdb2c9bf",
+   "nome": "Austria Hostel e Pousada",
+   "categoriaOverture": "hotel",
+   "confianca": 0.92,
+   "sites": [
+    "http://austriahostelpousada.placeweb.site/"
+   ],
+   "telefones": [
+    "+554730352183"
+   ],
+   "redesSociais": [
+    "https://www.facebook.com/711235569043448"
+   ],
+   "endereco": "R. Rodeio, 171",
+   "localidade": "Blumenau",
+   "latitude": -26.91225078,
+   "longitude": -49.07919986,
+   "fontes": [
+    "meta (CDLA-Permissive-2.0)",
+    "Overture (CDLA-Permissive-2.0)"
+   ]
+  },
+  {
+   "idOverture": "d975d5d5-f9d4-4faa-a7eb-afb8de1cb07f",
+   "nome": "Black Pizza",
+   "categoriaOverture": "pizza_restaurant",
+   "confianca": 0.944,
+   "sites": [
+    "http://www.blackpizza.com.br/"
+   ],
+   "telefones": [
+    "+554732883242"
+   ],
+   "redesSociais": [
+    "https://www.facebook.com/201994619907301"
+   ],
+   "endereco": "Rua Sete de Setembro, 2499",
+   "localidade": "Blumenau",
+   "latitude": -26.913343933328026,
+   "longitude": -49.0786907832939,
+   "fontes": [
+    "meta (CDLA-Permissive-2.0)",
+    "Overture (CDLA-Permissive-2.0)"
+   ]
+  },
+  {
+   "idOverture": "18794643-ad01-4248-b53f-677a43b3b214",
+   "nome": "Pousada Blumenau",
+   "categoriaOverture": "inn",
+   "confianca": 0.924,
+   "sites": [],
+   "telefones": [
+    "+5547988042121"
+   ],
+   "redesSociais": [
+    "https://www.facebook.com/2323165687960473"
+   ],
+   "endereco": "R. João Pessoa, 421",
+   "localidade": "Blumenau",
+   "latitude": -26.91424685,
+   "longitude": -49.07913119,
+   "fontes": [
+    "meta (CDLA-Permissive-2.0)",
+    "Overture (CDLA-Permissive-2.0)"
+   ]
+  },
+  {
+   "idOverture": "ef2b699a-d0ee-4d8b-880e-1cd3e9fcdc87",
+   "nome": "Centro Comercial Garcia",
+   "categoriaOverture": "shopping_mall",
+   "confianca": 0.99,
+   "sites": [
+    "http://www.centrocomercialgarcia.com.br/"
+   ],
+   "telefones": [
+    "+554730416461"
+   ],
+   "redesSociais": [
+    "https://www.facebook.com/772621752763417"
+   ],
+   "endereco": "Rua Amazonas, 3161",
+   "localidade": "Blumenau",
+   "latitude": -26.946148,
+   "longitude": -49.071946,
+   "fontes": [
+    "meta (CDLA-Permissive-2.0)",
+    "Overture (CDLA-Permissive-2.0)"
+   ]
+  },
+  {
+   "idOverture": "24e984bb-2bfc-4f59-9f76-52e6886b569c",
+   "nome": "Hotel de Trânsito do 23º Batalhão de Infantaria",
+   "categoriaOverture": "hotel",
+   "confianca": 0.871,
+   "sites": [],
+   "telefones": [
+    "+554733362731"
+   ],
+   "redesSociais": [
+    "https://www.facebook.com/266882233376557"
+   ],
+   "endereco": "R. Amazonas, 3461",
+   "localidade": "Blumenau",
+   "latitude": -26.9489786,
+   "longitude": -49.07145378,
+   "fontes": [
+    "meta (CDLA-Permissive-2.0)",
+    "Overture (CDLA-Permissive-2.0)"
+   ]
+  },
+  {
+   "idOverture": "72057d85-0afb-49ca-8550-dbbddd3c6ba6",
+   "nome": "Pousada e Hostel Vento Minuano",
+   "categoriaOverture": "hostel",
+   "confianca": 0.862,
+   "sites": [],
+   "telefones": [
+    "+5547991914422"
+   ],
+   "redesSociais": [
+    "https://www.facebook.com/1189070441110322"
+   ],
+   "endereco": "Rua Lydia Zwicker, 271",
+   "localidade": "Blumenau",
+   "latitude": -26.9436826,
+   "longitude": -49.06870499,
+   "fontes": [
+    "meta (CDLA-Permissive-2.0)",
+    "Overture (CDLA-Permissive-2.0)"
+   ]
+  },
+  {
+   "idOverture": "3665f529-1e40-4842-85e2-6ee6df0345fa",
+   "nome": "Pousada do Galdino",
+   "categoriaOverture": "inn",
+   "confianca": 0.959,
+   "sites": [
+    "http://www.facebook.com/pousadadogaldino"
+   ],
+   "telefones": [
+    "+5547991964433"
+   ],
+   "redesSociais": [
+    "https://www.facebook.com/534633256625024"
+   ],
+   "endereco": "R. Alterosa, 234",
+   "localidade": "Blumenau",
+   "latitude": -26.95328576,
+   "longitude": -49.06529754,
+   "fontes": [
+    "meta (CDLA-Permissive-2.0)",
+    "Overture (CDLA-Permissive-2.0)"
+   ]
+  },
+  {
+   "idOverture": "bacd7f2d-bb0d-4ddf-935a-9f5fa8508995",
+   "nome": "Espaço 386",
+   "categoriaOverture": "hostel",
+   "confianca": 0.916,
+   "sites": [],
+   "telefones": [
+    "+5547989242202"
+   ],
+   "redesSociais": [
+    "https://www.facebook.com/378547596130389"
+   ],
+   "endereco": "R. Goiás, 386",
+   "localidade": "Blumenau",
+   "latitude": -26.94081135,
+   "longitude": -49.06575125,
+   "fontes": [
+    "meta (CDLA-Permissive-2.0)",
+    "Overture (CDLA-Permissive-2.0)"
+   ]
+  },
+  {
+   "idOverture": "c6fd95d9-5fa2-4d35-a790-4800eeb56f05",
+   "nome": "O Português Restaurante",
+   "categoriaOverture": "portuguese_restaurant",
+   "confianca": 0.991,
+   "sites": [
+    "https://linktr.ee/Oportugues.restaurante"
+   ],
+   "telefones": [
+    "+5547997951723"
+   ],
+   "redesSociais": [
+    "https://www.facebook.com/164894821902523"
+   ],
+   "endereco": "R. Lauro Müller, n° 545",
+   "localidade": "Blumenau",
+   "latitude": -26.92851311,
+   "longitude": -49.06685951,
+   "fontes": [
+    "meta (CDLA-Permissive-2.0)",
+    "Overture (CDLA-Permissive-2.0)"
+   ]
+  },
+  {
+   "idOverture": "edce2829-9c56-48ff-ac9b-2866cdb0932a",
+   "nome": "Galeria Estação",
+   "categoriaOverture": "shopping_mall",
+   "confianca": 0.99,
+   "sites": [
+    "http://galeriaestacaoblumenau.com.br/"
+   ],
+   "telefones": [
+    "+554730423234"
+   ],
+   "redesSociais": [
+    "https://www.facebook.com/101000711649747"
+   ],
+   "endereco": "R. 7 de Setembro, 1036",
+   "localidade": "Blumenau",
+   "latitude": -26.92115232,
+   "longitude": -49.06690187,
+   "fontes": [
+    "meta (CDLA-Permissive-2.0)",
+    "Overture (CDLA-Permissive-2.0)"
+   ]
+  },
+  {
+   "idOverture": "83668283-2068-4a8e-a5a1-6cddacdcd23e",
+   "nome": "Hotel Himmelblau",
+   "categoriaOverture": "hotel",
+   "confianca": 0.851,
+   "sites": [
+    "https://www.booking.com/hotel/br/himmelblau-palace.pt-br.html?aid=1726433&label=himmelblau-palace-3JcH18AxLED3iVyBCV7QDQS438066181387%3Apl%3Ata%3Ap1%3Ap2%3Aac%3Aap%3Aneg%3Afi%3Atiaud-297601666475%3Akwd-43247199913%3Alp1001538%3Ali%3Adec%3Adm%3Appccp%3DUmFuZG9tSVYkc2RlIyh9YbC4OlOULAnvcrFmvh1xnqM&sid=c9db4c0bdcebd35dd3c36f514fc3a6e9&dest_id=-629420;dest_type=city;dist=0;group_adults=2;group_children=0;hapos=1;hpos=1;no_rooms=1;req_adults=2;req_children=0;room1=A%2CA;sb_price_type=total;sr_order=popularity;srepoch=1701270280;srpvid=b1406a00ee56006e;type=total;ucfs=1&#hotelTmpl"
+   ],
+   "telefones": [
+    "+554730365800"
+   ],
+   "redesSociais": [
+    "https://www.facebook.com/205017959342945"
+   ],
+   "endereco": "Rua Sete de Setembro",
+   "localidade": "Blumenau",
+   "latitude": -26.921585769341263,
+   "longitude": -49.066229856340215,
+   "fontes": [
+    "meta (CDLA-Permissive-2.0)",
+    "Overture (CDLA-Permissive-2.0)"
+   ]
+  },
+  {
+   "idOverture": "cd26ecde-6af3-4595-aa48-dc72013acbfe",
+   "nome": "Magnani Empório",
+   "categoriaOverture": "specialty_foods_store",
+   "confianca": 0.992,
+   "sites": [
+    "http://www.magnanis.com.br/"
+   ],
+   "telefones": [
+    "+554733401464"
+   ],
+   "redesSociais": [
+    "https://www.facebook.com/925941464151932"
+   ],
+   "endereco": "R. Floriano Peixoto, 536",
+   "localidade": "Blumenau",
+   "latitude": -26.92586338,
+   "longitude": -49.06561315,
+   "fontes": [
+    "meta (CDLA-Permissive-2.0)",
+    "Overture (CDLA-Permissive-2.0)"
+   ]
+  },
+  {
+   "idOverture": "76a3de73-ce8a-49bb-9f78-b339d64a3da9",
+   "nome": "Hotel Glória",
+   "categoriaOverture": "hotel",
+   "confianca": 0.993,
+   "sites": [
+    "http://www.hotelgloria.com.br/"
+   ],
+   "telefones": [
+    "+554733261988"
+   ],
+   "redesSociais": [
+    "https://www.facebook.com/611638622210182"
+   ],
+   "endereco": "Rua 7 de Setembro, 954",
+   "localidade": "Blumenau",
+   "latitude": -26.92157841,
+   "longitude": -49.06610106,
+   "fontes": [
+    "meta (CDLA-Permissive-2.0)",
+    "Overture (CDLA-Permissive-2.0)"
+   ]
+  },
+  {
+   "idOverture": "5436abc8-30e7-4982-b3c2-cbf9c2cafea0",
+   "nome": "Confeitaria Cafehaus Glória",
+   "categoriaOverture": "bakery",
+   "confianca": 0.975,
+   "sites": [
+    "http://www.cafehaus.com.br/"
+   ],
+   "telefones": [
+    "+554733226942"
+   ],
+   "redesSociais": [
+    "https://www.facebook.com/237652983016901"
+   ],
+   "endereco": "Rua 7 de Setembro, 954",
+   "localidade": "Blumenau",
+   "latitude": -26.92163701,
+   "longitude": -49.06610417,
+   "fontes": [
+    "meta (CDLA-Permissive-2.0)",
+    "Overture (CDLA-Permissive-2.0)"
+   ]
+  },
+  {
+   "idOverture": "0972f7da-6efa-4d9a-8f5c-e6b949366b22",
+   "nome": "Embala Presentes",
+   "categoriaOverture": "childrens_clothing_store",
+   "confianca": 0.843,
+   "sites": [],
+   "telefones": [
+    "+554730416050"
+   ],
+   "redesSociais": [
+    "https://www.facebook.com/460304890670193"
+   ],
+   "endereco": null,
+   "localidade": "Blumenau",
+   "latitude": -26.9212359,
+   "longitude": -49.0658454,
+   "fontes": [
+    "meta (CDLA-Permissive-2.0)",
+    "Overture (CDLA-Permissive-2.0)"
+   ]
+  },
+  {
+   "idOverture": "c66200d1-03d8-47bd-b4d1-7623b5ca3b58",
+   "nome": "Levâme Café Matriz - Cafeteria no Centro Blumenau SC",
+   "categoriaOverture": "cafe",
+   "confianca": 0.997,
+   "sites": [
+    "http://www.cafeteriaaroma.com.br/"
+   ],
+   "telefones": [
+    "+554730357726"
+   ],
+   "redesSociais": [
+    "https://www.facebook.com/1087590657935643"
+   ],
+   "endereco": "R. 7 de Setembro, 860",
+   "localidade": "Blumenau",
+   "latitude": -26.92208484,
+   "longitude": -49.06525461,
+   "fontes": [
+    "meta (CDLA-Permissive-2.0)",
+    "Overture (CDLA-Permissive-2.0)"
+   ]
+  },
+  {
+   "idOverture": "fb0defbf-04d5-4420-8478-e60935f6bfa7",
+   "nome": "Restaurante Sabor Imperial",
+   "categoriaOverture": "brazilian_restaurant",
+   "confianca": 0.998,
+   "sites": [
+    "http://www.saborimperialrestaurante.com.br"
+   ],
+   "telefones": [
+    "+554733260011"
+   ],
+   "redesSociais": [
+    "https://www.facebook.com/103904633052147"
+   ],
+   "endereco": "R. Ângelo Dias, 251",
+   "localidade": "Blumenau",
+   "latitude": -26.92398582,
+   "longitude": -49.0633332,
+   "fontes": [
+    "meta (CDLA-Permissive-2.0)",
+    "Overture (CDLA-Permissive-2.0)"
+   ]
+  },
+  {
+   "idOverture": "cbc61b81-089c-4777-89b3-f4e879af8ab3",
+   "nome": "Hotel Slaviero Blumenau",
+   "categoriaOverture": "hotel",
+   "confianca": 0.992,
+   "sites": [
+    "http://www.slavierohoteis.com.br"
+   ],
+   "telefones": [
+    "+554733265877"
+   ],
+   "redesSociais": [
+    "https://www.facebook.com/172841826534564"
+   ],
+   "endereco": "R. 7 de Setembro, 640",
+   "localidade": "Blumenau",
+   "latitude": -26.92302873,
+   "longitude": -49.06309141,
+   "fontes": [
+    "meta (CDLA-Permissive-2.0)",
+    "Overture (CDLA-Permissive-2.0)"
+   ]
+  },
+  {
+   "idOverture": "71110659-cada-4004-a3af-6178197a7edc",
+   "nome": "O Porão Restaurante e Buffet",
+   "categoriaOverture": "buffet_restaurant",
+   "confianca": 0.873,
+   "sites": [],
+   "telefones": [
+    "+554733408422"
+   ],
+   "redesSociais": [
+    "https://www.facebook.com/221025544977537"
+   ],
+   "endereco": "R. XV de Novembro, 701",
+   "localidade": "Blumenau",
+   "latitude": -26.92116229,
+   "longitude": -49.063732,
+   "fontes": [
+    "meta (CDLA-Permissive-2.0)",
+    "Overture (CDLA-Permissive-2.0)"
+   ]
+  },
+  {
+   "idOverture": "476504df-a8cd-48a4-9065-ce9aef5e05b8",
+   "nome": "Sushi Yuzu",
+   "categoriaOverture": "sushi_restaurant",
+   "confianca": 0.997,
+   "sites": [
+    "http://www.sushiyuzu.com.br"
+   ],
+   "telefones": [
+    "+554730412590"
+   ],
+   "redesSociais": [
+    "https://www.facebook.com/110595942332372"
+   ],
+   "endereco": "R. Curt Hering, 33",
+   "localidade": "Blumenau",
+   "latitude": -26.92208216,
+   "longitude": -49.06373209,
+   "fontes": [
+    "meta (CDLA-Permissive-2.0)",
+    "Overture (CDLA-Permissive-2.0)"
+   ]
+  },
+  {
+   "idOverture": "b3899af9-ed4f-470e-9156-fd82baa8bd39",
+   "nome": "Hotel Hermann",
+   "categoriaOverture": "hotel",
+   "confianca": 0.993,
+   "sites": [
+    "http://www.hotelhermann.com.br/"
+   ],
+   "telefones": [
+    "+554733224370"
+   ],
+   "redesSociais": [
+    "https://www.facebook.com/114239218651427"
+   ],
+   "endereco": "R. Floriano Peixoto, 213",
+   "localidade": "Blumenau",
+   "latitude": -26.92329991,
+   "longitude": -49.06402163,
+   "fontes": [
+    "meta (CDLA-Permissive-2.0)",
+    "Overture (CDLA-Permissive-2.0)"
+   ]
+  },
+  {
+   "idOverture": "d1fb14ea-b816-4ff8-9d15-7ba40798ec95",
+   "nome": "Aikau Poke",
+   "categoriaOverture": "poke_restaurant",
+   "confianca": 0.994,
+   "sites": [
+    "https://youtu.be/5HjWHk5zsr8"
+   ],
+   "telefones": [
+    "+5547992287708"
+   ],
+   "redesSociais": [
+    "https://www.facebook.com/712189215615618"
+   ],
+   "endereco": "R. Curt Hering, 40",
+   "localidade": "Blumenau",
+   "latitude": -26.92182699,
+   "longitude": -49.06384441,
+   "fontes": [
+    "meta (CDLA-Permissive-2.0)",
+    "Overture (CDLA-Permissive-2.0)"
+   ]
+  },
+  {
+   "idOverture": "420b99eb-1315-4521-9d3a-74cb22d3907c",
+   "nome": "The Town House Hotel",
+   "categoriaOverture": "hotel",
+   "confianca": 0.87,
+   "sites": [
+    "http://www.thetownhousehotel.com.br/"
+   ],
+   "telefones": [
+    "+554733267744"
+   ],
+   "redesSociais": [
+    "https://www.facebook.com/291598117555966"
+   ],
+   "endereco": "Rua Curt Hering, 80",
+   "localidade": "Blumenau",
+   "latitude": -26.92160852,
+   "longitude": -49.06429304,
+   "fontes": [
+    "meta (CDLA-Permissive-2.0)",
+    "Overture (CDLA-Permissive-2.0)"
+   ]
+  },
+  {
+   "idOverture": "2891b2bc-ac46-4ba6-99e7-c3715786010d",
+   "nome": "Santo Fogão Restaurante e Grill",
+   "categoriaOverture": "brazilian_restaurant",
+   "confianca": 0.967,
+   "sites": [],
+   "telefones": [
+    "+554732127070"
+   ],
+   "redesSociais": [
+    "https://www.facebook.com/464348580805893"
+   ],
+   "endereco": "Esquina com - Rua Caetano Deeke, R. Curt Hering, 87",
+   "localidade": "Blumenau",
+   "latitude": -26.92162995,
+   "longitude": -49.06433658,
+   "fontes": [
+    "meta (CDLA-Permissive-2.0)",
+    "Overture (CDLA-Permissive-2.0)"
+   ]
+  },
+  {
+   "idOverture": "a16eab99-b103-4c2e-a78a-0697f77dcc58",
+   "nome": "Visual Café",
+   "categoriaOverture": "cafe",
+   "confianca": 0.761,
+   "sites": [],
+   "telefones": [
+    "+554732222828"
+   ],
+   "redesSociais": [
+    "https://www.facebook.com/193620597354601"
+   ],
+   "endereco": "Rua Marechal Floriano Peixoto, 350",
+   "localidade": "Blumenau",
+   "latitude": -26.92368536,
+   "longitude": -49.06449585,
+   "fontes": [
+    "meta (CDLA-Permissive-2.0)",
+    "Overture (CDLA-Permissive-2.0)"
+   ]
+  },
+  {
+   "idOverture": "a8a86ee8-849c-4db8-8a51-a3aecd37da8a",
+   "nome": "Casa Amarela Blumenau - Hospedagem Alternativa",
+   "categoriaOverture": "lodging",
+   "confianca": 0.964,
+   "sites": [],
+   "telefones": [
+    "+5547999628393"
+   ],
+   "redesSociais": [
+    "https://www.facebook.com/1020938684612395"
+   ],
+   "endereco": "Rua Frederico G. Busch",
+   "localidade": "Blumenau",
+   "latitude": -26.92801,
+   "longitude": -49.064924,
+   "fontes": [
+    "meta (CDLA-Permissive-2.0)",
+    "Overture (CDLA-Permissive-2.0)"
+   ]
+  },
+  {
+   "idOverture": "90c6a4c4-974f-492c-ab4b-38c0dc8bf23d",
+   "nome": "Visual cafeteria",
+   "categoriaOverture": "cafe",
+   "confianca": 0.918,
+   "sites": [],
+   "telefones": [
+    "+554730417606"
+   ],
+   "redesSociais": [
+    "https://www.facebook.com/180840072448236"
+   ],
+   "endereco": "R. Victor Hering, 350",
+   "localidade": "Blumenau",
+   "latitude": -26.92421187,
+   "longitude": -49.06505722,
+   "fontes": [
+    "meta (CDLA-Permissive-2.0)",
+    "Overture (CDLA-Permissive-2.0)"
+   ]
+  },
+  {
+   "idOverture": "d86d2338-ec64-4a73-8b3c-428b9072fc55",
+   "nome": "Cafe 10",
+   "categoriaOverture": "diner",
+   "confianca": 0.933,
+   "sites": [],
+   "telefones": [
+    "+554733266500"
+   ],
+   "redesSociais": [
+    "https://www.facebook.com/532514903794188"
+   ],
+   "endereco": "R. Victor Hering, 4",
+   "localidade": "Blumenau",
+   "latitude": -26.92414544,
+   "longitude": -49.06489387,
+   "fontes": [
+    "meta (CDLA-Permissive-2.0)",
+    "Overture (CDLA-Permissive-2.0)"
+   ]
+  },
+  {
+   "idOverture": "a423fddb-70bd-43fa-8c25-470bcc8fd7e8",
+   "nome": "Trezze Rooftop",
+   "categoriaOverture": "bar",
+   "confianca": 0.998,
+   "sites": [],
+   "telefones": [
+    "+5547991362407"
+   ],
+   "redesSociais": [
+    "https://www.facebook.com/114171471513857"
+   ],
+   "endereco": "Edifício Stein Office - R. 7 de Setembro, 777 - 13º Andar",
+   "localidade": "Blumenau",
+   "latitude": -26.92296321,
+   "longitude": -49.06465714,
+   "fontes": [
+    "meta (CDLA-Permissive-2.0)",
+    "Overture (CDLA-Permissive-2.0)"
+   ]
+  },
+  {
+   "idOverture": "d8df19fd-75b4-4785-8ef0-e5e0a41bbdb8",
+   "nome": "Tomato Pasta e Pizza - Shopping H",
+   "categoriaOverture": "italian_restaurant",
+   "confianca": 0.888,
+   "sites": [
+    "https://tomatorestaurantes.com.br/"
+   ],
+   "telefones": [
+    "+5547988585977"
+   ],
+   "redesSociais": [
+    "https://www.facebook.com/483740764821599"
+   ],
+   "endereco": "R. Curt Hering, 126",
+   "localidade": "Blumenau",
+   "latitude": -26.92156219,
+   "longitude": -49.06473363,
+   "fontes": [
+    "meta (CDLA-Permissive-2.0)",
+    "Overture (CDLA-Permissive-2.0)"
+   ]
+  },
+  {
+   "idOverture": "bdd49225-08ee-49aa-811b-e94953fe78c0",
+   "nome": "Plaza Blumenau Hotel",
+   "categoriaOverture": "hotel",
+   "confianca": 0.996,
+   "sites": [
+    "https://www.plazahoteis.com.br/blumenau/pt-br/"
+   ],
+   "telefones": [
+    "+554732317000"
+   ],
+   "redesSociais": [
+    "https://www.facebook.com/140770835965276"
+   ],
+   "endereco": "R. 7 de Setembro, 818",
+   "localidade": "Blumenau",
+   "latitude": -26.92198014,
+   "longitude": -49.06485052,
+   "fontes": [
+    "meta (CDLA-Permissive-2.0)",
+    "Overture (CDLA-Permissive-2.0)"
+   ]
+  },
+  {
+   "idOverture": "b7542000-f076-450c-a6c1-2ec3c62904b5",
+   "nome": "Terrace Bar e Restaurante",
+   "categoriaOverture": "restaurant",
+   "confianca": 0.809,
+   "sites": [
+    "http://www.plazahoteis.com.br"
+   ],
+   "telefones": [
+    "+554732317000"
+   ],
+   "redesSociais": [
+    "https://www.facebook.com/145584718843518"
+   ],
+   "endereco": "R. 7 de Setembro, 818",
+   "localidade": "Blumenau",
+   "latitude": -26.92224674,
+   "longitude": -49.06493603,
+   "fontes": [
+    "meta (CDLA-Permissive-2.0)",
+    "Overture (CDLA-Permissive-2.0)"
+   ]
+  },
+  {
+   "idOverture": "f3381c24-3b0f-479f-843b-e3714ace2e88",
+   "nome": "ibis Blumenau",
+   "categoriaOverture": "hotel",
+   "confianca": 1.0,
+   "sites": [
+    "http://www.ibis.com/pt-br/hotel-5468-ibis-blumenau/index.shtml"
+   ],
+   "telefones": [
+    "+554732214700"
+   ],
+   "redesSociais": [
+    "https://www.facebook.com/117750118820528"
+   ],
+   "endereco": "R. Paul Hering, 67",
+   "localidade": "Blumenau",
+   "latitude": -26.9209206,
+   "longitude": -49.06501875,
+   "fontes": [
+    "meta (CDLA-Permissive-2.0)",
+    "Overture (CDLA-Permissive-2.0)"
+   ]
+  },
+  {
+   "idOverture": "66895669-1f43-430e-b479-b2a275987326",
+   "nome": "Galeria Rubens",
+   "categoriaOverture": "shopping_mall",
+   "confianca": 0.711,
+   "sites": [
+    "http://vendoloja.awardspace.com"
+   ],
+   "telefones": [
+    "+554732223440"
+   ],
+   "redesSociais": [
+    "https://www.facebook.com/385765591563645"
+   ],
+   "endereco": "Rua Curt Hering, 285",
+   "localidade": "Blumenau",
+   "latitude": -26.92102182,
+   "longitude": -49.06502204,
+   "fontes": [
+    "meta (CDLA-Permissive-2.0)",
+    "Overture (CDLA-Permissive-2.0)"
+   ]
+  },
+  {
+   "idOverture": "d234b99a-d437-4241-914b-7069c10360c4",
+   "nome": "Bruneti Geek",
+   "categoriaOverture": "flowers_and_gifts_store",
+   "confianca": 0.981,
+   "sites": [
+    "http://www.bruneti.com.br/"
+   ],
+   "telefones": [
+    "+5547984817213"
+   ],
+   "redesSociais": [
+    "https://www.facebook.com/468838663139197"
+   ],
+   "endereco": "R. XV de Novembro, 838",
+   "localidade": "Blumenau",
+   "latitude": -26.92002686,
+   "longitude": -49.06487343,
+   "fontes": [
+    "meta (CDLA-Permissive-2.0)",
+    "Overture (CDLA-Permissive-2.0)"
+   ]
+  },
+  {
+   "idOverture": "a0b464b1-7b38-413c-8096-4187e336e190",
+   "nome": "The Basement English Pub",
+   "categoriaOverture": "pub",
+   "confianca": 0.997,
+   "sites": [
+    "http://www.basementpub.com.br/"
+   ],
+   "telefones": [
+    "+5547992610035"
+   ],
+   "redesSociais": [
+    "https://www.facebook.com/107093902803"
+   ],
+   "endereco": "R. Paul Hering, 35",
+   "localidade": "Blumenau",
+   "latitude": -26.92063667,
+   "longitude": -49.06488018,
+   "fontes": [
+    "meta (CDLA-Permissive-2.0)",
+    "Overture (CDLA-Permissive-2.0)"
+   ]
+  },
+  {
+   "idOverture": "215d3f5e-f783-470e-91f7-cb937625498c",
+   "nome": "Belle Vie Café",
+   "categoriaOverture": "cafe",
+   "confianca": 0.777,
+   "sites": [],
+   "telefones": [
+    "+5547997472326"
+   ],
+   "redesSociais": [
+    "https://www.facebook.com/701781556348792"
+   ],
+   "endereco": "R. Paul Hering, 35 - Sl 01",
+   "localidade": "Blumenau",
+   "latitude": -26.92071451,
+   "longitude": -49.06484149,
+   "fontes": [
+    "meta (CDLA-Permissive-2.0)",
+    "Overture (CDLA-Permissive-2.0)"
+   ]
+  },
+  {
+   "idOverture": "00fef1ce-d7bb-4e96-89f9-c7d674bcadf0",
+   "nome": "Café Naná",
+   "categoriaOverture": "cafe",
+   "confianca": 0.974,
+   "sites": [],
+   "telefones": [
+    "+554730356033"
+   ],
+   "redesSociais": [
+    "https://www.facebook.com/1862543767407014"
+   ],
+   "endereco": "Av. Pres. Castelo Branco, 565",
+   "localidade": "Blumenau",
+   "latitude": -26.9198566,
+   "longitude": -49.06463305,
+   "fontes": [
+    "meta (CDLA-Permissive-2.0)",
+    "Overture (CDLA-Permissive-2.0)"
+   ]
+  },
+  {
+   "idOverture": "f7d7c239-0905-4a28-a27a-c6c5e3a06be1",
+   "nome": "Hotel Geranium Blue Tower",
+   "categoriaOverture": "hotel",
+   "confianca": 0.971,
+   "sites": [
+    "http://www.geranium.com.br"
+   ],
+   "telefones": [
+    "+554733260333"
+   ],
+   "redesSociais": [
+    "https://www.facebook.com/552146425149905"
+   ],
+   "endereco": "Rua Uruguai, 323",
+   "localidade": "Blumenau",
+   "latitude": -26.91693667,
+   "longitude": -49.06506754,
+   "fontes": [
+    "meta (CDLA-Permissive-2.0)",
+    "Overture (CDLA-Permissive-2.0)"
+   ]
+  },
+  {
+   "idOverture": "ed160072-7c35-4b1a-a682-b1e27a017eb6",
+   "nome": "Hotel Domhof Blumenau",
+   "categoriaOverture": "hotel",
+   "confianca": 0.99,
+   "sites": [
+    "http://www.hoteldomhof.com.br/"
+   ],
+   "telefones": [
+    "+554733262222"
+   ],
+   "redesSociais": [
+    "https://www.facebook.com/109354615308702"
+   ],
+   "endereco": "Rua Uruguai, 266",
+   "localidade": "Blumenau",
+   "latitude": -26.91702763,
+   "longitude": -49.06438692,
+   "fontes": [
+    "meta (CDLA-Permissive-2.0)",
+    "Overture (CDLA-Permissive-2.0)"
+   ]
+  },
+  {
+   "idOverture": "8f688ce1-4791-441b-8666-6bbe1d2ca7c5",
+   "nome": "Tip Tim Lanches",
+   "categoriaOverture": "cafe",
+   "confianca": 0.997,
+   "sites": [
+    "http://www.tiptim.com.br/"
+   ],
+   "telefones": [
+    "+554733229457"
+   ],
+   "redesSociais": [
+    "https://www.facebook.com/837454042999591"
+   ],
+   "endereco": "Rua República Argentina, 74",
+   "localidade": "Blumenau",
+   "latitude": -26.9174355,
+   "longitude": -49.06409768,
+   "fontes": [
+    "meta (CDLA-Permissive-2.0)",
+    "Overture (CDLA-Permissive-2.0)"
+   ]
+  },
+  {
+   "idOverture": "0cb4cc5e-c740-4340-9acf-fe20e7b44a4c",
+   "nome": "Shopping H",
+   "categoriaOverture": "shopping_mall",
+   "confianca": 0.997,
+   "sites": [
+    "http://www.shoppingh.com.br/"
+   ],
+   "telefones": [
+    "+554730353000"
+   ],
+   "redesSociais": [
+    "https://www.facebook.com/1196972893748176"
+   ],
+   "endereco": "R. XV de Novembro, 759",
+   "localidade": "Blumenau",
+   "latitude": -26.92087074,
+   "longitude": -49.06430365,
+   "fontes": [
+    "meta (CDLA-Permissive-2.0)",
+    "Overture (CDLA-Permissive-2.0)"
+   ]
+  },
+  {
+   "idOverture": "cee46903-5ebe-48be-99ee-772e96f6733c",
+   "nome": "Galeria Garden Wine Bar",
+   "categoriaOverture": "wine_bar",
+   "confianca": 0.991,
+   "sites": [
+    "https://www.instagram.com/galeriagardenwinebar/"
+   ],
+   "telefones": [
+    "+5547991721717"
+   ],
+   "redesSociais": [
+    "https://www.facebook.com/367638360883348"
+   ],
+   "endereco": "R. Chile, 55",
+   "localidade": "Blumenau",
+   "latitude": -26.91801636,
+   "longitude": -49.06305287,
+   "fontes": [
+    "meta (CDLA-Permissive-2.0)",
+    "Overture (CDLA-Permissive-2.0)"
+   ]
+  },
+  {
+   "idOverture": "6ae3f382-f39e-4df8-837b-50f4f9f66a3e",
+   "nome": "Hospedaria Vale Europeu",
+   "categoriaOverture": "hostel",
+   "confianca": 0.972,
+   "sites": [],
+   "telefones": [
+    "+5547991310924"
+   ],
+   "redesSociais": [
+    "https://www.facebook.com/460861667267703"
+   ],
+   "endereco": "R. Venezuela, 335",
+   "localidade": "Blumenau",
+   "latitude": -26.9127159,
+   "longitude": -49.06482529,
+   "fontes": [
+    "meta (CDLA-Permissive-2.0)",
+    "Overture (CDLA-Permissive-2.0)"
+   ]
+  },
+  {
+   "idOverture": "9e55b4e4-645e-4162-b99a-65414fe7f2f5",
+   "nome": "Blumenau Tower by Castelo Itaipava",
+   "categoriaOverture": "hotel",
+   "confianca": 0.96,
+   "sites": [],
+   "telefones": [
+    "+558007999925"
+   ],
+   "redesSociais": [
+    "https://www.facebook.com/600921649760456"
+   ],
+   "endereco": "Rua Uruguai, 323",
+   "localidade": "Blumenau",
+   "latitude": -26.91692347,
+   "longitude": -49.0651205,
+   "fontes": [
+    "meta (CDLA-Permissive-2.0)",
+    "Overture (CDLA-Permissive-2.0)"
+   ]
+  },
+  {
+   "idOverture": "a7c73a66-1dd3-4a19-a292-19230352785b",
+   "nome": "Centro Comercial Borba",
+   "categoriaOverture": "shopping_mall",
+   "confianca": 0.954,
+   "sites": [],
+   "telefones": [],
+   "redesSociais": [
+    "https://www.facebook.com/235412256662194"
+   ],
+   "endereco": "Rua Quinze de Novembro, 895",
+   "localidade": "Blumenau",
+   "latitude": -26.92003,
+   "longitude": -49.06515,
+   "fontes": [
+    "meta (CDLA-Permissive-2.0)",
+    "Overture (CDLA-Permissive-2.0)"
+   ]
+  },
+  {
+   "idOverture": "0cd7187c-243c-4b46-9aef-c15ad8665f2b",
+   "nome": "Cap Pizza",
+   "categoriaOverture": "pizza_restaurant",
+   "confianca": 0.77,
+   "sites": [
+    "https://cappizza.accon.app"
+   ],
+   "telefones": [
+    "(47) 3035-7799"
+   ],
+   "redesSociais": [
+    "https://www.instagram.com/cappizzas"
+   ],
+   "endereco": "R. Cap. Euclídes de Castro, 43",
+   "localidade": "Blumenau",
+   "latitude": -26.920355,
+   "longitude": -49.065384,
+   "fontes": [
+    "Foursquare (Apache-2.0)",
+    "Overture (CDLA-Permissive-2.0)"
+   ]
+  },
+  {
+   "idOverture": "9bfb6985-a88b-4d3e-9a25-cd373e23d2a9",
+   "nome": "Stannis Pub",
+   "categoriaOverture": "pub",
+   "confianca": 0.998,
+   "sites": [
+    "http://www.stannis.com/"
+   ],
+   "telefones": [
+    "+5547991338278"
+   ],
+   "redesSociais": [
+    "https://www.facebook.com/557356474405805"
+   ],
+   "endereco": "R. Padre Jacobs, 15B",
+   "localidade": "Blumenau",
+   "latitude": -26.91980207,
+   "longitude": -49.0655205,
+   "fontes": [
+    "meta (CDLA-Permissive-2.0)",
+    "Overture (CDLA-Permissive-2.0)"
+   ]
+  },
+  {
+   "idOverture": "2841ace0-ed0c-4913-9eae-0ea58ed722d4",
+   "nome": "Café da Marly",
+   "categoriaOverture": "cafe",
+   "confianca": 0.987,
+   "sites": [],
+   "telefones": [
+    "+5547988351099"
+   ],
+   "redesSociais": [
+    "https://www.facebook.com/1483822631726076"
+   ],
+   "endereco": "R. Cap. Euclídes de Castro",
+   "localidade": "Blumenau",
+   "latitude": -26.92074634,
+   "longitude": -49.06568288,
+   "fontes": [
+    "meta (CDLA-Permissive-2.0)",
+    "Overture (CDLA-Permissive-2.0)"
+   ]
+  },
+  {
+   "idOverture": "afd5454d-f979-4612-9e37-4bdf1def5f88",
+   "nome": "Hotel Mansiones",
+   "categoriaOverture": "hotel",
+   "confianca": 0.985,
+   "sites": [
+    "http://www.hoteleuropa.com.br/"
+   ],
+   "telefones": [
+    "+554730373761"
+   ],
+   "redesSociais": [
+    "https://www.facebook.com/104655554973632"
+   ],
+   "endereco": "Rua Padre Jacobs, 45",
+   "localidade": "Blumenau",
+   "latitude": -26.92023437,
+   "longitude": -49.06567066,
+   "fontes": [
+    "meta (CDLA-Permissive-2.0)",
+    "Overture (CDLA-Permissive-2.0)"
+   ]
+  },
+  {
+   "idOverture": "61670ebf-da4b-4792-baf8-ce1c96a516d7",
+   "nome": "Catedral São Paulo Apóstolo",
+   "categoriaOverture": "roman_catholic_place_of_worship",
+   "confianca": 0.997,
+   "sites": [
+    "http://www.catedraldeblumenau.org.br/"
+   ],
+   "telefones": [
+    "+554730913377"
+   ],
+   "redesSociais": [
+    "https://www.facebook.com/422191294503908"
+   ],
+   "endereco": "R. XV de Novembro, 955",
+   "localidade": "Blumenau",
+   "latitude": -26.91964983,
+   "longitude": -49.06599824,
+   "fontes": [
+    "meta (CDLA-Permissive-2.0)",
+    "Overture (CDLA-Permissive-2.0)"
+   ]
+  },
+  {
+   "idOverture": "26b29aa4-99d0-4b10-ae7a-de703770bfff",
+   "nome": "Tunga Choperia",
+   "categoriaOverture": "german_restaurant",
+   "confianca": 0.995,
+   "sites": [
+    "http://www.tungachoperia.com.br/"
+   ],
+   "telefones": [
+    "+554733222549"
+   ],
+   "redesSociais": [
+    "https://www.facebook.com/357432154281152"
+   ],
+   "endereco": "R. XV de Novembro, 1020",
+   "localidade": "Blumenau",
+   "latitude": -26.91901575,
+   "longitude": -49.06597171,
+   "fontes": [
+    "meta (CDLA-Permissive-2.0)",
+    "Overture (CDLA-Permissive-2.0)"
+   ]
+  },
+  {
+   "idOverture": "9d993fd0-c5dd-40ae-b021-cf1af20325f9",
+   "nome": "LOFT Harmonia",
+   "categoriaOverture": "hotel",
+   "confianca": 0.858,
+   "sites": [],
+   "telefones": [
+    "+5547999264705"
+   ],
+   "redesSociais": [
+    "https://www.facebook.com/109486824523618"
+   ],
+   "endereco": "rua arthur mantau 1014",
+   "localidade": "Blumenau",
+   "latitude": -26.91841,
+   "longitude": -49.06673,
+   "fontes": [
+    "meta (CDLA-Permissive-2.0)",
+    "Overture (CDLA-Permissive-2.0)"
+   ]
+  },
+  {
+   "idOverture": "a5cf87f4-8111-4097-8f8e-45f300123960",
+   "nome": "Don Pub",
+   "categoriaOverture": "pub",
+   "confianca": 0.988,
+   "sites": [
+    "http://linktr.ee/donpubbnu"
+   ],
+   "telefones": [
+    "+5547992477086"
+   ],
+   "redesSociais": [
+    "https://www.facebook.com/394215050615862"
+   ],
+   "endereco": "R. Padre Jacobs, 177 Subsolo",
+   "localidade": "Blumenau",
+   "latitude": -26.92083197,
+   "longitude": -49.06691935,
+   "fontes": [
+    "meta (CDLA-Permissive-2.0)",
+    "Overture (CDLA-Permissive-2.0)"
+   ]
+  },
+  {
+   "idOverture": "1e1e9665-85c2-49b7-b5f9-6989e9796ad9",
+   "nome": "Restaurante Eldorado",
+   "categoriaOverture": "brazilian_restaurant",
+   "confianca": 0.997,
+   "sites": [
+    "http://www.restauranteeldorado.com.br"
+   ],
+   "telefones": [
+    "+554733261292"
+   ],
+   "redesSociais": [
+    "https://www.facebook.com/100416675803596"
+   ],
+   "endereco": "Avenida Presidente Castelo Branco, 883",
+   "localidade": "Blumenau",
+   "latitude": -26.91766227,
+   "longitude": -49.06702707,
+   "fontes": [
+    "meta (CDLA-Permissive-2.0)",
+    "Overture (CDLA-Permissive-2.0)"
+   ]
+  },
+  {
+   "idOverture": "a507da96-06d7-4ec5-a1de-976c628aada4",
+   "nome": "Planetapeia",
+   "categoriaOverture": "arts_and_entertainment",
+   "confianca": 0.958,
+   "sites": [
+    "http://www.planetapeia.com.br/"
+   ],
+   "telefones": [
+    "+5547999737171"
+   ],
+   "redesSociais": [
+    "https://www.facebook.com/376046422726363"
+   ],
+   "endereco": "R. das Missões, 71",
+   "localidade": "Blumenau",
+   "latitude": -26.91259698,
+   "longitude": -49.0668916,
+   "fontes": [
+    "meta (CDLA-Permissive-2.0)",
+    "Overture (CDLA-Permissive-2.0)"
+   ]
+  },
+  {
+   "idOverture": "f22e0280-09e9-4702-8081-ec3e73ba7979",
+   "nome": "Hotel BlumenHof",
+   "categoriaOverture": "hotel",
+   "confianca": 0.995,
+   "sites": [
+    "http://www.hotelblumenhof.com.br/"
+   ],
+   "telefones": [
+    "+554733264868"
+   ],
+   "redesSociais": [
+    "https://www.facebook.com/141302589368085"
+   ],
+   "endereco": "Rua das Missões, 103",
+   "localidade": "Blumenau",
+   "latitude": -26.91228903,
+   "longitude": -49.06695406,
+   "fontes": [
+    "meta (CDLA-Permissive-2.0)",
+    "Overture (CDLA-Permissive-2.0)"
+   ]
+  },
+  {
+   "idOverture": "a9a26e0b-b308-46b3-af82-fb74a4ec9ece",
+   "nome": "Paladar Europeu",
+   "categoriaOverture": "buffet_restaurant",
+   "confianca": 0.958,
+   "sites": [
+    "http://www.paladareuropeu.com.br/"
+   ],
+   "telefones": [
+    "+554733261463"
+   ],
+   "redesSociais": [
+    "https://www.facebook.com/958959087566659"
+   ],
+   "endereco": "R. das Missões, 845",
+   "localidade": "Blumenau",
+   "latitude": -26.90607676,
+   "longitude": -49.06612224,
+   "fontes": [
+    "meta (CDLA-Permissive-2.0)",
+    "Overture (CDLA-Permissive-2.0)"
+   ]
+  },
+  {
+   "idOverture": "cc31e9f7-7fbc-497a-8160-458b1147ba97",
+   "nome": "Hotel Steinhausen Colonial",
+   "categoriaOverture": "hotel",
+   "confianca": 0.996,
+   "sites": [
+    "http://www.hotelsteinhausen.com.br"
+   ],
+   "telefones": [
+    "+554733225276"
+   ],
+   "redesSociais": [
+    "https://www.facebook.com/205822486097761"
+   ],
+   "endereco": "R. Buenos Aíres, 275",
+   "localidade": "Blumenau",
+   "latitude": -26.90624447,
+   "longitude": -49.06724597,
+   "fontes": [
+    "meta (CDLA-Permissive-2.0)",
+    "Overture (CDLA-Permissive-2.0)"
+   ]
+  },
+  {
+   "idOverture": "0da9a5d6-930b-43da-95ab-3a005b37d37f",
+   "nome": "Hostel Lumaria",
+   "categoriaOverture": "hostel",
+   "confianca": 0.948,
+   "sites": [],
+   "telefones": [
+    "+5547984151991"
+   ],
+   "redesSociais": [
+    "https://www.facebook.com/1800633363346047"
+   ],
+   "endereco": "R. Cuba, 90 - CASA",
+   "localidade": "Blumenau",
+   "latitude": -26.90816947,
+   "longitude": -49.06782953,
+   "fontes": [
+    "meta (CDLA-Permissive-2.0)",
+    "Overture (CDLA-Permissive-2.0)"
+   ]
+  },
+  {
+   "idOverture": "4cfdcd8d-0f51-4a3a-bb9a-a825793e96b9",
+   "nome": "Café Bremen",
+   "categoriaOverture": "coffee_shop",
+   "confianca": 0.907,
+   "sites": [],
+   "telefones": [
+    "+554732373437"
+   ],
+   "redesSociais": [
+    "https://www.facebook.com/588380837934847"
+   ],
+   "endereco": "Rua Quinze de Novembro, 1357",
+   "localidade": "Blumenau",
+   "latitude": -26.916938411056186,
+   "longitude": -49.06828056714213,
+   "fontes": [
+    "meta (CDLA-Permissive-2.0)",
+    "Overture (CDLA-Permissive-2.0)"
+   ]
+  },
+  {
+   "idOverture": "1303b4aa-6834-4df8-852c-f714a5e19e62",
+   "nome": "Café da Praça",
+   "categoriaOverture": null,
+   "confianca": 0.992,
+   "sites": [
+    "http://www.neumarkt.com.br/gastronomia/cafe-da-praca"
+   ],
+   "telefones": [
+    "+5547988459486"
+   ],
+   "redesSociais": [
+    "https://www.facebook.com/444339779034010"
+   ],
+   "endereco": "Rua 7 de Setembro 1213 Shopping Neumarkt",
+   "localidade": "Blumenau",
+   "latitude": -26.91995834,
+   "longitude": -49.06900017,
+   "fontes": [
+    "meta (CDLA-Permissive-2.0)",
+    "Overture (CDLA-Permissive-2.0)"
+   ]
+  },
+  {
+   "idOverture": "b26e49dd-39f0-4bc0-a09a-6981eaf6f2ad",
+   "nome": "Usaflex shopping Neumarkt",
+   "categoriaOverture": "shoe_store",
+   "confianca": 0.781,
+   "sites": [
+    "http://usaflex.com.br/"
+   ],
+   "telefones": [
+    "+554732344685"
+   ],
+   "redesSociais": [
+    "https://www.facebook.com/609294059502589"
+   ],
+   "endereco": "R. 7 de Setembro, 1213",
+   "localidade": "Blumenau",
+   "latitude": -26.91998093,
+   "longitude": -49.0690296,
+   "fontes": [
+    "meta (CDLA-Permissive-2.0)",
+    "Overture (CDLA-Permissive-2.0)"
+   ]
+  },
+  {
+   "idOverture": "d9ede192-51aa-4998-851c-cd5d085cb295",
+   "nome": "Pizza Hut",
+   "categoriaOverture": "pizza_restaurant",
+   "confianca": 0.994,
+   "sites": [
+    "http://www.pizzahut.com.br/"
+   ],
+   "telefones": [
+    "5540046446"
+   ],
+   "redesSociais": [],
+   "endereco": "Rua Sete de Setembro 1213",
+   "localidade": "Blumenau",
+   "latitude": -26.91977974,
+   "longitude": -49.0691652,
+   "fontes": [
+    "Microsoft (CDLA-Permissive-2.0)",
+    "Overture (CDLA-Permissive-2.0)"
+   ]
+  },
+  {
+   "idOverture": "40a88a35-3eed-4e56-8564-dcd935f911ce",
+   "nome": "Restaurante Due Sapori",
+   "categoriaOverture": "restaurant",
+   "confianca": 0.882,
+   "sites": [
+    "https://www.ifood.com.br/delivery/blumenau-sc/due-sapori-restaurante-centro/5f53c897-856c-42fc-bfa3-2300b44bcd27"
+   ],
+   "telefones": [
+    "+554733267150"
+   ],
+   "redesSociais": [
+    "https://www.facebook.com/1532639203655415"
+   ],
+   "endereco": "Terminal de Carregamento EV, Rua Ingo Hering, 21",
+   "localidade": "Blumenau",
+   "latitude": -26.91988765383357,
+   "longitude": -49.06920602678782,
+   "fontes": [
+    "meta (CDLA-Permissive-2.0)",
+    "Overture (CDLA-Permissive-2.0)"
+   ]
+  },
+  {
+   "idOverture": "672282d7-d41c-4cd5-ad24-d0370d09a31a",
+   "nome": "Cia Carona de Teatro e Carona Escola",
+   "categoriaOverture": "theatre_venue",
+   "confianca": 0.976,
+   "sites": [
+    "http://www.ciacarona.com.br/"
+   ],
+   "telefones": [
+    "+554791376576"
+   ],
+   "redesSociais": [
+    "https://www.facebook.com/142837893020"
+   ],
+   "endereco": "Rua Quinze de Novembro, 1181",
+   "localidade": "Blumenau",
+   "latitude": -26.918634011250646,
+   "longitude": -49.068228942188114,
+   "fontes": [
+    "meta (CDLA-Permissive-2.0)",
+    "Overture (CDLA-Permissive-2.0)"
+   ]
+  },
+  {
+   "idOverture": "5cd945ad-5563-4ba5-ba19-adfc018eef50",
+   "nome": "Restaurante dos Comerciários",
+   "categoriaOverture": "buffet_restaurant",
+   "confianca": 0.75,
+   "sites": [],
+   "telefones": [
+    "+554733408226"
+   ],
+   "redesSociais": [
+    "https://www.facebook.com/101321188344064"
+   ],
+   "endereco": "R. Pres. John Kennedy, 91",
+   "localidade": "Blumenau",
+   "latitude": -26.91879581,
+   "longitude": -49.06770239,
+   "fontes": [
+    "meta (CDLA-Permissive-2.0)",
+    "Overture (CDLA-Permissive-2.0)"
+   ]
+  },
+  {
+   "idOverture": "59e555ed-89c9-4a83-ace6-02d13686f4e3",
+   "nome": "Teatro Carlos Gomes",
+   "categoriaOverture": "theatre_venue",
+   "confianca": 0.996,
+   "sites": [
+    "https://teatrocarlosgomes.com.br/programacao/"
+   ],
+   "telefones": [
+    "+554731447166"
+   ],
+   "redesSociais": [
+    "https://www.facebook.com/267277449956113"
+   ],
+   "endereco": "Rua Quinze de Novembro, 1181",
+   "localidade": "Blumenau",
+   "latitude": -26.918534560496838,
+   "longitude": -49.06801688456638,
+   "fontes": [
+    "meta (CDLA-Permissive-2.0)",
+    "Overture (CDLA-Permissive-2.0)"
+   ]
+  },
+  {
+   "idOverture": "2cabfe51-c30f-4357-bd73-c6db9837af77",
+   "nome": "Bremen Zenter",
+   "categoriaOverture": "shopping_mall",
+   "confianca": 0.819,
+   "sites": [
+    "https://www.bremenzenter.com.br/"
+   ],
+   "telefones": [
+    "+554733223938"
+   ],
+   "redesSociais": [
+    "https://www.facebook.com/328102944716990"
+   ],
+   "endereco": "Rua Quinze de Novembro, 1357",
+   "localidade": "Blumenau",
+   "latitude": -26.916845,
+   "longitude": -49.068178,
+   "fontes": [
+    "meta (CDLA-Permissive-2.0)",
+    "Overture (CDLA-Permissive-2.0)"
+   ]
+  },
+  {
+   "idOverture": "8a384ae5-cb1a-4a56-bebb-b4e893d8abeb",
+   "nome": "Grão Fino Cafeteria",
+   "categoriaOverture": "coffee_shop",
+   "confianca": 0.725,
+   "sites": [],
+   "telefones": [
+    "+5547992929021"
+   ],
+   "redesSociais": [
+    "https://www.facebook.com/734079610052040"
+   ],
+   "endereco": "R. XV de Novembro, 1336",
+   "localidade": "Blumenau",
+   "latitude": -26.91659836,
+   "longitude": -49.06810414,
+   "fontes": [
+    "meta (CDLA-Permissive-2.0)",
+    "Overture (CDLA-Permissive-2.0)"
+   ]
+  },
+  {
+   "idOverture": "da220b50-f555-4043-bca2-628f4df4d3b3",
+   "nome": "Hotel Pousada XV",
+   "categoriaOverture": "hotel",
+   "confianca": 0.998,
+   "sites": [
+    "http://www.hotelpousadaxv.com.br"
+   ],
+   "telefones": [
+    "+554733228328"
+   ],
+   "redesSociais": [
+    "https://www.facebook.com/468356689934566"
+   ],
+   "endereco": "Rua Quinze de Novembro, 1290",
+   "localidade": "Blumenau",
+   "latitude": -26.91698796,
+   "longitude": -49.06795108,
+   "fontes": [
+    "meta (CDLA-Permissive-2.0)",
+    "Overture (CDLA-Permissive-2.0)"
+   ]
+  },
+  {
+   "idOverture": "d5fc0f18-09e4-457b-8517-bd5d888b986d",
+   "nome": "Estacao Choperia",
+   "categoriaOverture": "restaurant",
+   "confianca": 0.89,
+   "sites": [],
+   "telefones": [
+    "+554730354157"
+   ],
+   "redesSociais": [
+    "https://www.facebook.com/1638441966436293"
+   ],
+   "endereco": "Condomínio Comdo Shopcenneumarkt Bnu",
+   "localidade": "Blumenau",
+   "latitude": -26.92099337,
+   "longitude": -49.06733282,
+   "fontes": [
+    "meta (CDLA-Permissive-2.0)",
+    "Overture (CDLA-Permissive-2.0)"
+   ]
+  },
+  {
+   "idOverture": "4dd1b2f7-0bd6-4a03-86d5-648f70c50488",
+   "nome": "Quality Hotel Blumenau",
+   "categoriaOverture": "hotel",
+   "confianca": 1.0,
+   "sites": [
+    "https://www.qualityhotelblumenau.com.br/"
+   ],
+   "telefones": [
+    "+554735143587"
+   ],
+   "redesSociais": [
+    "https://www.facebook.com/354424958750478"
+   ],
+   "endereco": "R. Hermann Huscher, 670",
+   "localidade": "Blumenau",
+   "latitude": -26.93512676,
+   "longitude": -49.06756984,
+   "fontes": [
+    "meta (CDLA-Permissive-2.0)",
+    "Overture (CDLA-Permissive-2.0)"
+   ]
+  },
+  {
+   "idOverture": "43d96bf6-06a6-4579-ae3a-66e009343b04",
+   "nome": "Praça Curt Hering",
+   "categoriaOverture": "park",
+   "confianca": 0.717,
+   "sites": [],
+   "telefones": [],
+   "redesSociais": [
+    "https://www.facebook.com/775861839216509"
+   ],
+   "endereco": "Rua Victor Hering (final",
+   "localidade": "Blumenau",
+   "latitude": -26.92546208,
+   "longitude": -49.06917614,
+   "fontes": [
+    "meta (CDLA-Permissive-2.0)",
+    "Overture (CDLA-Permissive-2.0)"
+   ]
+  },
+  {
+   "idOverture": "b134bd2c-931b-4cfd-a3ad-2e4504b1c4cb",
+   "nome": "Funiculi Funicula",
+   "categoriaOverture": "italian_restaurant",
+   "confianca": 0.985,
+   "sites": [
+    "http://www.funiculifunicula.com.br/"
+   ],
+   "telefones": [
+    "+554730372901"
+   ],
+   "redesSociais": [
+    "https://www.facebook.com/201594966517271"
+   ],
+   "endereco": "Rua Hermann Hering, 532",
+   "localidade": "Blumenau",
+   "latitude": -26.92533787,
+   "longitude": -49.07071242,
+   "fontes": [
+    "meta (CDLA-Permissive-2.0)",
+    "Overture (CDLA-Permissive-2.0)"
+   ]
+  },
+  {
+   "idOverture": "adec015a-8380-4dd0-9364-c8f09ca9f3a1",
+   "nome": "Restaurante Madero Blu",
+   "categoriaOverture": "fast_food_restaurant",
+   "confianca": 0.652,
+   "sites": [],
+   "telefones": [],
+   "redesSociais": [
+    "https://www.facebook.com/192735661407337"
+   ],
+   "endereco": null,
+   "localidade": "Blumenau",
+   "latitude": -26.92115580000999,
+   "longitude": -49.07027254997881,
+   "fontes": [
+    "meta (CDLA-Permissive-2.0)",
+    "Overture (CDLA-Permissive-2.0)"
+   ]
+  },
+  {
+   "idOverture": "610dca10-5971-4739-bb8f-01386d03cb2e",
+   "nome": "Baader",
+   "categoriaOverture": "cafe",
+   "confianca": 0.998,
+   "sites": [
+    "http://www.baader.com.br/"
+   ],
+   "telefones": [
+    "+554733400513"
+   ],
+   "redesSociais": [
+    "https://www.facebook.com/882537451834496"
+   ],
+   "endereco": "R. São Paulo, 259",
+   "localidade": "Blumenau",
+   "latitude": -26.91335542,
+   "longitude": -49.07123924,
+   "fontes": [
+    "meta (CDLA-Permissive-2.0)",
+    "Overture (CDLA-Permissive-2.0)"
+   ]
+  },
+  {
+   "idOverture": "9a87a366-a4f0-4cd8-9796-5e33c395956b",
+   "nome": "Sinhá Benta Café",
+   "categoriaOverture": "coffee_shop",
+   "confianca": 0.77,
+   "sites": [
+    "http://www.sinhabenta.com.br"
+   ],
+   "telefones": [
+    "(47) 3361-5536"
+   ],
+   "redesSociais": [],
+   "endereco": null,
+   "localidade": null,
+   "latitude": -26.92102296917862,
+   "longitude": -49.0701777400149,
+   "fontes": [
+    "Foursquare (Apache-2.0)",
+    "Overture (CDLA-Permissive-2.0)"
+   ]
+  },
+  {
+   "idOverture": "62084110-93eb-4344-9133-f49d5e85c898",
+   "nome": "Nagairô Sushi",
+   "categoriaOverture": "japanese_restaurant",
+   "confianca": 0.77,
+   "sites": [
+    "http://www.nagairo.com.br"
+   ],
+   "telefones": [],
+   "redesSociais": [
+    "https://www.instagram.com/nagairosushi"
+   ],
+   "endereco": "R. Sete de Setembro, 1213",
+   "localidade": "Blumenau",
+   "latitude": -26.920603,
+   "longitude": -49.07012,
+   "fontes": [
+    "Foursquare (Apache-2.0)",
+    "Overture (CDLA-Permissive-2.0)"
+   ]
+  },
+  {
+   "idOverture": "9ef33814-0084-46e7-8767-d54bc027ee3d",
+   "nome": "Madero",
+   "categoriaOverture": "burger_restaurant",
+   "confianca": 0.77,
+   "sites": [
+    "http://restaurantemadero.com.br"
+   ],
+   "telefones": [
+    "(47) 3035-3344"
+   ],
+   "redesSociais": [],
+   "endereco": "Rua Sete de Setembro, 1213 – 2º piso",
+   "localidade": "Blumenau, SC",
+   "latitude": -26.92072145543293,
+   "longitude": -49.070059158604266,
+   "fontes": [
+    "Foursquare (Apache-2.0)",
+    "Overture (CDLA-Permissive-2.0)"
+   ]
+  },
+  {
+   "idOverture": "015c25d0-1d06-48f0-b47f-c4868f33d417",
+   "nome": "Himmelblau Palace Hotel",
+   "categoriaOverture": "hotel",
+   "confianca": 0.993,
+   "sites": [
+    "http://www.himmelblau.com.br"
+   ],
+   "telefones": [
+    "+554730365800"
+   ],
+   "redesSociais": [
+    "https://www.facebook.com/379908948699113"
+   ],
+   "endereco": "Rua 7 de Setembro, 1415",
+   "localidade": "Blumenau",
+   "latitude": -26.91873875,
+   "longitude": -49.06992325,
+   "fontes": [
+    "meta (CDLA-Permissive-2.0)",
+    "Overture (CDLA-Permissive-2.0)"
+   ]
+  },
+  {
+   "idOverture": "9aaa73a9-ee2d-4148-a491-0f73dee1a086",
+   "nome": "GNC Cinemas - Shopping Neumarkt Blumenau",
+   "categoriaOverture": "movie_theater",
+   "confianca": 0.987,
+   "sites": [
+    "http://www.gnccinemas.com.br"
+   ],
+   "telefones": [
+    "+554733220900"
+   ],
+   "redesSociais": [
+    "https://www.facebook.com/582297285274458"
+   ],
+   "endereco": "Shopping Neumarkt - R. 7 de Setembro, 1213 - Lj 214",
+   "localidade": "Blumenau",
+   "latitude": -26.92028046,
+   "longitude": -49.06994822,
+   "fontes": [
+    "meta (CDLA-Permissive-2.0)",
+    "Overture (CDLA-Permissive-2.0)"
+   ]
+  },
+  {
+   "idOverture": "c17b6e71-3cf1-4130-9407-a8d1c135a24c",
+   "nome": "Gelato Borelli Blumenau",
+   "categoriaOverture": "gelato_shop",
+   "confianca": 0.964,
+   "sites": [],
+   "telefones": [
+    "+5547999536176"
+   ],
+   "redesSociais": [
+    "https://www.facebook.com/349109594949706"
+   ],
+   "endereco": "R. 7 de Setembro, 1213 - Neumarkt Shopping",
+   "localidade": "Blumenau",
+   "latitude": -26.92066983,
+   "longitude": -49.06992638,
+   "fontes": [
+    "meta (CDLA-Permissive-2.0)",
+    "Overture (CDLA-Permissive-2.0)"
+   ]
+  },
+  {
+   "idOverture": "7fff0dcc-5d35-4eaf-a417-3a30c94bceb3",
+   "nome": "Sinhá Benta Cafeteria - Neumarkt Shopping",
+   "categoriaOverture": "cafe",
+   "confianca": 0.959,
+   "sites": [
+    "http://sinhabenta.placeweb.site"
+   ],
+   "telefones": [
+    "+5547999786723"
+   ],
+   "redesSociais": [
+    "https://www.facebook.com/302552914017258"
+   ],
+   "endereco": "R. 7 de Setembro, 1213 - Loja 245",
+   "localidade": "Blumenau",
+   "latitude": -26.92090076,
+   "longitude": -49.06984956,
+   "fontes": [
+    "meta (CDLA-Permissive-2.0)",
+    "Overture (CDLA-Permissive-2.0)"
+   ]
+  },
+  {
+   "idOverture": "6834f4a2-a23f-456c-afba-424b5f431e63",
+   "nome": "Rei do Mate",
+   "categoriaOverture": "coffee_shop",
+   "confianca": 0.996,
+   "sites": [
+    "http://www.reidomate.com.br"
+   ],
+   "telefones": [
+    "+554733224105"
+   ],
+   "redesSociais": [
+    "https://www.facebook.com/581284985063602"
+   ],
+   "endereco": "R. 7 de Setembro, 1213 - Loja 161C",
+   "localidade": "Blumenau",
+   "latitude": -26.92101789,
+   "longitude": -49.06981517,
+   "fontes": [
+    "meta (CDLA-Permissive-2.0)",
+    "Overture (CDLA-Permissive-2.0)"
+   ]
+  },
+  {
+   "idOverture": "8858d911-317b-4644-b032-76c3201e2b1f",
+   "nome": "Sinha Benta Gourmet - Neumarkt Shopping",
+   "categoriaOverture": null,
+   "confianca": 0.954,
+   "sites": [],
+   "telefones": [
+    "+5547992772449"
+   ],
+   "redesSociais": [
+    "https://www.facebook.com/302552914017258"
+   ],
+   "endereco": "R. 7 de Setembro, 1213 - Lj 143",
+   "localidade": "Blumenau",
+   "latitude": -26.9205632,
+   "longitude": -49.06984508,
+   "fontes": [
+    "meta (CDLA-Permissive-2.0)",
+    "Overture (CDLA-Permissive-2.0)"
+   ]
+  },
+  {
+   "idOverture": "cc648785-54c4-4a94-83c5-48b890dffdba",
+   "nome": "Divino Fogão",
+   "categoriaOverture": "brazilian_restaurant",
+   "confianca": 0.988,
+   "sites": [
+    "http://www.divinofogao.com.br/"
+   ],
+   "telefones": [
+    "+5547988304491"
+   ],
+   "redesSociais": [
+    "https://www.facebook.com/1970042286643279"
+   ],
+   "endereco": "R. 7 de Setembro, 1213",
+   "localidade": "Blumenau",
+   "latitude": -26.92089052,
+   "longitude": -49.06965889,
+   "fontes": [
+    "meta (CDLA-Permissive-2.0)",
+    "Overture (CDLA-Permissive-2.0)"
+   ]
+  },
+  {
+   "idOverture": "5b479452-9bd8-4409-9c87-0c46be5b31d4",
+   "nome": "Café Cultura",
+   "categoriaOverture": "coffee_shop",
+   "confianca": 0.675,
+   "sites": [],
+   "telefones": [
+    "+5547991789766"
+   ],
+   "redesSociais": [
+    "https://www.facebook.com/103240148801397"
+   ],
+   "endereco": "R. 7 de Setembro, 1213",
+   "localidade": "Blumenau",
+   "latitude": -26.92089066,
+   "longitude": -49.06965421,
+   "fontes": [
+    "meta (CDLA-Permissive-2.0)",
+    "Overture (CDLA-Permissive-2.0)"
+   ]
+  },
+  {
+   "idOverture": "65220f91-3973-4432-ac38-41f536218604",
+   "nome": "Outback Steakhouse",
+   "categoriaOverture": "steakhouse",
+   "confianca": 0.997,
+   "sites": [
+    "https://www.outback.com.br/"
+   ],
+   "telefones": [
+    "+554733284890"
+   ],
+   "redesSociais": [
+    "https://www.facebook.com/105969599219650"
+   ],
+   "endereco": "R. 7 de Setembro, 1213 - SALAO COMERCIAL N L.279/298",
+   "localidade": "Blumenau",
+   "latitude": -26.92088849,
+   "longitude": -49.06964721,
+   "fontes": [
+    "meta (CDLA-Permissive-2.0)",
+    "Overture (CDLA-Permissive-2.0)"
+   ]
+  },
+  {
+   "idOverture": "0acf4ad8-df8d-43a0-803e-9691d36224d8",
+   "nome": "Caramel Coffee Doceria",
+   "categoriaOverture": "cafe",
+   "confianca": 0.971,
+   "sites": [
+    "https://www.instagram.com/caramelcoffee.doceria/"
+   ],
+   "telefones": [
+    "+554792504310"
+   ],
+   "redesSociais": [
+    "https://www.facebook.com/268761266576031"
+   ],
+   "endereco": "Rua Doutor Amadeu da Luz, 19",
+   "localidade": "Blumenau",
+   "latitude": -26.91520223600031,
+   "longitude": -49.06959947266669,
+   "fontes": [
+    "meta (CDLA-Permissive-2.0)",
+    "Overture (CDLA-Permissive-2.0)"
+   ]
+  },
+  {
+   "idOverture": "0b976273-72ba-4933-98b9-464de394e0bd",
+   "nome": "Praça Victor Konder",
+   "categoriaOverture": "public_plaza",
+   "confianca": 0.921,
+   "sites": [],
+   "telefones": [],
+   "redesSociais": [
+    "https://www.facebook.com/303675403105454"
+   ],
+   "endereco": "",
+   "localidade": "Blumenau",
+   "latitude": -26.91456339,
+   "longitude": -49.06945653,
+   "fontes": [
+    "meta (CDLA-Permissive-2.0)",
+    "Overture (CDLA-Permissive-2.0)"
+   ]
+  },
+  {
+   "idOverture": "a0135308-a836-462d-bfac-8d5f4012566e",
+   "nome": "Estação Unifique",
+   "categoriaOverture": "public_plaza",
+   "confianca": 0.99,
+   "sites": [
+    "http://estacaounifique.com.br/"
+   ],
+   "telefones": [
+    "+554733041071"
+   ],
+   "redesSociais": [
+    "https://www.facebook.com/108212328417189"
+   ],
+   "endereco": "Landell de Moura - R. Padre Roberto Landel de Moura, 19",
+   "localidade": "Blumenau",
+   "latitude": -26.91473441,
+   "longitude": -49.06929269,
+   "fontes": [
+    "meta (CDLA-Permissive-2.0)",
+    "Overture (CDLA-Permissive-2.0)"
+   ]
+  },
+  {
+   "idOverture": "e01d2194-76fe-4765-9795-e14e29ff6724",
+   "nome": "Locomotiva Macuca",
+   "categoriaOverture": "historic_site",
+   "confianca": 0.917,
+   "sites": [],
+   "telefones": [
+    "+554733816900"
+   ],
+   "redesSociais": [
+    "https://www.facebook.com/627840473931392"
+   ],
+   "endereco": "R. Padre Roberto Landel de Moura, 19",
+   "localidade": "Blumenau",
+   "latitude": -26.91454121,
+   "longitude": -49.06934161,
+   "fontes": [
+    "meta (CDLA-Permissive-2.0)",
+    "Overture (CDLA-Permissive-2.0)"
+   ]
+  },
+  {
+   "idOverture": "fb61e376-2e3c-46e6-af70-08e4c288f629",
+   "nome": "Restaurante e Grill Per Tutti",
+   "categoriaOverture": "buffet_restaurant",
+   "confianca": 0.981,
+   "sites": [
+    "http://restaurantepertutti.com.br/"
+   ],
+   "telefones": [
+    "+554733229383"
+   ],
+   "redesSociais": [
+    "https://www.facebook.com/101994409653718"
+   ],
+   "endereco": "R. Dr. Amadeu da Luz, 40",
+   "localidade": "Blumenau",
+   "latitude": -26.91532252,
+   "longitude": -49.06990246,
+   "fontes": [
+    "meta (CDLA-Permissive-2.0)",
+    "Overture (CDLA-Permissive-2.0)"
+   ]
+  },
+  {
+   "idOverture": "72443bad-a3ff-402f-a1ef-8ccbc7582d18",
+   "nome": "Museu da Água",
+   "categoriaOverture": "museum",
+   "confianca": 0.962,
+   "sites": [
+    "http://www.samae.com.br"
+   ],
+   "telefones": [
+    "+554733403242"
+   ],
+   "redesSociais": [
+    "https://www.facebook.com/115295695256438"
+   ],
+   "endereco": "R. Lages, s/n",
+   "localidade": "Blumenau",
+   "latitude": -26.91021989,
+   "longitude": -49.07018526,
+   "fontes": [
+    "meta (CDLA-Permissive-2.0)",
+    "Overture (CDLA-Permissive-2.0)"
+   ]
+  },
+  {
+   "idOverture": "3a3f9a53-ceb1-4dea-be04-f5f8468ac008",
+   "nome": "Aleatory Blumenau Shopping Park Europeu",
+   "categoriaOverture": "clothing_store",
+   "confianca": 0.753,
+   "sites": [
+    "http://www.aleatorystore.com.br/"
+   ],
+   "telefones": [
+    "+554733395597"
+   ],
+   "redesSociais": [
+    "https://www.facebook.com/1398472510429909"
+   ],
+   "endereco": "Rua Primeiro de Maio, 7",
+   "localidade": "Blumenau",
+   "latitude": -26.887523,
+   "longitude": -49.069023,
+   "fontes": [
+    "meta (CDLA-Permissive-2.0)",
+    "Overture (CDLA-Permissive-2.0)"
+   ]
+  },
+  {
+   "idOverture": "5b4efa07-ba5b-49ea-8add-6db894d4197b",
+   "nome": "Uniavan - Blumenau (Shopping Park Europeu)",
+   "categoriaOverture": "college_university",
+   "confianca": 0.847,
+   "sites": [
+    "https://www.uniavan.edu.br/blumenau"
+   ],
+   "telefones": [
+    "+554733084074"
+   ],
+   "redesSociais": [
+    "https://www.facebook.com/549246545593915"
+   ],
+   "endereco": "Rodovia Paul Fritz Kuehnrich, 1600",
+   "localidade": "Blumenau",
+   "latitude": -26.88716298,
+   "longitude": -49.06894395,
+   "fontes": [
+    "meta (CDLA-Permissive-2.0)",
+    "Overture (CDLA-Permissive-2.0)"
+   ]
+  },
+  {
+   "idOverture": "dd6cb368-d6a2-453a-8c7b-91ec9760d2cb",
+   "nome": "EAT Café",
+   "categoriaOverture": "coffee_shop",
+   "confianca": 0.77,
+   "sites": [
+    "http://www.eatcafe.com.br"
+   ],
+   "telefones": [
+    "(47) 3037-3528"
+   ],
+   "redesSociais": [
+    "https://www.twitter.com/EATBlumenau"
+   ],
+   "endereco": "Shopping Park Europeu",
+   "localidade": "Blumenau",
+   "latitude": -26.886491061888126,
+   "longitude": -49.06878082992853,
+   "fontes": [
+    "Foursquare (Apache-2.0)",
+    "Overture (CDLA-Permissive-2.0)"
+   ]
+  },
+  {
+   "idOverture": "bb5e92f9-14bb-4572-8c71-7d06f95544e2",
+   "nome": "Cinema do Shopping Park Europeu",
+   "categoriaOverture": "movie_theater",
+   "confianca": 0.945,
+   "sites": [],
+   "telefones": [
+    "+554733040571"
+   ],
+   "redesSociais": [
+    "https://www.facebook.com/336612033172081"
+   ],
+   "endereco": "Rodovia Paul Fritz Kuehnrich, 1600",
+   "localidade": "Blumenau",
+   "latitude": -26.88752345,
+   "longitude": -49.06827979,
+   "fontes": [
+    "meta (CDLA-Permissive-2.0)",
+    "Overture (CDLA-Permissive-2.0)"
+   ]
+  },
+  {
+   "idOverture": "f834128a-5491-4973-a661-dc7df21a72df",
+   "nome": "Nahrung Haus - Festival de Sushi e Mini Hamburguer",
+   "categoriaOverture": "restaurant",
+   "confianca": 0.966,
+   "sites": [
+    "https://nahrunghaus.com.br/"
+   ],
+   "telefones": [
+    "4733282003"
+   ],
+   "redesSociais": [],
+   "endereco": "Rua Francisco Vahldiek 796",
+   "localidade": "Blumenau",
+   "latitude": -26.8803845,
+   "longitude": -49.0672018,
+   "fontes": [
+    "Microsoft (CDLA-Permissive-2.0)",
+    "Overture (CDLA-Permissive-2.0)"
+   ]
+  },
+  {
+   "idOverture": "e8cfe329-dab5-4934-8fab-392138b01c02",
+   "nome": "Assadão Fortaleza",
+   "categoriaOverture": "barbecue_restaurant",
+   "confianca": 0.911,
+   "sites": [],
+   "telefones": [
+    "+554733237146"
+   ],
+   "redesSociais": [
+    "https://www.facebook.com/411499039315652"
+   ],
+   "endereco": "R. Francisco Vahldieck, 662",
+   "localidade": "Blumenau",
+   "latitude": -26.88114011,
+   "longitude": -49.06864023,
+   "fontes": [
+    "meta (CDLA-Permissive-2.0)",
+    "Overture (CDLA-Permissive-2.0)"
+   ]
+  },
+  {
+   "idOverture": "d3597e3a-4360-4bc1-8751-253b6740daa3",
+   "nome": "Centro Comercial Fortaleza",
+   "categoriaOverture": "shopping_mall",
+   "confianca": 0.998,
+   "sites": [
+    "http://www.centrocomercialfortaleza.com.br/"
+   ],
+   "telefones": [
+    "+554733383795"
+   ],
+   "redesSociais": [
+    "https://www.facebook.com/101166394840883"
+   ],
+   "endereco": "R. Francisco Vahldieck, 777",
+   "localidade": "Blumenau",
+   "latitude": -26.88062826,
+   "longitude": -49.06888583,
+   "fontes": [
+    "meta (CDLA-Permissive-2.0)",
+    "Overture (CDLA-Permissive-2.0)"
+   ]
+  },
+  {
+   "idOverture": "e1e1c8f3-32de-4403-8e41-b3600aaad307",
+   "nome": "Restaurante D' Gustare",
+   "categoriaOverture": "restaurant",
+   "confianca": 0.987,
+   "sites": [],
+   "telefones": [
+    "+5547988680616"
+   ],
+   "redesSociais": [
+    "https://www.facebook.com/645466598802743"
+   ],
+   "endereco": "R. Francisco Vahldieck, 661",
+   "localidade": "Blumenau",
+   "latitude": -26.8809873,
+   "longitude": -49.06906925,
+   "fontes": [
+    "meta (CDLA-Permissive-2.0)",
+    "Overture (CDLA-Permissive-2.0)"
+   ]
+  },
+  {
+   "idOverture": "0f7967bd-06bc-4da1-85a0-c3522170fa6d",
+   "nome": "Shopping Park Europeu",
+   "categoriaOverture": "shopping_mall",
+   "confianca": 0.999,
+   "sites": [
+    "https://mobitsplaza.bitrix24.site/shoppingparkeuropeu_heif/"
+   ],
+   "telefones": [
+    "+554730391900"
+   ],
+   "redesSociais": [
+    "https://www.facebook.com/301916699832826"
+   ],
+   "endereco": "Rodovia Paul Fritz Kuehnrich, 1600",
+   "localidade": "Blumenau",
+   "latitude": -26.88615494,
+   "longitude": -49.069286,
+   "fontes": [
+    "meta (CDLA-Permissive-2.0)",
+    "Overture (CDLA-Permissive-2.0)"
+   ]
+  },
+  {
+   "idOverture": "929a870c-96da-4539-84eb-2bd266c86779",
+   "nome": "Neanderthal Gastronomia",
+   "categoriaOverture": "brazilian_restaurant",
+   "confianca": 0.991,
+   "sites": [
+    "http://www.neanderthalgastronomia.com.br/"
+   ],
+   "telefones": [
+    "+5547992185135"
+   ],
+   "redesSociais": [
+    "https://www.facebook.com/1246457452132097"
+   ],
+   "endereco": "Rua Fernando de Souza e Silva, 1691",
+   "localidade": "Blumenau",
+   "latitude": -26.88628334,
+   "longitude": -49.0699671,
+   "fontes": [
+    "meta (CDLA-Permissive-2.0)",
+    "Overture (CDLA-Permissive-2.0)"
+   ]
+  },
+  {
+   "idOverture": "017b041b-7188-4f41-8541-2ffc86029a48",
+   "nome": "Wunder Bier",
+   "categoriaOverture": "brewery",
+   "confianca": 0.997,
+   "sites": [
+    "http://www.wunderbier.com.br/"
+   ],
+   "telefones": [
+    "+554733390001"
+   ],
+   "redesSociais": [
+    "https://www.facebook.com/445485335655497"
+   ],
+   "endereco": "Rua Fritz Spernau, 155",
+   "localidade": "Blumenau",
+   "latitude": -26.88196909,
+   "longitude": -49.06214249,
+   "fontes": [
+    "meta (CDLA-Permissive-2.0)",
+    "Overture (CDLA-Permissive-2.0)"
+   ]
+  },
+  {
+   "idOverture": "aacbba58-c920-45bf-9ade-bba984899a13",
+   "nome": "Residencial Di Lucca",
+   "categoriaOverture": "hotel",
+   "confianca": 0.903,
+   "sites": [],
+   "telefones": [],
+   "redesSociais": [
+    "https://www.facebook.com/2094061230708581"
+   ],
+   "endereco": "Rua Emma Schuhart",
+   "localidade": "Blumenau",
+   "latitude": -26.86740847,
+   "longitude": -49.05526138,
+   "fontes": [
+    "meta (CDLA-Permissive-2.0)",
+    "Overture (CDLA-Permissive-2.0)"
+   ]
+  },
+  {
+   "idOverture": "68779dd4-928f-48f0-a038-a9a213e77872",
+   "nome": "Cafeteria Family",
+   "categoriaOverture": null,
+   "confianca": 0.987,
+   "sites": [],
+   "telefones": [
+    "+554733397507"
+   ],
+   "redesSociais": [
+    "https://www.facebook.com/376224886095520"
+   ],
+   "endereco": "R. Berta Odebrecht, 66",
+   "localidade": "Blumenau",
+   "latitude": -26.92989574,
+   "longitude": -49.05492143,
+   "fontes": [
+    "meta (CDLA-Permissive-2.0)",
+    "Overture (CDLA-Permissive-2.0)"
+   ]
+  },
+  {
+   "idOverture": "c4b91efd-2e2a-4b1d-97fc-fe4eed224e39",
+   "nome": "Restaurante Vó Marta",
+   "categoriaOverture": "restaurant",
+   "confianca": 0.886,
+   "sites": [],
+   "telefones": [
+    "+554732880403"
+   ],
+   "redesSociais": [
+    "https://www.facebook.com/948115571999561"
+   ],
+   "endereco": "Rua Max Wehmuth, 79",
+   "localidade": "Blumenau",
+   "latitude": -26.9277609,
+   "longitude": -49.0563155,
+   "fontes": [
+    "meta (CDLA-Permissive-2.0)",
+    "Overture (CDLA-Permissive-2.0)"
+   ]
+  },
+  {
+   "idOverture": "2a51cb9f-d015-4669-a834-6a50148b2ace",
+   "nome": "Oasis Chartouni Hotel",
+   "categoriaOverture": "hotel",
+   "confianca": 0.996,
+   "sites": [
+    "https://sbreserva.silbeck.com.br/oasischartounihotel"
+   ],
+   "telefones": [
+    "+554733265951"
+   ],
+   "redesSociais": [
+    "https://www.facebook.com/107588527668891"
+   ],
+   "endereco": "R. Max Wehmuth, 61",
+   "localidade": "Blumenau",
+   "latitude": -26.92750525,
+   "longitude": -49.05644799,
+   "fontes": [
+    "meta (CDLA-Permissive-2.0)",
+    "Overture (CDLA-Permissive-2.0)"
+   ]
+  },
+  {
+   "idOverture": "c9517116-335e-4a52-ab85-641c22f84251",
+   "nome": "Museu de Hábitos e Costumes",
+   "categoriaOverture": "costume_museum",
+   "confianca": 0.976,
+   "sites": [
+    "http://www.fcblu.com.br"
+   ],
+   "telefones": [
+    "+554733817979"
+   ],
+   "redesSociais": [
+    "https://www.facebook.com/1413496938867473"
+   ],
+   "endereco": "Rua XV de Novembro, 25",
+   "localidade": "Blumenau",
+   "latitude": -26.92132099,
+   "longitude": -49.05780644,
+   "fontes": [
+    "meta (CDLA-Permissive-2.0)",
+    "Overture (CDLA-Permissive-2.0)"
+   ]
+  },
+  {
+   "idOverture": "a518fa9c-4cbb-4ffe-bf49-3f0ca5961122",
+   "nome": "Museu da Família Colonial",
+   "categoriaOverture": "history_museum",
+   "confianca": 0.957,
+   "sites": [
+    "http://www.arquivodeblumenau.com.br/museufamcolonial.html"
+   ],
+   "telefones": [
+    "+554733221676"
+   ],
+   "redesSociais": [
+    "https://www.facebook.com/582680141806899"
+   ],
+   "endereco": "Alameda Duque de Caxias, 78",
+   "localidade": "Blumenau",
+   "latitude": -26.92234554,
+   "longitude": -49.05771263,
+   "fontes": [
+    "meta (CDLA-Permissive-2.0)",
+    "Overture (CDLA-Permissive-2.0)"
+   ]
+  },
+  {
+   "idOverture": "05ae4d54-6a1d-4cc0-af9c-7ea5e9e41815",
+   "nome": "Tio Pytter Restaurante e Café Gourmet",
+   "categoriaOverture": "restaurant",
+   "confianca": 0.985,
+   "sites": [],
+   "telefones": [
+    "+554730354889"
+   ],
+   "redesSociais": [
+    "https://www.facebook.com/113241870308915"
+   ],
+   "endereco": "Rua Amazonas, 482",
+   "localidade": "Blumenau",
+   "latitude": -26.92729956,
+   "longitude": -49.05749061,
+   "fontes": [
+    "meta (CDLA-Permissive-2.0)",
+    "Overture (CDLA-Permissive-2.0)"
+   ]
+  },
+  {
+   "idOverture": "d255b8be-da12-4a78-967d-0fee0acffbc2",
+   "nome": "Cemitério dos Gatos",
+   "categoriaOverture": "community_and_government",
+   "confianca": 0.864,
+   "sites": [],
+   "telefones": [
+    "+554733817516"
+   ],
+   "redesSociais": [
+    "https://www.facebook.com/264644503570591"
+   ],
+   "endereco": "",
+   "localidade": "Blumenau",
+   "latitude": -26.92244957,
+   "longitude": -49.05806654,
+   "fontes": [
+    "meta (CDLA-Permissive-2.0)",
+    "Overture (CDLA-Permissive-2.0)"
+   ]
+  },
+  {
+   "idOverture": "11a5e867-4251-45b9-909e-62f6156e952d",
+   "nome": "Museu de Arte de Blumenau",
+   "categoriaOverture": "art_museum",
+   "confianca": 0.786,
+   "sites": [
+    "http://www.museudeartedeblumenau.com.br"
+   ],
+   "telefones": [
+    "+554733266596"
+   ],
+   "redesSociais": [
+    "https://www.facebook.com/320890721437223"
+   ],
+   "endereco": "R. XV de Novembro, 161",
+   "localidade": "Blumenau",
+   "latitude": -26.92238138,
+   "longitude": -49.0588361,
+   "fontes": [
+    "meta (CDLA-Permissive-2.0)",
+    "Overture (CDLA-Permissive-2.0)"
+   ]
+  },
+  {
+   "idOverture": "8dccd4d1-99d0-4fff-8d6c-df5b07bb4ebd",
+   "nome": "Museu da Cerveja",
+   "categoriaOverture": "museum",
+   "confianca": 0.961,
+   "sites": [
+    "http://www.parquevilagermanica.com.br/"
+   ],
+   "telefones": [
+    "+554733266791"
+   ],
+   "redesSociais": [
+    "https://www.facebook.com/254625201216924"
+   ],
+   "endereco": "Rua 15 de Novembro, 160",
+   "localidade": "Blumenau",
+   "latitude": -26.9216254,
+   "longitude": -49.05868075,
+   "fontes": [
+    "meta (CDLA-Permissive-2.0)",
+    "Overture (CDLA-Permissive-2.0)"
+   ]
+  },
+  {
+   "idOverture": "399b3a8f-a773-4c6d-a629-b1ab00fda8cc",
+   "nome": "Praça Hercilio Luz",
+   "categoriaOverture": "public_plaza",
+   "confianca": 0.924,
+   "sites": [],
+   "telefones": [],
+   "redesSociais": [
+    "https://www.facebook.com/1728262124139964"
+   ],
+   "endereco": "Rua Quinze de Novembro, 119",
+   "localidade": "Blumenau",
+   "latitude": -26.92192255465267,
+   "longitude": -49.05880850671707,
+   "fontes": [
+    "meta (CDLA-Permissive-2.0)",
+    "Overture (CDLA-Permissive-2.0)"
+   ]
+  },
+  {
+   "idOverture": "da5edea0-6431-4237-b634-cc758f246088",
+   "nome": "Hostel da Maga",
+   "categoriaOverture": "hostel",
+   "confianca": 0.987,
+   "sites": [
+    "http://www.casadamaga.com/"
+   ],
+   "telefones": [
+    "+5547992883745"
+   ],
+   "redesSociais": [
+    "https://www.facebook.com/1380713911983140"
+   ],
+   "endereco": "R. Chile, 322",
+   "localidade": "Blumenau",
+   "latitude": -26.91684557,
+   "longitude": -49.06099683,
+   "fontes": [
+    "meta (CDLA-Permissive-2.0)",
+    "Overture (CDLA-Permissive-2.0)"
+   ]
+  },
+  {
+   "idOverture": "ee2ac0bc-0082-4aa8-a9e5-b80cdc46bb3d",
+   "nome": "Refugio Patagonia Blumenau",
+   "categoriaOverture": "beer_bar",
+   "confianca": 0.994,
+   "sites": [
+    "https://www.cervezapatagonia.com.br/refugios"
+   ],
+   "telefones": [
+    "+5547999141134"
+   ],
+   "redesSociais": [
+    "https://www.facebook.com/105396598571116"
+   ],
+   "endereco": "R. XV de Novembro, 400",
+   "localidade": "Blumenau",
+   "latitude": -26.92226564,
+   "longitude": -49.0613394,
+   "fontes": [
+    "meta (CDLA-Permissive-2.0)",
+    "Overture (CDLA-Permissive-2.0)"
+   ]
+  },
+  {
+   "idOverture": "a2f0aa83-7820-4b93-84a6-f692e0c1560b",
+   "nome": "Master Restaurante",
+   "categoriaOverture": "brazilian_restaurant",
+   "confianca": 0.989,
+   "sites": [
+    "https://instagram.com/lilubarerestaurante"
+   ],
+   "telefones": [
+    "+554730372145"
+   ],
+   "redesSociais": [
+    "https://www.facebook.com/228520580530730"
+   ],
+   "endereco": "Alameda Rio Branco, 333",
+   "localidade": "Blumenau",
+   "latitude": -26.92542419,
+   "longitude": -49.06112421,
+   "fontes": [
+    "meta (CDLA-Permissive-2.0)",
+    "Overture (CDLA-Permissive-2.0)"
+   ]
+  },
+  {
+   "idOverture": "e6403423-f45e-4bdb-b3ae-6b62589cb4a2",
+   "nome": "Brava Sushi",
+   "categoriaOverture": "sushi_restaurant",
+   "confianca": 0.997,
+   "sites": [
+    "http://www.bravasushi.com.br"
+   ],
+   "telefones": [
+    "+554733401600"
+   ],
+   "redesSociais": [
+    "https://www.facebook.com/100953958639543"
+   ],
+   "endereco": "Alameda Rio Branco, 403",
+   "localidade": "Blumenau",
+   "latitude": -26.9260649,
+   "longitude": -49.06121708,
+   "fontes": [
+    "meta (CDLA-Permissive-2.0)",
+    "Overture (CDLA-Permissive-2.0)"
+   ]
+  },
+  {
+   "idOverture": "edef05b6-9329-4d63-91ec-958cca465cef",
+   "nome": "Camelódromo da Nereu",
+   "categoriaOverture": "flowers_and_gifts_store",
+   "confianca": 0.825,
+   "sites": [],
+   "telefones": [
+    "+554733261891"
+   ],
+   "redesSociais": [
+    "https://www.facebook.com/218466811499095"
+   ],
+   "endereco": "Rua Nereu Ramos, 102",
+   "localidade": "Blumenau",
+   "latitude": -26.92323337,
+   "longitude": -49.06179957,
+   "fontes": [
+    "meta (CDLA-Permissive-2.0)",
+    "Overture (CDLA-Permissive-2.0)"
+   ]
+  },
+  {
+   "idOverture": "485ccb11-b09b-4737-bace-450bbcd62f17",
+   "nome": "Viela Café",
+   "categoriaOverture": "cafe",
+   "confianca": 0.977,
+   "sites": [
+    "https://www.instagram.com/vielacafe"
+   ],
+   "telefones": [
+    "+554730353135"
+   ],
+   "redesSociais": [
+    "https://www.facebook.com/121960051246530"
+   ],
+   "endereco": "R. Dr. Luiz de Freitas Melro, 190",
+   "localidade": "Blumenau",
+   "latitude": -26.92457168,
+   "longitude": -49.06151425,
+   "fontes": [
+    "meta (CDLA-Permissive-2.0)",
+    "Overture (CDLA-Permissive-2.0)"
+   ]
+  },
+  {
+   "idOverture": "5729544c-918d-4109-8b21-41aade6b4932",
+   "nome": "Restaurante Emporio Recanto do Sabor",
+   "categoriaOverture": "buffet_restaurant",
+   "confianca": 0.989,
+   "sites": [
+    "http://wa.me/message/JUNDKDXLLRJAP1"
+   ],
+   "telefones": [
+    "+554732376842"
+   ],
+   "redesSociais": [
+    "https://www.facebook.com/425908748264846"
+   ],
+   "endereco": "R. 7 de Setembro, 432",
+   "localidade": "Blumenau",
+   "latitude": -26.92345801,
+   "longitude": -49.06158935,
+   "fontes": [
+    "meta (CDLA-Permissive-2.0)",
+    "Overture (CDLA-Permissive-2.0)"
+   ]
+  },
+  {
+   "idOverture": "00f51cb7-95a0-410e-b31e-b9f2abc6b5b1",
+   "nome": "Confeitaria Saxônia",
+   "categoriaOverture": "bakery",
+   "confianca": 0.989,
+   "sites": [],
+   "telefones": [
+    "+554733260525"
+   ],
+   "redesSociais": [
+    "https://www.facebook.com/1450398658583243"
+   ],
+   "endereco": "R. 7 de Setembro, 517",
+   "localidade": "Blumenau",
+   "latitude": -26.92348267,
+   "longitude": -49.0623184,
+   "fontes": [
+    "meta (CDLA-Permissive-2.0)",
+    "Overture (CDLA-Permissive-2.0)"
+   ]
+  },
+  {
+   "idOverture": "aec98e3b-8733-409b-8c8a-737670376931",
+   "nome": "Blum's Kaffee Cafeteria",
+   "categoriaOverture": null,
+   "confianca": 0.997,
+   "sites": [
+    "http://www.blumskaffee.com.br/"
+   ],
+   "telefones": [
+    "+5547991325465"
+   ],
+   "redesSociais": [
+    "https://www.facebook.com/219697531803525"
+   ],
+   "endereco": "Alameda Rio Branco, 732",
+   "localidade": "Blumenau",
+   "latitude": -26.9287482,
+   "longitude": -49.06275362,
+   "fontes": [
+    "meta (CDLA-Permissive-2.0)",
+    "Overture (CDLA-Permissive-2.0)"
+   ]
+  },
+  {
+   "idOverture": "7733377f-41db-4b04-9a58-41a1bd603020",
+   "nome": "Confeitaria Bavaria",
+   "categoriaOverture": "bakery",
+   "confianca": 0.997,
+   "sites": [
+    "http://www.confeitariabavaria.com.br/"
+   ],
+   "telefones": [
+    "+554733223892"
+   ],
+   "redesSociais": [
+    "https://www.facebook.com/1632294807024191"
+   ],
+   "endereco": "Alameda Rio Branco, 765",
+   "localidade": "Blumenau",
+   "latitude": -26.92920019,
+   "longitude": -49.06248011,
+   "fontes": [
+    "meta (CDLA-Permissive-2.0)",
+    "Overture (CDLA-Permissive-2.0)"
+   ]
+  },
+  {
+   "idOverture": "22e3b0ce-ccb8-45c9-9931-7fae7b8b6c4d",
+   "nome": "Divina Vaca",
+   "categoriaOverture": "restaurant",
+   "confianca": 0.713,
+   "sites": [
+    "https://linktr.ee/assaria287"
+   ],
+   "telefones": [
+    "+554735160101"
+   ],
+   "redesSociais": [
+    "https://www.facebook.com/557734704088049"
+   ],
+   "endereco": "Alameda Rio Branco, 287",
+   "localidade": "Blumenau",
+   "latitude": -26.92513850881201,
+   "longitude": -49.06071258327987,
+   "fontes": [
+    "meta (CDLA-Permissive-2.0)",
+    "Overture (CDLA-Permissive-2.0)"
+   ]
+  },
+  {
+   "idOverture": "22623e96-97c7-4097-bf39-933c2f8c98de",
+   "nome": "Boulevard Alameda",
+   "categoriaOverture": "shopping_mall",
+   "confianca": 0.732,
+   "sites": [],
+   "telefones": [],
+   "redesSociais": [
+    "https://www.facebook.com/354172254669355"
+   ],
+   "endereco": "Al Rio Branco, 321",
+   "localidade": "Blumenau",
+   "latitude": -26.9252472,
+   "longitude": -49.06080755,
+   "fontes": [
+    "meta (CDLA-Permissive-2.0)",
+    "Overture (CDLA-Permissive-2.0)"
+   ]
+  },
+  {
+   "idOverture": "0d2d457a-f9ba-41d1-a3be-6c38ddda8562",
+   "nome": "Restaurante Chinês",
+   "categoriaOverture": "chinese_restaurant",
+   "confianca": 0.998,
+   "sites": [
+    "http://www.restaurantechines.com.br/"
+   ],
+   "telefones": [
+    "+554733225753"
+   ],
+   "redesSociais": [
+    "https://www.facebook.com/191054597623618"
+   ],
+   "endereco": "R. XV de Novembro, 340",
+   "localidade": "Blumenau",
+   "latitude": -26.92238069,
+   "longitude": -49.06049985,
+   "fontes": [
+    "meta (CDLA-Permissive-2.0)",
+    "Overture (CDLA-Permissive-2.0)"
+   ]
+  },
+  {
+   "idOverture": "53de787d-735b-4528-be5c-6117608cdcc1",
+   "nome": "Quiero Café",
+   "categoriaOverture": "cafe",
+   "confianca": 0.998,
+   "sites": [
+    "http://www.quierocafe.com.br/"
+   ],
+   "telefones": [
+    "+5547999571264"
+   ],
+   "redesSociais": [
+    "https://www.facebook.com/112428267747318"
+   ],
+   "endereco": "Alameda Rio Branco, 109",
+   "localidade": "Blumenau",
+   "latitude": -26.92340889,
+   "longitude": -49.06054668,
+   "fontes": [
+    "meta (CDLA-Permissive-2.0)",
+    "Overture (CDLA-Permissive-2.0)"
+   ]
+  },
+  {
+   "idOverture": "9237fa4b-f075-4b12-9e88-1fa2036b055a",
+   "nome": "Pizza Prime - Blumenau",
+   "categoriaOverture": "pizza_restaurant",
+   "confianca": 0.948,
+   "sites": [],
+   "telefones": [
+    "+554730411223"
+   ],
+   "redesSociais": [
+    "https://www.facebook.com/653152098516401"
+   ],
+   "endereco": "Av, R. 7 de Setembro, 304",
+   "localidade": "Blumenau",
+   "latitude": -26.92368066,
+   "longitude": -49.06026344,
+   "fontes": [
+    "meta (CDLA-Permissive-2.0)",
+    "Overture (CDLA-Permissive-2.0)"
+   ]
+  },
+  {
+   "idOverture": "c4fb6057-9dbc-4563-aac4-4d0486bb4764",
+   "nome": "Baggio Pizzeria e Focacceria",
+   "categoriaOverture": "pizza_restaurant",
+   "confianca": 0.998,
+   "sites": [
+    "http://www.pizzariabaggio.com.br"
+   ],
+   "telefones": [
+    "+554730376262"
+   ],
+   "redesSociais": [
+    "https://www.facebook.com/148183635253159"
+   ],
+   "endereco": "Rua 7 de Setembro, 250",
+   "localidade": "Blumenau",
+   "latitude": -26.92514213,
+   "longitude": -49.06030996,
+   "fontes": [
+    "meta (CDLA-Permissive-2.0)",
+    "Overture (CDLA-Permissive-2.0)"
+   ]
+  },
+  {
+   "idOverture": "57be187f-aa47-46e6-b7cf-05741971668a",
+   "nome": "Museu de Arte de Blumenau",
+   "categoriaOverture": "art_museum",
+   "confianca": 0.758,
+   "sites": [],
+   "telefones": [
+    "+554733266596"
+   ],
+   "redesSociais": [
+    "https://www.facebook.com/1094274297346190"
+   ],
+   "endereco": "Rua Quinze de Novembro, 161",
+   "localidade": "Blumenau",
+   "latitude": -26.92207809,
+   "longitude": -49.05951727,
+   "fontes": [
+    "meta (CDLA-Permissive-2.0)",
+    "Overture (CDLA-Permissive-2.0)"
+   ]
+  },
+  {
+   "idOverture": "2663df29-701e-460d-ba64-d26e1549f461",
+   "nome": "Hotel Kloppel",
+   "categoriaOverture": "hotel",
+   "confianca": 0.997,
+   "sites": [
+    "http://www.hotelkloppel.com.br/"
+   ],
+   "telefones": [
+    "+5547999460934"
+   ],
+   "redesSociais": [
+    "https://www.facebook.com/158351340895606"
+   ],
+   "endereco": "R. República Argentina, 2655",
+   "localidade": "Blumenau",
+   "latitude": -26.90417562,
+   "longitude": -49.04587709,
+   "fontes": [
+    "meta (CDLA-Permissive-2.0)",
+    "Overture (CDLA-Permissive-2.0)"
+   ]
+  },
+  {
+   "idOverture": "f241550d-9cda-4523-9df6-301e6db8f85e",
+   "nome": "Motel Libidus",
+   "categoriaOverture": "hotel",
+   "confianca": 0.904,
+   "sites": [
+    "http://www.motellibidus.com.br/blumenau/index.php"
+   ],
+   "telefones": [
+    "+554733391211"
+   ],
+   "redesSociais": [
+    "https://www.facebook.com/220701337943726"
+   ],
+   "endereco": "Rodovia BR-470, 8065",
+   "localidade": "Blumenau",
+   "latitude": -26.86243548,
+   "longitude": -49.04477274,
+   "fontes": [
+    "meta (CDLA-Permissive-2.0)",
+    "Overture (CDLA-Permissive-2.0)"
+   ]
+  },
+  {
+   "idOverture": "48970404-17e4-42f2-b9dc-bb5e69623696",
+   "nome": "Restaurante Lumar",
+   "categoriaOverture": "restaurant",
+   "confianca": 0.808,
+   "sites": [],
+   "telefones": [
+    "+554732341342"
+   ],
+   "redesSociais": [
+    "https://www.facebook.com/2295914933963466"
+   ],
+   "endereco": "Rua Antônio Treis, 157",
+   "localidade": "Blumenau",
+   "latitude": -26.90153835,
+   "longitude": -49.04218489,
+   "fontes": [
+    "meta (CDLA-Permissive-2.0)",
+    "Overture (CDLA-Permissive-2.0)"
+   ]
+  },
+  {
+   "idOverture": "966ccbae-d064-4767-9be8-c562b6b03173",
+   "nome": "Hostel Papos & Amigos",
+   "categoriaOverture": "hostel",
+   "confianca": 0.969,
+   "sites": [
+    "http://www.hostelpaposeamigos.com.br/"
+   ],
+   "telefones": [
+    "+5547991675192"
+   ],
+   "redesSociais": [
+    "https://www.facebook.com/673178366391699"
+   ],
+   "endereco": "R. Pastor Oswald Hesse, 1841",
+   "localidade": "Blumenau",
+   "latitude": -26.92811457,
+   "longitude": -49.03872179,
+   "fontes": [
+    "meta (CDLA-Permissive-2.0)",
+    "Overture (CDLA-Permissive-2.0)"
+   ]
+  },
+  {
+   "idOverture": "eaf2b76d-3e4c-4964-be38-a90398ac9276",
+   "nome": "Padaria Bublitz",
+   "categoriaOverture": "bakery",
+   "confianca": 0.998,
+   "sites": [
+    "http://www.padariabublitz.com.br/"
+   ],
+   "telefones": [
+    "+554733371152"
+   ],
+   "redesSociais": [
+    "https://www.facebook.com/527291523962703"
+   ],
+   "endereco": "Rua Doutor Pedro Zimmermann, 7859",
+   "localidade": "Blumenau",
+   "latitude": -26.80546229,
+   "longitude": -49.09072124,
+   "fontes": [
+    "meta (CDLA-Permissive-2.0)",
+    "Overture (CDLA-Permissive-2.0)"
+   ]
+  },
+  {
+   "idOverture": "93bde91b-f645-4027-95a3-2acf641a22a5",
+   "nome": "Presto Hotel",
+   "categoriaOverture": "hotel",
+   "confianca": 0.955,
+   "sites": [
+    "http://www.prestohotel.com.br/"
+   ],
+   "telefones": [
+    "+554733371001"
+   ],
+   "redesSociais": [
+    "https://www.facebook.com/106512602490700"
+   ],
+   "endereco": "Rua Doutor Pedro Zimmermann, 9798",
+   "localidade": "Blumenau",
+   "latitude": -26.78920478,
+   "longitude": -49.08590251,
+   "fontes": [
+    "meta (CDLA-Permissive-2.0)",
+    "Overture (CDLA-Permissive-2.0)"
+   ]
+  },
+  {
+   "idOverture": "5b4c7409-bc96-4595-a3f4-b043a38db411",
+   "nome": "Museu dos Clubes de Caca e Tiro de Blumenau",
+   "categoriaOverture": "museum",
+   "confianca": 0.932,
+   "sites": [
+    "http://www.museuclubesdecacaetiro.com.br/"
+   ],
+   "telefones": [
+    "+554733390590"
+   ],
+   "redesSociais": [
+    "https://www.facebook.com/343641375753725"
+   ],
+   "endereco": "Rua Dr. Pedro Zimmermann, 10377",
+   "localidade": "Blumenau",
+   "latitude": -26.784299,
+   "longitude": -49.0852241,
+   "fontes": [
+    "meta (CDLA-Permissive-2.0)",
+    "Overture (CDLA-Permissive-2.0)"
+   ]
+  },
+  {
+   "idOverture": "ff3d8a1f-8ab1-4981-ac3e-e71734fbba78",
+   "nome": "Feirinha DA VILA",
+   "categoriaOverture": "farmers_market",
+   "confianca": 0.886,
+   "sites": [],
+   "telefones": [],
+   "redesSociais": [
+    "https://www.facebook.com/103066217765195"
+   ],
+   "endereco": "Rua Henrique Conrad, 268",
+   "localidade": "Blumenau",
+   "latitude": -26.7240964,
+   "longitude": -49.067558,
+   "fontes": [
+    "meta (CDLA-Permissive-2.0)",
+    "Overture (CDLA-Permissive-2.0)"
+   ]
+  },
+  {
+   "idOverture": "37c46951-4bfe-46ce-ae41-dcc5bc2a8b53",
+   "nome": "Abendbrothaus",
+   "categoriaOverture": "german_restaurant",
+   "confianca": 0.989,
+   "sites": [
+    "http://abendbrothaus.blogspot.com/"
+   ],
+   "telefones": [
+    "+554733781157"
+   ],
+   "redesSociais": [
+    "https://www.facebook.com/1150274201679827"
+   ],
+   "endereco": "R. Henrique Conrad, 1194",
+   "localidade": "Blumenau",
+   "latitude": -26.73156078,
+   "longitude": -49.06925335,
+   "fontes": [
+    "meta (CDLA-Permissive-2.0)",
+    "Overture (CDLA-Permissive-2.0)"
+   ]
+  },
+  {
+   "idOverture": "2747643b-f6f9-4fe1-9c70-c385492eccae",
+   "nome": "Centro Cultural da Vila Itoupava",
+   "categoriaOverture": "history_museum",
+   "confianca": 0.852,
+   "sites": [
+    "http://centrocultural5.placeweb.site"
+   ],
+   "telefones": [
+    "+554733386044"
+   ],
+   "redesSociais": [
+    "https://www.facebook.com/641565895911879"
+   ],
+   "endereco": "Rua Doutor Pedro Zimmermann, 16230",
+   "localidade": "Blumenau",
+   "latitude": -26.73602332043793,
+   "longitude": -49.06657011539858,
+   "fontes": [
+    "meta (CDLA-Permissive-2.0)",
+    "Overture (CDLA-Permissive-2.0)"
+   ]
+  },
+  {
+   "idOverture": "90822615-7d16-4a51-a339-60553c0c8cd4",
+   "nome": "Braseiro da Vila",
+   "categoriaOverture": "german_restaurant",
+   "confianca": 0.987,
+   "sites": [
+    "http://www.braseirodavila.com.br/"
+   ],
+   "telefones": [
+    "+554733234368"
+   ],
+   "redesSociais": [
+    "https://www.facebook.com/201796293764637"
+   ],
+   "endereco": "R. Leopoldo Kostetzer, 620",
+   "localidade": "Blumenau",
+   "latitude": -26.7377763,
+   "longitude": -49.05696557,
+   "fontes": [
+    "meta (CDLA-Permissive-2.0)",
+    "Overture (CDLA-Permissive-2.0)"
+   ]
+  },
+  {
+   "idOverture": "21ff681e-f445-4434-9607-94f49b342db9",
+   "nome": "La Stalla Restaurante",
+   "categoriaOverture": "fondue_restaurant",
+   "confianca": 0.978,
+   "sites": [],
+   "telefones": [
+    "+5547992596961"
+   ],
+   "redesSociais": [
+    "https://www.facebook.com/2187216338231909"
+   ],
+   "endereco": "R. Leopoldo Kostetzer, 580",
+   "localidade": "Blumenau",
+   "latitude": -26.73785463,
+   "longitude": -49.05794984,
+   "fontes": [
+    "meta (CDLA-Permissive-2.0)",
+    "Overture (CDLA-Permissive-2.0)"
+   ]
+  },
+  {
+   "idOverture": "acfe60de-9446-43b7-81d5-c45049b04c1f",
+   "nome": "Bellagio Gastronomia",
+   "categoriaOverture": "buffet_restaurant",
+   "confianca": 0.966,
+   "sites": [
+    "http://bellagiogastronomia.com.br/"
+   ],
+   "telefones": [
+    "+5547996573828"
+   ],
+   "redesSociais": [
+    "https://www.facebook.com/535294656581863"
+   ],
+   "endereco": "R. Itajaí, 5707",
+   "localidade": "Blumenau",
+   "latitude": -26.90109674,
+   "longitude": -49.01437794,
+   "fontes": [
+    "meta (CDLA-Permissive-2.0)",
+    "Overture (CDLA-Permissive-2.0)"
+   ]
+  }
+ ]
+}
