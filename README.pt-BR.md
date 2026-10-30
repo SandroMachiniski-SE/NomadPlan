@@ -1,3 +1,5 @@
+> 🇺🇸 English version available: [README.md](README.md)
+
 # NomadPlan
 
 Plataforma de turismo inteligente que centraliza o inventário turístico das cidades (pontos, restaurantes, hospedagens e eventos) e sugere roteiros personalizados para cada usuário, respeitando horários de funcionamento, distâncias, interesses e necessidades de acessibilidade.
