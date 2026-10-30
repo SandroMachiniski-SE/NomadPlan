@@ -3,7 +3,7 @@ import assert from "node:assert/strict";
 import type { AddressInfo } from "node:net";
 import type { Server } from "node:http";
 import express from "express";
-import { limiteLogin, limiteLoginPorEmail } from "./rateLimit";
+import { ganchos, limiteLogin, limiteLoginPorEmail } from "./rateLimit";
 
 // Simula um login que sempre falha (senha errada): o handler devolve 401, e o
 // rate limit deve virar 429 a partir da 11ª tentativa.
@@ -40,6 +40,7 @@ describe("rate limit do login", () => {
   let comProxy: { server: Server; base: string };
 
   before(async () => {
+    ganchos.aoBloquearLogin = async () => {};
     semProxy = await iniciar(criarApp(false));
     comProxy = await iniciar(criarApp(true));
   });
@@ -62,13 +63,29 @@ describe("rate limit do login", () => {
     }
   });
 
-  it("bloqueia por e-mail mesmo trocando de IP a cada tentativa", async () => {
+  it("bloqueia a conta após 3 falhas (AF01) mesmo trocando de IP a cada tentativa", async () => {
     const alvo = "vitima@exemplo.com";
-    for (let i = 1; i <= 10; i++) {
+    for (let i = 1; i <= 3; i++) {
       assert.equal(await tentar(comProxy.base, alvo, `198.51.100.${i}`), 401, `tentativa ${i}`);
     }
     assert.equal(await tentar(comProxy.base, alvo, "198.51.100.200"), 429);
     // outro e-mail, vindo de um IP novo, continua liberado
     assert.equal(await tentar(comProxy.base, "outra-pessoa@exemplo.com", "198.51.100.201"), 401);
+  });
+
+  it("a mensagem de bloqueio diz em quantos minutos tentar de novo e sugere recuperar a senha", async () => {
+    const alvo = "bloqueada@exemplo.com";
+    for (let i = 1; i <= 3; i++) await tentar(comProxy.base, alvo, `192.0.2.${i}`);
+
+    const resposta = await fetch(`${comProxy.base}/auth/login`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json", "X-Forwarded-For": "192.0.2.99" },
+      body: JSON.stringify({ email: alvo, senha: "x" }),
+    });
+    const corpo = (await resposta.json()) as { erro: string; tentarNovamenteEmMinutos: number };
+
+    assert.equal(resposta.status, 429);
+    assert.match(corpo.erro, /Tente novamente em \d+ minutos? ou recupere a senha/);
+    assert.ok(corpo.tentarNovamenteEmMinutos >= 1 && corpo.tentarNovamenteEmMinutos <= 15);
   });
 });

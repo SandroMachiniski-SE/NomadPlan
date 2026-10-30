@@ -5,12 +5,21 @@
   "scripts": {
     "postinstall": "prisma generate",
     "dev": "tsx watch src/server.ts",
-    "test": "tsx --test \"src/**/*.test.ts\"",
+    "test": "npm run test:unit && npm run test:integracao",
+    "test:unit": "tsx --test \"src/**/*.test.ts\"",
+    "test:preparar": "tsx src/scripts/prepararBancoTeste.ts",
+    "test:integracao": "npm run test:preparar && tsx --test --test-concurrency=1 \"src/**/*.itest.ts\"",
+    "test:cobertura": "npm run test:preparar && tsx --test --test-concurrency=1 --experimental-test-coverage --test-coverage-include=\"src/**/*.ts\" --test-coverage-exclude=\"src/**/*.test.ts\" --test-coverage-exclude=\"src/**/*.itest.ts\" --test-coverage-exclude=\"src/testes/**\" --test-coverage-exclude=\"src/scripts/**\" --test-coverage-lines=60 \"src/**/*.test.ts\" \"src/**/*.itest.ts\"",
+    "typecheck": "tsc --noEmit -p tsconfig.test.json",
     "build": "tsc",
     "start": "node dist/src/server.js",
     "prisma:generate": "prisma generate",
-    "prisma:migrate": "prisma migrate dev",
-    "prisma:seed": "tsx prisma/seed.ts"
+    "prisma:migrate": "prisma migrate deploy",
+    "prisma:seed": "tsx prisma/seed.ts",
+    "e2e:preparar": "tsx src/scripts/prepararE2e.ts",
+    "email:testar": "tsx src/scripts/testarEmail.ts",
+    "osm:baixar": "tsx src/scripts/baixarOsm.ts",
+    "osm:importar": "tsx src/scripts/importarOsm.ts"
   },
   "dependencies": {
     "@prisma/client": "^6.19.3",
@@ -24,7 +33,7 @@
     "morgan": "^1.11.0",
     "multer": "^2.3.0",
     "nodemailer": "^10.0.10",
-    "zod": "^3.25.76"
+    "zod": "^4.6.7"
   },
   "devDependencies": {
     "@types/bcryptjs": "^2.4.6",

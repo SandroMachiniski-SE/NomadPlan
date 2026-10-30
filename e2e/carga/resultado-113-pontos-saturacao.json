@@ -1,0 +1,116 @@
+{
+  "url": "http://localhost:3360",
+  "usuarios": 100,
+  "duracaoS": 15,
+  "pausaMs": 0,
+  "resultados": [
+    {
+      "base": {
+        "cenario": "Busca por cidade e categoria",
+        "usuarios": 1,
+        "requisicoes": 4928,
+        "erros": 0,
+        "reqPorSegundo": 328.5,
+        "mediaMs": 2.9,
+        "p50Ms": 2.9,
+        "p95Ms": 3.7,
+        "p99Ms": 4.5,
+        "maxMs": 19.2
+      },
+      "carga": {
+        "cenario": "Busca por cidade e categoria",
+        "usuarios": 100,
+        "requisicoes": 16551,
+        "erros": 0,
+        "reqPorSegundo": 1099.3,
+        "mediaMs": 90.7,
+        "p50Ms": 85.9,
+        "p95Ms": 124.5,
+        "p99Ms": 155.6,
+        "maxMs": 187.3
+      },
+      "razaoMedia": 31.28
+    },
+    {
+      "base": {
+        "cenario": "Busca por proximidade (raio de 10 km)",
+        "usuarios": 1,
+        "requisicoes": 4189,
+        "erros": 0,
+        "reqPorSegundo": 279.2,
+        "mediaMs": 3.5,
+        "p50Ms": 3.4,
+        "p95Ms": 4.3,
+        "p99Ms": 5.6,
+        "maxMs": 19.6
+      },
+      "carga": {
+        "cenario": "Busca por proximidade (raio de 10 km)",
+        "usuarios": 100,
+        "requisicoes": 13692,
+        "erros": 0,
+        "reqPorSegundo": 907.7,
+        "mediaMs": 109.8,
+        "p50Ms": 106.3,
+        "p95Ms": 145.5,
+        "p99Ms": 169.3,
+        "maxMs": 185.8
+      },
+      "razaoMedia": 31.37
+    },
+    {
+      "base": {
+        "cenario": "Detalhe do ponto",
+        "usuarios": 1,
+        "requisicoes": 3273,
+        "erros": 0,
+        "reqPorSegundo": 218.2,
+        "mediaMs": 4.5,
+        "p50Ms": 4.4,
+        "p95Ms": 5.5,
+        "p99Ms": 6.7,
+        "maxMs": 20.4
+      },
+      "carga": {
+        "cenario": "Detalhe do ponto",
+        "usuarios": 100,
+        "requisicoes": 13822,
+        "erros": 0,
+        "reqPorSegundo": 916.8,
+        "mediaMs": 108.8,
+        "p50Ms": 103.9,
+        "p95Ms": 151.2,
+        "p99Ms": 178.9,
+        "maxMs": 195.6
+      },
+      "razaoMedia": 24.18
+    },
+    {
+      "base": {
+        "cenario": "Geração de roteiro",
+        "usuarios": 1,
+        "requisicoes": 1340,
+        "erros": 0,
+        "reqPorSegundo": 89.3,
+        "mediaMs": 11.1,
+        "p50Ms": 11.1,
+        "p95Ms": 12.9,
+        "p99Ms": 14.1,
+        "maxMs": 19.4
+      },
+      "carga": {
+        "cenario": "Geração de roteiro",
+        "usuarios": 100,
+        "requisicoes": 4833,
+        "erros": 0,
+        "reqPorSegundo": 319.5,
+        "mediaMs": 311.4,
+        "p50Ms": 297.6,
+        "p95Ms": 395.5,
+        "p99Ms": 419.9,
+        "maxMs": 523.8
+      },
+      "razaoMedia": 28.05
+    }
+  ]
+}

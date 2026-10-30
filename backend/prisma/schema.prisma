@@ -23,6 +23,18 @@ enum StatusPonto {
   REJEITADO
 }
 
+// RNF19: como o registro entrou no sistema.
+enum OrigemRegistro {
+  USUARIO
+  IMPORTACAO
+  API
+}
+
+enum PapelColaborador {
+  EDITOR
+  LEITOR
+}
+
 enum StatusSolicitacao {
   PENDENTE
   APROVADA
@@ -41,6 +53,19 @@ model Usuario {
   ativo       Boolean   @default(true)
   dataCriacao DateTime  @default(now()) @map("data_criacao")
 
+  // LGPD: quando o usuário aceitou a política de privacidade e quando a conta foi
+  // anonimizada (a linha é mantida, sem dados pessoais, para preservar o histórico).
+  consentimentoEm DateTime? @map("consentimento_em")
+  removidoEm      DateTime? @map("removido_em")
+
+  // Preferências do perfil (RF03).
+  idioma                     String   @default("pt-BR")
+  preferenciasAcessibilidade String[] @default([]) @map("preferencias_acessibilidade")
+
+  // Autenticação em dois fatores por TOTP (RF21).
+  mfaSegredo String? @map("mfa_segredo")
+  mfaAtivo   Boolean @default(false) @map("mfa_ativo")
+
   pontosResponsaveis  PontoTuristico[]
   roteiros            Roteiro[]
   sugestoesEdicao     SugestaoEdicao[]         @relation("autorSugestao")
@@ -48,6 +73,9 @@ model Usuario {
   avaliacoes          Avaliacao[]
   notificacoes        Notificacao[]
   logsAuditoria       LogAuditoria[]
+  pontosSalvos        PontoSalvo[]
+  colaboracoes        ColaboradorRoteiro[]
+  convitesEnviados    ConviteRoteiro[]
 
   @@map("usuario")
 }
@@ -75,6 +103,16 @@ model PontoTuristico {
   dataAtualizacao      DateTime    @updatedAt @map("data_atualizacao")
   idResponsavel        Int?        @map("id_responsavel")
 
+  // Origem do registro (RNF19). Pontos vindos do OpenStreetMap guardam o elemento de
+  // origem ("node/123", "way/456") para a próxima importação atualizar em vez de duplicar.
+  origem         OrigemRegistro @default(USUARIO)
+  idOsm          String?        @unique @map("id_osm")
+  sincronizadoEm DateTime?      @map("sincronizado_em")
+  // Crédito e página de origem da foto quando ela não foi enviada por um usuário
+  // (Wikimedia Commons: autor e licença precisam aparecer junto da imagem).
+  imagemCredito String? @map("imagem_credito")
+  imagemFonte   String? @map("imagem_fonte")
+
   // Coluna geográfica (PostGIS), gerada pelo Postgres a partir de latitude/longitude —
   // ver migration modulo3_geom_indice_geografico. O Prisma não modela colunas
   // "GENERATED ALWAYS AS ... STORED", então toda vez que o schema muda, `prisma migrate
@@ -87,6 +125,7 @@ model PontoTuristico {
   verificacoes SolicitacaoVerificacao[]
   avaliacoes   Avaliacao[]
   versoes      VersaoPonto[]
+  salvosPor    PontoSalvo[]
 
   @@index([cidade])
   @@index([categoria])
@@ -103,12 +142,15 @@ model Avaliacao {
   fotoUrl        String?           @map("foto_url")
   status         StatusSolicitacao @default(PENDENTE)
   motivoRejeicao String?           @map("motivo_rejeicao")
+  motivoRetencao String?           @map("motivo_retencao")
   dataCriacao    DateTime          @default(now()) @map("data_criacao")
 
   ponto PontoTuristico @relation(fields: [idPonto], references: [id], onDelete: Cascade)
   autor Usuario        @relation(fields: [idAutor], references: [id])
 
+  @@unique([idPonto, idAutor])
   @@index([idPonto])
+  @@index([idAutor])
   @@index([status])
   @@map("avaliacao")
 }
@@ -154,6 +196,7 @@ model LogAuditoria {
 
   @@index([entidade, idEntidade])
   @@index([dataCriacao])
+  @@index([idUsuario])
   @@map("log_auditoria")
 }
 
@@ -166,6 +209,7 @@ model SugestaoEdicao {
   status          StatusSolicitacao @default(PENDENTE)
   idModerador     Int?              @map("id_moderador")
   motivoRejeicao  String?           @map("motivo_rejeicao")
+  motivoRetencao  String?           @map("motivo_retencao")
   dataCriacao     DateTime          @default(now()) @map("data_criacao")
   dataResolucao   DateTime?         @map("data_resolucao")
 
@@ -206,11 +250,21 @@ model Roteiro {
   idUsuario       Int       @map("id_usuario")
   publico         Boolean   @default(false)
   slugPublico     String?   @unique @map("slug_publico")
+
+  // Anotações livres e teto de gastos da viagem (em centavos). Ficam só para o dono.
+  notas              String?
+  orcamentoCentavos  Int?      @map("orcamento_centavos")
+
   dataCriacao     DateTime  @default(now()) @map("data_criacao")
   dataAtualizacao DateTime  @updatedAt @map("data_atualizacao")
 
-  usuario Usuario       @relation(fields: [idUsuario], references: [id])
+  usuario Usuario         @relation(fields: [idUsuario], references: [id])
   itens   ItemRoteiro[]
+  versoes   VersaoRoteiro[]
+  checklist ItemChecklist[]
+
+  colaboradores ColaboradorRoteiro[]
+  convites      ConviteRoteiro[]
 
   @@index([idUsuario])
   @@map("roteiro")
@@ -220,8 +274,12 @@ model ItemRoteiro {
   id          Int      @id @default(autoincrement())
   idRoteiro   Int      @map("id_roteiro")
   idPonto     Int      @map("id_ponto")
+  // Dia do roteiro (1, 2, 3...) em que a parada acontece; a ordem vale dentro de cada dia.
+  dia         Int      @default(1)
   ordem       Int      @default(0)
   observacao  String?
+  // Quanto se pretende gastar nesta parada, em centavos (entrada, refeição...).
+  custoCentavos Int?     @map("custo_centavos")
   dataCriacao DateTime @default(now()) @map("data_criacao")
 
   roteiro Roteiro        @relation(fields: [idRoteiro], references: [id], onDelete: Cascade)
@@ -230,4 +288,89 @@ model ItemRoteiro {
   @@unique([idRoteiro, idPonto])
   @@index([idRoteiro])
   @@map("item_roteiro")
+}
+
+model PontoSalvo {
+  id          Int      @id @default(autoincrement())
+  idUsuario   Int      @map("id_usuario")
+  idPonto     Int      @map("id_ponto")
+  dataCriacao DateTime @default(now()) @map("data_criacao")
+
+  usuario Usuario        @relation(fields: [idUsuario], references: [id], onDelete: Cascade)
+  ponto   PontoTuristico @relation(fields: [idPonto], references: [id], onDelete: Cascade)
+
+  @@unique([idUsuario, idPonto])
+  @@index([idUsuario])
+  @@map("ponto_salvo")
+}
+
+model VersaoRoteiro {
+  id          Int      @id @default(autoincrement())
+  idRoteiro   Int      @map("id_roteiro")
+  dados       Json
+  idAutor     Int?     @map("id_autor")
+  motivo      String
+  dataCriacao DateTime @default(now()) @map("data_criacao")
+
+  roteiro Roteiro @relation(fields: [idRoteiro], references: [id], onDelete: Cascade)
+
+  @@index([idRoteiro])
+  @@map("versao_roteiro")
+}
+
+model MetricaDiaria {
+  dia   DateTime @db.Date
+  tipo  String
+  total Int      @default(0)
+
+  @@id([dia, tipo])
+  @@map("metrica_diaria")
+}
+
+model ItemChecklist {
+  id          Int      @id @default(autoincrement())
+  idRoteiro   Int      @map("id_roteiro")
+  texto       String
+  feito       Boolean  @default(false)
+  ordem       Int      @default(0)
+  dataCriacao DateTime @default(now()) @map("data_criacao")
+
+  roteiro Roteiro @relation(fields: [idRoteiro], references: [id], onDelete: Cascade)
+
+  @@index([idRoteiro])
+  @@map("item_checklist")
+}
+
+// Pessoas que, além do dono, participam de um roteiro (editando ou só consultando).
+model ColaboradorRoteiro {
+  id          Int              @id @default(autoincrement())
+  idRoteiro   Int              @map("id_roteiro")
+  idUsuario   Int              @map("id_usuario")
+  papel       PapelColaborador
+  dataCriacao DateTime         @default(now()) @map("data_criacao")
+
+  roteiro Roteiro @relation(fields: [idRoteiro], references: [id], onDelete: Cascade)
+  usuario Usuario @relation(fields: [idUsuario], references: [id], onDelete: Cascade)
+
+  @@unique([idRoteiro, idUsuario])
+  @@index([idUsuario])
+  @@map("colaborador_roteiro")
+}
+
+// Convite pendente, feito por e-mail. Quando a pessoa aceita vira ColaboradorRoteiro; ao
+// aceitar ou recusar, o convite é apagado.
+model ConviteRoteiro {
+  id           Int              @id @default(autoincrement())
+  idRoteiro    Int              @map("id_roteiro")
+  email        String
+  papel        PapelColaborador
+  idConvidante Int              @map("id_convidante")
+  dataCriacao  DateTime         @default(now()) @map("data_criacao")
+
+  roteiro    Roteiro @relation(fields: [idRoteiro], references: [id], onDelete: Cascade)
+  convidante Usuario @relation(fields: [idConvidante], references: [id], onDelete: Cascade)
+
+  @@unique([idRoteiro, email])
+  @@index([email])
+  @@map("convite_roteiro")
 }

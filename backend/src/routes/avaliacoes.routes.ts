@@ -5,6 +5,8 @@ import prisma from "../lib/prisma";
 import { autenticar, autorizar } from "../middleware/auth";
 import { incrementarReputacao, PONTOS_REPUTACAO } from "../lib/reputacao";
 import { registrarAuditoria } from "../lib/auditoria";
+import { criarNotificacao } from "../lib/notificacoes";
+import { removerArquivoPublico } from "../lib/arquivos";
 
 const avaliacoesRouter = Router();
 
@@ -69,6 +71,12 @@ avaliacoesRouter.post("/:id/aprovar", async (req: Request, res: Response) => {
       idEntidade: id.data,
     });
 
+    await criarNotificacao(
+      avaliacao.idAutor,
+      "Sua avaliação foi aprovada e já está publicada.",
+      `/pontos/${avaliacao.idPonto}`,
+    );
+
     return res.json(avaliacaoAtualizada);
   } catch (error) {
     console.error("Erro ao aprovar avaliação:", error);
@@ -106,8 +114,15 @@ avaliacoesRouter.post("/:id/rejeitar", async (req: Request, res: Response) => {
 
     const avaliacaoAtualizada = await prisma.avaliacao.update({
       where: { id: id.data },
-      data: { status: StatusSolicitacao.REJEITADA, motivoRejeicao: resultado.data.motivo },
+      data: {
+        status: StatusSolicitacao.REJEITADA,
+        motivoRejeicao: resultado.data.motivo,
+        fotoUrl: null,
+      },
     });
+
+    // Foto rejeitada não precisa continuar guardada.
+    await removerArquivoPublico(avaliacao.fotoUrl);
 
     await registrarAuditoria({
       idUsuario: req.usuario!.id,
@@ -116,6 +131,12 @@ avaliacoesRouter.post("/:id/rejeitar", async (req: Request, res: Response) => {
       idEntidade: id.data,
       detalhes: { motivo: resultado.data.motivo },
     });
+
+    await criarNotificacao(
+      avaliacao.idAutor,
+      `Sua avaliação não foi publicada: ${resultado.data.motivo}`,
+      `/pontos/${avaliacao.idPonto}`,
+    );
 
     return res.json(avaliacaoAtualizada);
   } catch (error) {

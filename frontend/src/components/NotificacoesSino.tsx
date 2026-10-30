@@ -24,6 +24,11 @@ function NotificacoesSino() {
   useEffect(() => {
     // eslint-disable-next-line react-hooks/set-state-in-effect -- fetch inicial ao montar o componente
     buscar();
+
+    // Novos avisos (moderação, confirmações...) chegam sem precisar recarregar a página.
+    const temporizador = window.setInterval(buscar, 60_000);
+
+    return () => window.clearInterval(temporizador);
   }, []);
 
   useEffect(() => {
@@ -42,6 +47,16 @@ function NotificacoesSino() {
     setAberto(novoEstado);
     if (novoEstado) {
       await buscar();
+    }
+  }
+
+  async function aoMarcarTodasComoLidas() {
+    try {
+      await api.post("/notificacoes/marcar-todas-lidas");
+      setNaoLidas(0);
+      setNotificacoes((atual) => atual.map((n) => ({ ...n, lida: true })));
+    } catch (err) {
+      console.error(err);
     }
   }
 
@@ -80,7 +95,14 @@ function NotificacoesSino() {
 
       {aberto && (
         <div className="sino__painel">
-          <div className="sino__titulo">Notificações</div>
+          <div className="sino__titulo">
+            Notificações
+            {naoLidas > 0 && (
+              <button type="button" className="sino__acao" onClick={aoMarcarTodasComoLidas}>
+                Marcar todas como lidas
+              </button>
+            )}
+          </div>
 
           {notificacoes.length === 0 ? (
             <p className="sino__vazio">Nenhuma notificação ainda.</p>

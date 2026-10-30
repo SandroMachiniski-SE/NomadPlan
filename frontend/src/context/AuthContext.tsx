@@ -1,24 +1,39 @@
-import { useEffect, useState, type ReactNode } from "react";
-import api, { limparToken, obterToken, salvarToken } from "../services/api";
+import { useCallback, useEffect, useState, type ReactNode } from "react";
+import api, { EVENTO_SESSAO_EXPIRADA, limparToken, obterToken, salvarToken } from "../services/api";
 import type { Usuario, RespostaAutenticacao } from "../types/usuario";
-import { AuthContext, type DadosRegistro } from "./auth-context";
+import {
+  AuthContext,
+  type DadosPerfil,
+  type DadosRegistro,
+  type ResultadoLogin,
+} from "./auth-context";
+
+// RNF09: a sessão do servidor expira, então enquanto o usuário usa o sistema o token é
+// renovado de tempos em tempos (só funciona enquanto o token atual ainda vale).
+const INTERVALO_RENOVACAO_MS = 30 * 60 * 1000;
 
 export function AuthProvider({ children }: { children: ReactNode }) {
   const [usuario, setUsuario] = useState<Usuario | null>(null);
   const [carregando, setCarregando] = useState(true);
+  const [sessaoExpirada, setSessaoExpirada] = useState(false);
+  const [saiuManualmente, setSaiuManualmente] = useState(false);
+
+  const renovarSessao = useCallback(async () => {
+    const resposta = await api.post<RespostaAutenticacao>("/auth/renovar");
+
+    salvarToken(resposta.data.token);
+    setUsuario(resposta.data.usuario);
+  }, []);
 
   useEffect(() => {
     async function carregarSessao() {
-      const token = obterToken();
-
-      if (!token) {
+      if (!obterToken()) {
         setCarregando(false);
         return;
       }
 
       try {
-        const resposta = await api.get<Usuario>("/auth/me");
-        setUsuario(resposta.data);
+        await renovarSessao();
       } catch {
         limparToken();
         setUsuario(null);
@@ -28,16 +43,52 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     }
 
     carregarSessao();
+  }, [renovarSessao]);
+
+  useEffect(() => {
+    function aoExpirar() {
+      setUsuario(null);
+      setSessaoExpirada(true);
+    }
+
+    window.addEventListener(EVENTO_SESSAO_EXPIRADA, aoExpirar);
+
+    return () => window.removeEventListener(EVENTO_SESSAO_EXPIRADA, aoExpirar);
   }, []);
 
-  async function login(email: string, senha: string) {
-    const resposta = await api.post<RespostaAutenticacao>("/auth/login", {
+  const autenticado = usuario !== null;
+
+  useEffect(() => {
+    if (!autenticado) {
+      return;
+    }
+
+    const temporizador = window.setInterval(() => {
+      renovarSessao().catch(() => {
+        // Se a renovação falhar por sessão inválida, o interceptor já encerra a sessão.
+      });
+    }, INTERVALO_RENOVACAO_MS);
+
+    return () => window.clearInterval(temporizador);
+  }, [autenticado, renovarSessao]);
+
+  async function login(email: string, senha: string, codigoMfa?: string): Promise<ResultadoLogin> {
+    const resposta = await api.post<RespostaAutenticacao | { mfaNecessario: true }>("/auth/login", {
       email,
       senha,
+      ...(codigoMfa ? { codigoMfa } : {}),
     });
+
+    if ("mfaNecessario" in resposta.data) {
+      return { mfaNecessario: true };
+    }
 
     salvarToken(resposta.data.token);
     setUsuario(resposta.data.usuario);
+    setSessaoExpirada(false);
+    setSaiuManualmente(false);
+
+    return { mfaNecessario: false };
   }
 
   async function registrar(dados: DadosRegistro) {
@@ -48,18 +99,18 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
     salvarToken(resposta.data.token);
     setUsuario(resposta.data.usuario);
+    setSessaoExpirada(false);
+    setSaiuManualmente(false);
   }
 
   function logout() {
     limparToken();
     setUsuario(null);
+    setSessaoExpirada(false);
+    setSaiuManualmente(true);
   }
 
-  async function atualizarPerfil(dados: {
-    nome?: string;
-    cidadeBase?: string | null;
-    interesses?: string[];
-  }) {
+  async function atualizarPerfil(dados: DadosPerfil) {
     const resposta = await api.put<Usuario>("/auth/me", dados);
     setUsuario(resposta.data);
   }
@@ -69,15 +120,17 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       value={{
         usuario,
         carregando,
-        autenticado: usuario !== null,
+        autenticado,
         login,
         registrar,
         logout,
         atualizarPerfil,
+        definirUsuario: setUsuario,
+        sessaoExpirada,
+        saiuManualmente,
       }}
     >
       {children}
     </AuthContext.Provider>
   );
 }
-

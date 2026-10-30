@@ -1,40 +1,98 @@
 import fs from "fs";
 import path from "path";
+import { Request, Response, NextFunction, RequestHandler } from "express";
 import multer from "multer";
+import { RAIZ_UPLOADS } from "../lib/caminhos";
+import { EXTENSAO_POR_TIPO, detectarTipoImagem, lerInicioDoArquivo, type TipoImagem } from "../lib/imagem";
+import { removerArquivoLocal } from "../lib/arquivos";
 
-const PASTA_UPLOADS = path.join(__dirname, "..", "..", "uploads", "pontos");
+// RNF03 / AF03: imagens de até 5 MB, em JPG, PNG ou WEBP. Cada falha tem um status e
+// uma mensagem própria, para o frontend poder orientar o usuário.
 
-fs.mkdirSync(PASTA_UPLOADS, { recursive: true });
+export const LIMITE_IMAGEM_BYTES = 5 * 1024 * 1024;
 
-const TIPOS_PERMITIDOS = new Set(["image/jpeg", "image/png", "image/webp"]);
+const MENSAGEM_TAMANHO = "A imagem excede 5 MB. Reduza o tamanho e tente novamente.";
+const MENSAGEM_FORMATO = "Formato não suportado. Use JPG, PNG ou WEBP.";
 
-const storage = multer.diskStorage({
-  destination: (_req, _file, callback) => {
-    callback(null, PASTA_UPLOADS);
-  },
-  filename: (_req, file, callback) => {
-    const extensao = path.extname(file.originalname).toLowerCase();
-    const nomeUnico = `${Date.now()}-${Math.round(Math.random() * 1e9)}${extensao}`;
-    callback(null, nomeUnico);
-  },
-});
+class ErroDeFormato extends Error {}
 
-export const uploadImagemPonto = multer({
-  storage,
-  limits: {
-    // RNF03: uploads de imagem limitados a 5 MB por arquivo.
-    fileSize: 5 * 1024 * 1024,
-  },
-  fileFilter: (_req, file, callback) => {
-    if (!TIPOS_PERMITIDOS.has(file.mimetype)) {
-      callback(new Error("Formato de imagem não suportado. Use JPG, PNG ou WEBP."));
-      return;
-    }
+function guardarEm(subpasta: string) {
+  const pasta = path.join(RAIZ_UPLOADS, subpasta);
 
-    callback(null, true);
-  },
-}).single("imagem");
+  return multer.diskStorage({
+    destination: (_req, _file, callback) => {
+      fs.mkdirSync(pasta, { recursive: true });
+      callback(null, pasta);
+    },
+    filename: (_req, file, callback) => {
+      // A extensão vem do tipo aceito, nunca do nome enviado pelo cliente (um ".html"
+      // com tipo "image/png" seria servido como página).
+      const extensao = EXTENSAO_POR_TIPO[file.mimetype as TipoImagem] ?? "";
+      callback(null, `${Date.now()}-${Math.round(Math.random() * 1e9)}${extensao}`);
+    },
+  });
+}
 
-export function caminhoPublicoImagem(nomeArquivo: string): string {
-  return `/uploads/pontos/${nomeArquivo}`;
+/**
+ * Recebe um campo de imagem. Depois do upload confere o conteúdo real do arquivo; se não
+ * for uma imagem de verdade, apaga o arquivo e responde 415. Em qualquer erro, nenhum
+ * arquivo parcial fica no disco.
+ */
+export function receberImagem(campo: string, subpasta: string): RequestHandler {
+  const upload = multer({
+    storage: guardarEm(subpasta),
+    limits: { fileSize: LIMITE_IMAGEM_BYTES, files: 1 },
+    fileFilter: (_req, file, callback) => {
+      if (!(file.mimetype in EXTENSAO_POR_TIPO)) {
+        callback(new ErroDeFormato(MENSAGEM_FORMATO));
+        return;
+      }
+
+      callback(null, true);
+    },
+  }).single(campo);
+
+  return (req: Request, res: Response, next: NextFunction) => {
+    upload(req, res, (erro: unknown) => {
+      if (erro) {
+        if (erro instanceof multer.MulterError && erro.code === "LIMIT_FILE_SIZE") {
+          return res.status(413).json({ erro: MENSAGEM_TAMANHO });
+        }
+
+        if (erro instanceof ErroDeFormato) {
+          return res.status(415).json({ erro: MENSAGEM_FORMATO });
+        }
+
+        if (erro instanceof multer.MulterError) {
+          return res.status(400).json({ erro: "Envio de arquivo inválido." });
+        }
+
+        return next(erro);
+      }
+
+      if (!req.file) {
+        return next();
+      }
+
+      const arquivo = req.file;
+
+      lerInicioDoArquivo(arquivo.path)
+        .then(async (inicio) => {
+          if (detectarTipoImagem(inicio) === null) {
+            await removerArquivoLocal(arquivo.path);
+            req.file = undefined;
+
+            return res.status(415).json({ erro: MENSAGEM_FORMATO });
+          }
+
+          return next();
+        })
+        .catch(next);
+    });
+  };
+}
+
+/** Endereço público ("/uploads/<subpasta>/<arquivo>") de um arquivo recém-enviado. */
+export function caminhoPublicoImagem(arquivo: Express.Multer.File, subpasta: string): string {
+  return `/uploads/${subpasta}/${arquivo.filename}`;
 }

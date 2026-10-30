@@ -1,5 +1,8 @@
 export type StatusPonto = "RASCUNHO" | "PUBLICADO" | "PENDENTE_VERIFICACAO" | "REJEITADO";
 
+/** Como o registro entrou no sistema (RNF19). */
+export type OrigemPonto = "USUARIO" | "IMPORTACAO" | "API";
+
 export interface Ponto {
   id: number;
   nome: string;
@@ -15,8 +18,15 @@ export interface Ponto {
   telefoneContato: string | null;
   horarioFuncionamento: string | null;
   imagemUrl: string | null;
+  /** Autor e licença da foto quando ela veio do Wikimedia Commons. */
+  imagemCredito?: string | null;
+  imagemFonte?: string | null;
   status: StatusPonto;
   seloVerificado: boolean;
+  origem?: OrigemPonto;
+  /** Elemento do OpenStreetMap de onde vieram os dados ("node/123"). */
+  idOsm?: string | null;
+  sincronizadoEm?: string | null;
   motivoRejeicao?: string | null;
   dataCriacao?: string;
   dataAtualizacao?: string;
@@ -24,11 +34,28 @@ export interface Ponto {
   responsavel?: { id: number; nome: string } | null;
   distanciaMetros?: number;
   versao?: number;
+  mediaAvaliacao?: number | null;
+  totalAvaliacoes?: number;
+  /** Só no detalhe, para quem está logado. */
+  salvo?: boolean;
+  /** Só nas recomendações para o usuário. */
+  motivoRecomendacao?: "usuarios_semelhantes" | "interesses";
 }
 
 export interface RespostaPontos {
   total: number;
   dados: Ponto[];
+  /** A busca veio do cache porque o banco demorou a responder (AF02). */
+  desatualizado?: boolean;
+}
+
+export type Ordenacao = "relevancia" | "distancia" | "nome" | "avaliacao";
+
+export interface SugestaoCriada extends SugestaoEdicao {
+  retidaParaModeracao?: boolean;
+  aviso?: string;
+  aplicadaAutomaticamente?: boolean;
+  motivoAplicacao?: "dono_verificado" | "reputacao" | "confirmacoes";
 }
 
 export interface SugestaoEdicao {
@@ -39,6 +66,7 @@ export interface SugestaoEdicao {
   mensagem: string | null;
   status: "PENDENTE" | "APROVADA" | "REJEITADA";
   motivoRejeicao: string | null;
+  motivoRetencao?: string | null;
   dataCriacao: string;
   autor?: { id: number; nome: string };
   ponto?: { id: number; nome: string; cidade: string };
@@ -65,6 +93,7 @@ export interface Avaliacao {
   fotoUrl: string | null;
   status: "PENDENTE" | "APROVADA" | "REJEITADA";
   motivoRejeicao: string | null;
+  motivoRetencao?: string | null;
   dataCriacao: string;
   autor?: { id: number; nome: string };
   ponto?: { id: number; nome: string; cidade: string };

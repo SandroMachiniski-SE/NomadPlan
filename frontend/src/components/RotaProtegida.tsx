@@ -8,7 +8,7 @@ interface RotaProtegidaProps {
 }
 
 function RotaProtegida({ papeis }: RotaProtegidaProps) {
-  const { usuario, autenticado, carregando } = useAuth();
+  const { usuario, autenticado, carregando, sessaoExpirada, saiuManualmente } = useAuth();
   const location = useLocation();
 
   if (carregando) {
@@ -20,11 +20,15 @@ function RotaProtegida({ papeis }: RotaProtegidaProps) {
   }
 
   if (!autenticado) {
+    // Quem acabou de sair por conta própria volta ao início; quem nunca entrou vai ao login.
     return (
       <Navigate
-        to="/login"
+        to={saiuManualmente ? "/" : "/login"}
         replace
-        state={{ destino: location.pathname }}
+        state={{
+          destino: location.pathname,
+          ...(sessaoExpirada ? { mensagem: "Sua sessão expirou. Entre novamente para continuar." } : {}),
+        }}
       />
     );
   }

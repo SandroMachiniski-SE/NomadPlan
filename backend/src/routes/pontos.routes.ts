@@ -1,19 +1,35 @@
-import { Router, Request, Response } from "express";
+import { Router, Request, Response, NextFunction } from "express";
 import { z } from "zod";
-import { Prisma } from "@prisma/client";
+import { OrigemRegistro, Prisma, PontoTuristico, StatusPonto, StatusSolicitacao, TipoConta } from "@prisma/client";
 import prisma from "../lib/prisma";
-import { StatusPonto, StatusSolicitacao, TipoConta } from "@prisma/client";
 import { autenticar, autenticarOpcional, autorizar } from "../middleware/auth";
-import { uploadImagemPonto, caminhoPublicoImagem } from "../middleware/upload";
-import { uploadCsv } from "../middleware/uploadCsv";
+import { receberImagem, caminhoPublicoImagem } from "../middleware/upload";
+import { uploadImportacao } from "../middleware/uploadCsv";
 import { distanciaMetros } from "../lib/geo";
 import { registrarAuditoria } from "../lib/auditoria";
-import { criarNotificacao } from "../lib/notificacoes";
+import { criarNotificacao, notificarModeradores } from "../lib/notificacoes";
 import { registrarVersaoPonto } from "../lib/versionamento";
 import { conteudoSuspeito } from "../lib/moderacaoTexto";
 import { ehUsuarioConfiavel, incrementarReputacao, PONTOS_REPUTACAO } from "../lib/reputacao";
 import { limiteContribuicao } from "../middleware/rateLimit";
 import { analisarCsv, linhasParaObjetos, objetosParaCsv } from "../lib/csv";
+import { ErroGeoJson, linhasDeGeoJson, type LinhaImportacao } from "../lib/geojson";
+import {
+  buscarComFallback,
+  ErroTempoEsgotado,
+  ORDENACOES,
+  RAIO_BUSCA_KM_MAXIMO,
+  RAIO_BUSCA_KM_PADRAO,
+} from "../lib/buscaPontos";
+import { pontoSelecaoCompleta, pontoSelecaoPublica } from "../lib/pontosSelecao";
+import { CONFIRMACOES_PARA_APLICAR, mesmaProposta, sugestaoSuspeita } from "../lib/sugestoes";
+import { aplicarCamposAoPonto } from "../lib/sugestoesAplicacao";
+import { ehViolacaoDeUnicidade } from "../lib/prismaErros";
+import { removerArquivoLocal, removerArquivoPublico } from "../lib/arquivos";
+import { registrarEvento } from "../lib/metricasUso";
+import { pontosDeUsuariosSemelhantes } from "../lib/similaridade";
+import { bonusDeCadastro } from "../lib/recomendacao";
+import { preferenciasAtendidas } from "../lib/preferencias";
 
 const pontosRouter = Router();
 
@@ -25,68 +41,13 @@ const TIPOS_CADASTRADORES = [
 ] as const;
 
 const TIPOS_MODERADORES = [TipoConta.MODERADOR, TipoConta.ADMIN] as const;
+const TIPOS_EXPORTADORES = [TipoConta.GESTOR, TipoConta.MODERADOR, TipoConta.ADMIN] as const;
 
 const DISTANCIA_DUPLICIDADE_METROS = 150;
-const RAIO_BUSCA_KM_PADRAO = 10;
-const RAIO_BUSCA_KM_MAXIMO = 200;
-
-interface PontoComDistancia {
-  id: number;
-  nome: string;
-  descricao: string | null;
-  categoria: string;
-  cidade: string;
-  endereco: string | null;
-  latitude: number | null;
-  longitude: number | null;
-  faixaPreco: string | null;
-  acessibilidade: string | null;
-  siteOficial: string | null;
-  telefoneContato: string | null;
-  horarioFuncionamento: string | null;
-  imagemUrl: string | null;
-  status: StatusPonto;
-  seloVerificado: boolean;
-  distanciaMetros: number;
-}
 
 function ehModerador(tipoConta: TipoConta): boolean {
   return tipoConta === TipoConta.MODERADOR || tipoConta === TipoConta.ADMIN;
 }
-
-const pontoSelecaoPublica = {
-  id: true,
-  nome: true,
-  descricao: true,
-  categoria: true,
-  cidade: true,
-  endereco: true,
-  latitude: true,
-  longitude: true,
-  faixaPreco: true,
-  acessibilidade: true,
-  siteOficial: true,
-  telefoneContato: true,
-  horarioFuncionamento: true,
-  imagemUrl: true,
-  status: true,
-  seloVerificado: true,
-} as const;
-
-const pontoSelecaoCompleta = {
-  ...pontoSelecaoPublica,
-  motivoRejeicao: true,
-  versao: true,
-  dataCriacao: true,
-  dataAtualizacao: true,
-  idResponsavel: true,
-  responsavel: {
-    select: {
-      id: true,
-      nome: true,
-    },
-  },
-} as const;
 
 const criarPontoSchema = z.object({
   nome: z.string().trim().min(1).max(160),
@@ -104,14 +65,13 @@ const criarPontoSchema = z.object({
   confirmarDuplicidade: z.coerce.boolean().default(false),
 });
 
-const atualizarPontoSchema = criarPontoSchema
-  .omit({ confirmarDuplicidade: true })
-  .partial()
-  .extend({
-    // RB08/AF04: se informado, a atualização só é aplicada se ninguém tiver
-    // alterado o ponto desde que o cliente carregou esta versão.
-    versaoEsperada: z.coerce.number().int().positive().optional(),
-  });
+const dadosDoPontoSchema = criarPontoSchema.omit({ confirmarDuplicidade: true });
+
+const atualizarPontoSchema = dadosDoPontoSchema.partial().extend({
+  // RB08/AF04: se informado, a atualização só é aplicada se ninguém tiver
+  // alterado o ponto desde que o cliente carregou esta versão.
+  versaoEsperada: z.coerce.number().int().positive().optional(),
+});
 
 const rejeitarSchema = z.object({
   motivo: z.string().trim().min(1).max(500),
@@ -120,11 +80,16 @@ const rejeitarSchema = z.object({
 const avaliacaoSchema = z.object({
   nota: z.coerce.number().int().min(1).max(5),
   comentario: z.string().trim().max(1000).optional(),
-  fotoUrl: z.string().trim().url().max(500).optional(),
 });
 
+// "?confirmarDuplicidade=false" precisa valer como falso (z.coerce.boolean() trataria
+// qualquer texto não vazio, inclusive "false", como verdadeiro).
+const booleanoDeQuery = z
+  .enum(["true", "false", "1", "0"])
+  .transform((valor) => valor === "true" || valor === "1");
+
 const importarPontosQuerySchema = z.object({
-  confirmarDuplicidade: z.coerce.boolean().default(false),
+  confirmarDuplicidade: booleanoDeQuery.default(false),
 });
 
 const sugestaoSchema = z.object({
@@ -155,26 +120,35 @@ const CAMPOS_SUGERIVEIS = new Set([
   "horarioFuncionamento",
 ]);
 
-async function buscarPossiveisDuplicados(
-  nome: string,
-  cidade: string,
-  latitude?: number,
-  longitude?: number,
-) {
-  const candidatos = await prisma.pontoTuristico.findMany({
+interface CandidatoDuplicado {
+  id: number;
+  nome: string;
+  endereco: string | null;
+  latitude: number | null;
+  longitude: number | null;
+}
+
+async function carregarCandidatosDuplicados(cidade: string): Promise<CandidatoDuplicado[]> {
+  return prisma.pontoTuristico.findMany({
     where: {
       cidade: { equals: cidade, mode: "insensitive" },
       status: { not: StatusPonto.REJEITADO },
     },
     select: { id: true, nome: true, endereco: true, latitude: true, longitude: true },
   });
+}
 
+// RB05: mesmo nome na cidade, ou a menos de 150 m de outro ponto.
+function filtrarDuplicados(
+  candidatos: CandidatoDuplicado[],
+  nome: string,
+  latitude?: number,
+  longitude?: number,
+): CandidatoDuplicado[] {
   const nomeNormalizado = nome.trim().toLowerCase();
 
   return candidatos.filter((candidato) => {
-    const mesmoNome = candidato.nome.trim().toLowerCase() === nomeNormalizado;
-
-    if (mesmoNome) {
+    if (candidato.nome.trim().toLowerCase() === nomeNormalizado) {
       return true;
     }
 
@@ -215,17 +189,25 @@ function camposObrigatoriosFaltantes(ponto: {
   return faltantes;
 }
 
-const buscaSchema = z.object({
-  cidade: z.string().trim().min(1).optional(),
-  categoria: z.string().trim().min(1).optional(),
-  busca: z.string().trim().min(1).optional(),
-  acessibilidade: z.string().trim().min(1).optional(),
-  faixaPreco: z.string().trim().min(1).optional(),
-  lat: z.coerce.number().min(-90).max(90).optional(),
-  lng: z.coerce.number().min(-180).max(180).optional(),
-  raioKm: z.coerce.number().positive().max(RAIO_BUSCA_KM_MAXIMO).default(RAIO_BUSCA_KM_PADRAO),
-  limite: z.coerce.number().int().min(1).max(100).default(20),
-});
+const buscaSchema = z
+  .object({
+    cidade: z.string().trim().min(1).optional(),
+    categoria: z.string().trim().min(1).optional(),
+    busca: z.string().trim().min(1).optional(),
+    acessibilidade: z.string().trim().min(1).optional(),
+    faixaPreco: z.string().trim().min(1).optional(),
+    lat: z.coerce.number().min(-90).max(90).optional(),
+    lng: z.coerce.number().min(-180).max(180).optional(),
+    raioKm: z.coerce.number().positive().max(RAIO_BUSCA_KM_MAXIMO).default(RAIO_BUSCA_KM_PADRAO),
+    limite: z.coerce.number().int().min(1).max(100).default(20),
+    notaMinima: z.coerce.number().min(1).max(5).optional(),
+    abertoAgora: booleanoDeQuery.optional(),
+    ordenar: z.enum(ORDENACOES).optional(),
+  })
+  .refine((q) => (q.lat === undefined) === (q.lng === undefined), {
+    message: "Informe latitude e longitude juntas.",
+    path: ["lat"],
+  });
 
 pontosRouter.get("/", async (req: Request, res: Response) => {
   try {
@@ -238,69 +220,21 @@ pontosRouter.get("/", async (req: Request, res: Response) => {
       });
     }
 
-    const { cidade, categoria, busca, acessibilidade, faixaPreco, lat, lng, raioKm, limite } =
-      resultado.data;
+    registrarEvento("busca");
 
-    // Com coordenadas informadas, buscamos por proximidade usando a coluna geográfica
-    // (PostGIS) — ordenando pela distância real, não pelo nome.
-    if (lat !== undefined && lng !== undefined) {
-      const condicoes: Prisma.Sql[] = [
-        Prisma.sql`status = 'PUBLICADO'`,
-        Prisma.sql`geom IS NOT NULL`,
-        Prisma.sql`ST_DWithin(geom, ST_SetSRID(ST_MakePoint(${lng}, ${lat}), 4326)::geography, ${raioKm * 1000})`,
-      ];
+    const busca = await buscarComFallback(resultado.data);
 
-      if (cidade) condicoes.push(Prisma.sql`cidade ILIKE ${`%${cidade}%`}`);
-      if (categoria) condicoes.push(Prisma.sql`categoria ILIKE ${`%${categoria}%`}`);
-      if (acessibilidade) condicoes.push(Prisma.sql`acessibilidade ILIKE ${`%${acessibilidade}%`}`);
-      if (faixaPreco) condicoes.push(Prisma.sql`faixa_preco ILIKE ${`%${faixaPreco}%`}`);
-      if (busca) {
-        condicoes.push(
-          Prisma.sql`(nome ILIKE ${`%${busca}%`} OR descricao ILIKE ${`%${busca}%`})`,
-        );
-      }
+    return res.json(busca);
+  } catch (error) {
+    if (error instanceof ErroTempoEsgotado) {
+      console.error("Busca de pontos excedeu o tempo limite.");
 
-      const pontos = await prisma.$queryRaw<PontoComDistancia[]>`
-        SELECT
-          id, nome, descricao, categoria, cidade, endereco, latitude, longitude,
-          faixa_preco AS "faixaPreco", acessibilidade, site_oficial AS "siteOficial",
-          telefone_contato AS "telefoneContato", horario_funcionamento AS "horarioFuncionamento",
-          imagem_url AS "imagemUrl", status, selo_verificado AS "seloVerificado",
-          ST_Distance(geom, ST_SetSRID(ST_MakePoint(${lng}, ${lat}), 4326)::geography) AS "distanciaMetros"
-        FROM ponto_turistico
-        WHERE ${Prisma.join(condicoes, " AND ")}
-        ORDER BY "distanciaMetros" ASC
-        LIMIT ${limite}
-      `;
-
-      return res.json({ total: pontos.length, dados: pontos });
+      return res.status(504).json({
+        erro: "Não foi possível completar a busca no momento. Tente novamente.",
+        tempoEsgotado: true,
+      });
     }
 
-    const pontos = await prisma.pontoTuristico.findMany({
-      where: {
-        status: StatusPonto.PUBLICADO,
-        ...(cidade ? { cidade: { contains: cidade, mode: "insensitive" } } : {}),
-        ...(categoria ? { categoria: { contains: categoria, mode: "insensitive" } } : {}),
-        ...(acessibilidade
-          ? { acessibilidade: { contains: acessibilidade, mode: "insensitive" } }
-          : {}),
-        ...(faixaPreco ? { faixaPreco: { contains: faixaPreco, mode: "insensitive" } } : {}),
-        ...(busca
-          ? {
-              OR: [
-                { nome: { contains: busca, mode: "insensitive" } },
-                { descricao: { contains: busca, mode: "insensitive" } },
-              ],
-            }
-          : {}),
-      },
-      orderBy: { nome: "asc" },
-      take: limite,
-      select: pontoSelecaoPublica,
-    });
-
-    return res.json({ total: pontos.length, dados: pontos });
-  } catch (error) {
     console.error("Erro ao buscar pontos turísticos:", error);
 
     return res.status(500).json({ erro: "Erro interno ao buscar pontos turísticos." });
@@ -362,9 +296,9 @@ pontosRouter.post(
       const dados = resultado.data;
 
       if (!dados.confirmarDuplicidade) {
-        const duplicados = await buscarPossiveisDuplicados(
+        const duplicados = filtrarDuplicados(
+          await carregarCandidatosDuplicados(dados.cidade),
           dados.nome,
-          dados.cidade,
           dados.latitude,
           dados.longitude,
         );
@@ -398,6 +332,15 @@ pontosRouter.post(
         select: pontoSelecaoCompleta,
       });
 
+      registrarEvento("ponto_cadastrado");
+
+      await registrarAuditoria({
+        idUsuario: req.usuario!.id,
+        acao: "criar",
+        entidade: "ponto_turistico",
+        idEntidade: ponto.id,
+      });
+
       return res.status(201).json(ponto);
     } catch (error) {
       console.error("Erro ao criar ponto turístico:", error);
@@ -406,8 +349,6 @@ pontosRouter.post(
     }
   },
 );
-
-const TIPOS_EXPORTADORES = [TipoConta.GESTOR, TipoConta.MODERADOR, TipoConta.ADMIN] as const;
 
 const COLUNAS_EXPORTACAO = [
   "id",
@@ -425,6 +366,8 @@ const COLUNAS_EXPORTACAO = [
   "horarioFuncionamento",
   "status",
   "seloVerificado",
+  "origem",
+  "idOsm",
 ];
 
 // RF17: exportação de dados para gestores/pesquisadores em CSV ou GeoJSON.
@@ -434,7 +377,11 @@ pontosRouter.get(
   autorizar(...TIPOS_EXPORTADORES),
   async (req: Request, res: Response) => {
     try {
-      const formato = z.enum(["csv", "geojson"]).default("csv").parse(req.query.formato ?? "csv");
+      const formato = z.enum(["csv", "geojson"]).safeParse(req.query.formato ?? "csv");
+
+      if (!formato.success) {
+        return res.status(400).json({ erro: 'Formato inválido. Use "csv" ou "geojson".' });
+      }
 
       const pontos = await prisma.pontoTuristico.findMany({
         where: { status: StatusPonto.PUBLICADO },
@@ -442,7 +389,14 @@ pontosRouter.get(
         select: pontoSelecaoPublica,
       });
 
-      if (formato === "geojson") {
+      await registrarAuditoria({
+        idUsuario: req.usuario!.id,
+        acao: "exportar",
+        entidade: "ponto_turistico",
+        detalhes: { formato: formato.data, total: pontos.length },
+      });
+
+      if (formato.data === "geojson") {
         const geojson = {
           type: "FeatureCollection",
           features: pontos
@@ -453,16 +407,25 @@ pontosRouter.get(
               properties: {
                 id: p.id,
                 nome: p.nome,
+                descricao: p.descricao,
                 categoria: p.categoria,
                 cidade: p.cidade,
+                endereco: p.endereco,
                 faixaPreco: p.faixaPreco,
+                acessibilidade: p.acessibilidade,
+                siteOficial: p.siteOficial,
+                telefoneContato: p.telefoneContato,
+                horarioFuncionamento: p.horarioFuncionamento,
                 seloVerificado: p.seloVerificado,
+                origem: p.origem,
+                idOsm: p.idOsm,
               },
             })),
         };
 
+        res.setHeader("Content-Type", "application/geo+json; charset=utf-8");
         res.setHeader("Content-Disposition", "attachment; filename=pontos.geojson");
-        return res.json(geojson);
+        return res.send(JSON.stringify(geojson));
       }
 
       const csv = objetosParaCsv(COLUNAS_EXPORTACAO, pontos);
@@ -478,16 +441,116 @@ pontosRouter.get(
   },
 );
 
-// RF18/AF09: importação em lote via CSV, com relatório de erro por linha.
+const COLUNAS_IMPORTACAO = [
+  "nome",
+  "categoria",
+  "cidade",
+  "endereco",
+  "descricao",
+  "latitude",
+  "longitude",
+  "faixaPreco",
+  "acessibilidade",
+  "siteOficial",
+  "telefoneContato",
+  "horarioFuncionamento",
+];
+
+const COLUNAS_OBRIGATORIAS_IMPORTACAO = ["nome", "categoria", "cidade"];
+
+// AF09: modelo do arquivo de importação, para o operador não precisar adivinhar o formato.
+pontosRouter.get(
+  "/importar/modelo",
+  autenticar,
+  autorizar(...TIPOS_EXPORTADORES),
+  (req: Request, res: Response) => {
+    const formato = z.enum(["csv", "geojson"]).safeParse(req.query.formato ?? "csv");
+
+    if (!formato.success) {
+      return res.status(400).json({ erro: 'Formato inválido. Use "csv" ou "geojson".' });
+    }
+
+    if (formato.data === "geojson") {
+      const modelo = {
+        type: "FeatureCollection",
+        features: [
+          {
+            type: "Feature",
+            geometry: { type: "Point", coordinates: [-48.8487, -26.3045] },
+            properties: {
+              nome: "Mirante de exemplo",
+              categoria: "Natureza",
+              cidade: "Joinville",
+              endereco: "Rua Exemplo, 100",
+              descricao: "Descrição do ponto",
+              faixaPreco: "Gratuito",
+              acessibilidade: "Rampa de acesso",
+              siteOficial: "https://exemplo.com.br",
+              telefoneContato: "(47) 3000-0000",
+              horarioFuncionamento: "Seg-Dom 8h-18h",
+            },
+          },
+        ],
+      };
+
+      res.setHeader("Content-Disposition", "attachment; filename=modelo-importacao.geojson");
+      return res.json(modelo);
+    }
+
+    const modelo = objetosParaCsv(COLUNAS_IMPORTACAO, [
+      {
+        nome: "Mirante de exemplo",
+        categoria: "Natureza",
+        cidade: "Joinville",
+        endereco: "Rua Exemplo, 100",
+        descricao: "Descrição do ponto",
+        latitude: "-26.3045",
+        longitude: "-48.8487",
+        faixaPreco: "Gratuito",
+        acessibilidade: "Rampa de acesso",
+        siteOficial: "https://exemplo.com.br",
+        telefoneContato: "(47) 3000-0000",
+        horarioFuncionamento: "Seg-Dom 8h-18h",
+      },
+    ]);
+
+    res.setHeader("Content-Type", "text/csv; charset=utf-8");
+    res.setHeader("Content-Disposition", "attachment; filename=modelo-importacao.csv");
+    return res.send(modelo);
+  },
+);
+
+function linhasDeCsv(texto: string): LinhaImportacao[] {
+  const tabela = analisarCsv(texto);
+  const cabecalho = (tabela[0] ?? []).map((coluna) => coluna.trim());
+  const faltando = COLUNAS_OBRIGATORIAS_IMPORTACAO.filter((coluna) => !cabecalho.includes(coluna));
+
+  if (faltando.length > 0) {
+    throw new ErroGeoJson(
+      `O cabeçalho do CSV precisa ter as colunas: ${COLUNAS_OBRIGATORIAS_IMPORTACAO.join(", ")}. Faltando: ${faltando.join(", ")}.`,
+    );
+  }
+
+  // numero = número da linha no arquivo (1 é o cabeçalho), como o operador vê no editor.
+  return linhasParaObjetos(tabela).map((valores, indice) => ({ numero: indice + 2, valores }));
+}
+
+// RF18/AF09: importação em lote (CSV ou GeoJSON), com relatório de erro por registro.
 pontosRouter.post(
   "/importar",
   autenticar,
   autorizar(...TIPOS_EXPORTADORES),
-  (req: Request, res: Response, next) => {
-    uploadCsv(req, res, (erro: unknown) => {
+  (req: Request, res: Response, next: NextFunction) => {
+    uploadImportacao(req, res, (erro: unknown) => {
       if (erro) {
-        const mensagem = erro instanceof Error ? erro.message : "Falha no upload do arquivo.";
-        return res.status(400).json({ erro: mensagem });
+        const grande = (erro as { code?: string }).code === "LIMIT_FILE_SIZE";
+        const mensagem = grande
+          ? "O arquivo excede 2 MB. Divida a importação em partes menores."
+          : erro instanceof Error
+            ? erro.message
+            : "Falha no upload do arquivo.";
+
+        return res.status(grande ? 413 : 400).json({ erro: mensagem });
       }
       return next();
     });
@@ -498,27 +561,46 @@ pontosRouter.post(
         return res.status(400).json({ erro: "Nenhum arquivo enviado." });
       }
 
-      const { confirmarDuplicidade } = importarPontosQuerySchema.parse(req.query);
+      const query = importarPontosQuerySchema.safeParse(req.query);
 
-      const linhas = linhasParaObjetos(analisarCsv(req.file.buffer.toString("utf-8")));
+      if (!query.success) {
+        return res.status(400).json({ erro: "Parâmetros inválidos." });
+      }
+
+      const { confirmarDuplicidade } = query.data;
+      const nomeArquivo = req.file.originalname.toLowerCase();
+      const ehGeoJson = nomeArquivo.endsWith(".geojson") || nomeArquivo.endsWith(".json");
+      const texto = req.file.buffer.toString("utf-8");
+
+      let linhas: LinhaImportacao[];
+
+      try {
+        linhas = ehGeoJson ? linhasDeGeoJson(texto) : linhasDeCsv(texto);
+      } catch (erro) {
+        if (erro instanceof ErroGeoJson) {
+          return res.status(400).json({ erro: erro.message });
+        }
+        throw erro;
+      }
 
       const resultados: { linha: number; sucesso: boolean; motivo?: string }[] = [];
+      const candidatosPorCidade = new Map<string, CandidatoDuplicado[]>();
 
-      for (let indice = 0; indice < linhas.length; indice += 1) {
-        const numeroLinha = indice + 2; // +1 cabeçalho, +1 para contagem humana (1-based)
-        const linha = linhas[indice];
+      for (const linha of linhas) {
+        if (linha.erro) {
+          resultados.push({ linha: linha.numero, sucesso: false, motivo: linha.erro });
+          continue;
+        }
 
-        const validacao = criarPontoSchema
-          .omit({ confirmarDuplicidade: true })
-          .safeParse({
-            ...linha,
-            latitude: linha.latitude || undefined,
-            longitude: linha.longitude || undefined,
-          });
+        const validacao = dadosDoPontoSchema.safeParse({
+          ...linha.valores,
+          latitude: linha.valores.latitude || undefined,
+          longitude: linha.valores.longitude || undefined,
+        });
 
         if (!validacao.success) {
           resultados.push({
-            linha: numeroLinha,
+            linha: linha.numero,
             sucesso: false,
             motivo: validacao.error.issues.map((i) => `${i.path.join(".")}: ${i.message}`).join("; "),
           });
@@ -526,18 +608,22 @@ pontosRouter.post(
         }
 
         const dados = validacao.data;
+        const chaveCidade = dados.cidade.toLowerCase();
+
+        // Uma consulta por cidade (e não por linha); os pontos criados no próprio lote
+        // entram na lista, para também pegar duplicados dentro do arquivo.
+        if (!candidatosPorCidade.has(chaveCidade)) {
+          candidatosPorCidade.set(chaveCidade, await carregarCandidatosDuplicados(dados.cidade));
+        }
+
+        const candidatos = candidatosPorCidade.get(chaveCidade)!;
 
         if (!confirmarDuplicidade) {
-          const duplicados = await buscarPossiveisDuplicados(
-            dados.nome,
-            dados.cidade,
-            dados.latitude,
-            dados.longitude,
-          );
+          const duplicados = filtrarDuplicados(candidatos, dados.nome, dados.latitude, dados.longitude);
 
           if (duplicados.length > 0) {
             resultados.push({
-              linha: numeroLinha,
+              linha: linha.numero,
               sucesso: false,
               motivo: `Possível duplicado de "${duplicados[0].nome}".`,
             });
@@ -545,7 +631,7 @@ pontosRouter.post(
           }
         }
 
-        await prisma.pontoTuristico.create({
+        const criado = await prisma.pontoTuristico.create({
           data: {
             nome: dados.nome,
             descricao: dados.descricao || null,
@@ -560,11 +646,14 @@ pontosRouter.post(
             telefoneContato: dados.telefoneContato || null,
             horarioFuncionamento: dados.horarioFuncionamento || null,
             status: StatusPonto.RASCUNHO,
+            origem: OrigemRegistro.IMPORTACAO,
             idResponsavel: req.usuario!.id,
           },
+          select: { id: true, nome: true, endereco: true, latitude: true, longitude: true },
         });
 
-        resultados.push({ linha: numeroLinha, sucesso: true });
+        candidatos.push(criado);
+        resultados.push({ linha: linha.numero, sucesso: true });
       }
 
       await registrarAuditoria({
@@ -572,6 +661,7 @@ pontosRouter.post(
         acao: "importar",
         entidade: "ponto_turistico",
         detalhes: {
+          formato: ehGeoJson ? "geojson" : "csv",
           total: resultados.length,
           sucesso: resultados.filter((r) => r.sucesso).length,
         },
@@ -590,32 +680,66 @@ pontosRouter.post(
   },
 );
 
-// RF24 (simplificado): sugestão passiva com base nos interesses do perfil —
-// não é filtragem colaborativa entre usuários (fora do escopo acadêmico definido
-// no RFC, seção 6.6), apenas prioriza categorias que o usuário já demonstrou gostar.
+// RF24: recomendações com base em usuários de gostos parecidos (pontos que eles salvaram,
+// avaliaram bem ou colocaram em roteiros) e, para completar, nos interesses do perfil,
+// priorizando o que atende às preferências de acessibilidade.
 pontosRouter.get("/recomendados", autenticar, async (req: Request, res: Response) => {
   try {
     const usuario = await prisma.usuario.findUnique({
       where: { id: req.usuario!.id },
-      select: { interesses: true, cidadeBase: true },
+      select: { interesses: true, cidadeBase: true, preferenciasAcessibilidade: true },
     });
 
-    if (!usuario || usuario.interesses.length === 0) {
+    if (!usuario) {
       return res.json({ total: 0, dados: [] });
     }
 
-    const pontos = await prisma.pontoTuristico.findMany({
-      where: {
-        status: StatusPonto.PUBLICADO,
-        categoria: { in: usuario.interesses, mode: "insensitive" },
-        ...(usuario.cidadeBase ? { cidade: { equals: usuario.cidadeBase, mode: "insensitive" } } : {}),
-      },
-      orderBy: [{ seloVerificado: "desc" }, { nome: "asc" }],
-      take: 12,
-      select: pontoSelecaoPublica,
-    });
+    const semelhantes = await pontosDeUsuariosSemelhantes(req.usuario!.id, 12);
+    const idsSemelhantes = semelhantes.map((p) => p.id);
 
-    return res.json({ total: pontos.length, dados: pontos });
+    const pontosSemelhantes = idsSemelhantes.length
+      ? await prisma.pontoTuristico.findMany({
+          where: { id: { in: idsSemelhantes }, status: StatusPonto.PUBLICADO },
+          select: pontoSelecaoPublica,
+        })
+      : [];
+
+    const pontosPorInteresse =
+      usuario.interesses.length > 0
+        ? await prisma.pontoTuristico.findMany({
+            where: {
+              status: StatusPonto.PUBLICADO,
+              id: { notIn: idsSemelhantes },
+              categoria: { in: usuario.interesses, mode: "insensitive" },
+              ...(usuario.cidadeBase
+                ? { cidade: { equals: usuario.cidadeBase, mode: "insensitive" } }
+                : {}),
+            },
+            // Os com foto primeiro; a ordem final (abaixo) pesa o cadastro completo.
+            orderBy: [{ seloVerificado: "desc" }, { imagemUrl: { sort: "asc", nulls: "last" } }, { nome: "asc" }],
+            take: 200,
+            select: pontoSelecaoPublica,
+          })
+        : [];
+
+    const ordemSemelhantes = new Map(idsSemelhantes.map((id, indice) => [id, indice]));
+
+    const porSimilaridade = pontosSemelhantes
+      .sort((a, b) => (ordemSemelhantes.get(a.id) ?? 0) - (ordemSemelhantes.get(b.id) ?? 0))
+      .map((ponto) => ({ ...ponto, motivoRecomendacao: "usuarios_semelhantes" as const }));
+
+    const porInteresse = pontosPorInteresse
+      .map((ponto) => ({
+        ponto,
+        atendidas: preferenciasAtendidas(ponto.acessibilidade, usuario.preferenciasAcessibilidade),
+        completude: bonusDeCadastro(ponto) + (ponto.siteOficial ? 0.25 : 0) + (ponto.acessibilidade ? 0.25 : 0),
+      }))
+      .sort((a, b) => b.atendidas - a.atendidas || b.completude - a.completude)
+      .map(({ ponto }) => ({ ...ponto, motivoRecomendacao: "interesses" as const }));
+
+    const dados = [...porSimilaridade, ...porInteresse].slice(0, 12);
+
+    return res.json({ total: dados.length, dados });
   } catch (error) {
     console.error("Erro ao buscar pontos recomendados:", error);
 
@@ -648,7 +772,16 @@ pontosRouter.get("/:id", autenticarOpcional, async (req: Request, res: Response)
       return res.status(404).json({ erro: "Ponto turístico não encontrado." });
     }
 
-    return res.json(ponto);
+    const salvo = usuario
+      ? Boolean(
+          await prisma.pontoSalvo.findUnique({
+            where: { idUsuario_idPonto: { idUsuario: usuario.id, idPonto: ponto.id } },
+            select: { id: true },
+          }),
+        )
+      : false;
+
+    return res.json({ ...ponto, salvo });
   } catch (error) {
     console.error("Erro ao buscar detalhe do ponto:", error);
 
@@ -695,45 +828,65 @@ pontosRouter.put("/:id", autenticar, async (req: Request, res: Response) => {
 
     const dados = resultado.data;
 
+    const respostaDeConflito = async () =>
+      res.status(409).json({
+        erro: "O conteúdo foi alterado por outro usuário desde que você abriu esta edição.",
+        pontoAtual: await prisma.pontoTuristico.findUnique({ where: { id: id.data } }),
+      });
+
     // RB08/AF04: lock otimista — se o cliente informar a versão que tinha em mãos e
     // ela não bater com a atual, alguém alterou o ponto nesse meio-tempo.
     if (dados.versaoEsperada !== undefined && dados.versaoEsperada !== ponto.versao) {
-      return res.status(409).json({
-        erro: "O conteúdo foi alterado por outro usuário desde que você abriu esta edição.",
-        pontoAtual: ponto,
-      });
+      return respostaDeConflito();
     }
 
-    await registrarVersaoPonto(ponto, "edicao", req.usuario!.id);
+    // Uma edição de dono corrige o ponto: volta ao rascunho e limpa uma eventual
+    // rejeição. Um administrador que ajusta um ponto já publicado não o tira do ar.
+    const statusDepois =
+      ehAdmin && ponto.status === StatusPonto.PUBLICADO ? StatusPonto.PUBLICADO : StatusPonto.RASCUNHO;
 
-    const ponteAtualizado = await prisma.pontoTuristico.update({
-      where: { id: id.data },
-      data: {
-        ...(dados.nome !== undefined ? { nome: dados.nome } : {}),
-        ...(dados.descricao !== undefined ? { descricao: dados.descricao || null } : {}),
-        ...(dados.categoria !== undefined ? { categoria: dados.categoria } : {}),
-        ...(dados.cidade !== undefined ? { cidade: dados.cidade } : {}),
-        ...(dados.endereco !== undefined ? { endereco: dados.endereco || null } : {}),
-        ...(dados.latitude !== undefined ? { latitude: dados.latitude } : {}),
-        ...(dados.longitude !== undefined ? { longitude: dados.longitude } : {}),
-        ...(dados.faixaPreco !== undefined ? { faixaPreco: dados.faixaPreco || null } : {}),
-        ...(dados.acessibilidade !== undefined
-          ? { acessibilidade: dados.acessibilidade || null }
-          : {}),
-        ...(dados.siteOficial !== undefined ? { siteOficial: dados.siteOficial || null } : {}),
-        ...(dados.telefoneContato !== undefined
-          ? { telefoneContato: dados.telefoneContato || null }
-          : {}),
-        ...(dados.horarioFuncionamento !== undefined
-          ? { horarioFuncionamento: dados.horarioFuncionamento || null }
-          : {}),
-        // Uma edição corrige o ponto: volta ao rascunho e limpa uma eventual rejeição anterior.
-        status: StatusPonto.RASCUNHO,
-        motivoRejeicao: null,
-        versao: { increment: 1 },
-      },
-      select: pontoSelecaoCompleta,
+    const atualizado = await prisma.$transaction(async (tx) => {
+      // O "where versao" torna a checagem atômica: de duas edições simultâneas sobre a
+      // mesma versão, só uma encontra a linha; a outra recebe conflito.
+      const alteradas = await tx.pontoTuristico.updateMany({
+        where: { id: id.data, versao: ponto.versao },
+        data: {
+          ...(dados.nome !== undefined ? { nome: dados.nome } : {}),
+          ...(dados.descricao !== undefined ? { descricao: dados.descricao || null } : {}),
+          ...(dados.categoria !== undefined ? { categoria: dados.categoria } : {}),
+          ...(dados.cidade !== undefined ? { cidade: dados.cidade } : {}),
+          ...(dados.endereco !== undefined ? { endereco: dados.endereco || null } : {}),
+          ...(dados.latitude !== undefined ? { latitude: dados.latitude } : {}),
+          ...(dados.longitude !== undefined ? { longitude: dados.longitude } : {}),
+          ...(dados.faixaPreco !== undefined ? { faixaPreco: dados.faixaPreco || null } : {}),
+          ...(dados.acessibilidade !== undefined
+            ? { acessibilidade: dados.acessibilidade || null }
+            : {}),
+          ...(dados.siteOficial !== undefined ? { siteOficial: dados.siteOficial || null } : {}),
+          ...(dados.telefoneContato !== undefined
+            ? { telefoneContato: dados.telefoneContato || null }
+            : {}),
+          ...(dados.horarioFuncionamento !== undefined
+            ? { horarioFuncionamento: dados.horarioFuncionamento || null }
+            : {}),
+          status: statusDepois,
+          motivoRejeicao: null,
+          versao: { increment: 1 },
+        },
+      });
+
+      if (alteradas.count === 0) {
+        return null;
+      }
+
+      await registrarVersaoPonto(ponto, "edicao", req.usuario!.id, tx);
+
+      return tx.pontoTuristico.findUnique({ where: { id: id.data }, select: pontoSelecaoCompleta });
     });
+
+    if (!atualizado) {
+      return respostaDeConflito();
+    }
 
     await registrarAuditoria({
       idUsuario: req.usuario!.id,
@@ -742,7 +895,7 @@ pontosRouter.put("/:id", autenticar, async (req: Request, res: Response) => {
       idEntidade: id.data,
     });
 
-    return res.json(ponteAtualizado);
+    return res.json(atualizado);
   } catch (error) {
     console.error("Erro ao atualizar ponto turístico:", error);
 
@@ -750,51 +903,84 @@ pontosRouter.put("/:id", autenticar, async (req: Request, res: Response) => {
   }
 });
 
+// Confere permissão ANTES de receber o arquivo: quem não pode editar o ponto nem chega a
+// gravar algo no disco.
+async function podeAlterarImagem(req: Request, res: Response, next: NextFunction) {
+  try {
+    const id = idSchema.safeParse(req.params.id);
+
+    if (!id.success) {
+      return res.status(400).json({ erro: "Identificador inválido." });
+    }
+
+    const ponto = await prisma.pontoTuristico.findUnique({ where: { id: id.data } });
+
+    if (!ponto) {
+      return res.status(404).json({ erro: "Ponto turístico não encontrado." });
+    }
+
+    const ehDono = ponto.idResponsavel === req.usuario!.id;
+    const ehAdmin = req.usuario!.tipoConta === TipoConta.ADMIN;
+
+    if (!ehDono && !ehAdmin) {
+      return res.status(403).json({ erro: "Você não tem permissão para editar este ponto." });
+    }
+
+    // Trocar a foto de um ponto publicado é uma alteração de conteúdo: segue o mesmo
+    // caminho das demais edições (sugestão), a não ser para o administrador.
+    if (!ehAdmin && ponto.status !== StatusPonto.RASCUNHO && ponto.status !== StatusPonto.REJEITADO) {
+      return res.status(409).json({
+        erro: "A imagem de um ponto publicado ou em análise não pode ser trocada diretamente.",
+      });
+    }
+
+    res.locals.ponto = ponto;
+
+    return next();
+  } catch (error) {
+    return next(error);
+  }
+}
+
 pontosRouter.post(
   "/:id/imagem",
   autenticar,
-  (req: Request, res: Response, next) => {
-    uploadImagemPonto(req, res, (erro: unknown) => {
-      if (erro) {
-        const mensagem = erro instanceof Error ? erro.message : "Falha no upload da imagem.";
-        return res.status(400).json({ erro: mensagem });
-      }
-
-      return next();
-    });
-  },
+  podeAlterarImagem,
+  receberImagem("imagem", "pontos"),
   async (req: Request, res: Response) => {
     try {
-      const id = idSchema.safeParse(req.params.id);
-
-      if (!id.success) {
-        return res.status(400).json({ erro: "Identificador inválido." });
-      }
-
       if (!req.file) {
         return res.status(400).json({ erro: "Nenhuma imagem enviada." });
       }
 
-      const ponto = await prisma.pontoTuristico.findUnique({ where: { id: id.data } });
+      const ponto = res.locals.ponto as PontoTuristico;
+      const novaUrl = caminhoPublicoImagem(req.file, "pontos");
 
-      if (!ponto) {
-        return res.status(404).json({ erro: "Ponto turístico não encontrado." });
+      let atualizado;
+
+      try {
+        atualizado = await prisma.pontoTuristico.update({
+          where: { id: ponto.id },
+          // A foto enviada substitui a que veio de fora, e com ela o crédito.
+          data: { imagemUrl: novaUrl, imagemCredito: null, imagemFonte: null },
+          select: pontoSelecaoCompleta,
+        });
+      } catch (erro) {
+        await removerArquivoLocal(req.file.path);
+        throw erro;
       }
 
-      const ehDono = ponto.idResponsavel === req.usuario!.id;
-      const ehAdmin = req.usuario!.tipoConta === TipoConta.ADMIN;
+      // A imagem anterior deixa de ser usada: apaga para não acumular arquivos órfãos.
+      await removerArquivoPublico(ponto.imagemUrl);
 
-      if (!ehDono && !ehAdmin) {
-        return res.status(403).json({ erro: "Você não tem permissão para editar este ponto." });
-      }
-
-      const ponteAtualizado = await prisma.pontoTuristico.update({
-        where: { id: id.data },
-        data: { imagemUrl: caminhoPublicoImagem(req.file.filename) },
-        select: pontoSelecaoCompleta,
+      await registrarAuditoria({
+        idUsuario: req.usuario!.id,
+        acao: "atualizar_imagem",
+        entidade: "ponto_turistico",
+        idEntidade: ponto.id,
       });
 
-      return res.json(ponteAtualizado);
+      return res.json(atualizado);
     } catch (error) {
       console.error("Erro ao enviar imagem do ponto:", error);
 
@@ -828,11 +1014,12 @@ pontosRouter.post("/:id/publicar", autenticar, async (req: Request, res: Respons
       return res.status(409).json({ erro: "Este ponto já foi enviado para publicação." });
     }
 
+    // AF07/RB06: sem os campos mínimos, o ponto não segue para publicação.
     const faltantes = camposObrigatoriosFaltantes(ponto);
 
     if (faltantes.length > 0) {
       return res.status(400).json({
-        erro: "Para publicar, preencha os campos obrigatórios.",
+        erro: `Para publicar, preencha: ${faltantes.join(", ")}.`,
         camposFaltantes: faltantes,
       });
     }
@@ -842,6 +1029,15 @@ pontosRouter.post("/:id/publicar", autenticar, async (req: Request, res: Respons
       data: { status: StatusPonto.PENDENTE_VERIFICACAO, motivoRejeicao: null },
       select: pontoSelecaoCompleta,
     });
+
+    await registrarAuditoria({
+      idUsuario: req.usuario!.id,
+      acao: "enviar_para_publicacao",
+      entidade: "ponto_turistico",
+      idEntidade: id.data,
+    });
+
+    await notificarModeradores(`O ponto "${ponto.nome}" aguarda aprovação.`, "/moderacao");
 
     return res.json(ponteAtualizado);
   } catch (error) {
@@ -1020,9 +1216,10 @@ pontosRouter.post(
         });
       }
 
-      const camposInvalidos = Object.keys(resultado.data.camposPropostos).filter(
-        (campo) => !CAMPOS_SUGERIVEIS.has(campo),
-      );
+      const campos = resultado.data.camposPropostos;
+      const mensagem = resultado.data.mensagem || null;
+
+      const camposInvalidos = Object.keys(campos).filter((campo) => !CAMPOS_SUGERIVEIS.has(campo));
 
       if (camposInvalidos.length > 0) {
         return res.status(400).json({
@@ -1038,51 +1235,138 @@ pontosRouter.post(
         return res.status(404).json({ erro: "Ponto turístico não encontrado." });
       }
 
-      // RB04: usuários confiáveis (reputação acima do limite) têm a sugestão
-      // aplicada automaticamente, sem passar pela fila de moderação manual.
-      const confiavel = await ehUsuarioConfiavel(req.usuario!.id);
+      const idAutor = req.usuario!.id;
 
-      if (confiavel) {
-        await registrarVersaoPonto(ponto, "sugestao_auto_aplicada", req.usuario!.id);
-
-        await prisma.pontoTuristico.update({
-          where: { id: id.data },
-          data: {
-            ...(resultado.data.camposPropostos as Prisma.PontoTuristicoUpdateInput),
-            versao: { increment: 1 },
-          },
-        });
-
+      // AF05: conteúdo suspeito (links, palavrões) nunca é aplicado sozinho, nem para
+      // usuário de confiança: vai para a fila de moderação, sinalizado.
+      if (sugestaoSuspeita(campos, mensagem)) {
         const sugestao = await prisma.sugestaoEdicao.create({
           data: {
             idPonto: id.data,
-            idAutor: req.usuario!.id,
-            camposPropostos: resultado.data.camposPropostos,
-            mensagem: resultado.data.mensagem || null,
-            status: StatusSolicitacao.APROVADA,
-            dataResolucao: new Date(),
+            idAutor,
+            camposPropostos: campos,
+            mensagem,
+            motivoRetencao: "conteudo_suspeito",
           },
         });
 
-        await incrementarReputacao(req.usuario!.id, PONTOS_REPUTACAO.SUGESTAO_APROVADA);
+        await registrarAuditoria({
+          idUsuario: idAutor,
+          acao: "sugestao_sinalizada",
+          entidade: "ponto_turistico",
+          idEntidade: id.data,
+        });
+
+        await notificarModeradores(
+          `Sugestão sinalizada como suspeita para "${ponto.nome}".`,
+          "/moderacao",
+        );
+
+        return res.status(201).json({
+          ...sugestao,
+          retidaParaModeracao: true,
+          aviso: "Sua sugestão será analisada.",
+        });
+      }
+
+      // RB04: aplicação automática para dono verificado do ponto ou usuário de confiança.
+      const donoVerificado = ponto.idResponsavel === idAutor && ponto.seloVerificado;
+      const confiavel = donoVerificado || (await ehUsuarioConfiavel(idAutor));
+
+      if (confiavel) {
+        const sugestao = await prisma.$transaction(async (tx) => {
+          await aplicarCamposAoPonto(tx, ponto, campos, "sugestao_auto_aplicada", idAutor);
+
+          return tx.sugestaoEdicao.create({
+            data: {
+              idPonto: id.data,
+              idAutor,
+              camposPropostos: campos,
+              mensagem,
+              status: StatusSolicitacao.APROVADA,
+              dataResolucao: new Date(),
+            },
+          });
+        });
+
+        if (!donoVerificado) {
+          await incrementarReputacao(idAutor, PONTOS_REPUTACAO.SUGESTAO_APROVADA);
+        }
 
         await registrarAuditoria({
-          idUsuario: req.usuario!.id,
+          idUsuario: idAutor,
           acao: "sugestao_auto_aplicada",
           entidade: "ponto_turistico",
           idEntidade: id.data,
         });
 
-        return res.status(201).json({ ...sugestao, aplicadaAutomaticamente: true });
+        return res.status(201).json({
+          ...sugestao,
+          aplicadaAutomaticamente: true,
+          motivoAplicacao: donoVerificado ? "dono_verificado" : "reputacao",
+        });
       }
 
       const sugestao = await prisma.sugestaoEdicao.create({
-        data: {
-          idPonto: id.data,
-          idAutor: req.usuario!.id,
-          camposPropostos: resultado.data.camposPropostos,
-          mensagem: resultado.data.mensagem || null,
-        },
+        data: { idPonto: id.data, idAutor, camposPropostos: campos, mensagem },
+      });
+
+      // RF23/RB04: a mesma mudança proposta por usuários diferentes se confirma sozinha.
+      const pendentes = await prisma.sugestaoEdicao.findMany({
+        where: { idPonto: id.data, status: StatusSolicitacao.PENDENTE, idAutor: { not: idAutor } },
+      });
+
+      const confirmacoes = pendentes.filter((outra) =>
+        mesmaProposta(outra.camposPropostos as Record<string, unknown>, campos),
+      );
+
+      const autoresDistintos = new Set([idAutor, ...confirmacoes.map((c) => c.idAutor)]);
+
+      if (autoresDistintos.size >= CONFIRMACOES_PARA_APLICAR) {
+        const idsConfirmados = [sugestao.id, ...confirmacoes.map((c) => c.id)];
+
+        await prisma.$transaction(async (tx) => {
+          await aplicarCamposAoPonto(tx, ponto, campos, "sugestao_confirmada_por_usuarios", idAutor);
+
+          await tx.sugestaoEdicao.updateMany({
+            where: { id: { in: idsConfirmados } },
+            data: { status: StatusSolicitacao.APROVADA, dataResolucao: new Date() },
+          });
+        });
+
+        for (const idConfirmado of autoresDistintos) {
+          await incrementarReputacao(idConfirmado, PONTOS_REPUTACAO.SUGESTAO_APROVADA);
+
+          if (idConfirmado !== idAutor) {
+            await criarNotificacao(
+              idConfirmado,
+              `Sua sugestão para "${ponto.nome}" foi confirmada por outro usuário e aplicada.`,
+              `/pontos/${ponto.id}`,
+            );
+          }
+        }
+
+        await registrarAuditoria({
+          idUsuario: idAutor,
+          acao: "sugestao_confirmada",
+          entidade: "ponto_turistico",
+          idEntidade: id.data,
+          detalhes: { confirmacoes: autoresDistintos.size },
+        });
+
+        return res.status(201).json({
+          ...sugestao,
+          status: StatusSolicitacao.APROVADA,
+          aplicadaAutomaticamente: true,
+          motivoAplicacao: "confirmacoes",
+        });
+      }
+
+      await registrarAuditoria({
+        idUsuario: idAutor,
+        acao: "sugerir_edicao",
+        entidade: "ponto_turistico",
+        idEntidade: id.data,
       });
 
       return res.status(201).json(sugestao);
@@ -1150,6 +1434,15 @@ pontosRouter.post(
         },
       });
 
+      await registrarAuditoria({
+        idUsuario: req.usuario!.id,
+        acao: "solicitar_verificacao",
+        entidade: "ponto_turistico",
+        idEntidade: id.data,
+      });
+
+      await notificarModeradores(`Nova solicitação de selo para "${ponto.nome}".`, "/moderacao");
+
       return res.status(201).json(solicitacao);
     } catch (error) {
       console.error("Erro ao solicitar verificação:", error);
@@ -1211,9 +1504,19 @@ pontosRouter.post(
       }
 
       const ehDono = ponto.idResponsavel === req.usuario!.id;
+      const moderador = ehModerador(req.usuario!.tipoConta);
 
-      if (!ehDono && !ehModerador(req.usuario!.tipoConta)) {
+      if (!ehDono && !moderador) {
         return res.status(403).json({ erro: "Você não tem permissão para restaurar este ponto." });
+      }
+
+      // RB09: restaurar conteúdo de um ponto já publicado é papel da moderação. O dono só
+      // pode voltar versões enquanto o ponto ainda é rascunho (ou foi rejeitado), antes de
+      // passar pela aprovação; senão restaurar seria um jeito de burlar a moderação.
+      if (!moderador && ponto.status !== StatusPonto.RASCUNHO && ponto.status !== StatusPonto.REJEITADO) {
+        return res.status(403).json({
+          erro: "A restauração de um ponto publicado ou em análise é feita pela moderação.",
+        });
       }
 
       const versao = await prisma.versaoPonto.findFirst({
@@ -1226,15 +1529,17 @@ pontosRouter.post(
 
       // A própria restauração gera uma nova versão do estado atual, para que a
       // ação seja reversível (RB09).
-      await registrarVersaoPonto(ponto, "antes_de_restaurar", req.usuario!.id);
+      const ponteAtualizado = await prisma.$transaction(async (tx) => {
+        await registrarVersaoPonto(ponto, "antes_de_restaurar", req.usuario!.id, tx);
 
-      const ponteAtualizado = await prisma.pontoTuristico.update({
-        where: { id: id.data },
-        data: {
-          ...(versao.dados as Prisma.PontoTuristicoUpdateInput),
-          versao: { increment: 1 },
-        },
-        select: pontoSelecaoCompleta,
+        return tx.pontoTuristico.update({
+          where: { id: id.data },
+          data: {
+            ...(versao.dados as Prisma.PontoTuristicoUpdateInput),
+            versao: { increment: 1 },
+          },
+          select: pontoSelecaoCompleta,
+        });
       });
 
       await registrarAuditoria({
@@ -1265,7 +1570,16 @@ pontosRouter.get("/:id/avaliacoes", async (req: Request, res: Response) => {
     const avaliacoes = await prisma.avaliacao.findMany({
       where: { idPonto: id.data, status: StatusSolicitacao.APROVADA },
       orderBy: { dataCriacao: "desc" },
-      include: { autor: { select: { id: true, nome: true } } },
+      select: {
+        id: true,
+        idPonto: true,
+        idAutor: true,
+        nota: true,
+        comentario: true,
+        fotoUrl: true,
+        dataCriacao: true,
+        autor: { select: { id: true, nome: true } },
+      },
     });
 
     const media =
@@ -1281,21 +1595,36 @@ pontosRouter.get("/:id/avaliacoes", async (req: Request, res: Response) => {
   }
 });
 
+// A foto é opcional: com ela a requisição vem como multipart/form-data; sem ela, como JSON.
+function receberFotoDaAvaliacao(req: Request, res: Response, next: NextFunction) {
+  if (req.is("multipart/form-data")) {
+    return receberImagem("foto", "avaliacoes")(req, res, next);
+  }
+
+  return next();
+}
+
 pontosRouter.post(
   "/:id/avaliacoes",
   autenticar,
   limiteContribuicao,
+  receberFotoDaAvaliacao,
   async (req: Request, res: Response) => {
+    const arquivo = req.file;
+
     try {
       const id = idSchema.safeParse(req.params.id);
 
       if (!id.success) {
+        await removerArquivoLocal(arquivo?.path);
         return res.status(400).json({ erro: "Identificador inválido." });
       }
 
       const resultado = avaliacaoSchema.safeParse(req.body);
 
       if (!resultado.success) {
+        await removerArquivoLocal(arquivo?.path);
+
         return res.status(400).json({
           erro: "Dados da avaliação inválidos.",
           detalhes: resultado.error.flatten(),
@@ -1304,43 +1633,69 @@ pontosRouter.post(
 
       const ponto = await prisma.pontoTuristico.findFirst({
         where: { id: id.data, status: StatusPonto.PUBLICADO },
-        select: { id: true },
+        select: { id: true, nome: true },
       });
 
       if (!ponto) {
+        await removerArquivoLocal(arquivo?.path);
         return res.status(404).json({ erro: "Ponto turístico não encontrado." });
       }
 
-      const jaAvaliou = await prisma.avaliacao.findFirst({
-        where: { idPonto: id.data, idAutor: req.usuario!.id },
-      });
+      // RF15: filtro automático de spam/linguagem; foto sempre passa por revisão humana
+      // (não dá para julgar uma imagem automaticamente). O que não é retido é publicado.
+      const comentario = resultado.data.comentario || null;
+      const suspeito = conteudoSuspeito(comentario);
+      const retida = suspeito || Boolean(arquivo);
+      const motivoRetencao = suspeito ? "conteudo_suspeito" : arquivo ? "foto_anexada" : null;
 
-      if (jaAvaliou) {
-        return res.status(409).json({ erro: "Você já avaliou este ponto." });
+      let avaliacao;
+
+      try {
+        avaliacao = await prisma.avaliacao.create({
+          data: {
+            idPonto: id.data,
+            idAutor: req.usuario!.id,
+            nota: resultado.data.nota,
+            comentario,
+            fotoUrl: arquivo ? caminhoPublicoImagem(arquivo, "avaliacoes") : null,
+            status: retida ? StatusSolicitacao.PENDENTE : StatusSolicitacao.APROVADA,
+            motivoRetencao,
+          },
+        });
+      } catch (erro) {
+        await removerArquivoLocal(arquivo?.path);
+
+        // A trava é do banco (índice único), então vale mesmo com requisições simultâneas.
+        if (ehViolacaoDeUnicidade(erro)) {
+          return res.status(409).json({ erro: "Você já avaliou este ponto." });
+        }
+
+        throw erro;
       }
 
-      // RF15: filtro automático simples de spam/linguagem antes da fila de
-      // moderação humana — comentários suspeitos ficam pendentes, os demais são
-      // publicados imediatamente.
-      const suspeito = conteudoSuspeito(resultado.data.comentario);
+      registrarEvento("avaliacao");
 
-      const avaliacao = await prisma.avaliacao.create({
-        data: {
-          idPonto: id.data,
-          idAutor: req.usuario!.id,
-          nota: resultado.data.nota,
-          comentario: resultado.data.comentario || null,
-          fotoUrl: resultado.data.fotoUrl || null,
-          status: suspeito ? StatusSolicitacao.PENDENTE : StatusSolicitacao.APROVADA,
-        },
-      });
-
-      if (!suspeito) {
+      if (!retida) {
         await incrementarReputacao(req.usuario!.id, PONTOS_REPUTACAO.AVALIACAO_APROVADA);
+      } else {
+        await notificarModeradores(
+          suspeito
+            ? `Avaliação sinalizada como suspeita em "${ponto.nome}".`
+            : `Avaliação com foto aguardando revisão em "${ponto.nome}".`,
+          "/moderacao",
+        );
       }
 
-      return res.status(201).json({ ...avaliacao, retidaParaModeracao: suspeito });
+      await registrarAuditoria({
+        idUsuario: req.usuario!.id,
+        acao: "criar",
+        entidade: "avaliacao",
+        idEntidade: avaliacao.id,
+      });
+
+      return res.status(201).json({ ...avaliacao, retidaParaModeracao: retida });
     } catch (error) {
+      await removerArquivoLocal(arquivo?.path);
       console.error("Erro ao criar avaliação:", error);
 
       return res.status(500).json({ erro: "Erro interno ao criar avaliação." });

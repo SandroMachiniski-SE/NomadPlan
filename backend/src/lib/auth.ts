@@ -5,7 +5,7 @@ import type { TipoConta } from "@prisma/client";
 import { validarSegredoJwt } from "./segredoJwt";
 
 const JWT_SECRET = validarSegredoJwt(process.env.JWT_SECRET, process.env.NODE_ENV);
-const JWT_EXPIRES_IN = process.env.JWT_EXPIRES_IN ?? "7d";
+const JWT_EXPIRES_IN = process.env.JWT_EXPIRES_IN || "1d";
 const RESET_TOKEN_EXPIRES_IN = "15m";
 
 const SALT_ROUNDS = 10;

@@ -1,5 +1,7 @@
-import { PontoTuristico, Prisma } from "@prisma/client";
+import { PontoTuristico, Prisma, PrismaClient } from "@prisma/client";
 import prisma from "./prisma";
+
+type Cliente = PrismaClient | Prisma.TransactionClient;
 
 const CAMPOS_VERSIONADOS = [
   "nome",
@@ -15,6 +17,8 @@ const CAMPOS_VERSIONADOS = [
   "telefoneContato",
   "horarioFuncionamento",
   "imagemUrl",
+  "imagemCredito",
+  "imagemFonte",
 ] as const;
 
 /**
@@ -26,6 +30,7 @@ export async function registrarVersaoPonto(
   ponto: PontoTuristico,
   motivo: string,
   idAutor: number | null,
+  cliente: Cliente = prisma,
 ): Promise<void> {
   const snapshot: Record<string, unknown> = {};
 
@@ -33,7 +38,7 @@ export async function registrarVersaoPonto(
     snapshot[campo] = ponto[campo];
   }
 
-  await prisma.versaoPonto.create({
+  await cliente.versaoPonto.create({
     data: {
       idPonto: ponto.id,
       dados: snapshot as Prisma.InputJsonValue,

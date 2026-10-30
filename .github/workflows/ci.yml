@@ -1,0 +1,108 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: true
+
+env:
+  # Mesma conta e senha do docker-compose.yml; o banco só existe durante a execução.
+  DATABASE_URL: postgresql://nomadplan:nomadplan_dev@localhost:5432/nomadplan?schema=public
+  JWT_SECRET: segredo-de-ci-apenas-para-testes-automatizados
+
+jobs:
+  backend:
+    name: Backend (tipos, build, testes e cobertura)
+    runs-on: ubuntu-latest
+    services:
+      postgres:
+        image: postgis/postgis:16-3.4
+        env:
+          POSTGRES_USER: nomadplan
+          POSTGRES_PASSWORD: nomadplan_dev
+          POSTGRES_DB: nomadplan
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd "pg_isready -U nomadplan"
+          --health-interval 5s
+          --health-timeout 5s
+          --health-retries 10
+    defaults:
+      run:
+        working-directory: backend
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+          cache-dependency-path: backend/package-lock.json
+      - run: npm ci
+      - run: npm run typecheck
+      - run: npm run build
+      # Testes unitários e de integração (banco real), com meta de 60% de linhas (RNF).
+      - run: npm run test:cobertura
+
+  frontend:
+    name: Frontend (lint e build)
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: frontend
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+          cache-dependency-path: frontend/package-lock.json
+      - run: npm ci
+      - run: npm run lint
+      - run: npm run build
+
+  e2e:
+    name: Ponta a ponta (Playwright)
+    runs-on: ubuntu-latest
+    needs: [backend, frontend]
+    services:
+      postgres:
+        image: postgis/postgis:16-3.4
+        env:
+          POSTGRES_USER: nomadplan
+          POSTGRES_PASSWORD: nomadplan_dev
+          POSTGRES_DB: nomadplan
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd "pg_isready -U nomadplan"
+          --health-interval 5s
+          --health-timeout 5s
+          --health-retries 10
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+      - run: npm ci
+        working-directory: backend
+      - run: npm ci
+        working-directory: frontend
+      - run: npm ci
+        working-directory: e2e
+      - run: npx playwright install --with-deps chromium
+        working-directory: e2e
+      - run: npx playwright test
+        working-directory: e2e
+      - uses: actions/upload-artifact@v4
+        if: ${{ !cancelled() }}
+        with:
+          name: relatorio-playwright
+          path: |
+            e2e/playwright-report/
+            e2e/test-results/
+          retention-days: 7

@@ -1,12 +1,13 @@
 import { useEffect, useState, type FormEvent } from "react";
 import { Link } from "react-router-dom";
 import api from "../services/api";
-import type { Ponto, RespostaPontos } from "../types/ponto";
+import type { Ordenacao, Ponto, RespostaPontos } from "../types/ponto";
 import MapaCarregavel from "../components/MapaCarregavel";
 import PontoCard from "../components/PontoCard";
 import Icone from "../components/Icone";
 import { useAuth } from "../context/useAuth";
 import { CATEGORIAS_PONTOS, iconeDaCategoria } from "../constants/categorias";
+import { extrairMensagemErro } from "../utils/erro";
 
 function Home() {
   const { autenticado } = useAuth();
@@ -35,6 +36,9 @@ function Home() {
   const [acessibilidade, setAcessibilidade] = useState("");
   const [faixaPreco, setFaixaPreco] = useState("");
   const [raioKm, setRaioKm] = useState("10");
+  const [notaMinima, setNotaMinima] = useState("");
+  const [abertoAgora, setAbertoAgora] = useState(false);
+  const [ordenar, setOrdenar] = useState<Ordenacao | "">("");
   const [localizacao, setLocalizacao] = useState<{ lat: number; lng: number } | null>(null);
   const [buscandoLocalizacao, setBuscandoLocalizacao] = useState(false);
 
@@ -42,6 +46,7 @@ function Home() {
   const [carregando, setCarregando] = useState(false);
   const [erro, setErro] = useState<string | null>(null);
   const [buscou, setBuscou] = useState(false);
+  const [desatualizado, setDesatualizado] = useState(false);
   const [visualizacao, setVisualizacao] = useState<"lista" | "mapa">("lista");
 
   async function buscarPontos(event?: FormEvent, categoriaEscolhida?: string) {
@@ -51,6 +56,7 @@ function Home() {
 
     setCarregando(true);
     setErro(null);
+    setDesatualizado(false);
     setBuscou(true);
 
     try {
@@ -60,6 +66,9 @@ function Home() {
       if (busca.trim()) params.busca = busca.trim();
       if (acessibilidade.trim()) params.acessibilidade = acessibilidade.trim();
       if (faixaPreco.trim()) params.faixaPreco = faixaPreco.trim();
+      if (notaMinima) params.notaMinima = notaMinima;
+      if (abertoAgora) params.abertoAgora = "true";
+      if (ordenar && (ordenar !== "distancia" || localizacao)) params.ordenar = ordenar;
 
       if (localizacao) {
         params.lat = String(localizacao.lat);
@@ -69,9 +78,10 @@ function Home() {
 
       const resposta = await api.get<RespostaPontos>("/pontos", { params });
       setPontos(resposta.data.dados);
+      setDesatualizado(Boolean(resposta.data.desatualizado));
     } catch (error) {
       console.error("Erro ao buscar pontos turísticos:", error);
-      setErro("Não foi possível carregar os pontos turísticos. Tente novamente.");
+      setErro(extrairMensagemErro(error, "Não foi possível carregar os pontos turísticos. Tente novamente."));
       setPontos([]);
     } finally {
       setCarregando(false);
@@ -174,6 +184,40 @@ function Home() {
                   />
                 </label>
 
+                <label className="field">
+                  <span>Nota mínima</span>
+                  <select value={notaMinima} onChange={(event) => setNotaMinima(event.target.value)}>
+                    <option value="">Qualquer nota</option>
+                    <option value="3">3 estrelas ou mais</option>
+                    <option value="4">4 estrelas ou mais</option>
+                    <option value="4.5">4,5 estrelas ou mais</option>
+                  </select>
+                </label>
+
+                <label className="field">
+                  <span>Ordenar por</span>
+                  <select
+                    value={ordenar}
+                    onChange={(event) => setOrdenar(event.target.value as Ordenacao | "")}
+                  >
+                    <option value="">Mais relevantes</option>
+                    <option value="avaliacao">Melhor avaliados</option>
+                    <option value="nome">Nome (A–Z)</option>
+                    <option value="distancia" disabled={!localizacao}>
+                      Mais próximos{localizacao ? "" : " (ative a localização)"}
+                    </option>
+                  </select>
+                </label>
+
+                <label className="checkbox busca__aberto">
+                  <input
+                    type="checkbox"
+                    checked={abertoAgora}
+                    onChange={(event) => setAbertoAgora(event.target.checked)}
+                  />
+                  <span>Aberto agora</span>
+                </label>
+
                 <div className="field">
                   <span>Localização</span>
                   <div className="cluster">
@@ -228,7 +272,9 @@ function Home() {
           <section className="section" aria-labelledby="titulo-recomendados">
             <div className="section__cabecalho">
               <h2 id="titulo-recomendados">Recomendados para você</h2>
-              <p className="muted">Sugestões baseadas nos seus interesses.</p>
+              <p className="muted">
+                Sugestões baseadas nos seus interesses e no que usuários de gosto parecido salvaram.
+              </p>
             </div>
 
             <div className="carrossel">
@@ -272,6 +318,16 @@ function Home() {
               <div className="alert alert--error" role="alert">
                 <Icone nome="alerta" />
                 <p>{erro}</p>
+              </div>
+            )}
+
+            {desatualizado && !carregando && (
+              <div className="alert alert--warning" role="status">
+                <Icone nome="info" />
+                <p>
+                  O servidor demorou a responder, então estes resultados vêm de uma consulta recente e
+                  podem estar levemente desatualizados.
+                </p>
               </div>
             )}
 
