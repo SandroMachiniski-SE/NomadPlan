@@ -1,7 +1,7 @@
 """Substitui o texto-modelo das seções 8 a 13 do RFC.docx pelo conteúdo real do NomadPlan.
 
 Uso: python rfc_preparar_figuras.py && python rfc_secoes_8_13.py [cobertura] [testes] [testes_e2e]
-Depois: python rfc_para_pdf.py. Refaz as seções 8 a 13 a cada execução (pode rodar de novo sobre o RFC.docx já preenchido)."""
+Depois: python rfc_capa_sumario.py && python rfc_para_pdf.py. Refaz as seções 8 a 13 a cada execução (pode rodar de novo sobre o RFC.docx já preenchido)."""
 import copy
 import re
 import shutil
