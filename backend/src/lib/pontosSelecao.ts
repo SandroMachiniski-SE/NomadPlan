@@ -16,8 +16,14 @@ export const pontoSelecaoPublica = {
   telefoneContato: true,
   horarioFuncionamento: true,
   imagemUrl: true,
+  imagemCredito: true,
+  imagemFonte: true,
   status: true,
   seloVerificado: true,
+  // RNF19: de onde veio o registro e, se veio do OpenStreetMap, qual elemento.
+  origem: true,
+  idOsm: true,
+  sincronizadoEm: true,
 } as const;
 
 export const pontoSelecaoCompleta = {

@@ -17,7 +17,9 @@
     "prisma:migrate": "prisma migrate deploy",
     "prisma:seed": "tsx prisma/seed.ts",
     "e2e:preparar": "tsx src/scripts/prepararE2e.ts",
-    "email:testar": "tsx src/scripts/testarEmail.ts"
+    "email:testar": "tsx src/scripts/testarEmail.ts",
+    "osm:baixar": "tsx src/scripts/baixarOsm.ts",
+    "osm:importar": "tsx src/scripts/importarOsm.ts"
   },
   "dependencies": {
     "@prisma/client": "^6.19.3",

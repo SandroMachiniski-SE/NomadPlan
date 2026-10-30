@@ -17,6 +17,8 @@ const CAMPOS_VERSIONADOS = [
   "telefoneContato",
   "horarioFuncionamento",
   "imagemUrl",
+  "imagemCredito",
+  "imagemFonte",
 ] as const;
 
 /**

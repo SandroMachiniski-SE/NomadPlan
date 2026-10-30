@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useMemo, useState, type FormEvent } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState, type FormEvent } from "react";
 import { Link, useParams } from "react-router-dom";
 import api, { urlDoArquivo } from "../services/api";
 import type { Ponto, RespostaAvaliacoes, SugestaoCriada } from "../types/ponto";
@@ -53,6 +53,7 @@ function PontoDetalhes() {
   const [mensagemSugestao, setMensagemSugestao] = useState("");
   const [enviandoSugestao, setEnviandoSugestao] = useState(false);
   const [sugestaoEnviada, setSugestaoEnviada] = useState<string | null>(null);
+  const secaoSugestao = useRef<HTMLElement>(null);
 
   const [solicitandoSelo, setSolicitandoSelo] = useState(false);
   const [seloSolicitado, setSeloSolicitado] = useState(false);
@@ -261,6 +262,13 @@ function PontoDetalhes() {
   }
 
   const ehResponsavel = Boolean(usuario && ponto && usuario.id === ponto.idResponsavel);
+  const podeSugerir = Boolean(autenticado && !ehResponsavel && ponto?.status === "PUBLICADO");
+
+  function aoInformarHorario() {
+    setCampoSugestao("horarioFuncionamento");
+    setMostrarSugestao(true);
+    secaoSugestao.current?.scrollIntoView({ behavior: "smooth", block: "center" });
+  }
 
   return (
     <div className="container page">
@@ -294,7 +302,19 @@ function PontoDetalhes() {
             <div className="ponto-principal stack stack--lg">
               <div className="ponto-capa" data-cat={ponto.categoria}>
                 {ponto.imagemUrl ? (
-                  <img src={urlDoArquivo(ponto.imagemUrl)} alt={ponto.nome} />
+                  <>
+                    <img src={urlDoArquivo(ponto.imagemUrl)} alt={ponto.nome} />
+                    {ponto.imagemCredito && (
+                      <a
+                        className="ponto-capa__credito"
+                        href={ponto.imagemFonte ?? undefined}
+                        target="_blank"
+                        rel="noreferrer"
+                      >
+                        {ponto.imagemCredito}
+                      </a>
+                    )}
+                  </>
                 ) : (
                   <Icone nome={iconeDaCategoria(ponto.categoria)} className="ponto-capa__icone" />
                 )}
@@ -367,6 +387,11 @@ function PontoDetalhes() {
                       <span className="meta-item__value">
                         {ponto.horarioFuncionamento ?? "Não informado"}
                       </span>
+                      {!ponto.horarioFuncionamento && podeSugerir && !sugestaoEnviada && (
+                        <button type="button" className="link-botao small" onClick={aoInformarHorario}>
+                          Conhece o horário? Informe aqui
+                        </button>
+                      )}
                     </div>
                   </li>
 
@@ -410,6 +435,23 @@ function PontoDetalhes() {
                     </li>
                   )}
                 </ul>
+
+                {ponto.idOsm && (
+                  <p className="ponto-fonte muted small">
+                    Dados do{" "}
+                    <a href={`https://www.openstreetmap.org/${ponto.idOsm}`} target="_blank" rel="noreferrer">
+                      OpenStreetMap
+                    </a>{" "}
+                    (© colaboradores do OpenStreetMap, licença{" "}
+                    <a href="https://www.openstreetmap.org/copyright" target="_blank" rel="noreferrer">
+                      ODbL
+                    </a>
+                    ), complementados pela comunidade do NomadPlan
+                    {ponto.sincronizadoEm
+                      ? `. Última importação em ${new Date(ponto.sincronizadoEm).toLocaleDateString("pt-BR")}.`
+                      : "."}
+                  </p>
+                )}
               </section>
 
               {autenticado && ponto.status === "PUBLICADO" && (
@@ -469,8 +511,8 @@ function PontoDetalhes() {
                 </button>
               )}
 
-              {autenticado && !ehResponsavel && ponto.status === "PUBLICADO" && (
-                <section className="card card--pad stack stack--sm">
+              {podeSugerir && (
+                <section className="card card--pad stack stack--sm" ref={secaoSugestao}>
                   <h2 className="ponto-lateral__titulo">Dados desatualizados?</h2>
 
                   {sugestaoEnviada ? (

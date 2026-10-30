@@ -1,5 +1,8 @@
 export type StatusPonto = "RASCUNHO" | "PUBLICADO" | "PENDENTE_VERIFICACAO" | "REJEITADO";
 
+/** Como o registro entrou no sistema (RNF19). */
+export type OrigemPonto = "USUARIO" | "IMPORTACAO" | "API";
+
 export interface Ponto {
   id: number;
   nome: string;
@@ -15,8 +18,15 @@ export interface Ponto {
   telefoneContato: string | null;
   horarioFuncionamento: string | null;
   imagemUrl: string | null;
+  /** Autor e licença da foto quando ela veio do Wikimedia Commons. */
+  imagemCredito?: string | null;
+  imagemFonte?: string | null;
   status: StatusPonto;
   seloVerificado: boolean;
+  origem?: OrigemPonto;
+  /** Elemento do OpenStreetMap de onde vieram os dados ("node/123"). */
+  idOsm?: string | null;
+  sincronizadoEm?: string | null;
   motivoRejeicao?: string | null;
   dataCriacao?: string;
   dataAtualizacao?: string;

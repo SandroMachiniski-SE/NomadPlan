@@ -16,6 +16,9 @@ const ABERTO_APOS_CHEGADA_MIN = 60;
 // Meia hora de deslocamento "custa" um ponto de pontuação: um ponto que combina com o
 // interesse do usuário (+3) vale uma viagem de até 1h30 a mais.
 const MINUTOS_POR_PONTO_DE_SCORE = 30;
+// Cada parada já escolhida da mesma categoria tira 1,5 ponto: cinco restaurantes seguidos
+// combinam com o interesse "Gastronomia", mas não fazem um bom passeio.
+const PENALIDADE_CATEGORIA_REPETIDA = 1.5;
 
 export interface CandidatoRoteiro {
   id: number;
@@ -29,6 +32,7 @@ export interface CandidatoRoteiro {
   acessibilidade: string | null;
   horarioFuncionamento: string | null;
   imagemUrl: string | null;
+  imagemCredito: string | null;
   seloVerificado: boolean;
   mediaAvaliacao: number | null;
 }
@@ -139,6 +143,15 @@ export function pontuarCandidato(
   return pontos;
 }
 
+/**
+ * Na base aberta do OpenStreetMap, a maioria dos lugares ainda não tem foto nem horário.
+ * Entre opções equivalentes, o roteiro prefere as de cadastro mais completo: a pessoa
+ * consegue conferir o lugar antes de ir, e o horário conhecido evita chegar com ele fechado.
+ */
+export function bonusDeCadastro(candidato: Pick<CandidatoRoteiro, "imagemUrl" | "horarioFuncionamento">): number {
+  return (candidato.imagemUrl ? 0.5 : 0) + (candidato.horarioFuncionamento?.trim() ? 0.5 : 0);
+}
+
 function calcularCentroide(pontos: { latitude: number | null; longitude: number | null }[]) {
   const comCoordenadas = pontos.filter(
     (p): p is { latitude: number; longitude: number } => p.latitude !== null && p.longitude !== null,
@@ -188,11 +201,12 @@ export function planejarRoteiro(
 
   const restantes = candidatos.map((candidato) => ({
     candidato,
-    pontuacao: pontuarCandidato(candidato, params.interesses, preferencias),
+    pontuacao: pontuarCandidato(candidato, params.interesses, preferencias) + bonusDeCadastro(candidato),
   }));
 
   const escolhidos: PontoRecomendado[] = [];
-  const fechados = new Map<number, string>();
+  const fechados = new Map<number, { texto: string; pontuacao: number }>();
+  const porCategoria = new Map<string, number>();
   let relogio = new Date(params.dataHoraInicio);
 
   while (escolhidos.length < maxPontos && restantes.length > 0) {
@@ -217,10 +231,10 @@ export function planejarRoteiro(
 
         if (!abertura) {
           if (!fechados.has(candidato.id)) {
-            fechados.set(
-              candidato.id,
-              `${candidato.nome}: estaria fechado às ${formatarHora(chegada)} (horário: ${candidato.horarioFuncionamento}).`,
-            );
+            fechados.set(candidato.id, {
+              texto: `${candidato.nome}: estaria fechado às ${formatarHora(chegada)} (horário: ${candidato.horarioFuncionamento}).`,
+              pontuacao,
+            });
           }
           continue;
         }
@@ -235,7 +249,9 @@ export function planejarRoteiro(
         continue;
       }
 
-      const valor = pontuacao - (deslocamento + espera) / MINUTOS_POR_PONTO_DE_SCORE;
+      const repetidas = porCategoria.get(candidato.categoria.toLowerCase()) ?? 0;
+      const valor =
+        pontuacao - repetidas * PENALIDADE_CATEGORIA_REPETIDA - (deslocamento + espera) / MINUTOS_POR_PONTO_DE_SCORE;
 
       if (!melhor || valor > melhor.valor) {
         melhor = { indice, valor, metros, deslocamento, espera, chegada };
@@ -262,6 +278,7 @@ export function planejarRoteiro(
     });
 
     relogio = saida;
+    porCategoria.set(candidato.categoria.toLowerCase(), (porCategoria.get(candidato.categoria.toLowerCase()) ?? 0) + 1);
 
     if (candidato.latitude !== null && candidato.longitude !== null) {
       posicao = { latitude: candidato.latitude, longitude: candidato.longitude };
@@ -269,11 +286,13 @@ export function planejarRoteiro(
   }
 
   // RB07: pontos que ficaram de fora por estarem fechados na hora prevista viram aviso,
-  // com a justificativa, em vez de sumirem sem explicação.
+  // com a justificativa, em vez de sumirem sem explicação. Vêm primeiro os que mais
+  // combinavam com a pessoa (numa cidade grande, dezenas de bares estão fechados de manhã).
   const idsEscolhidos = new Set(escolhidos.map((p) => p.id));
   const avisos = [...fechados]
     .filter(([id]) => !idsEscolhidos.has(id))
-    .map(([, texto]) => texto)
+    .sort(([, a], [, b]) => b.pontuacao - a.pontuacao)
+    .map(([, { texto }]) => texto)
     .slice(0, 5);
 
   return { pontos: escolhidos, avisos };
@@ -297,6 +316,7 @@ async function buscarCandidatos(cidade: string): Promise<CandidatoRoteiro[]> {
       acessibilidade: true,
       horarioFuncionamento: true,
       imagemUrl: true,
+      imagemCredito: true,
       seloVerificado: true,
     },
   });

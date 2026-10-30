@@ -10,7 +10,8 @@ Procedimentos para quem executa o NomadPlan fora do ambiente de desenvolvimento 
 | Frontend | Aplicação React compilada (`frontend/dist/`) | Arquivos estáticos; sirva com Nginx, Caddy, GitHub Pages, Netlify etc. A URL da API é definida **na compilação** por `VITE_API_URL`. |
 | Banco | PostgreSQL 16 com PostGIS | Imagem `postgis/postgis:16-3.4` no `docker-compose.yml`. |
 | Imagens enviadas | Pasta `UPLOADS_DIR` (padrão `backend/uploads`) | Precisa de disco persistente e entra no backup. |
-| E-mail | Servidor SMTP externo | Só para recuperação de senha; ver README. |
+| E-mail | Servidor SMTP externo | Recuperação de senha e convites de roteiro; ver README. |
+| Dados do OpenStreetMap | Arquivos em `backend/prisma/dados/osm/` | Inventário real das cidades, baixado da Overpass API. Ver *Dados reais* abaixo. |
 
 ## Variáveis de ambiente da API (`backend/.env`)
 
@@ -43,7 +44,27 @@ VITE_API_URL=https://api.exemplo.com.br npm run build   # gera frontend/dist
 1. **Antes** de `migrate deploy`, faça um backup (abaixo). As migrations são escritas à mão e não têm reversão automática.
 2. Coloque a API atrás de um proxy reverso com **HTTPS** (Nginx, Caddy). A API em si fala HTTP.
 3. Confira a saúde: `GET /health` deve responder `{"status":"ok"}`.
-4. Crie o primeiro administrador: cadastre-se pela tela de cadastro e promova a conta direto no banco: `UPDATE usuario SET tipo_conta = 'ADMIN' WHERE email = '...';`. Não use `npm run prisma:seed` em produção (cria contas de demonstração com senha conhecida; o comando recusa rodar com `NODE_ENV=production`).
+4. Carregue o inventário real das cidades: `npm run osm:importar` (ver *Dados reais*).
+5. Crie o primeiro administrador: cadastre-se pela tela de cadastro e promova a conta direto no banco: `UPDATE usuario SET tipo_conta = 'ADMIN' WHERE email = '...';`. Não use `npm run prisma:seed` em produção (cria contas de demonstração com senha conhecida; o comando recusa rodar com `NODE_ENV=production`).
+
+## Dados reais (OpenStreetMap)
+
+O inventário inicial vem do [OpenStreetMap](https://www.openstreetmap.org) (OSM), uma base aberta mantida por voluntários, com licença [ODbL](https://www.openstreetmap.org/copyright). As fotos e descrições curtas vêm do Wikidata e do Wikimedia Commons, que têm licenças livres e exigem o crédito do autor. O NomadPlan mostra os dois créditos na página do ponto.
+
+São dois passos. Baixar fica separado de importar para que o seed, o CI e quem clona o projeto tenham os mesmos dados sem depender de um servidor externo:
+
+```bash
+cd backend
+npm run osm:baixar -- Joinville Florianópolis Blumenau   # consulta a Overpass API e grava prisma/dados/osm/<cidade>.json
+npm run osm:importar                                     # leva todos os arquivos da pasta ao banco
+```
+
+- **Outras cidades:** use o nome oficial com acentos. A UF é `SC` por padrão; para outro estado, passe `--uf PR`. Cada cidade é uma consulta de 30 s a 1 min, e o script espera alguns segundos entre elas. Se a Overpass estiver ocupada (`429`/`504`), tente mais tarde ou use um espelho com `OVERPASS_URL=https://overpass.kumi.systems/api/interpreter`.
+- **O que entra:** lugares com nome de interesse turístico, como museus, teatros, patrimônio histórico, mirantes, praias, parques, restaurantes, cafés, bares, hotéis, pousadas, shoppings, mercados e igrejas de interesse histórico. Ficam de fora lanchonetes de rede, praças de bairro, residências antigas e o que estiver marcado como privado ou desativado. O mapeamento de etiquetas para categorias fica em `backend/src/lib/osm.ts`.
+- **Horários:** o formato do OSM (`Mo-Fr 09:00-18:00; Sa 09:00-13:00`) é convertido para o do sistema (`Seg-Sex 9h-18h; Sáb 9h-13h`), em `backend/src/lib/horariosOsm.ts`. O que não dá para converter com segurança, como variação por mês ou horário sem fim, fica como "não informado", e a página do ponto convida a comunidade a informar.
+- **Atualizar:** rode os dois comandos de novo quando quiser. A importação não duplica pontos (usa o `id_osm`). Nos pontos que já existem, só preenche os campos vazios: o que a comunidade e os responsáveis editaram nunca é sobrescrito, e cada complemento vira uma versão no histórico. Um ponto **rejeitado** pela moderação não volta. Para tirar um ponto importado do ar, rejeite-o em vez de excluí-lo.
+- **Pontos de exemplo antigos:** bancos criados com versões anteriores do seed têm 110 pontos fictícios ("Natureza Joinville #1"...). `npm run osm:importar -- --remover-ficticios` apaga esses pontos, junto com as avaliações, favoritos e sugestões ligados a eles. Os que estiverem em algum roteiro são mantidos.
+- Cada importação fica no log de auditoria (`importar_osm`, com o resumo).
 
 ## Rollback (RNF24)
 

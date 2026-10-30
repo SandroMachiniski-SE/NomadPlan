@@ -1,6 +1,6 @@
 import { Router, Request, Response, NextFunction } from "express";
 import { z } from "zod";
-import { Prisma, PontoTuristico, StatusPonto, StatusSolicitacao, TipoConta } from "@prisma/client";
+import { OrigemRegistro, Prisma, PontoTuristico, StatusPonto, StatusSolicitacao, TipoConta } from "@prisma/client";
 import prisma from "../lib/prisma";
 import { autenticar, autenticarOpcional, autorizar } from "../middleware/auth";
 import { receberImagem, caminhoPublicoImagem } from "../middleware/upload";
@@ -28,6 +28,7 @@ import { ehViolacaoDeUnicidade } from "../lib/prismaErros";
 import { removerArquivoLocal, removerArquivoPublico } from "../lib/arquivos";
 import { registrarEvento } from "../lib/metricasUso";
 import { pontosDeUsuariosSemelhantes } from "../lib/similaridade";
+import { bonusDeCadastro } from "../lib/recomendacao";
 import { preferenciasAtendidas } from "../lib/preferencias";
 
 const pontosRouter = Router();
@@ -365,6 +366,8 @@ const COLUNAS_EXPORTACAO = [
   "horarioFuncionamento",
   "status",
   "seloVerificado",
+  "origem",
+  "idOsm",
 ];
 
 // RF17: exportação de dados para gestores/pesquisadores em CSV ou GeoJSON.
@@ -414,6 +417,8 @@ pontosRouter.get(
                 telefoneContato: p.telefoneContato,
                 horarioFuncionamento: p.horarioFuncionamento,
                 seloVerificado: p.seloVerificado,
+                origem: p.origem,
+                idOsm: p.idOsm,
               },
             })),
         };
@@ -641,6 +646,7 @@ pontosRouter.post(
             telefoneContato: dados.telefoneContato || null,
             horarioFuncionamento: dados.horarioFuncionamento || null,
             status: StatusPonto.RASCUNHO,
+            origem: OrigemRegistro.IMPORTACAO,
             idResponsavel: req.usuario!.id,
           },
           select: { id: true, nome: true, endereco: true, latitude: true, longitude: true },
@@ -709,8 +715,9 @@ pontosRouter.get("/recomendados", autenticar, async (req: Request, res: Response
                 ? { cidade: { equals: usuario.cidadeBase, mode: "insensitive" } }
                 : {}),
             },
-            orderBy: [{ seloVerificado: "desc" }, { nome: "asc" }],
-            take: 24,
+            // Os com foto primeiro; a ordem final (abaixo) pesa o cadastro completo.
+            orderBy: [{ seloVerificado: "desc" }, { imagemUrl: { sort: "asc", nulls: "last" } }, { nome: "asc" }],
+            take: 200,
             select: pontoSelecaoPublica,
           })
         : [];
@@ -725,8 +732,9 @@ pontosRouter.get("/recomendados", autenticar, async (req: Request, res: Response
       .map((ponto) => ({
         ponto,
         atendidas: preferenciasAtendidas(ponto.acessibilidade, usuario.preferenciasAcessibilidade),
+        completude: bonusDeCadastro(ponto) + (ponto.siteOficial ? 0.25 : 0) + (ponto.acessibilidade ? 0.25 : 0),
       }))
-      .sort((a, b) => b.atendidas - a.atendidas)
+      .sort((a, b) => b.atendidas - a.atendidas || b.completude - a.completude)
       .map(({ ponto }) => ({ ...ponto, motivoRecomendacao: "interesses" as const }));
 
     const dados = [...porSimilaridade, ...porInteresse].slice(0, 12);
@@ -953,7 +961,8 @@ pontosRouter.post(
       try {
         atualizado = await prisma.pontoTuristico.update({
           where: { id: ponto.id },
-          data: { imagemUrl: novaUrl },
+          // A foto enviada substitui a que veio de fora, e com ela o crédito.
+          data: { imagemUrl: novaUrl, imagemCredito: null, imagemFonte: null },
           select: pontoSelecaoCompleta,
         });
       } catch (erro) {

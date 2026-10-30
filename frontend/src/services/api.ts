@@ -34,8 +34,9 @@ export function limparToken(): void {
 }
 
 /** Endereço completo de um arquivo enviado (imagens de pontos e de avaliações). */
+/** Arquivos enviados ficam na API ("/uploads/..."); fotos importadas já vêm com o endereço completo. */
 export function urlDoArquivo(caminho: string): string {
-  return `${api.defaults.baseURL}${caminho}`;
+  return /^https?:\/\//.test(caminho) ? caminho : `${api.defaults.baseURL}${caminho}`;
 }
 
 api.interceptors.request.use((config) => {

@@ -79,6 +79,15 @@ describe("busca de pontos turísticos", () => {
       assert.deepEqual(nomes(r), ["Praia Brava", "Grande Praia Norte", "Parque"]);
     });
 
+    it("sem termo de busca, mostra primeiro os verificados e os de cadastro mais completo", async () => {
+      await criarPonto({ nome: "A sem nada", horarioFuncionamento: null });
+      await criarPonto({ nome: "B com foto", horarioFuncionamento: null, imagemUrl: "https://upload.wikimedia.org/b.jpg" });
+      await criarPonto({ nome: "C verificado", horarioFuncionamento: null, seloVerificado: true });
+      await criarPonto({ nome: "D com horário", horarioFuncionamento: "Seg-Sex 9h-18h" });
+
+      assert.deepEqual(nomes(await api("GET", "/pontos")), ["C verificado", "B com foto", "D com horário", "A sem nada"]);
+    });
+
     it("trata % e _ digitados como texto comum, não como curinga", async () => {
       await criarPonto({ nome: "Promoção 100% off" });
       await criarPonto({ nome: "Praça Central" });

@@ -1,7 +1,7 @@
 import "./ambienteE2e";
 import { execSync } from "child_process";
 import bcrypt from "bcryptjs";
-import { PrismaClient, StatusPonto } from "@prisma/client";
+import { OrigemRegistro, PrismaClient, StatusPonto } from "@prisma/client";
 import prisma from "../lib/prisma";
 import { urlDoBancoE2e } from "./ambienteE2e";
 import { CONTAS_E2E, SENHA_E2E } from "./contasE2e";
@@ -114,6 +114,27 @@ async function recarregarDados(): Promise<void> {
       },
     });
   }
+
+  // Ponto como os importados do OpenStreetMap: sem responsável, sem horário e com foto
+  // de terceiros (aqui, uma imagem do próprio frontend, para o teste não depender da rede).
+  await prisma.pontoTuristico.create({
+    data: {
+      nome: "Fortaleza do OpenStreetMap E2E",
+      categoria: "Cultura",
+      cidade: "Florianópolis",
+      latitude: -27.5969,
+      longitude: -48.5495,
+      descricao: "Fortaleza.",
+      status: StatusPonto.PUBLICADO,
+      origem: OrigemRegistro.API,
+      idOsm: "node/999999001",
+      sincronizadoEm: new Date("2026-10-27T12:00:00Z"),
+      // Porta do frontend nos testes (ver e2e/playwright.config.ts).
+      imagemUrl: "http://localhost:5190/emblema.png",
+      imagemCredito: "Foto: Autora de Teste (CC BY-SA 4.0), via Wikimedia Commons",
+      imagemFonte: "https://commons.wikimedia.org/wiki/File:Teste.jpg",
+    },
+  });
 }
 
 async function main() {

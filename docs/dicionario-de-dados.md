@@ -8,6 +8,7 @@ Banco PostgreSQL 16 com a extensão PostGIS. O esquema é definido em `backend/p
 | --- | --- |
 | `TipoConta` | `VISITANTE`, `MORADOR`, `NEGOCIO`, `GESTOR`, `MODERADOR`, `ADMIN` |
 | `StatusPonto` | `RASCUNHO`, `PENDENTE_VERIFICACAO` (aguardando moderação), `PUBLICADO`, `REJEITADO` |
+| `OrigemRegistro` | `USUARIO` (cadastro pela tela), `IMPORTACAO` (arquivo CSV/GeoJSON), `API` (OpenStreetMap). RNF19. |
 | `PapelColaborador` | `EDITOR`, `LEITOR` (o dono é quem criou o roteiro, em `roteiro.id_usuario`) |
 | `StatusSolicitacao` | `PENDENTE`, `APROVADA`, `REJEITADA` (sugestões, verificações e avaliações) |
 
@@ -45,10 +46,14 @@ Banco PostgreSQL 16 com a extensão PostGIS. O esquema é definido em `backend/p
 | `selo_verificado` | booleano | Selo concedido pela moderação. |
 | `motivo_rejeicao` | texto | Preenchido ao rejeitar. |
 | `versao` | inteiro | Contador para o bloqueio otimista de edição (RB08). |
-| `id_responsavel` | FK → `usuario` | Dono do cadastro. |
+| `id_responsavel` | FK → `usuario` | Dono do cadastro. Nulo nos pontos importados do OpenStreetMap. |
+| `origem` | `OrigemRegistro` | Como o registro entrou no sistema (RNF19). Junto com `data_criacao`, `data_atualizacao`, `versao` e o histórico em `versao_ponto`, permite rastrear cada ponto. |
+| `id_osm` | texto, único | Elemento do OpenStreetMap de onde vieram os dados (`node/123`, `way/456`). Impede que uma nova importação duplique o ponto. Um ponto cadastrado à mão também pode ter, quando a importação o reconheceu pelo nome. |
+| `sincronizado_em` | timestamp | Última importação do OpenStreetMap que passou por este ponto. |
+| `imagem_credito`, `imagem_fonte` | texto | Autor, licença e página de origem da foto quando ela veio do Wikimedia Commons (a licença exige o crédito junto da imagem). Apagados quando alguém envia uma foto própria. |
 | `data_criacao`, `data_atualizacao` | timestamp | |
 
-Índices: `cidade`, `categoria`, `status`, `geom` (GiST).
+Índices: `cidade`, `categoria`, `status`, `id_osm` (único), `geom` (GiST).
 
 ### `avaliacao`
 
@@ -64,7 +69,7 @@ Banco PostgreSQL 16 com a extensão PostGIS. O esquema é definido em `backend/p
 
 ### `versao_ponto` e `versao_roteiro`
 
-Histórico de alterações (RF26). `id`, `id_ponto`/`id_roteiro` (FK, cascata), `dados` (JSON com o retrato completo antes da mudança), `id_autor`, `motivo` (pontos: `edicao`, `antes_de_restaurar` e os de sugestões aplicadas; roteiros: `edicao`, `adicionar_ponto`, `remover_ponto`, `reordenar`, `organizar`, `otimizar`, `antes_de_restaurar`), `data_criacao`. O roteiro guarda até 50 versões.
+Histórico de alterações (RF26). `id`, `id_ponto`/`id_roteiro` (FK, cascata), `dados` (JSON com o retrato completo antes da mudança), `id_autor`, `motivo` (pontos: `edicao`, `antes_de_restaurar`, os de sugestões aplicadas e `Complementado com dados do OpenStreetMap`; roteiros: `edicao`, `adicionar_ponto`, `remover_ponto`, `reordenar`, `organizar`, `otimizar`, `antes_de_restaurar`), `data_criacao`. O roteiro guarda até 50 versões.
 
 ### `roteiro` e `item_roteiro`
 
@@ -89,7 +94,7 @@ Favoritos. `id`, `id_usuario` (FK, cascata), `id_ponto` (FK, cascata), `data_cri
 
 ### `log_auditoria`
 
-Trilha de auditoria (RF20): `id`, `id_usuario` (nulo para ações do sistema ou tentativas anônimas), `acao` (ex.: `login_ok`, `login_falhou`, `login_bloqueado`, `alerta_forca_bruta`, `alterar_papel`, `desativar_conta`, `exportar`, `importar`), `entidade`, `id_entidade`, `detalhes` (JSON; nunca guarda senhas nem e-mails digitados), `data_criacao`.
+Trilha de auditoria (RF20): `id`, `id_usuario` (nulo para ações do sistema ou tentativas anônimas), `acao` (ex.: `login_ok`, `login_falhou`, `login_bloqueado`, `alerta_forca_bruta`, `alterar_papel`, `desativar_conta`, `exportar`, `importar`, `importar_osm`), `entidade`, `id_entidade`, `detalhes` (JSON; nunca guarda senhas nem e-mails digitados), `data_criacao`.
 
 ### `metrica_diaria`
 

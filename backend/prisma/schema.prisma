@@ -23,6 +23,13 @@ enum StatusPonto {
   REJEITADO
 }
 
+// RNF19: como o registro entrou no sistema.
+enum OrigemRegistro {
+  USUARIO
+  IMPORTACAO
+  API
+}
+
 enum PapelColaborador {
   EDITOR
   LEITOR
@@ -95,6 +102,16 @@ model PontoTuristico {
   dataCriacao          DateTime    @default(now()) @map("data_criacao")
   dataAtualizacao      DateTime    @updatedAt @map("data_atualizacao")
   idResponsavel        Int?        @map("id_responsavel")
+
+  // Origem do registro (RNF19). Pontos vindos do OpenStreetMap guardam o elemento de
+  // origem ("node/123", "way/456") para a próxima importação atualizar em vez de duplicar.
+  origem         OrigemRegistro @default(USUARIO)
+  idOsm          String?        @unique @map("id_osm")
+  sincronizadoEm DateTime?      @map("sincronizado_em")
+  // Crédito e página de origem da foto quando ela não foi enviada por um usuário
+  // (Wikimedia Commons: autor e licença precisam aparecer junto da imagem).
+  imagemCredito String? @map("imagem_credito")
+  imagemFonte   String? @map("imagem_fonte")
 
   // Coluna geográfica (PostGIS), gerada pelo Postgres a partir de latitude/longitude —
   // ver migration modulo3_geom_indice_geografico. O Prisma não modela colunas

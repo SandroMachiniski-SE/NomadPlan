@@ -4,6 +4,7 @@ Plataforma de turismo inteligente que centraliza o inventário turístico das ci
 
 ## ✨ Funcionalidades
 
+- **Dados reais:** cerca de 2 mil lugares de Joinville, Florianópolis e Blumenau importados do OpenStreetMap, com fotos do Wikimedia Commons (com autor e licença). Novas cidades entram com dois comandos, e a comunidade completa o que falta, como horários e acessibilidade.
 - **Explorar:** busca por cidade, categoria, texto, acessibilidade, faixa de preço, nota mínima, "aberto agora" e proximidade (raio a partir da localização), com ordenação por relevância, distância, nome ou avaliação; mapa interativo.
 - **Pontos salvos (favoritos)** e **recomendações** baseadas nos interesses do perfil e no gosto de usuários parecidos.
 - **Roteiros:** viagens de vários **dias** (com as datas e o dia da semana), mapa com paradas numeradas e trajeto de cada dia, **tempo e distância estimados entre as paradas**, botão para **otimizar a ordem** pelo caminho mais curto, **orçamento** (custo por parada, total por dia e teto de gastos), **checklist** e **notas** da viagem, **colaboração** (convites por e-mail com papéis de editor e leitor, atualização automática entre os participantes), compartilhamento por link público, histórico de versões com restauração e **geração automática** com horários estimados de chegada e saída, deslocamento e espera.
@@ -52,7 +53,21 @@ Pré-requisitos: Node.js 22+, Docker Desktop e Git. Rode cada etapa a partir da 
    ```
    Depois acesse http://localhost:5173.
 
-Contas de demonstração criadas pelo `prisma:seed` (senha `senha-temporaria`): `admin@nomadplan.local`, `moderador@nomadplan.local`, `negocio@nomadplan.local` e `morador@nomadplan.local`. O seed também cadastra 113 pontos em Joinville, Florianópolis e Blumenau e pode ser repetido sem duplicar nada. Ele **recusa rodar em produção**.
+Contas de demonstração criadas pelo `prisma:seed` (senha `senha-temporaria`): `admin@nomadplan.local`, `moderador@nomadplan.local`, `negocio@nomadplan.local` e `morador@nomadplan.local`. O seed também cadastra os pontos reais de Joinville, Florianópolis e Blumenau (cerca de 2 mil, vindos do OpenStreetMap; ver abaixo) e pode ser repetido sem duplicar nada. Ele **recusa rodar em produção**.
+
+### Dados reais (OpenStreetMap)
+
+Os pontos vêm do [OpenStreetMap](https://www.openstreetmap.org), uma base aberta e gratuita, e ficam salvos em `backend/prisma/dados/osm/`. As fotos vêm do Wikimedia Commons. Para atualizar ou incluir outra cidade:
+
+```bash
+cd backend
+npm run osm:baixar -- Joinville Florianópolis Blumenau "Balneário Camboriú"
+npm run osm:importar
+```
+
+A importação não duplica pontos e nunca sobrescreve o que a comunidade editou: só preenche campos vazios. Banco criado com uma versão antiga do seed? `npm run osm:importar -- --remover-ficticios` tira os 110 pontos fictícios de antes. Detalhes em [docs/operacao.md](docs/operacao.md#dados-reais-openstreetmap).
+
+Dados © colaboradores do OpenStreetMap, sob a licença [ODbL](https://www.openstreetmap.org/copyright). Fotos do Wikimedia Commons, com autor e licença indicados em cada ponto.
 
 ## 🧪 Testes
 
@@ -75,7 +90,7 @@ npx playwright test
 ```
 
 - Os testes de **integração** sobem a API de verdade e conversam por HTTP com um PostgreSQL real, cobrindo autenticação (inclusive 2FA e bloqueio de login), pontos, busca, contribuições, moderação, importação, roteiros, favoritos, notificações, administração e limites de taxa. Cada teste começa com o banco limpo.
-- Os testes **de ponta a ponta** (Playwright, 72 cenários) percorrem os fluxos principais no navegador: cadastro e login, busca e filtros, favoritos, avaliações com foto, cadastro e moderação de pontos, roteiros (manuais e gerados), perfil, 2FA, LGPD e administração. No computador usam o Microsoft Edge instalado; no CI, o Chromium.
+- Os testes **de ponta a ponta** (Playwright, 74 cenários) percorrem os fluxos principais no navegador: cadastro e login, busca e filtros, favoritos, avaliações com foto, cadastro e moderação de pontos, roteiros (manuais, gerados e colaborativos), pontos importados do OpenStreetMap, perfil, 2FA, LGPD e administração. No computador usam o Microsoft Edge instalado; no CI, o Chromium.
 - A cada *push*, o GitHub Actions executa tudo isso (`.github/workflows/ci.yml`).
 - Teste de carga: [docs/relatorio-de-carga.md](docs/relatorio-de-carga.md).
 

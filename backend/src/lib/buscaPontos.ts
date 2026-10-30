@@ -41,6 +41,7 @@ export interface PontoBusca {
   telefoneContato: string | null;
   horarioFuncionamento: string | null;
   imagemUrl: string | null;
+  imagemCredito: string | null;
   status: string;
   seloVerificado: boolean;
   mediaAvaliacao: number | null;
@@ -65,8 +66,7 @@ function contem(texto: string): string {
 }
 
 function montarOrdenacao(filtros: FiltrosBusca, comCoordenadas: boolean): Prisma.Sql {
-  const ordenacao: Ordenacao =
-    filtros.ordenar ?? (comCoordenadas ? "distancia" : filtros.busca ? "relevancia" : "nome");
+  const ordenacao: Ordenacao = filtros.ordenar ?? (comCoordenadas ? "distancia" : "relevancia");
 
   switch (ordenacao) {
     case "distancia":
@@ -84,7 +84,16 @@ function montarOrdenacao(filtros: FiltrosBusca, comCoordenadas: boolean): Prisma
           END,`
         : Prisma.empty;
 
-      return Prisma.sql`${peso} p.selo_verificado DESC, a.media DESC NULLS LAST, p.nome ASC`;
+      // Entre pontos igualmente bem avaliados, vêm primeiro os de cadastro mais completo:
+      // com a base importada do OpenStreetMap, muitos ainda não têm foto nem horário.
+      const completude = Prisma.sql`(
+        CASE WHEN p.imagem_url IS NOT NULL THEN 2 ELSE 0 END
+        + CASE WHEN p.horario_funcionamento IS NOT NULL THEN 1 ELSE 0 END
+        + CASE WHEN p.site_oficial IS NOT NULL THEN 1 ELSE 0 END
+        + CASE WHEN p.acessibilidade IS NOT NULL THEN 1 ELSE 0 END
+      )`;
+
+      return Prisma.sql`${peso} p.selo_verificado DESC, a.media DESC NULLS LAST, ${completude} DESC, p.nome ASC`;
     }
     default:
       return Prisma.sql`p.nome ASC`;
@@ -131,7 +140,7 @@ export async function buscarPontos(filtros: FiltrosBusca): Promise<ResultadoBusc
       p.id, p.nome, p.descricao, p.categoria, p.cidade, p.endereco, p.latitude, p.longitude,
       p.faixa_preco AS "faixaPreco", p.acessibilidade, p.site_oficial AS "siteOficial",
       p.telefone_contato AS "telefoneContato", p.horario_funcionamento AS "horarioFuncionamento",
-      p.imagem_url AS "imagemUrl", p.status::text AS status, p.selo_verificado AS "seloVerificado",
+      p.imagem_url AS "imagemUrl", p.imagem_credito AS "imagemCredito", p.status::text AS status, p.selo_verificado AS "seloVerificado",
       a.media AS "mediaAvaliacao", COALESCE(a.total, 0) AS "totalAvaliacoes"
       ${distancia}
     FROM ponto_turistico p

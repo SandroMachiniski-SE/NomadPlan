@@ -15,7 +15,7 @@ Este documento resume os controles de segurança do sistema, organizados pelo OW
 | A07 | Falhas de identificação e autenticação | Bloqueio após 3 senhas erradas por e-mail e 10 por IP (janela de 15 min) com alerta aos administradores quando há sequência de bloqueios; verificação em duas etapas (TOTP, RFC 6238) com proteção contra reutilização do código; tempo de resposta do login igual para e-mails existentes e inexistentes; recuperação de senha sem revelar quais e-mails existem; sessão expira e é renovada enquanto válida. |
 | A08 | Falhas de integridade | Uploads validados pelo **conteúdo** (assinatura do arquivo), não só pelo nome ou tipo informado; extensão gravada derivada do tipo real; limite de 5 MB (imagens) e 2 MB (importações). Nenhuma desserialização de dados não confiáveis; dependências travadas pelos arquivos de lock. |
 | A09 | Falhas de registro e monitoramento | Log de auditoria (RF20) para ações sensíveis: login, falhas e bloqueios, mudança de papel, desativação de conta, importação e exportação, moderação. O e-mail digitado em tentativas falhas **não** é gravado. Alerta automático de possível força bruta. Métricas de uso agregadas. |
-| A10 | SSRF | O servidor nunca busca URLs informadas por usuários (o campo "site oficial" é apenas armazenado e exibido como link). |
+| A10 | SSRF | O servidor nunca busca URLs informadas por usuários (o campo "site oficial" é apenas armazenado e exibido como link). Só o script de linha de comando `osm:baixar` acessa a internet, e apenas endereços fixos (Overpass API, Wikidata e Wikimedia Commons). Sites vindos do OpenStreetMap só são aceitos com `http(s)`. |
 
 ## Privacidade (LGPD)
 
@@ -23,6 +23,7 @@ Este documento resume os controles de segurança do sistema, organizados pelo OW
 - Portabilidade: o próprio usuário baixa seus dados em JSON (Perfil → *Baixar meus dados*).
 - Exclusão: o usuário anonimiza a conta pelo Perfil, confirmando com a senha (e o código do 2FA). Detalhes no [dicionário de dados](dicionario-de-dados.md#dados-pessoais-lgpd).
 - Minimização: o e-mail nunca é exibido a outros usuários; a localização usada em buscas "perto de mim" não é gravada.
+- Serviços de terceiros carregados pelo navegador: as imagens do mapa (OpenStreetMap) e as fotos importadas do Wikimedia Commons vêm direto desses servidores, que recebem o endereço IP de quem visualiza a página, como em qualquer site que usa esses serviços. Nenhum dado da conta é enviado a eles.
 
 ## Riscos aceitos
 

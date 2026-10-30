@@ -30,6 +30,7 @@ function PontoCard({ ponto, compacto = false }: PontoCardProps) {
             <img
               src={urlDoArquivo(ponto.imagemUrl)}
               alt=""
+              title={ponto.imagemCredito ?? undefined}
               loading="lazy"
               className="ponto-card__imagem"
             />

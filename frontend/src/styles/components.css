@@ -91,6 +91,24 @@
   font-size: 0.875rem;
 }
 
+/* Ação discreta com cara de link, no meio de um texto. */
+.link-botao {
+  display: inline;
+  padding: 0;
+  border: 0;
+  background: none;
+  color: var(--primary-text);
+  font: inherit;
+  text-decoration: underline;
+  text-decoration-thickness: 1px;
+  text-underline-offset: 3px;
+  cursor: pointer;
+}
+
+.link-botao.small {
+  font-size: 0.875rem;
+}
+
 .text-center {
   text-align: center;
 }

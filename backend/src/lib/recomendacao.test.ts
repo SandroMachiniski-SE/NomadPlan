@@ -1,6 +1,7 @@
 import { describe, it } from "node:test";
 import assert from "node:assert/strict";
 import {
+  bonusDeCadastro,
   calcularMaxPontos,
   DURACAO_VISITA_MIN,
   inicioPadrao,
@@ -28,6 +29,7 @@ function candidato(parcial: Partial<CandidatoRoteiro> = {}): CandidatoRoteiro {
     acessibilidade: null,
     horarioFuncionamento: "Todos os dias, 24h",
     imagemUrl: null,
+    imagemCredito: null,
     seloVerificado: false,
     mediaAvaliacao: null,
     ...parcial,
@@ -186,6 +188,46 @@ describe("planejarRoteiro", () => {
 
     assert.equal(pontos.length, 1);
     assert.equal(pontos[0].distanciaMetros, null);
+  });
+
+  it("varia as categorias: não monta um passeio só de restaurantes", () => {
+    // Três restaurantes vizinhos e um museu a uns 2 km; todos combinam com os interesses.
+    const restaurantes = [-48.84, -48.8401, -48.8402].map((longitude, i) =>
+      candidato({ nome: `Restaurante ${i + 1}`, categoria: "Gastronomia", longitude }),
+    );
+    const museu = candidato({ nome: "Museu", categoria: "Cultura", longitude: -48.82 });
+
+    const { pontos } = planejarRoteiro(
+      [...restaurantes, museu],
+      params({ interesses: ["Gastronomia", "Cultura"], horasDisponiveis: 4, latitude: -26.3, longitude: -48.84 }),
+    );
+
+    assert.equal(pontos.length, 2);
+    assert.deepEqual(pontos.map((p) => p.categoria).sort(), ["Cultura", "Gastronomia"]);
+  });
+
+  it("entre opções equivalentes, prefere o ponto com foto e horário conhecidos", () => {
+    const semDados = candidato({ nome: "Sem dados", horarioFuncionamento: null });
+    const completo = candidato({ nome: "Completo", imagemUrl: "https://upload.wikimedia.org/x.jpg" });
+
+    const { pontos } = planejarRoteiro([semDados, completo], params({ horasDisponiveis: 1.5 }));
+
+    assert.deepEqual(pontos.map((p) => p.nome), ["Completo"]);
+    assert.equal(bonusDeCadastro(completo), 1);
+    assert.equal(bonusDeCadastro(semDados), 0);
+  });
+
+  it("nos avisos de fechado, mostra primeiro os pontos que mais combinavam com a pessoa", () => {
+    const bares = Array.from({ length: 6 }, (_, i) =>
+      candidato({ nome: `Bar ${i + 1}`, categoria: "Gastronomia", horarioFuncionamento: "Todos os dias, 18h-23h" }),
+    );
+    const museu = candidato({ nome: "Museu fechado", categoria: "Cultura", horarioFuncionamento: "Seg fechado; Ter-Dom 9h-17h" });
+    const aberto = candidato({ nome: "Praça" });
+
+    const { avisos } = planejarRoteiro([...bares, museu, aberto], params({ interesses: ["Cultura"], horasDisponiveis: 1.5 }));
+
+    assert.equal(avisos.length, 5);
+    assert.match(avisos[0], /^Museu fechado: estaria fechado às 10:00/);
   });
 });
 

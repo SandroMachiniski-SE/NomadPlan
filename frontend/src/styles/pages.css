@@ -811,6 +811,35 @@ fieldset.field {
   object-fit: cover;
 }
 
+/* Autor e licença da foto importada (Wikimedia Commons), exigidos pela licença. */
+.ponto-capa__credito {
+  position: absolute;
+  right: 0.5rem;
+  bottom: 0.5rem;
+  max-width: calc(100% - 1rem);
+  padding: 0.2rem 0.55rem;
+  overflow: hidden;
+  border-radius: var(--radius-sm);
+  background: rgba(0, 0, 0, 0.55);
+  color: #fff;
+  font-size: 0.72rem;
+  line-height: 1.4;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  text-decoration: none;
+}
+
+.ponto-capa__credito:hover,
+.ponto-capa__credito:focus-visible {
+  text-decoration: underline;
+}
+
+.ponto-fonte {
+  margin-top: 0.75rem;
+  padding-top: 0.75rem;
+  border-top: 1px solid var(--border);
+}
+
 .ponto-capa__icone {
   width: 84px;
   height: 84px;
