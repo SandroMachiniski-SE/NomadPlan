@@ -1,6 +1,6 @@
 """Substitui o texto-modelo das seções 8 a 13 do RFC.docx pelo conteúdo real do NomadPlan.
 
-Uso: python rfc_preparar_figuras.py && python rfc_secoes_8_13.py [cobertura] [testes]
+Uso: python rfc_preparar_figuras.py && python rfc_secoes_8_13.py [cobertura] [testes] [testes_e2e]
 Depois: python rfc_para_pdf.py. Refaz as seções 8 a 13 a cada execução (pode rodar de novo sobre o RFC.docx já preenchido)."""
 import copy
 import re
@@ -18,8 +18,9 @@ RAIZ = Path(__file__).resolve().parent
 RFC = RAIZ.parents[1] / "RFC.docx"
 FIGS = RAIZ / "rfc_figuras"
 DIAG = RAIZ / "rfc_diagramas"
-COBERTURA = sys.argv[1] if len(sys.argv) > 1 else "91%"
-TESTES = sys.argv[2] if len(sys.argv) > 2 else "393"
+COBERTURA = sys.argv[1] if len(sys.argv) > 1 else "92%"
+TESTES = sys.argv[2] if len(sys.argv) > 2 else "421"
+TESTES_E2E = sys.argv[3] if len(sys.argv) > 3 else "74"
 
 doc = Document(RFC)
 ps = doc.paragraphs
@@ -241,8 +242,9 @@ par(
     "As imagens desta seção são **capturas do sistema implementado**, não desenhos feitos antes do código: "
     "as telas foram prototipadas diretamente em React, sobre um conjunto de componentes e uma paleta próprios "
     "(verde-petróleo para ação principal, coral para destaque e confirmação). A interface é responsiva e funciona "
-    "no computador e no celular. Os dados exibidos (pontos, roteiros e nomes de usuários) são de demonstração, "
-    "gerados pelo seed do projeto e pelos testes de ponta a ponta."
+    "no computador e no celular. As telas de busca e de detalhe mostram **pontos reais**, importados do "
+    "OpenStreetMap (seção 9.5); os roteiros e os nomes de usuários das demais telas são de demonstração, criados "
+    "pelos testes de ponta a ponta."
 )
 par("Princípios de experiência que orientaram o desenho das telas:", manter=True)
 lista(
@@ -291,7 +293,8 @@ figura(FIGS / "celular.png", "Versão para celular da tela inicial.", 5.2)
 h3("Detalhe do ponto turístico (RF10, RF05)")
 par(
     "Ficha completa do ponto: imagem, categoria, selo de verificação (quando concedido), endereço, horário, faixa de "
-    "preço, acessibilidade, mapa com o local e avaliações de outros usuários."
+    "preço, acessibilidade, mapa com o local e avaliações de outros usuários. Nos pontos importados, a ficha mostra o "
+    "crédito da foto (autor e licença) e a fonte dos dados, e convida quem está logado a informar o que falta, como o horário."
 )
 lista(
     [
@@ -299,7 +302,7 @@ lista(
         "Quando logado: salvar nos favoritos, adicionar a um roteiro, avaliar com nota e comentário e **sugerir edição** de dados desatualizados.",
     ]
 )
-figura(FIGS / "ponto.png", "Detalhe de um ponto turístico com mapa e avaliações.", 10.0)
+figura(FIGS / "ponto.png", "Detalhe de um ponto turístico importado do OpenStreetMap, com foto do Wikimedia Commons e mapa.", 10.0)
 
 h3("Entrar (RF02)")
 par(
@@ -417,9 +420,9 @@ par(
 h2("8.4 Feedback Inicial de Usuários (Opcional)")
 par(
     "Até a entrega do RFC não houve pesquisa formal de usabilidade com usuários externos; por isso esta subseção não "
-    "apresenta depoimentos. A validação das telas foi feita de duas formas: (i) **72 testes de ponta a ponta** em "
+    f"apresenta depoimentos. A validação das telas foi feita de duas formas: (i) **{TESTES_E2E} testes de ponta a ponta** em "
     "navegador real, que percorrem os fluxos descritos nesta seção (cadastro, busca, moderação, roteiros por dia, "
-    "planejamento, colaboração, perfil e administração) e conferem as mensagens exibidas; e (ii) revisões internas "
+    "planejamento, colaboração, dados importados, perfil e administração) e conferem as mensagens exibidas; e (ii) revisões internas "
     "da equipe a cada módulo entregue. A apresentação final será usada para coletar comentários da banca e de "
     "convidados, que alimentarão a próxima iteração."
 )
@@ -435,9 +438,11 @@ h2("9.1 Diagrama C4")
 h3("Nível 1 — Diagrama de Contexto")
 par(
     "O NomadPlan é uma plataforma web única, usada por seis perfis de pessoas: visitante/turista, morador, negócio/gestor "
-    "de pontos, gestor de turismo, moderador e administrador. Ele depende de apenas três sistemas externos: um **servidor "
-    "SMTP** (e-mails de recuperação de senha e de convites), o **OpenStreetMap** (imagens do mapa, carregadas direto pelo "
-    "navegador) e um **aplicativo autenticador** do próprio usuário, que gera os códigos TOTP da verificação em duas etapas."
+    "de pontos, gestor de turismo, moderador e administrador. Ele depende de quatro sistemas externos: um **servidor "
+    "SMTP** (e-mails de recuperação de senha e de convites); o **OpenStreetMap**, que fornece as imagens do mapa, "
+    "carregadas direto pelo navegador, e a base aberta de onde vêm os pontos turísticos, baixada pela Overpass API; o "
+    "**Wikimedia Commons**, de onde vêm as fotos dos pontos importados; e um **aplicativo autenticador** do próprio "
+    "usuário, que gera os códigos TOTP da verificação em duas etapas."
 )
 figura(DIAG / "c4_contexto.png", "Diagrama de contexto (C4, nível 1).", paisagem=True)
 
@@ -468,7 +473,7 @@ par(
     "participação social (`avaliacao`, `sugestao_edicao`, `solicitacao_verificacao`, `ponto_salvo`), de colaboração "
     "(`colaborador_roteiro`, `convite_roteiro`), de planejamento (`item_checklist`), de histórico (`versao_ponto`, "
     "`versao_roteiro`) e de governança (`notificacao`, `log_auditoria`, `metrica_diaria`). O esquema é versionado em "
-    "12 migrações SQL escritas à mão; o dicionário de dados completo está em `docs/dicionario-de-dados.md`."
+    "13 migrações SQL escritas à mão; o dicionário de dados completo está em `docs/dicionario-de-dados.md`."
 )
 figura(DIAG / "modelo_de_dados.png", "Diagrama entidade-relacionamento (DER) do NomadPlan.", paisagem=True)
 par("Principais decisões de modelagem:", manter=True)
@@ -478,6 +483,7 @@ lista(
         "**Avaliação única:** índice único em (usuário, ponto) garante uma avaliação por pessoa por local.",
         "**Histórico:** edições aprovadas e mudanças de roteiro geram versões consultáveis e restauráveis.",
         "**Anonimização em vez de exclusão:** a linha do usuário é mantida sem dados pessoais para preservar o histórico (seção 10.1).",
+        "**Origem de cada ponto (RNF19):** `ponto_turistico.origem` registra se o ponto veio do cadastro de um usuário, de um arquivo importado ou da API do OpenStreetMap, e `id_osm` liga o ponto ao elemento original, o que impede duplicar numa nova importação. Com a data de criação, a de atualização, a versão e o histórico, cada registro é rastreável.",
     ]
 )
 
@@ -487,7 +493,7 @@ tabela(
     [
         ["Aplicação web (SPA)", "Telas em React 19 e TypeScript, rotas protegidas por papel, mapas com Leaflet, estado de sessão e de favoritos em contexto."],
         ["Autenticação e contas", "Cadastro, login com bloqueio por tentativas, token JWT conferido no banco a cada requisição, renovação de sessão, recuperação de senha e verificação em duas etapas (TOTP, RFC 6238)."],
-        ["Pontos turísticos", "Cadastro com moderação, edição com bloqueio otimista, selo de verificação, importação e exportação CSV/GeoJSON, upload de imagens validado pelo conteúdo."],
+        ["Pontos turísticos", "Cadastro com moderação, edição com bloqueio otimista, selo de verificação, importação e exportação CSV/GeoJSON, upload de imagens validado pelo conteúdo e importação do OpenStreetMap, com fotos do Wikimedia Commons e a origem de cada ponto registrada."],
         ["Busca", "Consulta única em SQL com filtros (categoria, preço, acessibilidade, nota, “aberto agora”, distância), ordenação, limite de tempo e resposta em cache quando a consulta demora (AF02)."],
         ["Recomendação e roteiros", "Planejador que monta o dia respeitando horários e distâncias, otimização do trajeto (vizinho mais próximo seguido de 2-opt), recomendações por similaridade entre usuários, orçamento e checklist."],
         ["Colaboração", "Convites por e-mail, papéis de dono, editor e leitor, conferidos por middleware antes de qualquer rota do roteiro."],
@@ -513,11 +519,38 @@ tabela(
         ["helmet, CORS, rate limit", "Proteção da API", "Cabeçalhos de segurança, origem restrita ao frontend e limite de tentativas por IP e por conta."],
         ["React 19 + Vite + React Router", "Aplicação web", "Componentização, carregamento sob demanda por rota e desenvolvimento rápido; SPA entregue como arquivos estáticos simples de hospedar."],
         ["Leaflet + OpenStreetMap", "Mapas", "Biblioteca leve e livre, sem chave de API nem custo por uso."],
+        ["OpenStreetMap (Overpass API) + Wikimedia Commons", "Dados dos pontos", "Base aberta e gratuita que pode ser guardada no próprio banco, com atribuição (licença ODbL), ao contrário de serviços pagos como o Google Places, cujos termos não permitem isso; as fotos têm licenças livres, e o autor e a licença aparecem junto de cada uma."],
         ["Docker Compose", "Ambiente", "Sobe o banco com PostGIS em um comando e torna o ambiente reproduzível entre as máquinas da equipe."],
-        ["Vitest, Playwright e GitHub Actions", "Testes e CI", f"{TESTES} testes automatizados no backend (unitários e de integração, cobertura de linhas de {COBERTURA}), 72 testes de ponta a ponta em navegador real e pipeline de integração contínua a cada alteração."],
+        ["node:test, Playwright e GitHub Actions", "Testes e CI", f"{TESTES} testes automatizados no backend (unitários e de integração, cobertura de linhas de {COBERTURA}), {TESTES_E2E} testes de ponta a ponta em navegador real e pipeline de integração contínua a cada alteração."],
     ],
     [3.6, 3.0, 8.4],
     legenda="Tecnologias utilizadas e justificativas.",
+)
+
+h2("9.5 Origem dos Dados")
+par(
+    "Os pontos turísticos da demonstração são reais: **2.025 lugares de Joinville, Florianópolis e Blumenau** vindos do "
+    "**OpenStreetMap**, uma base aberta mantida por voluntários, que pode ser guardada e reutilizada desde que se dê o "
+    "crédito (licença ODbL). Um script (`npm run osm:baixar`) faz uma consulta à Overpass API por cidade, escolhe os "
+    "lugares de interesse turístico, como museus, patrimônio histórico, mirantes, praias, parques, restaurantes, cafés, "
+    "hotéis e shoppings, classifica cada um nas sete categorias do sistema e converte endereço, telefone, site e "
+    "acessibilidade. Ficam de fora lanchonetes de rede, praças de bairro e residências. O script também busca no "
+    "Wikidata e no **Wikimedia Commons** as fotos e descrições curtas, com autor e licença. O resultado fica salvo no "
+    "repositório, e assim o seed e os testes não dependem de um serviço externo."
+)
+par(
+    "O horário de funcionamento no OpenStreetMap tem sintaxe própria (por exemplo, `Mo-Fr 09:00-18:00; Sa 09:00-13:00`) "
+    "e é convertido para o formato do sistema (`Seg-Sex 9h-18h; Sáb 9h-13h`). Foram convertidos 94% dos horários "
+    "encontrados; os demais usam recursos raros, como variação por mês, e ficam como não informados para não gerar um "
+    "horário errado. Uma nova importação não duplica pontos e só preenche campos vazios, sem nunca sobrescrever o que a "
+    "comunidade editou. Um ponto rejeitado pela moderação também não volta."
+)
+par(
+    "A base aberta é boa em nomes, localização e categorias, mas tem poucos horários (370 dos 2.025 pontos, 18%) e "
+    "quase nenhuma informação de acessibilidade. É essa lacuna que a parte colaborativa do NomadPlan preenche: a ficha "
+    "do ponto mostra a fonte dos dados e convida quem está logado a informar o que falta, e as sugestões passam pelas "
+    "regras de reputação e moderação (seção 6.5). Os 370 pontos com todos os campos obrigatórios, inclusive o horário, "
+    "superam a meta de cobertura mínima de 100 pontos (seção 5.3)."
 )
 
 # ============================================================ 10
@@ -538,7 +571,7 @@ tabela(
         ["A07 Identificação e autenticação", "Bloqueio após 3 senhas erradas por conta e 10 por IP em 15 minutos, com alerta aos administradores; 2FA com proteção contra reutilização do código; tempo de resposta do login igual para e-mails existentes e inexistentes."],
         ["A08 Integridade", "Uploads validados pelo conteúdo (assinatura do arquivo), com limites de 5 MB (imagens) e 2 MB (importações)."],
         ["A09 Registro e monitoramento", "Log de auditoria de ações sensíveis (login, falhas, mudança de papel, importação, moderação); o e-mail digitado em tentativas falhas não é gravado; alerta de força bruta."],
-        ["A10 SSRF", "O servidor nunca busca URLs informadas por usuários; o site oficial de um ponto é apenas armazenado e exibido como link."],
+        ["A10 SSRF", "O servidor nunca busca URLs informadas por usuários; o site oficial de um ponto é apenas armazenado e exibido como link. Só o script de importação do OpenStreetMap acessa a internet, e apenas endereços fixos."],
     ],
     [4.0, 11.0],
     legenda="Controles de segurança por categoria do OWASP Top 10.",
@@ -581,7 +614,8 @@ tabela(
         ["M3", "Módulos 1 a 5: autenticação e perfis, pontos com moderação, busca por proximidade e mapa, recomendação e roteiros completos, social e governança", "09 a 10/09/2026"],
         ["M4", "Endurecimento e identidade visual: limite de tentativas de login, correção do histórico de credenciais, redesenho da interface com a marca NomadPlan, recuperação de senha por e-mail e ajustes a partir das revisões dos colegas", "15 a 20/09/2026"],
         ["M5", "Conformidade com o RFC: 2FA, bloqueio de login, LGPD, validação de upload, importação, busca unificada, roteiros por dia, orçamento, checklist, versões e roteiro colaborativo; testes de integração, de ponta a ponta e de carga; CI e backup", "26 a 27/10/2026"],
-        ["M6", "Finalização do RFC (seções 8 a 13), nomenclatura NomadPlan, revisão geral e ensaio da demonstração", "até 04/11/2026"],
+        ["M6", "Dados reais: importação de cerca de 2 mil pontos do OpenStreetMap (Joinville, Florianópolis e Blumenau) com fotos do Wikimedia Commons, conversão de horários e registro da origem de cada ponto (RNF19)", "27 a 28/10/2026"],
+        ["M7", "Finalização do RFC (seções 8 a 13), nomenclatura NomadPlan, revisão geral e ensaio da demonstração", "até 04/11/2026"],
         ["Entrega", "Entrega final e apresentação (02/11 é feriado)", "05/11/2026"],
     ],
     [2.0, 9.5, 3.5],
@@ -590,8 +624,8 @@ tabela(
 par(
     "**Verificação da qualidade antes da entrega.** O backend tem "
     f"{TESTES} testes automatizados (unitários e de integração, contra um banco de testes real), com cobertura de linhas "
-    f"de {COBERTURA}; o frontend é validado por lint e build; e 72 testes de ponta a ponta rodam em navegador real. "
-    "O teste de carga com 100 usuários simultâneos (26/10/2026, um único processo da API, 5.113 pontos) não registrou "
+    f"de {COBERTURA}; o frontend é validado por lint e build; e {TESTES_E2E} testes de ponta a ponta rodam em navegador real. "
+    "O teste de carga com 100 usuários simultâneos (26/10/2026, um único processo da API, base sintética de 5.113 pontos) não registrou "
     "nenhum erro: a latência média das buscas ficou entre 9 e 18 ms em uso normal e abaixo de 150 ms mesmo sem pausa "
     "entre as requisições, e a geração de roteiro ficou em 0,5 s de média com a base grande — dentro das metas RNF01, "
     "RNF02 e RNF04 (detalhes em `docs/relatorio-de-carga.md`)."
@@ -609,6 +643,10 @@ lista(
         "NIST. *SP 800-63B — Digital Identity Guidelines: Authentication and Lifecycle Management*. https://pages.nist.gov/800-63-3/sp800-63b.html",
         "PostGIS. *PostGIS Documentation*. https://postgis.net/documentation/",
         "OpenStreetMap Foundation. *OpenStreetMap* e política de uso de tiles. https://www.openstreetmap.org/",
+        "OpenStreetMap Foundation. *Copyright and License* (Open Database License e atribuição). https://www.openstreetmap.org/copyright",
+        "OpenStreetMap Wiki. *Overpass API*. https://wiki.openstreetmap.org/wiki/Overpass_API",
+        "OpenStreetMap Wiki. *Key:opening_hours* (especificação do horário de funcionamento). https://wiki.openstreetmap.org/wiki/Key:opening_hours",
+        "Wikimedia Commons. *Reusing content outside Wikimedia*. https://commons.wikimedia.org/wiki/Commons:Reusing_content_outside_Wikimedia",
     ]
 )
 h3("Ferramentas e bibliotecas")
@@ -617,7 +655,7 @@ lista(
         "Node.js, Express, TypeScript, Prisma, Zod, bcryptjs, jsonwebtoken, helmet, multer e nodemailer (backend).",
         "React, Vite, React Router, Axios e Leaflet (frontend).",
         "PostgreSQL e PostGIS; Docker e Docker Compose.",
-        "Vitest e Playwright (testes); GitHub Actions (integração contínua).",
+        "node:test, tsx e Playwright (testes); GitHub Actions (integração contínua).",
     ]
 )
 h3("Repositório e documentação do projeto")
@@ -640,7 +678,7 @@ tabela(
         ["docs/api.md", "Referência das rotas da API REST, com papéis exigidos e exemplos."],
         ["docs/dicionario-de-dados.md", "Tabelas, colunas, relacionamentos e dados pessoais (LGPD)."],
         ["docs/seguranca.md", "Controles por categoria do OWASP, privacidade e riscos aceitos."],
-        ["docs/operacao.md", "Implantação, rollback, backup diário, restauração (RNF08) e monitoramento."],
+        ["docs/operacao.md", "Implantação, rollback, backup diário, restauração (RNF08), monitoramento e importação dos dados do OpenStreetMap."],
         ["docs/relatorio-de-carga.md", "Método e resultados do teste de carga com 100 usuários."],
     ],
     [5.0, 10.0],
@@ -649,8 +687,10 @@ tabela(
 h3("Apêndice B — Contas de demonstração")
 par(
     "O comando de seed do backend (`npm run prisma:seed`) cria contas de demonstração para cada perfil — administrador, "
-    "moderador, negócio e morador, todas com o domínio `@nomadplan.local` — e 113 pontos de exemplo em Joinville, Florianópolis e Blumenau. O seed "
-    "recusa rodar em produção. As senhas estão no README do repositório."
+    "moderador, negócio e morador, todas com o domínio `@nomadplan.local` — e carrega os 2.025 pontos reais de Joinville, "
+    "Florianópolis e Blumenau baixados do OpenStreetMap (arquivos em `backend/prisma/dados/osm/`). O seed recusa rodar em "
+    "produção; lá, os pontos entram com `npm run osm:importar`. Para atualizar os dados ou incluir outra cidade: "
+    "`npm run osm:baixar -- <cidade>` seguido de `npm run osm:importar`. As senhas estão no README do repositório."
 )
 h3("Apêndice C — Como executar e testar")
 lista(

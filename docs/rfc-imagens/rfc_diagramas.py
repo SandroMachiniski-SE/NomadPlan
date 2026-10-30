@@ -162,15 +162,17 @@ def c4_contexto():
     caixa(ax, 52, 26, 38, 28, "NomadPlan", "Plataforma de turismo inteligente:\ninventário turístico colaborativo,\nbusca, recomendações e roteiros\npersonalizados e compartilháveis", TEAL, TEAL_CLARO, tam=12)
 
     externos = [
-        ("Servidor SMTP", "e-mails de recuperação\nde senha e de convites", 62),
-        ("OpenStreetMap", "mapas (tiles) exibidos\nno navegador", 42),
-        ("Aplicativo autenticador", "gera os códigos TOTP\nda verificação em 2 etapas", 22),
+        ("Servidor SMTP", "e-mails de recuperação\nde senha e de convites", 67),
+        ("OpenStreetMap", "mapas (tiles) e dados dos\npontos (Overpass API)", 50),
+        ("Wikimedia Commons", "fotos dos pontos importados,\ncom autor e licença", 33),
+        ("Aplicativo autenticador", "gera os códigos TOTP\nda verificação em 2 etapas", 16),
     ]
     for nome, desc, y in externos:
         caixa(ax, 108, y - 5, 30, 11, nome, desc, CINZA, CINZA_CLARO, tam=8.5, tracejada=True)
-    seta(ax, (90, 45), (108, 62.5), "envia e-mails", pos=0.5)
-    seta(ax, (90, 40), (108, 42.5), "mapas", pos=0.55)
-    seta(ax, (108, 22.5), (90, 33), "código de 6 dígitos\n(digitado pelo usuário)", pos=0.45)
+    seta(ax, (90, 48), (108, 67.5), "envia e-mails", pos=0.5)
+    seta(ax, (90, 43), (108, 50.5), "mapas e\nimportação", pos=0.5)
+    seta(ax, (90, 37), (108, 33.5), "fotos", pos=0.5)
+    seta(ax, (108, 16.5), (90, 30), "código de 6 dígitos\n(digitado pelo usuário)", pos=0.45)
 
     ax.text(70, 76, "Diagrama de contexto (C4 — nível 1)", ha="center", fontsize=11, fontweight="bold", color=TEXTO)
     salvar(fig, "c4_contexto.png")
@@ -191,7 +193,7 @@ def c4_containers():
     caixa(ax, 38, 10, 28, 18, "Arquivos enviados", "imagens de pontos e\nfotos de avaliações\n(pasta UPLOADS_DIR)", TEAL, TEAL_CLARO, tam=9)
 
     caixa(ax, 122, 54, 26, 14, "Servidor SMTP", "Gmail, Brevo, Mailpit...", CINZA, CINZA_CLARO, tam=9, tracejada=True)
-    caixa(ax, 122, 20, 26, 14, "OpenStreetMap", "tiles do mapa", CINZA, CINZA_CLARO, tam=9, tracejada=True)
+    caixa(ax, 122, 20, 26, 14, "OpenStreetMap", "tiles do mapa · dados dos\npontos · fotos (Wikimedia)", CINZA, CINZA_CLARO, tam=9, tracejada=True)
 
     seta(ax, (24, 49), (38, 55), "HTTPS", pos=0.5, desloc=(0, 3))
     seta(ax, (66, 55), (80, 55), None)
@@ -199,12 +201,14 @@ def c4_containers():
     seta(ax, (94, 46), (94, 28), "SQL (Prisma)", pos=0.5, desloc=(8, 0))
     seta(ax, (80, 50), (66, 24), "grava / lê", pos=0.45, desloc=(-5, 1.5))
     seta(ax, (108, 58), (122, 60), "SMTP", pos=0.5, desloc=(0, 2.5))
+    # Os pontos vêm de um script da própria API, rodado pela equipe (não a cada requisição).
+    seta(ax, (108, 49), (122, 30), "importação\n(npm run osm:baixar)", pos=0.5, desloc=(10, 0.5))
 
     # O mapa é desenhado no navegador: os tiles vêm do OpenStreetMap direto para o usuário.
     ax.plot([13, 13, 135], [40, 0.5, 0.5], color=CINZA, linewidth=1.1, linestyle="--", solid_capstyle="butt")
     ax.add_patch(FancyArrowPatch((135, 0.5), (135, 20), arrowstyle="-|>", mutation_scale=9, linewidth=1.1, color=CINZA,
                                  linestyle="--", shrinkA=0, shrinkB=2))
-    ax.text(74, 0.5, "tiles do mapa (HTTPS, direto do navegador)", fontsize=6.3, color=CINZA, ha="center", va="center",
+    ax.text(74, 0.5, "tiles do mapa e fotos (HTTPS, direto do navegador)", fontsize=6.3, color=CINZA, ha="center", va="center",
             bbox=dict(boxstyle="round,pad=0.25", facecolor="white", edgecolor="none"))
 
     ax.text(74, 81, "Diagrama de containers (C4 — nível 2)", ha="center", fontsize=11, fontweight="bold", color=TEXTO)
