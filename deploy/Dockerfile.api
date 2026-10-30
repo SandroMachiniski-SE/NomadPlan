@@ -1,0 +1,26 @@
+# API do NomadPlan para produção. Contexto de build: a raiz do repositório.
+FROM node:22-slim
+
+# O Prisma precisa do OpenSSL; os certificados permitem as consultas HTTPS (e-mail, OpenStreetMap).
+RUN apt-get update \
+    && apt-get install -y --no-install-recommends openssl ca-certificates \
+    && rm -rf /var/lib/apt/lists/*
+
+WORKDIR /app
+
+# O postinstall roda "prisma generate", que precisa do schema.
+COPY backend/package.json backend/package-lock.json ./
+COPY backend/prisma ./prisma
+RUN npm ci
+
+COPY backend/tsconfig.json ./
+COPY backend/src ./src
+RUN npm run build
+
+ENV NODE_ENV=production \
+    PORT=3333 \
+    UPLOADS_DIR=/app/uploads
+EXPOSE 3333
+
+# Aplica as migrações pendentes a cada subida e só então inicia a API.
+CMD ["sh", "-c", "npx prisma migrate deploy && node dist/src/server.js"]

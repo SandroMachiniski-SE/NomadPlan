@@ -1,0 +1,16 @@
+**/node_modules
+**/dist
+**/.env
+**/.env.*
+backend/uploads
+backend/.env
+backups
+e2e
+docs
+Diagramas
+.git
+*.docx
+*.pdf
+*.png
+!frontend/public/**
+!frontend/src/**

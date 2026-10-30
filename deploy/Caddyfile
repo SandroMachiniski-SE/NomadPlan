@@ -1,0 +1,21 @@
+# Dois endereços: o site (arquivos estáticos) e a API (proxy para o contêiner "api").
+# O Caddy obtém e renova os certificados HTTPS sozinho, desde que o DNS aponte para este servidor.
+
+{$DOMINIO_WEB} {
+	root * /srv
+	encode zstd gzip
+	# Aplicação de página única: qualquer rota desconhecida devolve o index.html.
+	try_files {path} /index.html
+	file_server
+
+	header {
+		X-Content-Type-Options nosniff
+		X-Frame-Options DENY
+		Referrer-Policy strict-origin-when-cross-origin
+	}
+}
+
+{$DOMINIO_API} {
+	encode zstd gzip
+	reverse_proxy api:3333
+}

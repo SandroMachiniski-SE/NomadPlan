@@ -1,0 +1,74 @@
+# Produção: banco + API + site com HTTPS. Passo a passo em docs/implantacao-web.md.
+#
+#   cp deploy/env.prod.exemplo .env.prod        (e preencha)
+#   docker compose --env-file .env.prod -f docker-compose.prod.yml up -d --build
+#
+# Só as portas 80 e 443 ficam abertas; o banco e a API não são expostos diretamente.
+
+services:
+  postgres:
+    image: postgis/postgis:16-3.4
+    container_name: nomadplan-postgres
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: nomadplan
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:?defina POSTGRES_PASSWORD no .env.prod}
+      POSTGRES_DB: nomadplan
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U nomadplan -d nomadplan"]
+      interval: 5s
+      timeout: 5s
+      retries: 20
+
+  api:
+    build:
+      context: .
+      dockerfile: deploy/Dockerfile.api
+    container_name: nomadplan-api
+    restart: unless-stopped
+    depends_on:
+      postgres:
+        condition: service_healthy
+    environment:
+      NODE_ENV: production
+      DATABASE_URL: postgresql://nomadplan:${POSTGRES_PASSWORD}@postgres:5432/nomadplan?schema=public
+      JWT_SECRET: ${JWT_SECRET:?defina JWT_SECRET no .env.prod}
+      CHAVE_CRIPTOGRAFIA: ${CHAVE_CRIPTOGRAFIA:?defina CHAVE_CRIPTOGRAFIA no .env.prod}
+      FRONTEND_URL: https://${DOMINIO_WEB:?defina DOMINIO_WEB no .env.prod}
+      TRUST_PROXY: "1"
+      SMTP_HOST: ${SMTP_HOST:-}
+      SMTP_PORT: ${SMTP_PORT:-587}
+      SMTP_USER: ${SMTP_USER:-}
+      SMTP_PASS: ${SMTP_PASS:-}
+      EMAIL_FROM: ${EMAIL_FROM:-}
+    volumes:
+      - uploads:/app/uploads
+
+  web:
+    build:
+      context: .
+      dockerfile: deploy/Dockerfile.web
+      args:
+        VITE_API_URL: https://${DOMINIO_API:?defina DOMINIO_API no .env.prod}
+    container_name: nomadplan-web
+    restart: unless-stopped
+    depends_on:
+      - api
+    environment:
+      DOMINIO_WEB: ${DOMINIO_WEB}
+      DOMINIO_API: ${DOMINIO_API}
+    ports:
+      - "80:80"
+      - "443:443"
+      - "443:443/udp"
+    volumes:
+      - caddy_data:/data
+      - caddy_config:/config
+
+volumes:
+  postgres_data:
+  uploads:
+  caddy_data:
+  caddy_config:
