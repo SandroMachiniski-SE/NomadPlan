@@ -11,7 +11,14 @@
 	header {
 		X-Content-Type-Options nosniff
 		X-Frame-Options DENY
+		# O link de redefinição de senha leva um token na URL: o Referrer-Policy impede que
+		# ele vá parar em outros sites (mapas, fotos) pelo cabeçalho Referer.
 		Referrer-Policy strict-origin-when-cross-origin
+		Strict-Transport-Security "max-age=31536000"
+		Permissions-Policy "camera=(), microphone=(), geolocation=(self)"
+		# Restrições que não afetam o site: sem embutir em outras páginas, sem plugins,
+		# sem trocar o endereço-base dos links.
+		Content-Security-Policy "frame-ancestors 'none'; object-src 'none'; base-uri 'self'"
 	}
 }
 
