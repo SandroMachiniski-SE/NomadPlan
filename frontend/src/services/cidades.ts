@@ -40,3 +40,47 @@ export function useCidadesDisponiveis(): CidadeDisponivel[] {
 
   return cidades;
 }
+
+export interface PreparoDaCidade {
+  estado: "preparando" | "pronta" | "erro";
+  etapa?: string;
+  pontos?: number | null;
+  erro?: string | null;
+}
+
+/** Município brasileiro devolvido pela busca; sem UF/coordenadas quando vem só do nosso banco. */
+export interface CidadeDaBusca {
+  cidade: string;
+  uf: string | null;
+  latitude: number | null;
+  longitude: number | null;
+  pontos: number;
+  disponivel: boolean;
+  preparo: PreparoDaCidade | null;
+}
+
+export async function buscarCidadesDoBrasil(texto: string) {
+  const resposta = await api.get<{ dados: CidadeDaBusca[]; semServidorDeMapas: boolean }>("/cidades/buscar", {
+    params: { q: texto },
+  });
+
+  return resposta.data;
+}
+
+/** Pede a preparação de uma cidade nova (baixa os lugares do OpenStreetMap em segundo plano). */
+export async function prepararCidade(cidade: CidadeDaBusca): Promise<PreparoDaCidade> {
+  const resposta = await api.post<PreparoDaCidade>("/cidades/preparar", {
+    cidade: cidade.cidade,
+    uf: cidade.uf,
+    latitude: cidade.latitude,
+    longitude: cidade.longitude,
+  });
+
+  return resposta.data;
+}
+
+export async function consultarPreparoDaCidade(cidade: string, uf: string): Promise<PreparoDaCidade> {
+  const resposta = await api.get<PreparoDaCidade>("/cidades/preparar", { params: { cidade, uf } });
+
+  return resposta.data;
+}
