@@ -280,6 +280,15 @@ describe("autenticação e contas", () => {
       }
     });
 
+    it("o link de redefinição não serve como sessão (não contorna senha nem 2FA)", async () => {
+      const { usuario } = await criarUsuario({ email: "joao@exemplo.com" });
+      const token = gerarTokenRedefinicaoSenha(usuario.id, usuario.senhaHash);
+
+      const me = await api("GET", "/auth/me", { token });
+
+      assert.equal(me.status, 401);
+    });
+
     it("troca a senha com o link e o link só funciona uma vez", async () => {
       const { usuario } = await criarUsuario({ email: "joao@exemplo.com" });
       const token = gerarTokenRedefinicaoSenha(usuario.id, usuario.senhaHash);

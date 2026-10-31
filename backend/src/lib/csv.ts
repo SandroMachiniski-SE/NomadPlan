@@ -73,6 +73,21 @@ function escaparCampoCsv(valor: string): string {
   return valor;
 }
 
+/**
+ * Planilhas (Excel, LibreOffice) executam como fórmula uma célula de texto que começa com
+ * "=", "+", "-", "@", tabulação ou retorno de carro. Como nomes e descrições vêm de
+ * usuários, um "=HYPERLINK(...)" no nome de um ponto agiria em quem abrisse o arquivo
+ * exportado. Textos assim ganham um apóstrofo na frente; telefones e números (só
+ * dígitos e pontuação) seguem como estão.
+ */
+export function neutralizarFormula(valor: string): string {
+  if (!/^[=+\-@\t\r]/.test(valor) || /^[+-]?[\d\s().-]+$/.test(valor)) {
+    return valor;
+  }
+
+  return `'${valor}`;
+}
+
 export function objetosParaCsv(colunas: string[], linhas: Record<string, unknown>[]): string {
   const cabecalho = colunas.map(escaparCampoCsv).join(",");
 
@@ -80,7 +95,11 @@ export function objetosParaCsv(colunas: string[], linhas: Record<string, unknown
     colunas
       .map((coluna) => {
         const valor = linha[coluna];
-        return escaparCampoCsv(valor === null || valor === undefined ? "" : String(valor));
+        if (valor === null || valor === undefined) {
+          return "";
+        }
+
+        return escaparCampoCsv(typeof valor === "string" ? neutralizarFormula(valor) : String(valor));
       })
       .join(","),
   );

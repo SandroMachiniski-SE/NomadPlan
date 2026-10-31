@@ -57,6 +57,18 @@ describe("token de login", () => {
 
     assert.throws(() => auth.verificarToken(falso));
   });
+
+  it("não aceita o token de redefinição de senha como sessão (contornaria o 2FA)", () => {
+    const tokenReset = auth.gerarTokenRedefinicaoSenha(42, "hash-atual");
+
+    assert.throws(() => auth.verificarToken(tokenReset));
+  });
+
+  it("recusa token sem assinatura (alg none)", () => {
+    const semAssinatura = jwt.sign({ sub: 1, tipoConta: "ADMIN" }, "", { algorithm: "none" });
+
+    assert.throws(() => auth.verificarToken(semAssinatura));
+  });
 });
 
 describe("token de redefinição de senha", () => {
