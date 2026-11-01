@@ -14,6 +14,7 @@ import adminRouter from "./routes/admin.routes";
 import salvosRouter from "./routes/salvos.routes";
 import convitesRouter from "./routes/convites.routes";
 import cidadesRouter from "./routes/cidades.routes";
+import { limiteGeral } from "./middleware/rateLimit";
 
 interface ErroComStatus {
   type?: string;
@@ -70,6 +71,9 @@ export function criarApp(): express.Express {
       servico: "nomadplan-api",
     });
   });
+
+  // Depois de /health e /uploads: o monitoramento e as imagens não entram na conta.
+  app.use(limiteGeral);
 
   app.use("/auth", authRouter);
   app.use("/pontos", pontosRouter);

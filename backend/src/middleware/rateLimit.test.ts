@@ -3,7 +3,7 @@ import assert from "node:assert/strict";
 import type { AddressInfo } from "node:net";
 import type { Server } from "node:http";
 import express from "express";
-import { ganchos, limiteLogin, limiteLoginPorEmail } from "./rateLimit";
+import { ganchos, limiteGeral, limiteLogin, limiteLoginPorEmail } from "./rateLimit";
 
 // Simula um login que sempre falha (senha errada): o handler devolve 401, e o
 // rate limit deve virar 429 a partir da 11ª tentativa.
@@ -87,5 +87,31 @@ describe("rate limit do login", () => {
     assert.equal(resposta.status, 429);
     assert.match(corpo.erro, /Tente novamente em \d+ minutos? ou recupere a senha/);
     assert.ok(corpo.tentarNovamenteEmMinutos >= 1 && corpo.tentarNovamenteEmMinutos <= 15);
+  });
+});
+
+describe("limite geral da API", () => {
+  it("deixa passar 600 requisições por minuto do mesmo IP e responde 429 na seguinte", async () => {
+    const app = express();
+    app.use(limiteGeral);
+    app.get("/qualquer", (_req, res) => {
+      res.json({ ok: true });
+    });
+    const { server, base } = await iniciar(app);
+
+    try {
+      for (let i = 1; i <= 600; i++) {
+        const resposta = await fetch(`${base}/qualquer`);
+
+        assert.equal(resposta.status, 200, `requisição ${i}`);
+      }
+
+      const excedida = await fetch(`${base}/qualquer`);
+
+      assert.equal(excedida.status, 429);
+      assert.match(((await excedida.json()) as { erro: string }).erro, /Muitas requisições/);
+    } finally {
+      server.close();
+    }
   });
 });
