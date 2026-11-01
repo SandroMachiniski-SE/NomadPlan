@@ -69,6 +69,12 @@ model Usuario {
   // Sobe a cada redefinição de senha: tokens de login de uma versão anterior são recusados.
   versaoSessao Int @default(0) @map("versao_sessao")
 
+  // Onde a pessoa mora (município do IBGE; `cidadeBase` recebe o nome dele) e o consumo do
+  // carro, para a viagem de carro.
+  codigoMunicipioBase Int?       @map("codigo_municipio_base")
+  consumoKmPorLitro   Decimal?   @map("consumo_km_por_litro") @db.Decimal(4, 1)
+  municipioBase       Municipio? @relation(fields: [codigoMunicipioBase], references: [codigoIbge])
+
   pontosResponsaveis  PontoTuristico[]
   roteiros            Roteiro[]
   sugestoesEdicao     SugestaoEdicao[]         @relation("autorSugestao")
@@ -81,6 +87,26 @@ model Usuario {
   convitesEnviados    ConviteRoteiro[]
 
   @@map("usuario")
+}
+
+// Municípios do Brasil (IBGE). `geom` é gerada pelo Postgres a partir de latitude/longitude e
+// `nome_normalizado` serve para buscar sem acento (ver migration municipios). `resumoOsm` guarda
+// por 30 dias as hospedagens e atrações perto da sede, para sugerir pernoites na estrada.
+model Municipio {
+  codigoIbge      Int       @id @map("codigo_ibge")
+  nome            String
+  nomeNormalizado String    @map("nome_normalizado")
+  uf              String    @db.Char(2)
+  latitude        Float
+  longitude       Float
+  resumoOsm       Json?     @map("resumo_osm")
+  resumoEm        DateTime? @map("resumo_em")
+  geom            Unsupported("geography(Point,4326)")?
+
+  moradores Usuario[]
+
+  @@index([nomeNormalizado, uf])
+  @@map("municipio")
 }
 
 model PontoTuristico {

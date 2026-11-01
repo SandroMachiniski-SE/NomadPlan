@@ -22,7 +22,9 @@
     "osm:importar": "tsx src/scripts/importarOsm.ts",
     "overture:importar": "tsx src/scripts/importarOverture.ts",
     "curadoria:aplicar": "tsx src/scripts/aplicarCuradoria.ts",
-    "roteiro:exemplo": "tsx src/scripts/criarRoteiroExemplo.ts"
+    "roteiro:exemplo": "tsx src/scripts/criarRoteiroExemplo.ts",
+    "municipios:baixar": "tsx src/scripts/baixarMunicipios.ts",
+    "municipios:importar": "tsx src/scripts/importarMunicipios.ts"
   },
   "dependencies": {
     "@prisma/client": "^6.19.3",
