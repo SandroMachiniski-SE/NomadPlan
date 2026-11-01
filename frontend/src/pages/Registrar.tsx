@@ -3,7 +3,8 @@ import { Link, useNavigate } from "react-router-dom";
 import { useAuth } from "../context/useAuth";
 import { extrairMensagemErro } from "../utils/erro";
 import AuthShell from "../components/AuthShell";
-import SugestoesDeCidade from "../components/SugestoesDeCidade";
+import CampoMinhaCidade from "../components/CampoMinhaCidade";
+import type { MunicipioEscolhido } from "../services/cidades";
 import type { DadosRegistro } from "../context/auth-context";
 
 function Registrar() {
@@ -13,7 +14,7 @@ function Registrar() {
   const [nome, setNome] = useState("");
   const [email, setEmail] = useState("");
   const [senha, setSenha] = useState("");
-  const [cidadeBase, setCidadeBase] = useState("");
+  const [municipio, setMunicipio] = useState<MunicipioEscolhido | null>(null);
   const [tipoConta, setTipoConta] = useState<DadosRegistro["tipoConta"]>("VISITANTE");
   const [aceitouPolitica, setAceitouPolitica] = useState(false);
   const [enviando, setEnviando] = useState(false);
@@ -40,7 +41,7 @@ function Registrar() {
         nome: nome.trim(),
         email: email.trim(),
         senha,
-        cidadeBase: cidadeBase.trim() || undefined,
+        codigoMunicipioBase: municipio?.codigoIbge,
         tipoConta,
         aceitouPolitica,
       });
@@ -103,19 +104,7 @@ function Registrar() {
           />
         </label>
 
-        <label className="field">
-          <span>
-            Cidade base <span className="field__optional">(opcional)</span>
-          </span>
-          <input
-            type="text"
-            maxLength={120}
-            value={cidadeBase}
-            onChange={(e) => setCidadeBase(e.target.value)}
-            list="cidades-do-cadastro"
-          />
-          <SugestoesDeCidade id="cidades-do-cadastro" />
-        </label>
+        <CampoMinhaCidade valor={municipio} aoMudar={setMunicipio} />
 
         <label className="field">
           <span>Como você vai usar o NomadPlan?</span>

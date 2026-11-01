@@ -450,6 +450,27 @@
   color: var(--text-muted);
 }
 
+.field__erro {
+  font-size: 0.85rem;
+  color: var(--danger-text);
+}
+
+/* Campo "Onde você mora": busca pelo nome ou pelo GPS, com os municípios encontrados. */
+.campo-cidade {
+  display: flex;
+  flex-direction: column;
+  gap: 0.45rem;
+}
+
+.campo-cidade__opcoes {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.35rem;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
 .field__optional {
   font-weight: 400;
   color: var(--text-faint);

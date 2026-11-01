@@ -5,6 +5,7 @@ import { OrigemRegistro, PrismaClient, StatusPonto } from "@prisma/client";
 import prisma from "../lib/prisma";
 import { urlDoBancoE2e } from "./ambienteE2e";
 import { CONTAS_E2E, SENHA_E2E } from "./contasE2e";
+import { importarMunicipios, lerMunicipios } from "../lib/municipios";
 
 // Deixa o banco de ponta a ponta pronto: cria o banco (se preciso), aplica as migrations e
 // recarrega os dados de partida. Roda antes de cada execução do Playwright.
@@ -52,6 +53,9 @@ async function recarregarDados(): Promise<void> {
     .map((nome) => `"${nome}"`);
 
   await prisma.$executeRawUnsafe(`TRUNCATE TABLE ${alvo.join(", ")} RESTART IDENTITY CASCADE`);
+
+  // Municípios do IBGE: onde a pessoa mora (GPS e busca) e a viagem de carro.
+  await importarMunicipios(lerMunicipios());
 
   const senhaHash = await bcrypt.hash(SENHA_E2E, 4);
 

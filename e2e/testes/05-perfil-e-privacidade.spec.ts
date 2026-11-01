@@ -10,7 +10,9 @@ test.describe("perfil", () => {
     await page.goto("/perfil");
 
     await page.getByLabel("Nome", { exact: true }).fill("Nome Atualizado");
-    await page.getByLabel("Cidade base").fill("Joinville");
+    await page.getByLabel("Onde você mora").fill("Joinville");
+    await page.getByRole("button", { name: "Buscar", exact: true }).click();
+    await page.getByRole("button", { name: "Joinville, SC" }).click();
     await page.getByLabel("Idioma preferido").selectOption("en");
     await page.getByRole("button", { name: "Cultura" }).click();
     await page.getByRole("button", { name: "Mobilidade reduzida" }).click();
@@ -28,7 +30,9 @@ test.describe("perfil", () => {
   test("recomendações usam os interesses e a cidade base do perfil", async ({ page }) => {
     await cadastrar(page);
     await page.goto("/perfil");
-    await page.getByLabel("Cidade base").fill("Joinville");
+    await page.getByLabel("Onde você mora").fill("Joinville");
+    await page.getByRole("button", { name: "Buscar", exact: true }).click();
+    await page.getByRole("button", { name: "Joinville, SC" }).click();
     await page.getByRole("button", { name: "Gastronomia" }).click();
     await page.getByRole("button", { name: "Salvar alterações" }).click();
     await expect(page.getByText("Perfil atualizado com sucesso.")).toBeVisible();
