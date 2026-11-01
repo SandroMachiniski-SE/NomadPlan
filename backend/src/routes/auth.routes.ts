@@ -226,7 +226,7 @@ authRouter.post("/login", limiteLogin, limiteLoginPorEmail, async (req: Request,
       }
     }
 
-    const token = gerarToken({ sub: usuario.id, tipoConta: usuario.tipoConta });
+    const token = gerarToken({ sub: usuario.id, tipoConta: usuario.tipoConta, v: usuario.versaoSessao });
 
     await registrarAuditoria({
       idUsuario: usuario.id,
@@ -264,7 +264,10 @@ authRouter.post("/renovar", autenticar, async (req: Request, res: Response) => {
       return res.status(404).json({ erro: "Usuário não encontrado." });
     }
 
-    return res.json({ usuario, token: gerarToken({ sub: usuario.id, tipoConta: usuario.tipoConta }) });
+    return res.json({
+      usuario,
+      token: gerarToken({ sub: usuario.id, tipoConta: usuario.tipoConta, v: req.usuario!.versaoSessao }),
+    });
   } catch (error) {
     console.error("Erro ao renovar sessão:", error);
 
@@ -591,7 +594,7 @@ authRouter.post("/redefinir-senha", limiteRecuperacaoSenha, async (req: Request,
 
     await prisma.usuario.update({
       where: { id: usuario.id },
-      data: { senhaHash },
+      data: { senhaHash, versaoSessao: { increment: 1 } },
     });
 
     await registrarAuditoria({

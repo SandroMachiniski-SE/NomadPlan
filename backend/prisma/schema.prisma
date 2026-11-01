@@ -66,6 +66,9 @@ model Usuario {
   mfaSegredo String? @map("mfa_segredo")
   mfaAtivo   Boolean @default(false) @map("mfa_ativo")
 
+  // Sobe a cada redefinição de senha: tokens de login de uma versão anterior são recusados.
+  versaoSessao Int @default(0) @map("versao_sessao")
+
   pontosResponsaveis  PontoTuristico[]
   roteiros            Roteiro[]
   sugestoesEdicao     SugestaoEdicao[]         @relation("autorSugestao")

@@ -19,6 +19,8 @@ const HASH_FALSO = bcrypt.hashSync("nomadplan-senha-inexistente", SALT_ROUNDS);
 export interface TokenPayload {
   sub: number;
   tipoConta: TipoConta;
+  /** Versão da sessão da conta quando o token foi emitido (ausente = 0). */
+  v?: number;
 }
 
 interface ResetTokenPayload {
