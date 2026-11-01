@@ -7,6 +7,7 @@ import { gerarTokenRedefinicaoSenha } from "../../lib/auth";
 import { codigoTotp, passoDoTempo } from "../../lib/totp";
 import {
   criarCliente,
+  criarMunicipio,
   criarPonto,
   criarUsuario,
   iniciarServidor,
@@ -440,6 +441,69 @@ describe("autenticação e contas", () => {
 
       const login = await api("POST", "/auth/login", { json: { email: "admin@exemplo.com", senha: SENHA_DE_TESTE } });
       assert.ok(login.corpo.token, "sem 2FA o login volta a ser só com a senha");
+    });
+  });
+
+  describe("município de casa e consumo do carro", () => {
+    const JOINVILLE = { codigoIbge: 4209102, cidade: "Joinville", uf: "SC", latitude: -26.3045, longitude: -48.8487 };
+    const BRASILIA = { codigoIbge: 5300108, cidade: "Brasília", uf: "DF", latitude: -15.7795, longitude: -47.9297 };
+
+    it("o cadastro grava o município de casa e preenche a cidade base", async () => {
+      await criarMunicipio(JOINVILLE);
+
+      const r = await api("POST", "/auth/registrar", { json: { ...DADOS_VALIDOS, email: emailNovo(), codigoMunicipioBase: 4209102 } });
+      assert.equal(r.status, 201);
+
+      const me = await api("GET", "/auth/me", { token: r.corpo.token });
+      assert.deepEqual(me.corpo.municipioBase, { codigoIbge: 4209102, cidade: "Joinville", uf: "SC" });
+      assert.equal(me.corpo.cidadeBase, "Joinville");
+      assert.equal(me.corpo.consumoKmPorLitro, null);
+      assert.deepEqual(r.corpo.usuario.municipioBase, { codigoIbge: 4209102, cidade: "Joinville", uf: "SC" });
+    });
+
+    it("código de município inexistente no cadastro dá 400", async () => {
+      const r = await api("POST", "/auth/registrar", { json: { ...DADOS_VALIDOS, email: emailNovo(), codigoMunicipioBase: 1234567 } });
+
+      assert.equal(r.status, 400);
+      assert.equal(r.corpo.erro, "Município não encontrado.");
+    });
+
+    it("o perfil troca e limpa o município e o consumo", async () => {
+      await criarMunicipio(BRASILIA);
+      const { token } = await criarUsuario({ cidadeBase: "Joinville" });
+
+      const trocado = await api("PUT", "/auth/me", { token, json: { codigoMunicipioBase: 5300108, consumoKmPorLitro: 11.5 } });
+      assert.equal(trocado.status, 200);
+      assert.deepEqual(trocado.corpo.municipioBase, { codigoIbge: 5300108, cidade: "Brasília", uf: "DF" });
+      assert.equal(trocado.corpo.cidadeBase, "Brasília");
+      assert.equal(trocado.corpo.consumoKmPorLitro, 11.5);
+
+      const limpo = await api("PUT", "/auth/me", { token, json: { codigoMunicipioBase: null, consumoKmPorLitro: null } });
+      assert.equal(limpo.corpo.municipioBase, null);
+      assert.equal(limpo.corpo.cidadeBase, null);
+      assert.equal(limpo.corpo.consumoKmPorLitro, null);
+    });
+
+    it("consumo fora de 3 a 40 km/l dá 400", async () => {
+      const { token } = await criarUsuario();
+
+      assert.equal((await api("PUT", "/auth/me", { token, json: { consumoKmPorLitro: 2.5 } })).status, 400);
+      assert.equal((await api("PUT", "/auth/me", { token, json: { consumoKmPorLitro: 41 } })).status, 400);
+    });
+
+    it("exportação traz e anonimização apaga o município e o consumo", async () => {
+      await criarMunicipio(JOINVILLE);
+      const { usuario, token } = await criarUsuario();
+      await api("PUT", "/auth/me", { token, json: { codigoMunicipioBase: 4209102, consumoKmPorLitro: 12 } });
+
+      const dados = await api("GET", "/auth/me/dados", { token });
+      assert.deepEqual(dados.corpo.perfil.municipioBase, { codigoIbge: 4209102, cidade: "Joinville", uf: "SC" });
+      assert.equal(dados.corpo.perfil.consumoKmPorLitro, 12);
+
+      assert.equal((await api("DELETE", "/auth/me", { token, json: { senha: SENHA_DE_TESTE } })).status, 200);
+      const depois = await prisma.usuario.findUnique({ where: { id: usuario.id } });
+      assert.equal(depois?.codigoMunicipioBase, null);
+      assert.equal(depois?.consumoKmPorLitro, null);
     });
   });
 
