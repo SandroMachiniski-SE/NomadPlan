@@ -1,9 +1,10 @@
 import "../ambiente";
-import { beforeEach, describe, it } from "node:test";
+import { after, afterEach, before, beforeEach, describe, it } from "node:test";
 import assert from "node:assert/strict";
 import prisma from "../../lib/prisma";
 import { importarMunicipios, municipioMaisProximo, procurarMunicipio } from "../../lib/municipios";
-import { criarMunicipio, limparBanco } from "../suporte";
+import { criarCliente, criarMunicipio, iniciarServidor, limparBanco, type ServidorDeTeste } from "../suporte";
+import { instalarMapasFalsos, municipioNominatim } from "../mapasFalsos";
 
 const JOINVILLE = { codigoIbge: 4209102, cidade: "Joinville", uf: "SC", latitude: -26.3045, longitude: -48.8487 };
 const BRASILIA = { codigoIbge: 5300108, cidade: "Brasília", uf: "DF", latitude: -15.7795, longitude: -47.9297 };
@@ -59,5 +60,81 @@ describe("municípios do IBGE", () => {
 
     assert.equal(perto?.codigoIbge, 4209102);
     assert.ok(perto!.distanciaKm > 2 && perto!.distanciaKm < 4, `distância ${perto?.distanciaKm}`);
+  });
+});
+
+describe("rotas de cidades com os municípios", () => {
+  let servidor: ServidorDeTeste;
+  let api: ReturnType<typeof criarCliente>;
+  let mapas: ReturnType<typeof instalarMapasFalsos> | null = null;
+
+  before(async () => {
+    servidor = await iniciarServidor();
+    api = criarCliente(servidor.base);
+  });
+
+  beforeEach(async () => {
+    await limparBanco();
+  });
+
+  afterEach(() => {
+    mapas?.desinstalar();
+    mapas = null;
+  });
+
+  after(async () => {
+    await servidor.fechar();
+  });
+
+  it("a busca devolve o código IBGE do município", async () => {
+    await criarMunicipio(JOINVILLE);
+    mapas = instalarMapasFalsos({
+      nominatim: () => ({ corpo: [municipioNominatim("Joinville", "SC", -26.3045, -48.8487)] }),
+    });
+
+    const r = await api("GET", "/cidades/buscar?q=Joinville");
+
+    assert.equal(r.status, 200);
+    assert.equal(r.corpo.dados[0].codigoIbge, 4209102);
+  });
+
+  it("sem Nominatim, procura na tabela de municípios", async () => {
+    await criarMunicipio({ codigoIbge: 3509502, cidade: "Campinas", uf: "SP", latitude: -22.9053, longitude: -47.0659 });
+    mapas = instalarMapasFalsos({ nominatim: () => ({ status: 503, corpo: {} }) });
+
+    const r = await api("GET", "/cidades/buscar?q=Campinas");
+
+    assert.equal(r.status, 200);
+    assert.equal(r.corpo.semServidorDeMapas, true);
+    const campinas = r.corpo.dados.find((c: { cidade: string }) => c.cidade === "Campinas");
+    assert.deepEqual(
+      { codigoIbge: campinas.codigoIbge, uf: campinas.uf, latitude: campinas.latitude },
+      { codigoIbge: 3509502, uf: "SP", latitude: -22.9053 },
+    );
+  });
+
+  it("POST /cidades/perto devolve o município mais próximo", async () => {
+    await criarMunicipio(JOINVILLE);
+    await criarMunicipio(BRASILIA);
+
+    const r = await api("POST", "/cidades/perto", { json: { latitude: -26.31, longitude: -48.84 } });
+
+    assert.equal(r.status, 200);
+    assert.deepEqual(r.corpo, { ...JOINVILLE });
+  });
+
+  it("POST /cidades/perto fora do Brasil responde 404", async () => {
+    await criarMunicipio(JOINVILLE);
+
+    const r = await api("POST", "/cidades/perto", { json: { latitude: 48.85, longitude: 2.35 } });
+
+    assert.equal(r.status, 404);
+    assert.equal(r.corpo.erro, "Não encontramos um município do Brasil perto de você.");
+  });
+
+  it("POST /cidades/perto valida as coordenadas", async () => {
+    const r = await api("POST", "/cidades/perto", { json: { latitude: 120, longitude: -48 } });
+
+    assert.equal(r.status, 400);
   });
 });
