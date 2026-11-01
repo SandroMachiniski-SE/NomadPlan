@@ -103,10 +103,31 @@ model Municipio {
   resumoEm        DateTime? @map("resumo_em")
   geom            Unsupported("geography(Point,4326)")?
 
-  moradores Usuario[]
+  moradores     Usuario[]
+  rotasSaindo   RotaEmCache[] @relation("origemDaRota")
+  rotasChegando RotaEmCache[] @relation("destinoDaRota")
 
   @@index([nomeNormalizado, uf])
   @@map("municipio")
+}
+
+// Rota de carro já consultada no OSRM (um registro por sentido). `tracado` é uma LineString do
+// PostGIS gravada por SQL (o Prisma não modela); `perfil` tem [km, segundos] a cada 5 km.
+model RotaEmCache {
+  id            Int      @id @default(autoincrement())
+  codigoOrigem  Int      @map("codigo_origem")
+  codigoDestino Int      @map("codigo_destino")
+  metros        Int
+  segundos      Int
+  tracado       Unsupported("geometry(LineString,4326)")
+  perfil        Json
+  buscadaEm     DateTime @default(now()) @map("buscada_em")
+
+  origem  Municipio @relation("origemDaRota", fields: [codigoOrigem], references: [codigoIbge], onDelete: Cascade)
+  destino Municipio @relation("destinoDaRota", fields: [codigoDestino], references: [codigoIbge], onDelete: Cascade)
+
+  @@unique([codigoOrigem, codigoDestino])
+  @@map("rota_em_cache")
 }
 
 model PontoTuristico {
