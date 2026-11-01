@@ -241,6 +241,42 @@ tbody tr:hover td {
   border: 0;
 }
 
+/* Vários pontos juntos no mesmo lugar do mapa. */
+.marcador-grupo {
+  background: none;
+  border: 0;
+}
+
+.marcador-grupo span {
+  display: grid;
+  place-items: center;
+  width: 44px;
+  height: 44px;
+  border: 3px solid #fff;
+  border-radius: 50%;
+  background: var(--coral-600);
+  box-shadow: 0 3px 8px rgba(0, 0, 0, 0.35);
+  color: #fff;
+  font-family: var(--font-body);
+  font-size: 0.95rem;
+  font-weight: 700;
+  transition: transform 0.12s;
+}
+
+.marcador-grupo:hover span {
+  transform: scale(1.1);
+}
+
+.balao-grupo {
+  display: grid;
+  gap: 0.3rem;
+  max-height: 180px;
+  margin: 0;
+  padding: 0;
+  overflow-y: auto;
+  list-style: none;
+}
+
 .marcador-pin svg {
   display: block;
   filter: drop-shadow(0 3px 3px rgba(0, 0, 0, 0.35));

@@ -56,6 +56,28 @@ test.describe("explorar pontos turísticos", () => {
     await expect(page.getByRole("link", { name: "Como chegar" })).toBeVisible();
   });
 
+  test("as ações do ponto ficam logo abaixo do título e levam ao roteiro", async ({ page }) => {
+    await cadastrar(page);
+    await buscarCidade(page, "Joinville");
+    await page.getByRole("link", { name: new RegExp(MUSEU) }).click();
+
+    const acoes = page.getByRole("group", { name: "Ações do ponto" });
+
+    await expect(acoes.getByRole("link", { name: "Como chegar" })).toBeVisible();
+    await expect(acoes.getByRole("button", { name: "Salvar nos favoritos" })).toBeVisible();
+
+    await acoes.getByRole("button", { name: "Adicionar a um roteiro" }).click();
+    await expect(page.locator("#adicionar-ao-roteiro")).toBeInViewport();
+  });
+
+  test("a lista no mapa junta pinos próximos e mostra os lugares", async ({ page }) => {
+    await buscarCidade(page, "Joinville");
+    await page.getByRole("button", { name: "Mapa", exact: true }).click();
+
+    await expect(page.locator(".leaflet-container")).toBeVisible();
+    await expect(page.locator(".marcador-pin, .marcador-grupo").first()).toBeVisible();
+  });
+
   test("visitante sem login não vê o botão de favoritar nem o de avaliar", async ({ page }) => {
     await buscarCidade(page, "Joinville");
 
