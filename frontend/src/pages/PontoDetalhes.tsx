@@ -267,6 +267,14 @@ function PontoDetalhes() {
   const ehResponsavel = Boolean(usuario && ponto && usuario.id === ponto.idResponsavel);
   const podeSugerir = Boolean(autenticado && !ehResponsavel && ponto?.status === "PUBLICADO");
 
+  /** Leva até o cartão "Adicionar a um roteiro" e já deixa a lista de roteiros em foco. */
+  function aoIrParaRoteiro() {
+    const cartao = document.getElementById("adicionar-ao-roteiro");
+
+    cartao?.scrollIntoView({ behavior: "smooth", block: "center" });
+    cartao?.querySelector("select")?.focus({ preventScroll: true });
+  }
+
   function aoInformarHorario() {
     setCampoSugestao("horarioFuncionamento");
     setMostrarSugestao(true);
@@ -360,23 +368,43 @@ function PontoDetalhes() {
                 </p>
               </header>
 
+              {(ponto.latitude !== null || ponto.status === "PUBLICADO") && (
+                <div className="ponto-acoes" role="group" aria-label="Ações do ponto">
+                  {ponto.latitude !== null && ponto.longitude !== null && (
+                    <a
+                      href={`https://www.google.com/maps/dir/?api=1&destination=${ponto.latitude},${ponto.longitude}`}
+                      target="_blank"
+                      rel="noreferrer"
+                      className="btn btn--primary"
+                    >
+                      <Icone nome="localizar" />
+                      Como chegar
+                    </a>
+                  )}
+
+                  {ponto.status === "PUBLICADO" &&
+                    (autenticado ? (
+                      <>
+                        <BotaoSalvar idPonto={ponto.id} variante="barra" />
+                        <button type="button" className="btn btn--outline" onClick={aoIrParaRoteiro}>
+                          <Icone nome="mais" />
+                          Adicionar a um roteiro
+                        </button>
+                      </>
+                    ) : (
+                      <Link to="/login" className="btn btn--outline">
+                        Entre para salvar e montar roteiros
+                      </Link>
+                    ))}
+                </div>
+              )}
+
               {ponto.descricao && <p className="ponto-descricao">{ponto.descricao}</p>}
 
               {ponto.latitude !== null && ponto.longitude !== null && (
                 <section className="stack stack--sm" aria-label="Localização no mapa">
                   <div className="mapa-wrap">
                     <MapaCarregavel pontos={[ponto]} altura={300} />
-                  </div>
-                  <div>
-                    <a
-                      href={`https://www.google.com/maps/dir/?api=1&destination=${ponto.latitude},${ponto.longitude}`}
-                      target="_blank"
-                      rel="noreferrer"
-                      className="btn btn--outline btn--sm"
-                    >
-                      <Icone nome="localizar" />
-                      Como chegar
-                    </a>
                   </div>
                 </section>
               )}
@@ -486,11 +514,7 @@ function PontoDetalhes() {
               {ponto.status === "PUBLICADO" && <InformacoesGoogle ponto={ponto} aoReceberFoto={setFotoGoogle} />}
 
               {autenticado && ponto.status === "PUBLICADO" && (
-                <BotaoSalvar idPonto={ponto.id} variante="completo" />
-              )}
-
-              {autenticado && ponto.status === "PUBLICADO" && (
-                <section className="card card--pad stack stack--sm">
+                <section id="adicionar-ao-roteiro" className="card card--pad stack stack--sm">
                   <h2 className="ponto-lateral__titulo">Adicionar a um roteiro</h2>
 
                   {adicionadoRoteiro ? (

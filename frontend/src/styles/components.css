@@ -51,6 +51,8 @@
 
 .stack {
   display: grid;
+  /* minmax(0, 1fr): sem isso um filho largo (seletor de dias, tabela) estica a coluna além da tela. */
+  grid-template-columns: minmax(0, 1fr);
   gap: 1rem;
 }
 
@@ -545,13 +547,18 @@
 
 .segmented {
   display: inline-flex;
+  max-width: 100%;
   padding: 4px;
   gap: 2px;
+  overflow-x: auto;
   border-radius: var(--radius);
   background: var(--surface-3);
+  scrollbar-width: thin;
 }
 
 .segmented button {
+  flex: 0 0 auto;
+  white-space: nowrap;
   display: inline-flex;
   align-items: center;
   gap: 0.4rem;

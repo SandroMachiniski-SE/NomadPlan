@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { MapContainer, Marker, Popup, TileLayer, useMap, useMapEvents } from "react-leaflet";
 import { Link } from "react-router-dom";
 import L from "leaflet";
@@ -57,6 +57,93 @@ function areaVisivel(mapa: L.Map): AreaDoMapa {
   const raioKm = mapa.distance(centro, mapa.getBounds().getNorthEast()) / 1000;
 
   return { latitude: centro.lat, longitude: centro.lng, raioKm };
+}
+
+const TAMANHO_DA_CELULA_PX = 84;
+const ZOOM_SEM_AGRUPAR = 17;
+
+const iconeDoGrupo = (quantidade: number) =>
+  L.divIcon({
+    className: "marcador-grupo",
+    html: `<span>${quantidade}</span>`,
+    iconSize: [44, 44],
+    iconAnchor: [22, 22],
+    popupAnchor: [0, -22],
+  });
+
+/**
+ * Junta pinos que ficariam um por cima do outro. Agrupa por células de tela no zoom atual, então ao
+ * aproximar o mapa os grupos se desfazem sozinhos.
+ */
+function PinosAgrupados({ pontos, explorando }: { pontos: PontoComCoordenadas[]; explorando: boolean }) {
+  const mapa = useMap();
+  const [zoom, setZoom] = useState(() => mapa.getZoom());
+
+  useMapEvents({ zoomend: () => setZoom(mapa.getZoom()) });
+
+  const grupos = useMemo(() => {
+    const celulas = new Map<string, PontoComCoordenadas[]>();
+
+    for (const ponto of pontos) {
+      const pixel = mapa.project([ponto.latitude, ponto.longitude], zoom);
+      const chave = `${Math.floor(pixel.x / TAMANHO_DA_CELULA_PX)}:${Math.floor(pixel.y / TAMANHO_DA_CELULA_PX)}`;
+
+      celulas.set(chave, [...(celulas.get(chave) ?? []), ponto]);
+    }
+
+    return [...celulas.values()];
+  }, [pontos, zoom, mapa]);
+
+  return (
+    <>
+      {grupos.map((grupo) => {
+        if (grupo.length === 1) {
+          const ponto = grupo[0];
+
+          return (
+            <Marker key={ponto.id} position={[ponto.latitude, ponto.longitude]} icon={iconeMarcador}>
+              <Popup>
+                <BalaoDoPonto ponto={ponto} explorando={explorando} />
+              </Popup>
+            </Marker>
+          );
+        }
+
+        const limites = L.latLngBounds(grupo.map((p) => [p.latitude, p.longitude] as [number, number]));
+        const centro = limites.getCenter();
+        // No zoom máximo, ou com pontos exatamente no mesmo lugar, aproximar não separa: mostra a lista.
+        const naoSepara = zoom >= ZOOM_SEM_AGRUPAR || limites.getNorthEast().equals(limites.getSouthWest());
+        const chave = grupo.map((p) => p.id).join(",");
+
+        return (
+          <Marker
+            key={chave}
+            position={centro}
+            icon={iconeDoGrupo(grupo.length)}
+            title={`${grupo.length} lugares: aproxime para ver`}
+            eventHandlers={{
+              click: () => {
+                if (!naoSepara) mapa.fitBounds(limites, { padding: [60, 60], maxZoom: ZOOM_SEM_AGRUPAR });
+              },
+            }}
+          >
+            {naoSepara && (
+              <Popup>
+                <ul className="balao-grupo">
+                  {grupo.map((ponto) => (
+                    <li key={ponto.id}>
+                      <Link to={`/pontos/${ponto.id}`}>{ponto.nome}</Link>
+                      <span className="muted small"> · {ponto.categoria}</span>
+                    </li>
+                  ))}
+                </ul>
+              </Popup>
+            )}
+          </Marker>
+        );
+      })}
+    </>
+  );
 }
 
 /** Enquadra os pontos quando a lista muda, sem fazer o botão de busca achar que a pessoa mexeu no mapa. */
@@ -256,13 +343,7 @@ function MapaPontos({
             jaMostraPontos={comCoordenadas.length > 0}
           />}
 
-        {comCoordenadas.map((ponto) => (
-          <Marker key={ponto.id} position={[ponto.latitude, ponto.longitude]} icon={iconeMarcador}>
-            <Popup>
-              <BalaoDoPonto ponto={ponto} explorando={explorando} />
-            </Popup>
-          </Marker>
-        ))}
+        <PinosAgrupados pontos={comCoordenadas} explorando={explorando} />
       </MapContainer>
     </div>
   );

@@ -82,6 +82,11 @@ function RoteiroDetalhes() {
   // Dias vazios que a pessoa criou com "Adicionar dia" ainda não existem no servidor (um
   // dia só passa a existir quando recebe uma parada), então ficam guardados aqui.
   const [diasMinimos, setDiasMinimos] = useState(1);
+  // Dias recolhidos pela pessoa e dia que está na tela (para a barra de navegação por dia).
+  const [diasRecolhidos, setDiasRecolhidos] = useState<number[]>([]);
+  const [diaAtivo, setDiaAtivo] = useState<number | null>(null);
+  // Depois de um clique na barra, a rolagem do navegador não deve trocar o dia marcado.
+  const marcacaoTravada = useRef(false);
   const [diaDoNovoPonto, setDiaDoNovoPonto] = useState("");
   const [otimizando, setOtimizando] = useState<number | "todos" | null>(null);
   const [resultadoOtimizacao, setResultadoOtimizacao] = useState<{ dia: number | null; texto: string } | null>(null);
@@ -299,6 +304,52 @@ function RoteiroDetalhes() {
   const totalDias = roteiro ? contarDias(roteiro.itens, roteiro.dataInicio, roteiro.dataFim, diasMinimos) : 1;
   const dias = agruparPorDia(itens, totalDias);
   const itensEmOrdem = dias.flatMap((grupo) => grupo.itens);
+  const quantidadeDeDias = dias.length;
+  const todosRecolhidos = quantidadeDeDias > 0 && diasRecolhidos.length >= quantidadeDeDias;
+
+  function alternarDia(dia: number) {
+    setDiasRecolhidos((atual) => (atual.includes(dia) ? atual.filter((d) => d !== dia) : [...atual, dia]));
+  }
+
+  function alternarTodosOsDias() {
+    setDiasRecolhidos(todosRecolhidos ? [] : dias.map((grupo) => grupo.dia));
+  }
+
+  /** Abre o dia (se estava recolhido) e leva a página até ele. */
+  function irParaODia(dia: number) {
+    setDiasRecolhidos((atual) => atual.filter((d) => d !== dia));
+    setDiaAtivo(dia);
+    marcacaoTravada.current = true;
+    window.setTimeout(() => {
+      marcacaoTravada.current = false;
+    }, 1500);
+    window.setTimeout(() => {
+      document.getElementById(`dia-${dia}`)?.scrollIntoView({ behavior: "smooth", block: "start" });
+    }, 30);
+  }
+
+  // Marca na barra o dia que está na faixa de leitura da tela.
+  useEffect(() => {
+    if (quantidadeDeDias < 2 || typeof IntersectionObserver === "undefined") {
+      return;
+    }
+
+    const observador = new IntersectionObserver(
+      (entradas) => {
+        if (marcacaoTravada.current) return;
+
+        const visivel = entradas.find((entrada) => entrada.isIntersecting);
+        const dia = Number(visivel?.target.getAttribute("data-dia"));
+
+        if (visivel && dia) setDiaAtivo(dia);
+      },
+      { rootMargin: "-25% 0px -65% 0px" },
+    );
+
+    document.querySelectorAll("[data-dia]").forEach((elemento) => observador.observe(elemento));
+
+    return () => observador.disconnect();
+  }, [quantidadeDeDias, carregando]);
 
   // Envia ao servidor a lista completa de paradas, na ordem e com os dias desejados.
   async function organizar(lista: { id: number; dia: number }[], mensagemDeErro: string) {
@@ -731,6 +782,28 @@ function RoteiroDetalhes() {
               </div>
             )}
 
+            {quantidadeDeDias > 1 && itens.length > 0 && (
+              <nav className="dias-nav" aria-label="Ir para o dia">
+                <div className="dias-nav__lista">
+                  {dias.map((grupo) => (
+                    <button
+                      key={grupo.dia}
+                      type="button"
+                      className="dias-nav__item"
+                      aria-current={diaAtivo === grupo.dia ? "true" : undefined}
+                      style={{ ["--cor-dia" as string]: corDoDia(grupo.dia) }}
+                      onClick={() => irParaODia(grupo.dia)}
+                    >
+                      Dia {grupo.dia}
+                    </button>
+                  ))}
+                </div>
+                <button type="button" className="btn btn--ghost btn--sm" onClick={alternarTodosOsDias}>
+                  {todosRecolhidos ? "Expandir todos" : "Recolher todos"}
+                </button>
+              </nav>
+            )}
+
             {itens.length === 0 && (
               <div className="empty">
                 <div className="empty__icon">
@@ -750,8 +823,24 @@ function RoteiroDetalhes() {
                 const viagem = roteiro?.viagensEntreDias?.find((v) => v.dia === grupo.dia);
 
                 return (
-                  <div key={grupo.dia} className="dia" style={{ ["--cor-dia" as string]: corDoDia(grupo.dia) }}>
+                  <div
+                    key={grupo.dia}
+                    id={`dia-${grupo.dia}`}
+                    data-dia={grupo.dia}
+                    className="dia"
+                    style={{ ["--cor-dia" as string]: corDoDia(grupo.dia) }}
+                  >
                     <div className="dia__cabecalho">
+                      <button
+                        type="button"
+                        className="dia__alternar"
+                        onClick={() => alternarDia(grupo.dia)}
+                        aria-expanded={!diasRecolhidos.includes(grupo.dia)}
+                        aria-controls={`dia-${grupo.dia}-conteudo`}
+                        aria-label={`${diasRecolhidos.includes(grupo.dia) ? "Mostrar" : "Esconder"} o dia ${grupo.dia}`}
+                      >
+                        <Icone nome="baixo" />
+                      </button>
                       <h3 className="dia__titulo">
                         {rotuloDoDia(grupo.dia, roteiro?.dataInicio ?? null)}
                         {cidades.length > 0 && <span className="dia__cidades"> · {cidades.join(", ")}</span>}
@@ -777,6 +866,7 @@ function RoteiroDetalhes() {
                       )}
                     </div>
 
+                    <div id={`dia-${grupo.dia}-conteudo`} hidden={diasRecolhidos.includes(grupo.dia)}>
                     {resultadoOtimizacao?.dia === grupo.dia && (
                       <div className="alert alert--info" role="status">
                         <Icone nome="info" />
@@ -921,6 +1011,7 @@ function RoteiroDetalhes() {
                         />
                       </div>
                     )}
+                    </div>
                   </div>
                 );
               })}

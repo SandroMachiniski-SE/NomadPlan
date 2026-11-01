@@ -784,6 +784,19 @@ fieldset.field {
   top: calc(var(--header-height) + 1rem);
 }
 
+/* Ações principais logo abaixo do título (antes ficavam perdidas no fim da página). */
+.ponto-acoes {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.6rem;
+}
+
+@media (max-width: 520px) {
+  .ponto-acoes > * {
+    flex: 1 1 100%;
+  }
+}
+
 .ponto-lateral__titulo {
   margin-bottom: 0.25rem;
   font-size: 1.05rem;
@@ -795,7 +808,7 @@ fieldset.field {
   position: relative;
   display: grid;
   place-items: center;
-  height: clamp(200px, 32vw, 340px);
+  height: clamp(170px, 24vw, 280px);
   overflow: hidden;
   border-radius: var(--radius-lg);
   background: linear-gradient(135deg, var(--capa-a), var(--capa-b));
@@ -1188,6 +1201,92 @@ fieldset.field {
 
 .dia__cabecalho .btn {
   margin-left: auto;
+}
+
+/* Recolhe/expande o dia. */
+.dia__alternar {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 32px;
+  height: 32px;
+  padding: 0;
+  border: 1px solid var(--border-strong);
+  border-radius: var(--radius-pill);
+  background: var(--surface);
+  color: var(--cor-dia);
+  cursor: pointer;
+  transition: transform 0.15s, background-color 0.15s;
+}
+
+.dia__alternar:hover {
+  background: var(--surface-2);
+}
+
+.dia__alternar[aria-expanded="false"] svg {
+  transform: rotate(-90deg);
+}
+
+.dia {
+  scroll-margin-top: calc(var(--header-height) + 4rem);
+}
+
+/* Barra fixa para pular entre os dias de um roteiro longo. */
+.dias-nav {
+  position: sticky;
+  top: var(--header-height);
+  z-index: 20;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.75rem;
+  margin: 0.75rem 0 1.25rem;
+  padding: 0.5rem 0.75rem;
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  background: var(--surface);
+  box-shadow: var(--shadow-sm);
+}
+
+.dias-nav__lista {
+  display: flex;
+  flex: 1 1 0;
+  gap: 0.4rem;
+  min-width: 0;
+  /* Sem isto, os botões dos dias alargam o contêiner em vez de rolar. */
+  contain: inline-size;
+  overflow-x: auto;
+  scrollbar-width: thin;
+}
+
+.dias-nav__item {
+  flex: 0 0 auto;
+  min-height: 34px;
+  padding: 0.25rem 0.8rem;
+  border: 1.5px solid var(--cor-dia);
+  border-radius: var(--radius-pill);
+  background: transparent;
+  color: var(--cor-dia);
+  font: inherit;
+  font-size: 0.875rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background-color 0.15s, color 0.15s, transform 0.1s;
+}
+
+.dias-nav__item:hover,
+.dias-nav__item[aria-current="true"] {
+  background: var(--cor-dia);
+  color: #fff;
+}
+
+.dias-nav__item:active {
+  transform: scale(0.95);
+}
+
+.dias-nav .btn {
+  flex: 0 0 auto;
+  margin-left: 0;
 }
 
 .dia__vazio {
