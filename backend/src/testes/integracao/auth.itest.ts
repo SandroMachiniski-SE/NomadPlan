@@ -280,6 +280,15 @@ describe("autenticação e contas", () => {
       }
     });
 
+    it("o link de redefinição não serve como sessão (não contorna senha nem 2FA)", async () => {
+      const { usuario } = await criarUsuario({ email: "joao@exemplo.com" });
+      const token = gerarTokenRedefinicaoSenha(usuario.id, usuario.senhaHash);
+
+      const me = await api("GET", "/auth/me", { token });
+
+      assert.equal(me.status, 401);
+    });
+
     it("troca a senha com o link e o link só funciona uma vez", async () => {
       const { usuario } = await criarUsuario({ email: "joao@exemplo.com" });
       const token = gerarTokenRedefinicaoSenha(usuario.id, usuario.senhaHash);
@@ -295,6 +304,29 @@ describe("autenticação e contas", () => {
       const antigo = await api("POST", "/auth/login", { json: { email: "joao@exemplo.com", senha: SENHA_DE_TESTE } });
       assert.equal(novo.status, 200);
       assert.equal(antigo.status, 401);
+    });
+
+    it("redefinir a senha derruba as sessões abertas antes, e a nova sessão funciona", async () => {
+      const { usuario, token: sessaoAntiga } = await criarUsuario({ email: "joao@exemplo.com" });
+
+      assert.equal((await api("GET", "/auth/me", { token: sessaoAntiga })).status, 200);
+
+      const link = gerarTokenRedefinicaoSenha(usuario.id, usuario.senhaHash);
+      const troca = await api("POST", "/auth/redefinir-senha", { json: { token: link, novaSenha: "senha-nova-12345" } });
+
+      assert.equal(troca.status, 200);
+      assert.equal((await api("GET", "/auth/me", { token: sessaoAntiga })).status, 401);
+
+      const login = await api("POST", "/auth/login", { json: { email: "joao@exemplo.com", senha: "senha-nova-12345" } });
+
+      assert.equal(login.status, 200);
+      assert.equal((await api("GET", "/auth/me", { token: login.corpo.token })).status, 200);
+
+      // Renovar mantém a versão da sessão: o token novo continua valendo.
+      const renovada = await api("POST", "/auth/renovar", { token: login.corpo.token });
+
+      assert.equal(renovada.status, 200);
+      assert.equal((await api("GET", "/auth/me", { token: renovada.corpo.token })).status, 200);
     });
 
     it("recusa token adulterado, de outro tipo e senha nova curta", async () => {

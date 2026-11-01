@@ -1,0 +1,1870 @@
+{
+ "fonte": "Overture Maps Foundation, tema places, versão 2026-10-21.0",
+ "licenca": "CDLA Permissive 2.0 (https://cdla.dev/permissive-2-0/); algumas fontes em Apache 2.0 ou CC0, indicadas em cada lugar",
+ "cidade": "São Francisco do Sul",
+ "baixadoEm": "2026-10-30T03:00:27.568817+00:00",
+ "lugares": [
+  {
+   "idOverture": "62c0a4e9-ecd2-4707-8daa-a6adce97fb8c",
+   "nome": "Morro da Ribeira",
+   "categoriaOverture": "geographic_entities",
+   "confianca": 0.808,
+   "sites": [],
+   "telefones": [],
+   "redesSociais": [
+    "https://www.facebook.com/958796184194786"
+   ],
+   "endereco": "",
+   "localidade": "São Francisco do Sul",
+   "latitude": -26.321389,
+   "longitude": -48.67527065,
+   "fontes": [
+    "meta (CDLA-Permissive-2.0)",
+    "Overture (CDLA-Permissive-2.0)"
+   ]
+  },
+  {
+   "idOverture": "eadd46f7-0567-43e4-bdab-8df55a6d6561",
+   "nome": "Pousada Vila da gloria",
+   "categoriaOverture": "hotel",
+   "confianca": 0.886,
+   "sites": [],
+   "telefones": [
+    "+554734495026"
+   ],
+   "redesSociais": [
+    "https://www.facebook.com/1377818455809414"
+   ],
+   "endereco": "vila da gloria ",
+   "localidade": "São Francisco do Sul",
+   "latitude": -26.243431382173824,
+   "longitude": -48.695750113815,
+   "fontes": [
+    "meta (CDLA-Permissive-2.0)",
+    "Overture (CDLA-Permissive-2.0)"
+   ]
+  },
+  {
+   "idOverture": "05025863-8203-4678-8415-41c0ddf66e65",
+   "nome": "Chalés La Basquetera",
+   "categoriaOverture": "cabin",
+   "confianca": 0.961,
+   "sites": [],
+   "telefones": [
+    "+5547991090324"
+   ],
+   "redesSociais": [
+    "https://www.facebook.com/1082770021849385"
+   ],
+   "endereco": "Chalés Lá Basquetera - R. Theodoro Antônio de Oliveira",
+   "localidade": "São Francisco do Sul",
+   "latitude": -26.22045455,
+   "longitude": -48.67697692,
+   "fontes": [
+    "meta (CDLA-Permissive-2.0)",
+    "Overture (CDLA-Permissive-2.0)"
+   ]
+  },
+  {
+   "idOverture": "4817a5cd-b5c7-49c7-8e40-251f51f6f04b",
+   "nome": "Pousada do Bulldog",
+   "categoriaOverture": "hotel",
+   "confianca": 0.993,
+   "sites": [],
+   "telefones": [
+    "+5547992284035"
+   ],
+   "redesSociais": [
+    "https://www.facebook.com/1417502135158889"
+   ],
+   "endereco": "BATISTA - RUA DALZIZA COSTA, R. do Falanstério",
+   "localidade": "São Francisco do Sul",
+   "latitude": -26.21382001,
+   "longitude": -48.65798398,
+   "fontes": [
+    "meta (CDLA-Permissive-2.0)",
+    "Overture (CDLA-Permissive-2.0)"
+   ]
+  },
+  {
+   "idOverture": "98d6d82f-3f2d-4e6f-a40f-e3efb958b3aa",
+   "nome": "Morro das Laranjeiras",
+   "categoriaOverture": "geographic_entities",
+   "confianca": 0.808,
+   "sites": [],
+   "telefones": [],
+   "redesSociais": [
+    "https://www.facebook.com/1507082866261434"
+   ],
+   "endereco": "",
+   "localidade": "São Francisco do Sul",
+   "latitude": -26.29027761,
+   "longitude": -48.66861282,
+   "fontes": [
+    "meta (CDLA-Permissive-2.0)",
+    "Overture (CDLA-Permissive-2.0)"
+   ]
+  },
+  {
+   "idOverture": "5418c64d-bb0c-442e-8648-488b5098c9cf",
+   "nome": "Morro Jacutinga",
+   "categoriaOverture": "geographic_entities",
+   "confianca": 0.803,
+   "sites": [],
+   "telefones": [],
+   "redesSociais": [
+    "https://www.facebook.com/196843857328135"
+   ],
+   "endereco": "",
+   "localidade": "São Francisco do Sul",
+   "latitude": -26.31472566,
+   "longitude": -48.65722139,
+   "fontes": [
+    "meta (CDLA-Permissive-2.0)",
+    "Overture (CDLA-Permissive-2.0)"
+   ]
+  },
+  {
+   "idOverture": "df1e958e-a0a4-4d57-ab53-d0daea6a9aac",
+   "nome": "Morro da Cruz",
+   "categoriaOverture": "geographic_entities",
+   "confianca": 0.817,
+   "sites": [],
+   "telefones": [],
+   "redesSociais": [
+    "https://www.facebook.com/1684787528476947"
+   ],
+   "endereco": "",
+   "localidade": "São Francisco do Sul",
+   "latitude": -26.29972776,
+   "longitude": -48.64888574,
+   "fontes": [
+    "meta (CDLA-Permissive-2.0)",
+    "Overture (CDLA-Permissive-2.0)"
+   ]
+  },
+  {
+   "idOverture": "adb7a897-a02d-41f4-ac6c-0d79fe8c0c8d",
+   "nome": "Paróquia Nossa Senhora dos Navegantes",
+   "categoriaOverture": "roman_catholic_place_of_worship",
+   "confianca": 0.961,
+   "sites": [
+    "http://www.saofranciscodosul.sc.gov.br/"
+   ],
+   "telefones": [
+    "+554734490478"
+   ],
+   "redesSociais": [
+    "https://www.facebook.com/375041459276447"
+   ],
+   "endereco": "Avenida Santa Catarina",
+   "localidade": "São Francisco do Sul",
+   "latitude": -26.22691282,
+   "longitude": -48.50899497,
+   "fontes": [
+    "meta (CDLA-Permissive-2.0)",
+    "Overture (CDLA-Permissive-2.0)"
+   ]
+  },
+  {
+   "idOverture": "53616d52-6820-4747-af10-75436558ab2c",
+   "nome": "Restaurante Trem Bão Sô",
+   "categoriaOverture": "restaurant",
+   "confianca": 0.633,
+   "sites": [],
+   "telefones": [
+    "+5547997270316"
+   ],
+   "redesSociais": [
+    "https://www.facebook.com/103082461251207"
+   ],
+   "endereco": "Av. Santa Catarina, 811",
+   "localidade": "São Francisco do Sul",
+   "latitude": -26.22739719,
+   "longitude": -48.5080187,
+   "fontes": [
+    "meta (CDLA-Permissive-2.0)",
+    "Overture (CDLA-Permissive-2.0)"
+   ]
+  },
+  {
+   "idOverture": "44263e53-3589-4968-b8e5-96b4b0f7044f",
+   "nome": "Paviloche",
+   "categoriaOverture": "ice_cream_shop",
+   "confianca": 0.984,
+   "sites": [
+    "http://paviloche.com.br/"
+   ],
+   "telefones": [
+    "+554734490519"
+   ],
+   "redesSociais": [
+    "https://www.facebook.com/128803913872801"
+   ],
+   "endereco": "Av. Atlântica, 1288",
+   "localidade": "São Francisco do Sul",
+   "latitude": -26.22714616,
+   "longitude": -48.5050614,
+   "fontes": [
+    "meta (CDLA-Permissive-2.0)",
+    "Overture (CDLA-Permissive-2.0)"
+   ]
+  },
+  {
+   "idOverture": "e61ae498-e1d5-44cb-90d6-3878ce081b4b",
+   "nome": "Restaurante Deck 66",
+   "categoriaOverture": "restaurant",
+   "confianca": 0.959,
+   "sites": [
+    "https://www.instagram.com/deck66restaurante/"
+   ],
+   "telefones": [
+    "+554734423886"
+   ],
+   "redesSociais": [
+    "https://www.facebook.com/552111904867390"
+   ],
+   "endereco": "Av. Atlântica, 1516",
+   "localidade": "São Francisco do Sul",
+   "latitude": -26.22607936,
+   "longitude": -48.50296566,
+   "fontes": [
+    "meta (CDLA-Permissive-2.0)",
+    "Overture (CDLA-Permissive-2.0)"
+   ]
+  },
+  {
+   "idOverture": "10d0405a-8d21-487e-9da4-5fc6df325f1c",
+   "nome": "Hotel Fragata",
+   "categoriaOverture": "hotel",
+   "confianca": 0.991,
+   "sites": [
+    "http://www.hotelfragata.com.br/"
+   ],
+   "telefones": [
+    "+554734491040"
+   ],
+   "redesSociais": [
+    "https://www.facebook.com/327259801249372"
+   ],
+   "endereco": "Av. Atlântica, 1738",
+   "localidade": "São Francisco do Sul",
+   "latitude": -26.22458097,
+   "longitude": -48.5016479,
+   "fontes": [
+    "meta (CDLA-Permissive-2.0)",
+    "Overture (CDLA-Permissive-2.0)"
+   ]
+  },
+  {
+   "idOverture": "ae04d2ca-83b7-4cd4-a1d9-66e35a4e2435",
+   "nome": "Praia do Molhe",
+   "categoriaOverture": "beach",
+   "confianca": 0.954,
+   "sites": [],
+   "telefones": [],
+   "redesSociais": [
+    "https://www.facebook.com/1158478994166791"
+   ],
+   "endereco": "Av. Atlântica, 22846",
+   "localidade": "São Francisco do Sul",
+   "latitude": -26.21867757,
+   "longitude": -48.49800092,
+   "fontes": [
+    "meta (CDLA-Permissive-2.0)",
+    "Overture (CDLA-Permissive-2.0)"
+   ]
+  },
+  {
+   "idOverture": "8025bc0b-95ad-4dda-b343-7c2665b2e7e7",
+   "nome": "Edifício Brisa do Mar",
+   "categoriaOverture": "holiday_rental_home",
+   "confianca": 0.917,
+   "sites": [],
+   "telefones": [
+    "+4799615502"
+   ],
+   "redesSociais": [
+    "https://www.facebook.com/869427813108657"
+   ],
+   "endereco": "",
+   "localidade": "São Francisco do Sul",
+   "latitude": -26.23383447,
+   "longitude": -48.50102271,
+   "fontes": [
+    "meta (CDLA-Permissive-2.0)",
+    "Overture (CDLA-Permissive-2.0)"
+   ]
+  },
+  {
+   "idOverture": "c7292c46-15bb-4187-a1ef-7e63b4524007",
+   "nome": "Santa Pasta",
+   "categoriaOverture": "italian_restaurant",
+   "confianca": 0.972,
+   "sites": [],
+   "telefones": [
+    "+554734443619"
+   ],
+   "redesSociais": [
+    "https://www.facebook.com/110208523978830"
+   ],
+   "endereco": "Rua Brasília, s/n, sala 4, poste 19 Prainha",
+   "localidade": "São Francisco do Sul",
+   "latitude": -26.23402999,
+   "longitude": -48.50104058,
+   "fontes": [
+    "meta (CDLA-Permissive-2.0)",
+    "Overture (CDLA-Permissive-2.0)"
+   ]
+  },
+  {
+   "idOverture": "d7bf0be4-ede4-40c3-b37b-46dc960c4fb4",
+   "nome": "Bar do Banana",
+   "categoriaOverture": "bar",
+   "confianca": 0.997,
+   "sites": [
+    "http://www.bardobanana.com.br"
+   ],
+   "telefones": [
+    "+5547991370785"
+   ],
+   "redesSociais": [
+    "https://www.facebook.com/171036193000500"
+   ],
+   "endereco": "Av. Brasília, 21",
+   "localidade": "São Francisco do Sul",
+   "latitude": -26.23037999,
+   "longitude": -48.50119796,
+   "fontes": [
+    "meta (CDLA-Permissive-2.0)",
+    "Overture (CDLA-Permissive-2.0)"
+   ]
+  },
+  {
+   "idOverture": "0f7fcacd-3042-4a80-952e-3ef087b07069",
+   "nome": "Tá na Onda",
+   "categoriaOverture": "restaurant",
+   "confianca": 0.994,
+   "sites": [
+    "http://www.tanaondabar.com.br/"
+   ],
+   "telefones": [
+    "+5547988749339"
+   ],
+   "redesSociais": [
+    "https://www.facebook.com/196403643730327"
+   ],
+   "endereco": "Av. Brasília, 15",
+   "localidade": "São Francisco do Sul",
+   "latitude": -26.23191218,
+   "longitude": -48.50105528,
+   "fontes": [
+    "meta (CDLA-Permissive-2.0)",
+    "Overture (CDLA-Permissive-2.0)"
+   ]
+  },
+  {
+   "idOverture": "14852c6b-7c7f-4713-a1a0-cb654c0c9d75",
+   "nome": "Pousada da Ilha",
+   "categoriaOverture": "lodging",
+   "confianca": 0.989,
+   "sites": [
+    "http://www.pousadadailhasfs.com.br/"
+   ],
+   "telefones": [
+    "+554734490756"
+   ],
+   "redesSociais": [
+    "https://www.facebook.com/260225187350134"
+   ],
+   "endereco": "R. São Luís, 28",
+   "localidade": "São Francisco do Sul",
+   "latitude": -26.23364072,
+   "longitude": -48.5012181,
+   "fontes": [
+    "meta (CDLA-Permissive-2.0)",
+    "Overture (CDLA-Permissive-2.0)"
+   ]
+  },
+  {
+   "idOverture": "3be68b0f-a308-4128-b0d1-3eb8b13364fb",
+   "nome": "Residencial Prainha",
+   "categoriaOverture": "bed_and_breakfast",
+   "confianca": 0.929,
+   "sites": [
+    "http://www.residencialprainha.com.br/"
+   ],
+   "telefones": [
+    "+554734490234"
+   ],
+   "redesSociais": [
+    "https://www.facebook.com/393193865692"
+   ],
+   "endereco": "Rua São Luiz, 41",
+   "localidade": "São Francisco do Sul",
+   "latitude": -26.23376464,
+   "longitude": -48.50134062,
+   "fontes": [
+    "meta (CDLA-Permissive-2.0)",
+    "Overture (CDLA-Permissive-2.0)"
+   ]
+  },
+  {
+   "idOverture": "e89ff443-8c31-4571-b7ee-70c353e09cac",
+   "nome": "Praia da Saudade",
+   "categoriaOverture": "beach",
+   "confianca": 0.741,
+   "sites": [],
+   "telefones": [],
+   "redesSociais": [
+    "https://www.facebook.com/1852697964967173"
+   ],
+   "endereco": "Rua Praia Grande, S/N",
+   "localidade": "São Francisco do Sul",
+   "latitude": -26.23103993,
+   "longitude": -48.50112182,
+   "fontes": [
+    "meta (CDLA-Permissive-2.0)",
+    "Overture (CDLA-Permissive-2.0)"
+   ]
+  },
+  {
+   "idOverture": "1d4a9e56-79fb-4cf7-981e-7bbfb4361f7d",
+   "nome": "Pousada Casa da Praia",
+   "categoriaOverture": "hotel",
+   "confianca": 0.975,
+   "sites": [
+    "http://pousadapraiacaraiva.com.br"
+   ],
+   "telefones": [
+    "+5547999645911"
+   ],
+   "redesSociais": [
+    "https://www.facebook.com/194106914270052"
+   ],
+   "endereco": "R. Maceió, 90",
+   "localidade": "São Francisco do Sul",
+   "latitude": -26.23058439,
+   "longitude": -48.50183879,
+   "fontes": [
+    "meta (CDLA-Permissive-2.0)",
+    "Overture (CDLA-Permissive-2.0)"
+   ]
+  },
+  {
+   "idOverture": "1b68ea6c-0ba5-4529-99e4-a38620d65a59",
+   "nome": "Babitonga Hostel",
+   "categoriaOverture": "hostel",
+   "confianca": 0.949,
+   "sites": [
+    "https://www.instagram.com/babitongahostel"
+   ],
+   "telefones": [
+    "+5547992682502"
+   ],
+   "redesSociais": [
+    "https://www.facebook.com/105268368467903"
+   ],
+   "endereco": "R. Rio de Janeiro, 110",
+   "localidade": "São Francisco do Sul",
+   "latitude": -26.22962568,
+   "longitude": -48.50180989,
+   "fontes": [
+    "meta (CDLA-Permissive-2.0)",
+    "Overture (CDLA-Permissive-2.0)"
+   ]
+  },
+  {
+   "idOverture": "0beb42c8-6cbc-49de-b67c-67b6f9f36391",
+   "nome": "Hotel Enseada | São Francisco do Sul",
+   "categoriaOverture": "hotel",
+   "confianca": 0.973,
+   "sites": [
+    "http://www.hotelenseada.com/"
+   ],
+   "telefones": [
+    "+554734490122"
+   ],
+   "redesSociais": [
+    "https://www.facebook.com/290511470983473"
+   ],
+   "endereco": "Av. Atlântica, 1074",
+   "localidade": "São Francisco do Sul",
+   "latitude": -26.22755035,
+   "longitude": -48.50723982,
+   "fontes": [
+    "meta (CDLA-Permissive-2.0)",
+    "Overture (CDLA-Permissive-2.0)"
+   ]
+  },
+  {
+   "idOverture": "9a3e146f-ca4b-4542-bc18-ca131adf37d1",
+   "nome": "Dunas House",
+   "categoriaOverture": "hotel",
+   "confianca": 0.909,
+   "sites": [
+    "http://dunashouse.com/"
+   ],
+   "telefones": [
+    "+5547991412719"
+   ],
+   "redesSociais": [
+    "https://www.facebook.com/1967317366887274"
+   ],
+   "endereco": "Avenida São Francisco do Sul, 646",
+   "localidade": "São Francisco do Sul",
+   "latitude": -26.2385876205,
+   "longitude": -48.512189425999,
+   "fontes": [
+    "meta (CDLA-Permissive-2.0)",
+    "Overture (CDLA-Permissive-2.0)"
+   ]
+  },
+  {
+   "idOverture": "d418d796-e20a-4d39-914a-27c98f8bd208",
+   "nome": "Residencial Praia Enseada",
+   "categoriaOverture": "holiday_rental_home",
+   "confianca": 0.933,
+   "sites": [],
+   "telefones": [
+    "+5547984209451"
+   ],
+   "redesSociais": [
+    "https://www.facebook.com/200037757068083"
+   ],
+   "endereco": "Rua Goiás, 423",
+   "localidade": "São Francisco do Sul",
+   "latitude": -26.23065062000481,
+   "longitude": -48.5100884133214,
+   "fontes": [
+    "meta (CDLA-Permissive-2.0)",
+    "Overture (CDLA-Permissive-2.0)"
+   ]
+  },
+  {
+   "idOverture": "3634417b-a47a-4d41-8cb7-0197c4cff0ed",
+   "nome": "Pousada Rancho Quintal do Céu",
+   "categoriaOverture": "cottage",
+   "confianca": 0.887,
+   "sites": [],
+   "telefones": [
+    "+5547984166916"
+   ],
+   "redesSociais": [
+    "https://www.facebook.com/112215288374024"
+   ],
+   "endereco": "R. Saudades, 1185",
+   "localidade": "São Francisco do Sul",
+   "latitude": -26.23600375,
+   "longitude": -48.51801651,
+   "fontes": [
+    "meta (CDLA-Permissive-2.0)",
+    "Overture (CDLA-Permissive-2.0)"
+   ]
+  },
+  {
+   "idOverture": "bfc5d411-9812-4327-bf61-fc03a1898a3e",
+   "nome": "Pousada Cantinho da Tia Sandra",
+   "categoriaOverture": "bed_and_breakfast",
+   "confianca": 0.965,
+   "sites": [
+    "https://instagram.com/cantinhodatiasandra_"
+   ],
+   "telefones": [
+    "+5547996776985"
+   ],
+   "redesSociais": [
+    "https://www.facebook.com/104150644325962"
+   ],
+   "endereco": "rua: Palma Sola, 453",
+   "localidade": "São Francisco do Sul",
+   "latitude": -26.22765026,
+   "longitude": -48.52258982,
+   "fontes": [
+    "meta (CDLA-Permissive-2.0)",
+    "Overture (CDLA-Permissive-2.0)"
+   ]
+  },
+  {
+   "idOverture": "53f4d734-c414-493d-ab8d-e9ddf4e1b340",
+   "nome": "Pousada Max House",
+   "categoriaOverture": "inn",
+   "confianca": 0.97,
+   "sites": [
+    "http://www.pousadamaxhouse.com.br/"
+   ],
+   "telefones": [
+    "+5547984979377"
+   ],
+   "redesSociais": [
+    "https://www.facebook.com/105245894772592"
+   ],
+   "endereco": "R. Palmitos, 500",
+   "localidade": "São Francisco do Sul",
+   "latitude": -26.22805429,
+   "longitude": -48.52280401,
+   "fontes": [
+    "meta (CDLA-Permissive-2.0)",
+    "Overture (CDLA-Permissive-2.0)"
+   ]
+  },
+  {
+   "idOverture": "5c28999f-f8bd-47da-89bf-ad401cfd0998",
+   "nome": "Gaivotas Praia Hotel",
+   "categoriaOverture": "hotel",
+   "confianca": 0.973,
+   "sites": [
+    "http://www.saofranciscodosul.tur.br/pousadas/gaivotas"
+   ],
+   "telefones": [
+    "+554734492024"
+   ],
+   "redesSociais": [
+    "https://www.facebook.com/198334623593764"
+   ],
+   "endereco": "Av. Santa Catarina, 73",
+   "localidade": "São Francisco do Sul",
+   "latitude": -26.22487242,
+   "longitude": -48.51529589,
+   "fontes": [
+    "meta (CDLA-Permissive-2.0)",
+    "Overture (CDLA-Permissive-2.0)"
+   ]
+  },
+  {
+   "idOverture": "b9c829ec-10ab-487d-a656-98095010aa93",
+   "nome": "Hotel e Restaurante Ribadejo",
+   "categoriaOverture": "hotel",
+   "confianca": 0.972,
+   "sites": [],
+   "telefones": [
+    "+554734490202"
+   ],
+   "redesSociais": [
+    "https://www.facebook.com/742451712506001"
+   ],
+   "endereco": "Avenida Atlântica, 1594",
+   "localidade": "São Francisco do Sul",
+   "latitude": -26.22613,
+   "longitude": -48.51156,
+   "fontes": [
+    "meta (CDLA-Permissive-2.0)",
+    "Overture (CDLA-Permissive-2.0)"
+   ]
+  },
+  {
+   "idOverture": "e4097e55-f289-48e4-a906-071b5b8fc8b2",
+   "nome": "Pousada Sombrero Verde",
+   "categoriaOverture": "bed_and_breakfast",
+   "confianca": 0.902,
+   "sites": [
+    "http://www.sombreroverde.com.br"
+   ],
+   "telefones": [
+    "+554734423117"
+   ],
+   "redesSociais": [
+    "https://www.facebook.com/312929675725000"
+   ],
+   "endereco": "Rua Tóquio, 457",
+   "localidade": "São Francisco do Sul",
+   "latitude": -26.18062121,
+   "longitude": -48.52862872,
+   "fontes": [
+    "meta (CDLA-Permissive-2.0)",
+    "Overture (CDLA-Permissive-2.0)"
+   ]
+  },
+  {
+   "idOverture": "beea647b-1af4-47d1-805f-8d83799d0986",
+   "nome": "Pousada da bisa e tia Ruth",
+   "categoriaOverture": "bed_and_breakfast",
+   "confianca": 0.895,
+   "sites": [],
+   "telefones": [
+    "+5547991164778"
+   ],
+   "redesSociais": [
+    "https://www.facebook.com/177588317712911"
+   ],
+   "endereco": "R. Moscou, 72",
+   "localidade": "São Francisco do Sul",
+   "latitude": -26.18878114,
+   "longitude": -48.52983443,
+   "fontes": [
+    "meta (CDLA-Permissive-2.0)",
+    "Overture (CDLA-Permissive-2.0)"
+   ]
+  },
+  {
+   "idOverture": "887aee5b-3735-41aa-b948-a65962d46433",
+   "nome": "Recanto da Val",
+   "categoriaOverture": "bed_and_breakfast",
+   "confianca": 0.983,
+   "sites": [
+    "http://www.recantodaval.com.br/"
+   ],
+   "telefones": [
+    "+554734422680"
+   ],
+   "redesSociais": [
+    "https://www.facebook.com/1136366499767787"
+   ],
+   "endereco": "Avenida Jayme Ernesto de Oliveira, 2657",
+   "localidade": "São Francisco do Sul",
+   "latitude": -26.1877635,
+   "longitude": -48.5287875,
+   "fontes": [
+    "meta (CDLA-Permissive-2.0)",
+    "Overture (CDLA-Permissive-2.0)"
+   ]
+  },
+  {
+   "idOverture": "bee62818-787b-4c1d-9d2e-0ce4f10c70d6",
+   "nome": "Praia de Itaguaçu - São Francisco do Sul",
+   "categoriaOverture": "beach",
+   "confianca": 0.821,
+   "sites": [],
+   "telefones": [],
+   "redesSociais": [
+    "https://www.facebook.com/319940894703805"
+   ],
+   "endereco": "Av. Tripoli",
+   "localidade": "São Francisco do Sul",
+   "latitude": -26.184498349003,
+   "longitude": -48.527619838715,
+   "fontes": [
+    "meta (CDLA-Permissive-2.0)",
+    "Overture (CDLA-Permissive-2.0)"
+   ]
+  },
+  {
+   "idOverture": "39029860-4202-4093-b8a8-d3d6cf442d1f",
+   "nome": "Caiçara",
+   "categoriaOverture": "seafood_restaurant",
+   "confianca": 0.912,
+   "sites": [],
+   "telefones": [
+    "+554734496083"
+   ],
+   "redesSociais": [
+    "https://www.facebook.com/175777306341172"
+   ],
+   "endereco": "Av. Jaime Ernesto de Oliveira, 2282-2470",
+   "localidade": "São Francisco do Sul",
+   "latitude": -26.19513542,
+   "longitude": -48.52848155,
+   "fontes": [
+    "meta (CDLA-Permissive-2.0)",
+    "Overture (CDLA-Permissive-2.0)"
+   ]
+  },
+  {
+   "idOverture": "40445fc8-8299-4cda-a7fc-9bfe3d4c2018",
+   "nome": "Varandas do Mar",
+   "categoriaOverture": "holiday_rental_home",
+   "confianca": 0.95,
+   "sites": [
+    "http://www.estereomagia.com.br/varandasdomar/"
+   ],
+   "telefones": [
+    "+554734423738"
+   ],
+   "redesSociais": [
+    "https://www.facebook.com/210450338978606"
+   ],
+   "endereco": "Avenida Jaime Ernesto de Oliveira, 1",
+   "localidade": "São Francisco do Sul",
+   "latitude": -26.21050757,
+   "longitude": -48.52588665,
+   "fontes": [
+    "meta (CDLA-Permissive-2.0)",
+    "Overture (CDLA-Permissive-2.0)"
+   ]
+  },
+  {
+   "idOverture": "a1901526-eb7b-4f1a-9ede-f8f1c64b0d58",
+   "nome": "Hotel Pousada Varandas do Mar",
+   "categoriaOverture": "hotel",
+   "confianca": 0.901,
+   "sites": [
+    "http://www.varandasdomar.com.br/"
+   ],
+   "telefones": [
+    "+554734423738"
+   ],
+   "redesSociais": [
+    "https://www.facebook.com/748208948844587"
+   ],
+   "endereco": "2344, Rodovia Duque de Caxias, 1940",
+   "localidade": "São Francisco do Sul",
+   "latitude": -26.21035548,
+   "longitude": -48.52581461,
+   "fontes": [
+    "meta (CDLA-Permissive-2.0)",
+    "Overture (CDLA-Permissive-2.0)"
+   ]
+  },
+  {
+   "idOverture": "8a0fca38-df5c-4eb7-89ad-14035636718a",
+   "nome": "Restaurante Sabor Caseiro",
+   "categoriaOverture": "brazilian_restaurant",
+   "confianca": 0.795,
+   "sites": [],
+   "telefones": [],
+   "redesSociais": [
+    "https://www.facebook.com/144385868759789"
+   ],
+   "endereco": "Rod. Duque de Caxias, 2185",
+   "localidade": "São Francisco do Sul",
+   "latitude": -26.21756025,
+   "longitude": -48.52384639,
+   "fontes": [
+    "meta (CDLA-Permissive-2.0)",
+    "Overture (CDLA-Permissive-2.0)"
+   ]
+  },
+  {
+   "idOverture": "32387865-8b3f-4b9b-9d66-e863d5bc9f31",
+   "nome": "Pousada Sao Francisco do Sul",
+   "categoriaOverture": "bed_and_breakfast",
+   "confianca": 0.973,
+   "sites": [],
+   "telefones": [
+    "+554734425748"
+   ],
+   "redesSociais": [
+    "https://www.facebook.com/1222604744521762"
+   ],
+   "endereco": "R. Corupá, 180",
+   "localidade": "São Francisco do Sul",
+   "latitude": -26.21955565,
+   "longitude": -48.52442367,
+   "fontes": [
+    "meta (CDLA-Permissive-2.0)",
+    "Overture (CDLA-Permissive-2.0)"
+   ]
+  },
+  {
+   "idOverture": "3fc48d15-36d5-4814-86bc-0059ee3128d8",
+   "nome": "Tony Camping",
+   "categoriaOverture": "campground",
+   "confianca": 0.992,
+   "sites": [
+    "http://www.tonycamping.com.br/"
+   ],
+   "telefones": [
+    "+554734423288"
+   ],
+   "redesSociais": [
+    "https://www.facebook.com/218106574868090"
+   ],
+   "endereco": "Rua Campos Novos, 375",
+   "localidade": "São Francisco do Sul",
+   "latitude": -26.21743944,
+   "longitude": -48.52654136,
+   "fontes": [
+    "meta (CDLA-Permissive-2.0)",
+    "Overture (CDLA-Permissive-2.0)"
+   ]
+  },
+  {
+   "idOverture": "a8d4661f-7924-4938-acc7-ba13a2fdf06a",
+   "nome": "Colônia de Férias",
+   "categoriaOverture": "lodging",
+   "confianca": 0.717,
+   "sites": [
+    "http://www.secor.org.br"
+   ],
+   "telefones": [
+    "+551334713807"
+   ],
+   "redesSociais": [
+    "https://www.facebook.com/149694742123362"
+   ],
+   "endereco": "Colônia de férias _ Sindicato dos Metalúrgicos",
+   "localidade": "São Francisco do Sul",
+   "latitude": -26.215086545928393,
+   "longitude": -48.52933873325438,
+   "fontes": [
+    "meta (CDLA-Permissive-2.0)",
+    "Overture (CDLA-Permissive-2.0)"
+   ]
+  },
+  {
+   "idOverture": "faaf0954-36e7-448c-86b8-5f3dfc969e10",
+   "nome": "Hostel da Ilha de São Francisco do Sul",
+   "categoriaOverture": "hostel",
+   "confianca": 0.965,
+   "sites": [
+    "http://www.hosteldailhasfs.com/"
+   ],
+   "telefones": [
+    "+5547999608363"
+   ],
+   "redesSociais": [
+    "https://www.facebook.com/101034123400513"
+   ],
+   "endereco": "R. Agronômica, 195",
+   "localidade": "São Francisco do Sul",
+   "latitude": -26.21250105,
+   "longitude": -48.52874434,
+   "fontes": [
+    "meta (CDLA-Permissive-2.0)",
+    "Overture (CDLA-Permissive-2.0)"
+   ]
+  },
+  {
+   "idOverture": "a2f90240-9bd5-4a33-b90e-10f986e8368b",
+   "nome": "Pousada Bom Abrigo",
+   "categoriaOverture": "hotel",
+   "confianca": 0.986,
+   "sites": [
+    "https://pousadabomabrigo.blogspot.com/?m=1"
+   ],
+   "telefones": [
+    "+554734423741"
+   ],
+   "redesSociais": [
+    "https://www.facebook.com/380176628767047"
+   ],
+   "endereco": "Rodovia Duque de Caxias, 2662",
+   "localidade": "São Francisco do Sul",
+   "latitude": -26.2073997,
+   "longitude": -48.5280637,
+   "fontes": [
+    "meta (CDLA-Permissive-2.0)",
+    "Overture (CDLA-Permissive-2.0)"
+   ]
+  },
+  {
+   "idOverture": "6a85c28f-f952-4542-8b71-f05446df7429",
+   "nome": "Pousada da Cris",
+   "categoriaOverture": "bed_and_breakfast",
+   "confianca": 0.963,
+   "sites": [
+    "http://pousadadacris.wix.com/pousadadacris"
+   ],
+   "telefones": [
+    "+5547984009055"
+   ],
+   "redesSociais": [
+    "https://www.facebook.com/533755870000221"
+   ],
+   "endereco": "Praia, R. Grécia, 127",
+   "localidade": "São Francisco do Sul",
+   "latitude": -26.21584127,
+   "longitude": -48.5320574,
+   "fontes": [
+    "meta (CDLA-Permissive-2.0)",
+    "Overture (CDLA-Permissive-2.0)"
+   ]
+  },
+  {
+   "idOverture": "1be0b858-806b-491b-b416-130f33d75306",
+   "nome": "Pizzaria Maré Mansa",
+   "categoriaOverture": "pizza_restaurant",
+   "confianca": 0.926,
+   "sites": [
+    "https://pedir.delivery/pizzariamaremansa"
+   ],
+   "telefones": [
+    "+554734422752"
+   ],
+   "redesSociais": [
+    "https://www.facebook.com/568630436620124"
+   ],
+   "endereco": "R. Manila, 153",
+   "localidade": "São Francisco do Sul",
+   "latitude": -26.19012116,
+   "longitude": -48.53002922,
+   "fontes": [
+    "meta (CDLA-Permissive-2.0)",
+    "Overture (CDLA-Permissive-2.0)"
+   ]
+  },
+  {
+   "idOverture": "8b2678ab-5d2b-4b37-a885-6b74591d335e",
+   "nome": "Canto das Ondas Apart Studios",
+   "categoriaOverture": "holiday_rental_home",
+   "confianca": 0.862,
+   "sites": [
+    "http://www.cantodasondas.com/"
+   ],
+   "telefones": [
+    "+5547999825025"
+   ],
+   "redesSociais": [
+    "https://www.facebook.com/234102929980964"
+   ],
+   "endereco": "",
+   "localidade": "São Francisco do Sul",
+   "latitude": -26.18647682,
+   "longitude": -48.5299197,
+   "fontes": [
+    "meta (CDLA-Permissive-2.0)",
+    "Overture (CDLA-Permissive-2.0)"
+   ]
+  },
+  {
+   "idOverture": "226bd407-b1ba-48fa-a45e-881e94fe79eb",
+   "nome": "Hotel Porto de Paz",
+   "categoriaOverture": "hotel",
+   "confianca": 0.991,
+   "sites": [
+    "http://www.chahoteis.com.br/hotelportodepaz"
+   ],
+   "telefones": [
+    "+554734425706"
+   ],
+   "redesSociais": [
+    "https://www.facebook.com/183879318320217"
+   ],
+   "endereco": "R. Roma, 555",
+   "localidade": "São Francisco do Sul",
+   "latitude": -26.18535387,
+   "longitude": -48.52995378,
+   "fontes": [
+    "meta (CDLA-Permissive-2.0)",
+    "Overture (CDLA-Permissive-2.0)"
+   ]
+  },
+  {
+   "idOverture": "1cef58d0-751e-433a-9aa6-61e8c88aacf2",
+   "nome": "Residencial Toc Toc",
+   "categoriaOverture": "hotel",
+   "confianca": 0.957,
+   "sites": [],
+   "telefones": [
+    "+554734423327"
+   ],
+   "redesSociais": [
+    "https://www.facebook.com/203254253153834"
+   ],
+   "endereco": "Estrada do Forte, 2273",
+   "localidade": "São Francisco do Sul",
+   "latitude": -26.189531595555554,
+   "longitude": -48.53383546277777,
+   "fontes": [
+    "meta (CDLA-Permissive-2.0)",
+    "Overture (CDLA-Permissive-2.0)"
+   ]
+  },
+  {
+   "idOverture": "ba4e2a36-e7f6-4925-8426-247ee8724e2d",
+   "nome": "Hotel e creche Doce Cão",
+   "categoriaOverture": "hotel",
+   "confianca": 0.925,
+   "sites": [],
+   "telefones": [
+    "+5547997198306"
+   ],
+   "redesSociais": [
+    "https://www.facebook.com/724670334220475"
+   ],
+   "endereco": "Rua Simão Piaz, 371",
+   "localidade": "São Francisco do Sul",
+   "latitude": -26.211947003413165,
+   "longitude": -48.543537899705,
+   "fontes": [
+    "meta (CDLA-Permissive-2.0)",
+    "Overture (CDLA-Permissive-2.0)"
+   ]
+  },
+  {
+   "idOverture": "17859f6f-78a7-41f4-b320-3809952349f4",
+   "nome": "Capri Hotel",
+   "categoriaOverture": "hotel",
+   "confianca": 0.973,
+   "sites": [],
+   "telefones": [
+    "+5547996114608"
+   ],
+   "redesSociais": [
+    "https://www.facebook.com/892944527464213"
+   ],
+   "endereco": "Rua Blandina Steiner Beckhauser, 720",
+   "localidade": "São Francisco do Sul",
+   "latitude": -26.18721427,
+   "longitude": -48.57076221,
+   "fontes": [
+    "meta (CDLA-Permissive-2.0)",
+    "Overture (CDLA-Permissive-2.0)"
+   ]
+  },
+  {
+   "idOverture": "f16d99ee-fdc8-4bb9-8d20-7b27e2058a5b",
+   "nome": "Capri Iate Clube",
+   "categoriaOverture": "marina",
+   "confianca": 0.981,
+   "sites": [
+    "http://www.capriiateclube.com.br/"
+   ],
+   "telefones": [
+    "+554734447247"
+   ],
+   "redesSociais": [
+    "https://www.facebook.com/489133774441993"
+   ],
+   "endereco": "Avenida Brasil, 14",
+   "localidade": "São Francisco do Sul",
+   "latitude": -26.19107562,
+   "longitude": -48.57718349,
+   "fontes": [
+    "meta (CDLA-Permissive-2.0)",
+    "Overture (CDLA-Permissive-2.0)"
+   ]
+  },
+  {
+   "idOverture": "42360a9a-ac74-4d73-a59c-741a3e246cc4",
+   "nome": "Pousada Rainha do Mar",
+   "categoriaOverture": "bed_and_breakfast",
+   "confianca": 0.955,
+   "sites": [],
+   "telefones": [
+    "+5547996824377"
+   ],
+   "redesSociais": [
+    "https://www.facebook.com/354637365161689"
+   ],
+   "endereco": "Rod. Duque de Caxias, 4100",
+   "localidade": "São Francisco do Sul",
+   "latitude": -26.23334408,
+   "longitude": -48.58543307,
+   "fontes": [
+    "meta (CDLA-Permissive-2.0)",
+    "Overture (CDLA-Permissive-2.0)"
+   ]
+  },
+  {
+   "idOverture": "977c90b6-d3e1-4565-ba96-5fdc9c645ac0",
+   "nome": "Hotel São Francisco | São Francisco do Sul",
+   "categoriaOverture": "hotel",
+   "confianca": 0.943,
+   "sites": [
+    "https://www.booking.com/Share-szoLF5"
+   ],
+   "telefones": [
+    "+554732041285"
+   ],
+   "redesSociais": [
+    "https://www.facebook.com/348574441681241"
+   ],
+   "endereco": "Rod. Duque de Caxias, 4215",
+   "localidade": "São Francisco do Sul",
+   "latitude": -26.2321588,
+   "longitude": -48.58488563,
+   "fontes": [
+    "meta (CDLA-Permissive-2.0)",
+    "Overture (CDLA-Permissive-2.0)"
+   ]
+  },
+  {
+   "idOverture": "24d1a493-d303-48f0-84ff-310622dc5a6e",
+   "nome": "Hotel São Francisco Praia Flat",
+   "categoriaOverture": "hotel",
+   "confianca": 0.709,
+   "sites": [],
+   "telefones": [
+    "+554734590130"
+   ],
+   "redesSociais": [
+    "https://www.facebook.com/165579013594263"
+   ],
+   "endereco": "Avenida Atlântica",
+   "localidade": "São Francisco do Sul",
+   "latitude": -26.38882297,
+   "longitude": -48.58418464,
+   "fontes": [
+    "meta (CDLA-Permissive-2.0)",
+    "Overture (CDLA-Permissive-2.0)"
+   ]
+  },
+  {
+   "idOverture": "8592271b-7a57-449b-94e2-0fdbcf1a8c2b",
+   "nome": "Ervino Charme Flats",
+   "categoriaOverture": "resort",
+   "confianca": 0.984,
+   "sites": [],
+   "telefones": [
+    "+5547997358078"
+   ],
+   "redesSociais": [
+    "https://www.facebook.com/105073771261638"
+   ],
+   "endereco": "Avenida atlantica esquina com a avenida acarai Ervino",
+   "localidade": "São Francisco do Sul",
+   "latitude": -26.3887699,
+   "longitude": -48.58399992,
+   "fontes": [
+    "meta (CDLA-Permissive-2.0)",
+    "Overture (CDLA-Permissive-2.0)"
+   ]
+  },
+  {
+   "idOverture": "a3fc6a8b-a962-4761-8575-74b3e35e4a5b",
+   "nome": "Casa Azul 51",
+   "categoriaOverture": "holiday_rental_home",
+   "confianca": 0.864,
+   "sites": [],
+   "telefones": [
+    "+5547996015187"
+   ],
+   "redesSociais": [
+    "https://www.facebook.com/116193256588790"
+   ],
+   "endereco": "R. 1",
+   "localidade": "São Francisco do Sul",
+   "latitude": -26.40342664,
+   "longitude": -48.59193283,
+   "fontes": [
+    "meta (CDLA-Permissive-2.0)",
+    "Overture (CDLA-Permissive-2.0)"
+   ]
+  },
+  {
+   "idOverture": "09961526-1321-49f1-b3f9-3d196517d002",
+   "nome": "Pousada Jolie Maison",
+   "categoriaOverture": "inn",
+   "confianca": 0.938,
+   "sites": [],
+   "telefones": [
+    "+5547992843077"
+   ],
+   "redesSociais": [
+    "https://www.facebook.com/302564113981687"
+   ],
+   "endereco": "Av. Portugal, 660",
+   "localidade": "São Francisco do Sul",
+   "latitude": -26.41628135,
+   "longitude": -48.60364627,
+   "fontes": [
+    "meta (CDLA-Permissive-2.0)",
+    "Overture (CDLA-Permissive-2.0)"
+   ]
+  },
+  {
+   "idOverture": "75806544-c5ab-4b1c-94c0-667f256e3b9e",
+   "nome": "Praia do Calixto",
+   "categoriaOverture": "beach",
+   "confianca": 0.717,
+   "sites": [],
+   "telefones": [],
+   "redesSociais": [
+    "https://www.facebook.com/223739417820614"
+   ],
+   "endereco": "Rua Doutor Francisco Mascarenhas",
+   "localidade": "São Francisco do Sul",
+   "latitude": -26.23036,
+   "longitude": -48.61791,
+   "fontes": [
+    "meta (CDLA-Permissive-2.0)",
+    "Overture (CDLA-Permissive-2.0)"
+   ]
+  },
+  {
+   "idOverture": "c76009fd-c6ce-49b4-96b1-4ae8b942025b",
+   "nome": "Bar do Parafuso",
+   "categoriaOverture": "bar",
+   "confianca": 0.814,
+   "sites": [
+    "http://bar49.placeweb.site"
+   ],
+   "telefones": [],
+   "redesSociais": [
+    "https://www.facebook.com/138907589610401"
+   ],
+   "endereco": "R. Ten. José Macário dos Santos, 171-315",
+   "localidade": "São Francisco do Sul",
+   "latitude": -26.22897768,
+   "longitude": -48.61718264,
+   "fontes": [
+    "meta (CDLA-Permissive-2.0)",
+    "Overture (CDLA-Permissive-2.0)"
+   ]
+  },
+  {
+   "idOverture": "17cdee95-2750-4f24-bffb-5b0bfc8861e7",
+   "nome": "Praia das Varizes",
+   "categoriaOverture": "beach",
+   "confianca": 0.942,
+   "sites": [],
+   "telefones": [],
+   "redesSociais": [
+    "https://www.facebook.com/1406505869461779"
+   ],
+   "endereco": "Serv. Gomercindo Ayres Müller",
+   "localidade": "São Francisco do Sul",
+   "latitude": -26.22736974,
+   "longitude": -48.61177023,
+   "fontes": [
+    "meta (CDLA-Permissive-2.0)",
+    "Overture (CDLA-Permissive-2.0)"
+   ]
+  },
+  {
+   "idOverture": "6b65a121-26fd-4dbb-8b93-83df6e87eb42",
+   "nome": "Quintal da Dani",
+   "categoriaOverture": "party_and_event_planning",
+   "confianca": 0.986,
+   "sites": [],
+   "telefones": [
+    "+5547999970522"
+   ],
+   "redesSociais": [
+    "https://www.facebook.com/397049084470954"
+   ],
+   "endereco": "R. Dr. Francisco Mascarenhas, 2201",
+   "localidade": "São Francisco do Sul",
+   "latitude": -26.23056179,
+   "longitude": -48.61926844,
+   "fontes": [
+    "meta (CDLA-Permissive-2.0)",
+    "Overture (CDLA-Permissive-2.0)"
+   ]
+  },
+  {
+   "idOverture": "9846c0b0-60f8-44aa-b93f-0cfe86d7709d",
+   "nome": "Pousada Pedra das Tartarugas",
+   "categoriaOverture": "lodge",
+   "confianca": 0.995,
+   "sites": [
+    "http://pousadapedradastartarugas.com.br/contato"
+   ],
+   "telefones": [
+    "+5547996068725"
+   ],
+   "redesSociais": [
+    "https://www.facebook.com/319662698511900"
+   ],
+   "endereco": "Rua Doutor Francisco Mascarenhas, 2149",
+   "localidade": "São Francisco do Sul",
+   "latitude": -26.23033208,
+   "longitude": -48.61994248,
+   "fontes": [
+    "meta (CDLA-Permissive-2.0)",
+    "Overture (CDLA-Permissive-2.0)"
+   ]
+  },
+  {
+   "idOverture": "bb6d433e-694e-424c-b12a-397475cbcfa6",
+   "nome": "Pousada Vida Simples",
+   "categoriaOverture": "inn",
+   "confianca": 0.992,
+   "sites": [
+    "https://www.booking.com/hotel/br/pousada-vida-simples-sao-francisco-do-sul.pt-pt.html?aid=360920&label=New_Portuguese_PT_EMEA_6409089246-nhpEtxYyJ8VkY9V5WPERTgSM217921514547%3Apl%3Ata%3Ap1%3Ap2%3Aac%3Aap%3Aneg&sid=a9455e9143881423fbcf968acd1cb139&dest_id=-670510;dest_type=city;dist=0;group_adults=2;group_children=0;hapos=1;hpos=1;no_rooms=1;req_adults=2;req_children=0;room1=A%2CA;sb_price_type=total;sr_order=popularity;srepoch=1713358469;srpvid=8aa05ac15c5f0155;type=total;ucfs=1&"
+   ],
+   "telefones": [
+    "+5541992668843"
+   ],
+   "redesSociais": [
+    "https://www.facebook.com/1792967444052148"
+   ],
+   "endereco": "R. Dr. Francisco Mascarenhas, 2080",
+   "localidade": "São Francisco do Sul",
+   "latitude": -26.23055929,
+   "longitude": -48.62057131,
+   "fontes": [
+    "meta (CDLA-Permissive-2.0)",
+    "Overture (CDLA-Permissive-2.0)"
+   ]
+  },
+  {
+   "idOverture": "577ce271-7e50-4bad-b08d-47d57e7b2d21",
+   "nome": "Pousada Baía de São Chico",
+   "categoriaOverture": "bed_and_breakfast",
+   "confianca": 0.946,
+   "sites": [
+    "https://www.airbnb.com.br/rooms/8614782"
+   ],
+   "telefones": [
+    "+5541996672657"
+   ],
+   "redesSociais": [
+    "https://www.facebook.com/523875490963908"
+   ],
+   "endereco": "",
+   "localidade": "São Francisco do Sul",
+   "latitude": -26.23142875,
+   "longitude": -48.62023165,
+   "fontes": [
+    "meta (CDLA-Permissive-2.0)",
+    "Overture (CDLA-Permissive-2.0)"
+   ]
+  },
+  {
+   "idOverture": "e4743ca8-2480-45ef-8b34-656b510a6e2c",
+   "nome": "Rancho Velho Tropeiro",
+   "categoriaOverture": "hostel",
+   "confianca": 0.927,
+   "sites": [],
+   "telefones": [
+    "+5547999554906"
+   ],
+   "redesSociais": [
+    "https://www.facebook.com/483432885454021"
+   ],
+   "endereco": "",
+   "localidade": "São Francisco do Sul",
+   "latitude": -26.26106191,
+   "longitude": -48.63137112,
+   "fontes": [
+    "meta (CDLA-Permissive-2.0)",
+    "Overture (CDLA-Permissive-2.0)"
+   ]
+  },
+  {
+   "idOverture": "f6d3a059-bc29-432d-8af2-c33c2a9bef33",
+   "nome": "Praia da Figueira - Paulas",
+   "categoriaOverture": "beach",
+   "confianca": 0.85,
+   "sites": [],
+   "telefones": [],
+   "redesSociais": [
+    "https://www.facebook.com/104632878061235"
+   ],
+   "endereco": "Rua Francisco Machado de Souza, 1325",
+   "localidade": "São Francisco do Sul",
+   "latitude": -26.230353,
+   "longitude": -48.626284,
+   "fontes": [
+    "meta (CDLA-Permissive-2.0)",
+    "Overture (CDLA-Permissive-2.0)"
+   ]
+  },
+  {
+   "idOverture": "bb3bee1f-f59e-4ab8-9d0b-dceaef6d3e39",
+   "nome": "Hotel Villa Real",
+   "categoriaOverture": "hotel",
+   "confianca": 0.975,
+   "sites": [
+    "http://www.hoteisvillareal.com.br"
+   ],
+   "telefones": [
+    "+554734442010"
+   ],
+   "redesSociais": [
+    "https://www.facebook.com/184189611622665"
+   ],
+   "endereco": "Rua Francisco Machado de Souza, 1135",
+   "localidade": "São Francisco do Sul",
+   "latitude": -26.23023566,
+   "longitude": -48.62727907,
+   "fontes": [
+    "meta (CDLA-Permissive-2.0)",
+    "Overture (CDLA-Permissive-2.0)"
+   ]
+  },
+  {
+   "idOverture": "169b9dcf-7ffb-4417-a6bb-3a848bff67fe",
+   "nome": "Morada das Pedras",
+   "categoriaOverture": "bed_and_breakfast",
+   "confianca": 0.884,
+   "sites": [],
+   "telefones": [
+    "+5541999637771"
+   ],
+   "redesSociais": [
+    "https://www.facebook.com/2420812907937404"
+   ],
+   "endereco": "Francisco Machado de Souza 1115",
+   "localidade": "São Francisco do Sul",
+   "latitude": -26.23045673552373,
+   "longitude": -48.627554325769836,
+   "fontes": [
+    "meta (CDLA-Permissive-2.0)",
+    "Overture (CDLA-Permissive-2.0)"
+   ]
+  },
+  {
+   "idOverture": "63fa5414-d976-42af-9ed6-a15068f094d2",
+   "nome": "Praia dos Ingleses",
+   "categoriaOverture": "beach",
+   "confianca": 0.93,
+   "sites": [],
+   "telefones": [],
+   "redesSociais": [
+    "https://www.facebook.com/101276215203939"
+   ],
+   "endereco": "",
+   "localidade": "São Francisco do Sul",
+   "latitude": -26.23114096,
+   "longitude": -48.62862944,
+   "fontes": [
+    "meta (CDLA-Permissive-2.0)",
+    "Overture (CDLA-Permissive-2.0)"
+   ]
+  },
+  {
+   "idOverture": "c10de139-b83e-439f-a5a5-99124df54783",
+   "nome": "Summer Bar",
+   "categoriaOverture": "bar",
+   "confianca": 0.98,
+   "sites": [
+    "https://www.instagram.com/summer.sfs"
+   ],
+   "telefones": [
+    "+5547991304854"
+   ],
+   "redesSociais": [
+    "https://www.facebook.com/201781426355654"
+   ],
+   "endereco": "R. Francisco Machado de Souza, 850",
+   "localidade": "São Francisco do Sul",
+   "latitude": -26.23159609,
+   "longitude": -48.62972239,
+   "fontes": [
+    "meta (CDLA-Permissive-2.0)",
+    "Overture (CDLA-Permissive-2.0)"
+   ]
+  },
+  {
+   "idOverture": "c9eb1b8a-da77-4aa4-99f0-cef41116a92c",
+   "nome": "Museu Nacional do Mar",
+   "categoriaOverture": "history_museum",
+   "confianca": 0.77,
+   "sites": [
+    "http://www.museunacionaldomar.com.br/museu/index.htm"
+   ],
+   "telefones": [
+    "(47) 3481-2155"
+   ],
+   "redesSociais": [],
+   "endereco": "R. Manoel Lourenço de Andrade",
+   "localidade": "São Francisco do Sul",
+   "latitude": -26.240445184072385,
+   "longitude": -48.63915965898236,
+   "fontes": [
+    "Foursquare (Apache-2.0)",
+    "Overture (CDLA-Permissive-2.0)"
+   ]
+  },
+  {
+   "idOverture": "d5c10420-e5ef-477d-91dc-2be1d5770fc4",
+   "nome": "Associação dos Amigos - Museu Nacional do Mar",
+   "categoriaOverture": "museum",
+   "confianca": 0.726,
+   "sites": [
+    "http://www.fcc.sc.gov.br/museudomar/"
+   ],
+   "telefones": [
+    "+554734441868"
+   ],
+   "redesSociais": [
+    "https://www.facebook.com/242494839117910"
+   ],
+   "endereco": "Rua Manoel Lourenço de Andrade, 133",
+   "localidade": "São Francisco do Sul",
+   "latitude": -26.240444484139957,
+   "longitude": -48.639190008476156,
+   "fontes": [
+    "meta (CDLA-Permissive-2.0)",
+    "Overture (CDLA-Permissive-2.0)"
+   ]
+  },
+  {
+   "idOverture": "3095c2a1-5eb4-477c-befd-45bbd1f52f62",
+   "nome": "Hotel Kontiki",
+   "categoriaOverture": "hotel",
+   "confianca": 0.996,
+   "sites": [
+    "http://www.hotelkontiki.com.br/"
+   ],
+   "telefones": [
+    "+554734442232"
+   ],
+   "redesSociais": [
+    "https://www.facebook.com/357065158372702"
+   ],
+   "endereco": "Esquina com Rua Babitonga, R. Cel. Camacho, 211",
+   "localidade": "São Francisco do Sul",
+   "latitude": -26.24295004,
+   "longitude": -48.63955165,
+   "fontes": [
+    "meta (CDLA-Permissive-2.0)",
+    "Overture (CDLA-Permissive-2.0)"
+   ]
+  },
+  {
+   "idOverture": "e1627cb7-ee9e-4b2c-8017-9e1907b4ae1f",
+   "nome": "Hotel Zibamba",
+   "categoriaOverture": "hotel",
+   "confianca": 0.994,
+   "sites": [
+    "http://www.hotelzibamba.com.br/"
+   ],
+   "telefones": [
+    "+554734442020"
+   ],
+   "redesSociais": [
+    "https://www.facebook.com/653574191499565"
+   ],
+   "endereco": "R. Fernandes Dias, 27 - sala 03",
+   "localidade": "São Francisco do Sul",
+   "latitude": -26.24221289,
+   "longitude": -48.63939999,
+   "fontes": [
+    "meta (CDLA-Permissive-2.0)",
+    "Overture (CDLA-Permissive-2.0)"
+   ]
+  },
+  {
+   "idOverture": "081647f3-2718-4326-935d-b134599ad3d2",
+   "nome": "DEDO VERDE",
+   "categoriaOverture": "smoothie_juice_bar",
+   "confianca": 0.99,
+   "sites": [],
+   "telefones": [
+    "+5547997350301"
+   ],
+   "redesSociais": [
+    "https://www.facebook.com/113883517002263"
+   ],
+   "endereco": "Praça Getúlio Vargas, 50",
+   "localidade": "São Francisco do Sul",
+   "latitude": -26.243629,
+   "longitude": -48.63903,
+   "fontes": [
+    "meta (CDLA-Permissive-2.0)",
+    "Overture (CDLA-Permissive-2.0)"
+   ]
+  },
+  {
+   "idOverture": "ef580fb4-00a2-4c4b-a93f-992b2d6ae6a0",
+   "nome": "Restaurante e Petisqueira Balaio de Siri",
+   "categoriaOverture": "bar",
+   "confianca": 0.719,
+   "sites": [],
+   "telefones": [
+    "+5547988132905"
+   ],
+   "redesSociais": [
+    "https://www.facebook.com/235162767345891"
+   ],
+   "endereco": "Pça. da Bandeira, 58",
+   "localidade": "São Francisco do Sul",
+   "latitude": -26.24420876,
+   "longitude": -48.6397055,
+   "fontes": [
+    "meta (CDLA-Permissive-2.0)",
+    "Overture (CDLA-Permissive-2.0)"
+   ]
+  },
+  {
+   "idOverture": "2c23510c-fc6a-4687-ab66-4ada650e943f",
+   "nome": "Igreja Matriz Nossa Senhora da Graça",
+   "categoriaOverture": "roman_catholic_place_of_worship",
+   "confianca": 0.988,
+   "sites": [],
+   "telefones": [
+    "+554734445093"
+   ],
+   "redesSociais": [
+    "https://www.facebook.com/375209619342514"
+   ],
+   "endereco": "Praça Getúlio Vargas, 180",
+   "localidade": "São Francisco do Sul",
+   "latitude": -26.24332163,
+   "longitude": -48.63838148,
+   "fontes": [
+    "meta (CDLA-Permissive-2.0)",
+    "Overture (CDLA-Permissive-2.0)"
+   ]
+  },
+  {
+   "idOverture": "a424dfed-00c3-4e39-b89e-39239822cb45",
+   "nome": "Restaurante Vô Rui",
+   "categoriaOverture": "seafood_restaurant",
+   "confianca": 0.961,
+   "sites": [],
+   "telefones": [
+    "+5547992441221"
+   ],
+   "redesSociais": [
+    "https://www.facebook.com/104298958683909"
+   ],
+   "endereco": "R. Anita Garibaldi, n52",
+   "localidade": "São Francisco do Sul",
+   "latitude": -26.24241956,
+   "longitude": -48.63465924,
+   "fontes": [
+    "meta (CDLA-Permissive-2.0)",
+    "Overture (CDLA-Permissive-2.0)"
+   ]
+  },
+  {
+   "idOverture": "c1bd54ed-6f3e-49dd-ae0b-e51f58207c9a",
+   "nome": "Espaço Nereu",
+   "categoriaOverture": "shopping_mall",
+   "confianca": 0.99,
+   "sites": [],
+   "telefones": [
+    "+554734441703"
+   ],
+   "redesSociais": [
+    "https://www.facebook.com/129698587644215"
+   ],
+   "endereco": "Av. Nereu Ramos, 439",
+   "localidade": "São Francisco do Sul",
+   "latitude": -26.25541224,
+   "longitude": -48.642975,
+   "fontes": [
+    "meta (CDLA-Permissive-2.0)",
+    "Overture (CDLA-Permissive-2.0)"
+   ]
+  },
+  {
+   "idOverture": "e78f24ab-9564-4096-9536-015a774c2ea3",
+   "nome": "Hotel Avenida • Hotel em São Francisco do Sul",
+   "categoriaOverture": "hotel",
+   "confianca": 0.916,
+   "sites": [],
+   "telefones": [
+    "+554734444700"
+   ],
+   "redesSociais": [
+    "https://www.facebook.com/217539378617562"
+   ],
+   "endereco": "Av. Nereu Ramos, 474",
+   "localidade": "São Francisco do Sul",
+   "latitude": -26.25566841,
+   "longitude": -48.64339263,
+   "fontes": [
+    "meta (CDLA-Permissive-2.0)",
+    "Overture (CDLA-Permissive-2.0)"
+   ]
+  },
+  {
+   "idOverture": "b59b5bb4-49cb-45df-9435-786fc8c1098e",
+   "nome": "Zurus",
+   "categoriaOverture": "bar",
+   "confianca": 0.733,
+   "sites": [],
+   "telefones": [
+    "+554799624548"
+   ],
+   "redesSociais": [
+    "https://www.facebook.com/100719086085759"
+   ],
+   "endereco": "R. Ver. Valdeci do Amaral, 74",
+   "localidade": "São Francisco do Sul",
+   "latitude": -26.25196451,
+   "longitude": -48.64364162,
+   "fontes": [
+    "meta (CDLA-Permissive-2.0)",
+    "Overture (CDLA-Permissive-2.0)"
+   ]
+  },
+  {
+   "idOverture": "d9841750-102b-4904-b49c-e47a411fd1f0",
+   "nome": "São Francisco do Sul",
+   "categoriaOverture": "real_estate_agent",
+   "confianca": 0.778,
+   "sites": [
+    "http://www.droneimoveis.com.br/"
+   ],
+   "telefones": [
+    "+5547984657686"
+   ],
+   "redesSociais": [
+    "https://www.facebook.com/398723860560624"
+   ],
+   "endereco": "R. Mal. Floriano Peixoto, 144",
+   "localidade": "São Francisco do Sul",
+   "latitude": -26.24215771,
+   "longitude": -48.64025063,
+   "fontes": [
+    "meta (CDLA-Permissive-2.0)",
+    "Overture (CDLA-Permissive-2.0)"
+   ]
+  },
+  {
+   "idOverture": "4de100c5-7bd7-4539-baa6-466e664b2805",
+   "nome": "Restaurante Portela",
+   "categoriaOverture": "seafood_restaurant",
+   "confianca": 0.998,
+   "sites": [
+    "http://www.restauranteportela.com/"
+   ],
+   "telefones": [
+    "+554734441579"
+   ],
+   "redesSociais": [
+    "https://www.facebook.com/191014754872663"
+   ],
+   "endereco": "R. Babitonga, 84",
+   "localidade": "São Francisco do Sul",
+   "latitude": -26.2416012,
+   "longitude": -48.64023833,
+   "fontes": [
+    "meta (CDLA-Permissive-2.0)",
+    "Overture (CDLA-Permissive-2.0)"
+   ]
+  },
+  {
+   "idOverture": "bc40fae8-18bf-40ff-8597-6cbcd5044c4d",
+   "nome": "Chácara de ferias Costão do Forte",
+   "categoriaOverture": "hotel",
+   "confianca": 0.913,
+   "sites": [],
+   "telefones": [
+    "+554734422952"
+   ],
+   "redesSociais": [
+    "https://www.facebook.com/2334751709996890"
+   ],
+   "endereco": "R. João Dias",
+   "localidade": "São Francisco do Sul",
+   "latitude": -26.172504,
+   "longitude": -48.532715,
+   "fontes": [
+    "meta (CDLA-Permissive-2.0)",
+    "Overture (CDLA-Permissive-2.0)"
+   ]
+  },
+  {
+   "idOverture": "d0f16bb0-d77a-47ff-a303-4f8402e15ba2",
+   "nome": "Pousada do Morro",
+   "categoriaOverture": "lodge",
+   "confianca": 0.982,
+   "sites": [
+    "http://www.pousadadomorrosaochico.com/"
+   ],
+   "telefones": [
+    "+554734422944"
+   ],
+   "redesSociais": [
+    "https://www.facebook.com/215571868546839"
+   ],
+   "endereco": "Estrada do Forte Marechal Luz, s/n",
+   "localidade": "São Francisco do Sul",
+   "latitude": -26.17393564,
+   "longitude": -48.53287791,
+   "fontes": [
+    "meta (CDLA-Permissive-2.0)",
+    "Overture (CDLA-Permissive-2.0)"
+   ]
+  },
+  {
+   "idOverture": "2e80d51a-cb39-4ee7-98cb-70cd982cf956",
+   "nome": "Mirante do Forte Marechal Luz",
+   "categoriaOverture": "arts_and_entertainment",
+   "confianca": 0.791,
+   "sites": [
+    "http://www.saofranciscodosul.tur.br/index.php"
+   ],
+   "telefones": [],
+   "redesSociais": [
+    "https://www.facebook.com/912228995562150"
+   ],
+   "endereco": null,
+   "localidade": "São Francisco do Sul",
+   "latitude": -26.16633,
+   "longitude": -48.52905,
+   "fontes": [
+    "meta (CDLA-Permissive-2.0)",
+    "Overture (CDLA-Permissive-2.0)"
+   ]
+  }
+ ]
+}

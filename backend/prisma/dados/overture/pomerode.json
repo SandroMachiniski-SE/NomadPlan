@@ -1,0 +1,2388 @@
+{
+ "fonte": "Overture Maps Foundation, tema places, versão 2026-10-21.0",
+ "licenca": "CDLA Permissive 2.0 (https://cdla.dev/permissive-2-0/); algumas fontes em Apache 2.0 ou CC0, indicadas em cada lugar",
+ "cidade": "Pomerode",
+ "baixadoEm": "2026-10-30T03:03:27.189709+00:00",
+ "lugares": [
+  {
+   "idOverture": "b668f104-1e3a-49b5-b00b-c38975967381",
+   "nome": "Morro Azul",
+   "categoriaOverture": "mountain",
+   "confianca": 0.766,
+   "sites": [],
+   "telefones": [],
+   "redesSociais": [
+    "https://www.facebook.com/602072006482448"
+   ],
+   "endereco": "",
+   "localidade": null,
+   "latitude": -26.762976624742556,
+   "longitude": -49.204365853192215,
+   "fontes": [
+    "meta (CDLA-Permissive-2.0)",
+    "Overture (CDLA-Permissive-2.0)"
+   ]
+  },
+  {
+   "idOverture": "5368690e-3d1e-449d-a669-0e8b600215fb",
+   "nome": "Pousada Hoff Haus",
+   "categoriaOverture": "lodge",
+   "confianca": 0.967,
+   "sites": [
+    "http://www.pousadahoffhaus.com.br/"
+   ],
+   "telefones": [
+    "+5547991432369"
+   ],
+   "redesSociais": [
+    "https://www.facebook.com/216011568264262"
+   ],
+   "endereco": "R. Vidal Ferreira, 1373",
+   "localidade": "Pomerode",
+   "latitude": -26.73076206,
+   "longitude": -49.21293516,
+   "fontes": [
+    "meta (CDLA-Permissive-2.0)",
+    "Overture (CDLA-Permissive-2.0)"
+   ]
+  },
+  {
+   "idOverture": "5512d9dd-60a9-468b-b053-d4622db0dc2e",
+   "nome": "Pousada do Imigrante",
+   "categoriaOverture": "hotel",
+   "confianca": 0.922,
+   "sites": [],
+   "telefones": [
+    "+5547997107948"
+   ],
+   "redesSociais": [
+    "https://www.facebook.com/111231887122403"
+   ],
+   "endereco": "R. Heinrich Kanies, 390",
+   "localidade": "Pomerode",
+   "latitude": -26.72229435,
+   "longitude": -49.21349914,
+   "fontes": [
+    "meta (CDLA-Permissive-2.0)",
+    "Overture (CDLA-Permissive-2.0)"
+   ]
+  },
+  {
+   "idOverture": "109943e2-f102-4435-b821-0fc0f54d808e",
+   "nome": "Casa do Imigrante Carl Weege",
+   "categoriaOverture": "museum",
+   "confianca": 0.856,
+   "sites": [
+    "http://www.pomerode.sc.gov.br/AtrativosTuristicos4.asp"
+   ],
+   "telefones": [
+    "+554733872613"
+   ],
+   "redesSociais": [
+    "https://www.facebook.com/1551039921832828"
+   ],
+   "endereco": "Rua Leopoldo Blaese, 11",
+   "localidade": "Pomerode",
+   "latitude": -26.72275032,
+   "longitude": -49.20367215,
+   "fontes": [
+    "meta (CDLA-Permissive-2.0)",
+    "Overture (CDLA-Permissive-2.0)"
+   ]
+  },
+  {
+   "idOverture": "e86efcec-e651-4db2-8075-e8df86464d66",
+   "nome": "Paraíso Enxaimel Mundo Antigo",
+   "categoriaOverture": "hotel",
+   "confianca": 0.998,
+   "sites": [
+    "http://www.mundoantigo.com.br/"
+   ],
+   "telefones": [
+    "+554733873143"
+   ],
+   "redesSociais": [
+    "https://www.facebook.com/432369650106847"
+   ],
+   "endereco": "R. Ribeirão Herdt, 1830",
+   "localidade": "Pomerode",
+   "latitude": -26.77319925,
+   "longitude": -49.19085321,
+   "fontes": [
+    "meta (CDLA-Permissive-2.0)",
+    "Overture (CDLA-Permissive-2.0)"
+   ]
+  },
+  {
+   "idOverture": "9f8c15a4-b173-475e-8b69-57fb61c689af",
+   "nome": "Village du Lac Hotel",
+   "categoriaOverture": "hotel",
+   "confianca": 0.991,
+   "sites": [
+    "https://villagedulachotel.com.br/"
+   ],
+   "telefones": [
+    "+554733873401"
+   ],
+   "redesSociais": [
+    "https://www.facebook.com/160830410444450"
+   ],
+   "endereco": "Av. 21 de Janeiro, 4222",
+   "localidade": "Pomerode",
+   "latitude": -26.76153234,
+   "longitude": -49.17698632,
+   "fontes": [
+    "meta (CDLA-Permissive-2.0)",
+    "Overture (CDLA-Permissive-2.0)"
+   ]
+  },
+  {
+   "idOverture": "c764d1ac-e126-4a66-b3ac-c4b96745aede",
+   "nome": "Chalés",
+   "categoriaOverture": "hotel",
+   "confianca": 0.873,
+   "sites": [
+    "http://www.chalespomerode.com.br/"
+   ],
+   "telefones": [
+    "+5547984069626"
+   ],
+   "redesSociais": [
+    "https://www.facebook.com/1371379646322193"
+   ],
+   "endereco": "R. Gustav Koch, 267",
+   "localidade": "Pomerode",
+   "latitude": -26.81737161,
+   "longitude": -49.16664583,
+   "fontes": [
+    "meta (CDLA-Permissive-2.0)",
+    "Overture (CDLA-Permissive-2.0)"
+   ]
+  },
+  {
+   "idOverture": "eb20e8d4-6d95-4a3f-a2c6-039b70e0c811",
+   "nome": "Pizzaria Cazarin",
+   "categoriaOverture": "pizza_restaurant",
+   "confianca": 0.961,
+   "sites": [],
+   "telefones": [
+    "+554733804875"
+   ],
+   "redesSociais": [
+    "https://www.facebook.com/1503604919949634"
+   ],
+   "endereco": "Rua Quinze de Novembro, 9944",
+   "localidade": "Pomerode",
+   "latitude": -26.82007,
+   "longitude": -49.164795,
+   "fontes": [
+    "meta (CDLA-Permissive-2.0)",
+    "Overture (CDLA-Permissive-2.0)"
+   ]
+  },
+  {
+   "idOverture": "e6175f3f-be4b-4206-9bad-b900612faf3f",
+   "nome": "Essência Gaúcha Pomerode",
+   "categoriaOverture": "pizza_restaurant",
+   "confianca": 0.966,
+   "sites": [],
+   "telefones": [
+    "+554733876430"
+   ],
+   "redesSociais": [
+    "https://www.facebook.com/1175871915806456"
+   ],
+   "endereco": "R. XV de Novembro",
+   "localidade": "Pomerode",
+   "latitude": -26.815993423583187,
+   "longitude": -49.16449771592895,
+   "fontes": [
+    "meta (CDLA-Permissive-2.0)",
+    "Overture (CDLA-Permissive-2.0)"
+   ]
+  },
+  {
+   "idOverture": "56c637c0-0df7-4f06-b3f1-3207acd17765",
+   "nome": "Pousada Casarão Gastehaus",
+   "categoriaOverture": "inn",
+   "confianca": 0.986,
+   "sites": [
+    "https://casaraoboutique.com.br/"
+   ],
+   "telefones": [
+    "+554733041178"
+   ],
+   "redesSociais": [
+    "https://www.facebook.com/1857107957910148"
+   ],
+   "endereco": "R. XV de Novembro, 7440",
+   "localidade": "Pomerode",
+   "latitude": -26.8022755,
+   "longitude": -49.16575384,
+   "fontes": [
+    "meta (CDLA-Permissive-2.0)",
+    "Overture (CDLA-Permissive-2.0)"
+   ]
+  },
+  {
+   "idOverture": "12a94532-4d88-4d19-b2aa-6f4c3c13c7de",
+   "nome": "Brotland",
+   "categoriaOverture": "bakery",
+   "confianca": 0.608,
+   "sites": [
+    "https://www.instagram.com/brotlandpomerode/"
+   ],
+   "telefones": [
+    "+5547992066844"
+   ],
+   "redesSociais": [
+    "https://www.facebook.com/963026256886666"
+   ],
+   "endereco": "Rua Leopoldo Liesemberg n0, 33",
+   "localidade": "Pomerode",
+   "latitude": -26.80507577,
+   "longitude": -49.16564967,
+   "fontes": [
+    "meta (CDLA-Permissive-2.0)",
+    "Overture (CDLA-Permissive-2.0)"
+   ]
+  },
+  {
+   "idOverture": "691d71fe-70b3-4371-9178-d9a02bce759b",
+   "nome": "Restaurante WunderWald",
+   "categoriaOverture": "german_restaurant",
+   "confianca": 0.77,
+   "sites": [
+    "http://www.wunderwald.com.br"
+   ],
+   "telefones": [
+    "(47) 3387-4167"
+   ],
+   "redesSociais": [
+    "https://www.facebook.com/340102946179677",
+    "https://www.instagram.com/restaurantewunderwald"
+   ],
+   "endereco": "R. XV de Novembro, 8444",
+   "localidade": "Pomerode",
+   "latitude": -26.805321094524743,
+   "longitude": -49.16554589873441,
+   "fontes": [
+    "Foursquare (Apache-2.0)",
+    "Overture (CDLA-Permissive-2.0)"
+   ]
+  },
+  {
+   "idOverture": "b8a2c395-2c31-4717-b933-887bec603907",
+   "nome": "Kibazar e Presentes",
+   "categoriaOverture": "flowers_and_gifts_store",
+   "confianca": 0.989,
+   "sites": [],
+   "telefones": [
+    "+5547992453052"
+   ],
+   "redesSociais": [
+    "https://www.facebook.com/267504510259523"
+   ],
+   "endereco": "R. XV de Novembro, 9607",
+   "localidade": "Pomerode",
+   "latitude": -26.81587329,
+   "longitude": -49.16391633,
+   "fontes": [
+    "meta (CDLA-Permissive-2.0)",
+    "Overture (CDLA-Permissive-2.0)"
+   ]
+  },
+  {
+   "idOverture": "d0610f66-bcb9-4259-836f-d9271b3c46bf",
+   "nome": "Restaurante do Xirú",
+   "categoriaOverture": "restaurant",
+   "confianca": 0.998,
+   "sites": [],
+   "telefones": [
+    "+554733949839"
+   ],
+   "redesSociais": [
+    "https://www.facebook.com/498827976885558"
+   ],
+   "endereco": "R. XV de Novembro, 11425",
+   "localidade": "Pomerode",
+   "latitude": -26.83251586,
+   "longitude": -49.16290971,
+   "fontes": [
+    "meta (CDLA-Permissive-2.0)",
+    "Overture (CDLA-Permissive-2.0)"
+   ]
+  },
+  {
+   "idOverture": "d13ba8db-4199-4b35-be57-68b0dfec7c88",
+   "nome": "Pousada Edelweiss",
+   "categoriaOverture": "lodging",
+   "confianca": 0.998,
+   "sites": [
+    "http://www.edelweisspomerode.com.br"
+   ],
+   "telefones": [
+    "+554733872738"
+   ],
+   "redesSociais": [
+    "https://www.facebook.com/1315489768466807"
+   ],
+   "endereco": "Rua XV de Novembro 10533 Testo Central",
+   "localidade": "Pomerode",
+   "latitude": -26.82414803,
+   "longitude": -49.15946859,
+   "fontes": [
+    "meta (CDLA-Permissive-2.0)",
+    "Overture (CDLA-Permissive-2.0)"
+   ]
+  },
+  {
+   "idOverture": "3c16f164-b562-4a9e-92ac-d92e68ef999f",
+   "nome": "Pousada Recanto Pomerano",
+   "categoriaOverture": "hotel",
+   "confianca": 0.994,
+   "sites": [
+    "https://recantopomerano.com.br/"
+   ],
+   "telefones": [
+    "+5547992793618"
+   ],
+   "redesSociais": [
+    "https://www.facebook.com/102342508060599"
+   ],
+   "endereco": "R. dos Atiradores, 8125",
+   "localidade": "Pomerode",
+   "latitude": -26.79967648,
+   "longitude": -49.15772205,
+   "fontes": [
+    "meta (CDLA-Permissive-2.0)",
+    "Overture (CDLA-Permissive-2.0)"
+   ]
+  },
+  {
+   "idOverture": "201eed6c-039b-4f7f-a74d-5e61197743fa",
+   "nome": "Frau Dickmann Café Rural",
+   "categoriaOverture": "cafe",
+   "confianca": 0.891,
+   "sites": [
+    "https://wa.me/055479920792612"
+   ],
+   "telefones": [
+    "+5547992072612"
+   ],
+   "redesSociais": [
+    "https://www.facebook.com/1397053586983567"
+   ],
+   "endereco": "R. XV de Novembro, 5503",
+   "localidade": "Pomerode",
+   "latitude": -26.7851612,
+   "longitude": -49.16674494,
+   "fontes": [
+    "meta (CDLA-Permissive-2.0)",
+    "Overture (CDLA-Permissive-2.0)"
+   ]
+  },
+  {
+   "idOverture": "a13a2f56-0307-4eb0-a4fe-1a38e2a1cdce",
+   "nome": "Kreativer Platz",
+   "categoriaOverture": "arts_crafts_and_hobby_store",
+   "confianca": 0.875,
+   "sites": [
+    "https://linktr.ee/kreativerplatz"
+   ],
+   "telefones": [
+    "+5547997309201"
+   ],
+   "redesSociais": [
+    "https://www.facebook.com/107532442231569"
+   ],
+   "endereco": "R. XV de Novembro, 5503",
+   "localidade": "Pomerode",
+   "latitude": -26.78532813,
+   "longitude": -49.16690292,
+   "fontes": [
+    "meta (CDLA-Permissive-2.0)",
+    "Overture (CDLA-Permissive-2.0)"
+   ]
+  },
+  {
+   "idOverture": "b334fbbf-1de6-4775-83d6-73a485fcca88",
+   "nome": "Manga Rock Bar",
+   "categoriaOverture": "bar",
+   "confianca": 0.989,
+   "sites": [],
+   "telefones": [
+    "+5547999404525"
+   ],
+   "redesSociais": [
+    "https://www.facebook.com/1876199236029124"
+   ],
+   "endereco": "R. XV de Novembro, 3090",
+   "localidade": "Pomerode",
+   "latitude": -26.76384127,
+   "longitude": -49.1695829,
+   "fontes": [
+    "meta (CDLA-Permissive-2.0)",
+    "Overture (CDLA-Permissive-2.0)"
+   ]
+  },
+  {
+   "idOverture": "0f1254f1-35b9-4a92-9def-b4f5a5cfb0e9",
+   "nome": "Pousada Luiza",
+   "categoriaOverture": "inn",
+   "confianca": 0.936,
+   "sites": [
+    "http://pousadaluiza.com.br/"
+   ],
+   "telefones": [
+    "+554733872724"
+   ],
+   "redesSociais": [
+    "https://www.facebook.com/248248035599492"
+   ],
+   "endereco": "Rua Indaial 66 City Center",
+   "localidade": "Pomerode",
+   "latitude": -26.72233652,
+   "longitude": -49.17040014,
+   "fontes": [
+    "meta (CDLA-Permissive-2.0)",
+    "Overture (CDLA-Permissive-2.0)"
+   ]
+  },
+  {
+   "idOverture": "c382b39c-a696-4106-ae4f-be22263ed0cb",
+   "nome": "Chacara Aloha",
+   "categoriaOverture": "bed_and_breakfast",
+   "confianca": 0.949,
+   "sites": [
+    "http://BOOKING.COM/"
+   ],
+   "telefones": [
+    "+5541998782298"
+   ],
+   "redesSociais": [
+    "https://www.facebook.com/808466322577291"
+   ],
+   "endereco": "R. dos Atiradores, 3131",
+   "localidade": "Pomerode",
+   "latitude": -26.75573239,
+   "longitude": -49.16534949,
+   "fontes": [
+    "meta (CDLA-Permissive-2.0)",
+    "Overture (CDLA-Permissive-2.0)"
+   ]
+  },
+  {
+   "idOverture": "b3a86614-0f15-47e8-a3f3-c497169237c8",
+   "nome": "Verace Pizza",
+   "categoriaOverture": "pizza_restaurant",
+   "confianca": 0.97,
+   "sites": [],
+   "telefones": [
+    "+554733875671"
+   ],
+   "redesSociais": [
+    "https://www.facebook.com/1714805565490852"
+   ],
+   "endereco": "Rua Doutor Wunderwald, 595",
+   "localidade": "Pomerode",
+   "latitude": -26.713897160000116,
+   "longitude": -49.15926744000016,
+   "fontes": [
+    "meta (CDLA-Permissive-2.0)",
+    "Overture (CDLA-Permissive-2.0)"
+   ]
+  },
+  {
+   "idOverture": "8daf4934-36c1-434a-b579-45b24460425d",
+   "nome": "Nascita Pizzaria Ltda",
+   "categoriaOverture": "pizza_restaurant",
+   "confianca": 0.745,
+   "sites": [],
+   "telefones": [
+    "+5547992873228"
+   ],
+   "redesSociais": [
+    "https://www.facebook.com/102166848857573"
+   ],
+   "endereco": "atrás do Club Primavera - R. Pres. Costa e Silva, 2100",
+   "localidade": "Pomerode",
+   "latitude": -26.69506231,
+   "longitude": -49.15803093,
+   "fontes": [
+    "meta (CDLA-Permissive-2.0)",
+    "Overture (CDLA-Permissive-2.0)"
+   ]
+  },
+  {
+   "idOverture": "ec99ffcf-edd6-4313-b05b-a72a467fcf68",
+   "nome": "Pousada Agradável Pomerode",
+   "categoriaOverture": "lodging",
+   "confianca": 0.972,
+   "sites": [
+    "https://www.booking.com/Pulse-0H5K3I"
+   ],
+   "telefones": [
+    "+5547991821428"
+   ],
+   "redesSociais": [
+    "https://www.facebook.com/181293589139712"
+   ],
+   "endereco": "R. Pres. Costa e Silva, 150",
+   "localidade": "Pomerode",
+   "latitude": -26.71151457,
+   "longitude": -49.16411548,
+   "fontes": [
+    "meta (CDLA-Permissive-2.0)",
+    "Overture (CDLA-Permissive-2.0)"
+   ]
+  },
+  {
+   "idOverture": "c11fc40c-e222-4d8e-8586-d4d9e2960add",
+   "nome": "Restaurante GLATZ E LAMIN",
+   "categoriaOverture": "restaurant",
+   "confianca": 0.819,
+   "sites": [
+    "http://restauranteelanchoneteglatzefilhos1.placeweb.site/"
+   ],
+   "telefones": [
+    "+554733870018"
+   ],
+   "redesSociais": [
+    "https://www.facebook.com/338234263396698"
+   ],
+   "endereco": "R. Hermann Weege, 3139",
+   "localidade": "Pomerode",
+   "latitude": -26.71313842,
+   "longitude": -49.16534451,
+   "fontes": [
+    "meta (CDLA-Permissive-2.0)",
+    "Overture (CDLA-Permissive-2.0)"
+   ]
+  },
+  {
+   "idOverture": "b886cf63-fc97-4014-924b-8ab987e9d7d6",
+   "nome": "Baracchetta",
+   "categoriaOverture": "argentine_restaurant",
+   "confianca": 0.985,
+   "sites": [
+    "http://www.baracchetta.com.br/"
+   ],
+   "telefones": [
+    "+554733066703"
+   ],
+   "redesSociais": [
+    "https://www.facebook.com/634225353639746"
+   ],
+   "endereco": "R. Hermann Weege, 3007",
+   "localidade": "Pomerode",
+   "latitude": -26.71386062,
+   "longitude": -49.16650391,
+   "fontes": [
+    "meta (CDLA-Permissive-2.0)",
+    "Overture (CDLA-Permissive-2.0)"
+   ]
+  },
+  {
+   "idOverture": "c6fbfe92-4662-480d-b03f-b0fd607a99bc",
+   "nome": "One Gastro Art",
+   "categoriaOverture": "restaurant",
+   "confianca": 0.768,
+   "sites": [
+    "https://www.instagram.com/onegastroart?igsh=dzlkZmdybHF6b3A0"
+   ],
+   "telefones": [
+    "+554733043157"
+   ],
+   "redesSociais": [
+    "https://www.facebook.com/600753893124096"
+   ],
+   "endereco": "R. Pres. Costa e Silva, 719",
+   "localidade": "Pomerode",
+   "latitude": -26.706994,
+   "longitude": -49.1647257,
+   "fontes": [
+    "meta (CDLA-Permissive-2.0)",
+    "Overture (CDLA-Permissive-2.0)"
+   ]
+  },
+  {
+   "idOverture": "7105da88-f8d7-468a-99e0-9a9498afff99",
+   "nome": "Camping Sítio Pomerode",
+   "categoriaOverture": "campground",
+   "confianca": 0.954,
+   "sites": [],
+   "telefones": [
+    "+5547991828713"
+   ],
+   "redesSociais": [
+    "https://www.facebook.com/111726361917620"
+   ],
+   "endereco": "R. Progresso, 3709",
+   "localidade": "Pomerode",
+   "latitude": -26.68425651,
+   "longitude": -49.1787197,
+   "fontes": [
+    "meta (CDLA-Permissive-2.0)",
+    "Overture (CDLA-Permissive-2.0)"
+   ]
+  },
+  {
+   "idOverture": "d99f0dc9-96e6-4ac4-8125-d147c32a924c",
+   "nome": "Pousada Casa Wachholz - Rota do Enxaimel - Four-Bedroom House",
+   "categoriaOverture": "holiday_rental_home",
+   "confianca": 0.991,
+   "sites": [
+    "http://www.pousadacasawachholz.com.br/"
+   ],
+   "telefones": [],
+   "redesSociais": [
+    "https://www.facebook.com/502194659792598"
+   ],
+   "endereco": "",
+   "localidade": "Pomerode",
+   "latitude": -26.6955191,
+   "longitude": -49.17591624,
+   "fontes": [
+    "meta (CDLA-Permissive-2.0)",
+    "Overture (CDLA-Permissive-2.0)"
+   ]
+  },
+  {
+   "idOverture": "b625d00e-ba04-42e1-8ee3-b743d5f571a9",
+   "nome": "Casa da Edri Hostel",
+   "categoriaOverture": "hostel",
+   "confianca": 0.961,
+   "sites": [],
+   "telefones": [
+    "+5547999791128"
+   ],
+   "redesSociais": [
+    "https://www.facebook.com/234762316983721"
+   ],
+   "endereco": "R. Guilherme Gustmann, 707",
+   "localidade": "Pomerode",
+   "latitude": -26.70861102,
+   "longitude": -49.17538523,
+   "fontes": [
+    "meta (CDLA-Permissive-2.0)",
+    "Overture (CDLA-Permissive-2.0)"
+   ]
+  },
+  {
+   "idOverture": "edfede73-9569-47fc-a345-548522fec4e8",
+   "nome": "Pousada Pomerode",
+   "categoriaOverture": "inn",
+   "confianca": 0.991,
+   "sites": [
+    "http://www.pousadapomerode.com.br/"
+   ],
+   "telefones": [
+    "+554733876646"
+   ],
+   "redesSociais": [
+    "https://www.facebook.com/878741872159763"
+   ],
+   "endereco": "Rua Ricardo Eischtaedt, 100",
+   "localidade": "Pomerode",
+   "latitude": -26.71593049,
+   "longitude": -49.17130312,
+   "fontes": [
+    "meta (CDLA-Permissive-2.0)",
+    "Overture (CDLA-Permissive-2.0)"
+   ]
+  },
+  {
+   "idOverture": "ec543ec8-8d5b-45f7-aee9-94273b4d02d2",
+   "nome": "Ristorante La Spezia",
+   "categoriaOverture": "restaurant",
+   "confianca": 0.998,
+   "sites": [
+    "http://www.laspezia.com.br/"
+   ],
+   "telefones": [
+    "+554733873200"
+   ],
+   "redesSociais": [
+    "https://www.facebook.com/172576276133972"
+   ],
+   "endereco": "Rua Luiz Abry, 1206",
+   "localidade": "Pomerode",
+   "latitude": -26.72754487,
+   "longitude": -49.17369217,
+   "fontes": [
+    "meta (CDLA-Permissive-2.0)",
+    "Overture (CDLA-Permissive-2.0)"
+   ]
+  },
+  {
+   "idOverture": "2b92e6f8-0bf0-4af1-856d-0bfe5a555e75",
+   "nome": "Museu do Automóvel Pomerode",
+   "categoriaOverture": "museum",
+   "confianca": 0.998,
+   "sites": [
+    "http://www.museupomerode.com.br"
+   ],
+   "telefones": [
+    "+554733870124"
+   ],
+   "redesSociais": [
+    "https://www.facebook.com/2999050340168333"
+   ],
+   "endereco": "R. Hermann Weege, 544",
+   "localidade": "Pomerode",
+   "latitude": -26.73382801,
+   "longitude": -49.17369043,
+   "fontes": [
+    "meta (CDLA-Permissive-2.0)",
+    "Overture (CDLA-Permissive-2.0)"
+   ]
+  },
+  {
+   "idOverture": "e18ad8fd-eb9b-4e25-81fd-efbe2ae331f5",
+   "nome": "Museu do Brinquedo Pomerode",
+   "categoriaOverture": "museum",
+   "confianca": 0.991,
+   "sites": [],
+   "telefones": [
+    "+554733067122"
+   ],
+   "redesSociais": [
+    "https://www.facebook.com/111595240219353"
+   ],
+   "endereco": "R. Hermann Weege, 544",
+   "localidade": "Pomerode",
+   "latitude": -26.73344056,
+   "longitude": -49.17376348,
+   "fontes": [
+    "meta (CDLA-Permissive-2.0)",
+    "Overture (CDLA-Permissive-2.0)"
+   ]
+  },
+  {
+   "idOverture": "ff669552-de9a-4f16-8b3b-bdfc2cb0acc3",
+   "nome": "Hotel Paradies",
+   "categoriaOverture": "hostel",
+   "confianca": 0.89,
+   "sites": [
+    "http://www.priceline.com/r/?product=hotel&theme=property&propertyID=34594803&refid=PLGOOGLEHPARM&refclickid=HOTELFPT"
+   ],
+   "telefones": [
+    "+554791869178"
+   ],
+   "redesSociais": [
+    "https://www.facebook.com/1117211061664050"
+   ],
+   "endereco": "",
+   "localidade": "Pomerode",
+   "latitude": -26.73200784,
+   "longitude": -49.17467182,
+   "fontes": [
+    "meta (CDLA-Permissive-2.0)",
+    "Overture (CDLA-Permissive-2.0)"
+   ]
+  },
+  {
+   "idOverture": "52d2b039-2edd-4e3b-b195-1211ea5915d3",
+   "nome": "Pommern Kaffee",
+   "categoriaOverture": "cafe",
+   "confianca": 0.981,
+   "sites": [],
+   "telefones": [
+    "+554733040551"
+   ],
+   "redesSociais": [
+    "https://www.facebook.com/314104025801380"
+   ],
+   "endereco": "Rua Hermann Weege, 160",
+   "localidade": "Pomerode",
+   "latitude": -26.73791847043462,
+   "longitude": -49.17380137044797,
+   "fontes": [
+    "meta (CDLA-Permissive-2.0)",
+    "Overture (CDLA-Permissive-2.0)"
+   ]
+  },
+  {
+   "idOverture": "af258cdb-50da-4338-b543-b6449175a08a",
+   "nome": "Vila Encantada",
+   "categoriaOverture": "amusement_park",
+   "confianca": 0.992,
+   "sites": [
+    "http://www.vilaencantada.com.br/"
+   ],
+   "telefones": [
+    "+554733338882"
+   ],
+   "redesSociais": [
+    "https://www.facebook.com/1946828078916358"
+   ],
+   "endereco": "Rua Hermann Weege, 204",
+   "localidade": "Pomerode",
+   "latitude": -26.737222005428354,
+   "longitude": -49.173997167468904,
+   "fontes": [
+    "meta (CDLA-Permissive-2.0)",
+    "Overture (CDLA-Permissive-2.0)"
+   ]
+  },
+  {
+   "idOverture": "e2fede18-5448-433e-a59f-e4951cb8be82",
+   "nome": "Museu Pomerano",
+   "categoriaOverture": "museum",
+   "confianca": 0.973,
+   "sites": [
+    "http://www.pomerode.sc.gov.br/AtrativosTuristicos14.asp"
+   ],
+   "telefones": [
+    "+554733870408"
+   ],
+   "redesSociais": [
+    "https://www.facebook.com/104411004515158"
+   ],
+   "endereco": "R. Hermann Weege, 111",
+   "localidade": "Pomerode",
+   "latitude": -26.73793075,
+   "longitude": -49.17410036,
+   "fontes": [
+    "meta (CDLA-Permissive-2.0)",
+    "Overture (CDLA-Permissive-2.0)"
+   ]
+  },
+  {
+   "idOverture": "05bf4be0-ce07-469e-83b7-3a4e2a74ed24",
+   "nome": "Special Presentes",
+   "categoriaOverture": "arts_crafts_and_hobby_store",
+   "confianca": 0.85,
+   "sites": [],
+   "telefones": [
+    "+554733874270"
+   ],
+   "redesSociais": [
+    "https://www.facebook.com/680891935332721"
+   ],
+   "endereco": "Rua Hermann Weege, 243",
+   "localidade": "Pomerode",
+   "latitude": -26.736881272222547,
+   "longitude": -49.17480540000042,
+   "fontes": [
+    "meta (CDLA-Permissive-2.0)",
+    "Overture (CDLA-Permissive-2.0)"
+   ]
+  },
+  {
+   "idOverture": "aeb6d4f4-f42f-4131-9d01-b9712759db42",
+   "nome": "Die Ecke Gastronomie",
+   "categoriaOverture": "german_restaurant",
+   "confianca": 0.939,
+   "sites": [
+    "https://www.dieecke.com.br/"
+   ],
+   "telefones": [
+    "+554722042892"
+   ],
+   "redesSociais": [
+    "https://www.facebook.com/478854121981326"
+   ],
+   "endereco": "R. Hermann Weege, 187",
+   "localidade": "Pomerode",
+   "latitude": -26.73746473,
+   "longitude": -49.17467101,
+   "fontes": [
+    "meta (CDLA-Permissive-2.0)",
+    "Overture (CDLA-Permissive-2.0)"
+   ]
+  },
+  {
+   "idOverture": "ccee46a9-395c-4d26-b1e5-765e98b62370",
+   "nome": "Pomerode",
+   "categoriaOverture": "restaurant",
+   "confianca": 0.867,
+   "sites": [],
+   "telefones": [
+    "+554733870406"
+   ],
+   "redesSociais": [
+    "https://www.facebook.com/364198557420520"
+   ],
+   "endereco": "Rua Hermann Weege, 242",
+   "localidade": "Pomerode",
+   "latitude": -26.736996223593486,
+   "longitude": -49.17443257233475,
+   "fontes": [
+    "meta (CDLA-Permissive-2.0)",
+    "Overture (CDLA-Permissive-2.0)"
+   ]
+  },
+  {
+   "idOverture": "d13b61fc-5295-499a-9999-e03f383b8c42",
+   "nome": "Teatro Municipal de Pomerode",
+   "categoriaOverture": "theatre_venue",
+   "confianca": 0.996,
+   "sites": [
+    "www.vemprapomerode.com.br"
+   ],
+   "telefones": [
+    "+554733876801"
+   ],
+   "redesSociais": [
+    "https://www.facebook.com/121200751952170"
+   ],
+   "endereco": "R. Hermann Weege, 111",
+   "localidade": "Pomerode",
+   "latitude": -26.73908454,
+   "longitude": -49.17388928,
+   "fontes": [
+    "meta (CDLA-Permissive-2.0)",
+    "Overture (CDLA-Permissive-2.0)"
+   ]
+  },
+  {
+   "idOverture": "f0a0675d-2d8b-4080-bcd4-37eef6c13d0c",
+   "nome": "Schornstein Kneipe",
+   "categoriaOverture": "brewery",
+   "confianca": 0.998,
+   "sites": [
+    "http://www.schornstein.com.br/"
+   ],
+   "telefones": [
+    "+5541999690600"
+   ],
+   "redesSociais": [
+    "https://www.facebook.com/334695386962463"
+   ],
+   "endereco": "R. Hermann Weege, 60",
+   "localidade": "Pomerode",
+   "latitude": -26.73836767,
+   "longitude": -49.17365163,
+   "fontes": [
+    "meta (CDLA-Permissive-2.0)",
+    "Overture (CDLA-Permissive-2.0)"
+   ]
+  },
+  {
+   "idOverture": "ca1a9daf-b64c-40d1-8688-4e6820bb5325",
+   "nome": "Maria Fulana Sorvete Artesanal",
+   "categoriaOverture": "ice_cream_shop",
+   "confianca": 0.935,
+   "sites": [],
+   "telefones": [
+    "+5547991803771"
+   ],
+   "redesSociais": [
+    "https://www.facebook.com/280252096179789"
+   ],
+   "endereco": "R. Hermann Weege, 60",
+   "localidade": "Pomerode",
+   "latitude": -26.7383508,
+   "longitude": -49.17363063,
+   "fontes": [
+    "meta (CDLA-Permissive-2.0)",
+    "Overture (CDLA-Permissive-2.0)"
+   ]
+  },
+  {
+   "idOverture": "f4737274-9b2c-42b8-932c-8950285f86c4",
+   "nome": "Ki Delícia Yogurteria Pomerode",
+   "categoriaOverture": "frozen_yogurt_shop",
+   "confianca": 0.964,
+   "sites": [
+    "https://www.instagram.com/yogurteriakidelicia/?hl=pt-br"
+   ],
+   "telefones": [
+    "+5547992218838"
+   ],
+   "redesSociais": [
+    "https://www.facebook.com/1549985201802164"
+   ],
+   "endereco": "Rua Hermann Weege, 160",
+   "localidade": "Pomerode",
+   "latitude": -26.73773281327945,
+   "longitude": -49.173642533625895,
+   "fontes": [
+    "meta (CDLA-Permissive-2.0)",
+    "Overture (CDLA-Permissive-2.0)"
+   ]
+  },
+  {
+   "idOverture": "b631ba51-51f9-4cc4-b2e5-1f64b783fd8d",
+   "nome": "Bittersüss",
+   "categoriaOverture": "fast_food_restaurant",
+   "confianca": 0.736,
+   "sites": [],
+   "telefones": [
+    "+4733801775"
+   ],
+   "redesSociais": [
+    "https://www.facebook.com/299059254337587"
+   ],
+   "endereco": "Rua Hermann Weege, 160",
+   "localidade": "Pomerode",
+   "latitude": -26.737694646429,
+   "longitude": -49.173609585714,
+   "fontes": [
+    "meta (CDLA-Permissive-2.0)",
+    "Overture (CDLA-Permissive-2.0)"
+   ]
+  },
+  {
+   "idOverture": "5ba75370-1221-4940-9c19-edb078d01f43",
+   "nome": "Hostel Villa Pomerania",
+   "categoriaOverture": "hostel",
+   "confianca": 0.894,
+   "sites": [],
+   "telefones": [
+    "+554733066605"
+   ],
+   "redesSociais": [
+    "https://www.facebook.com/868066326718386"
+   ],
+   "endereco": "Rua Hermann Weege, 452",
+   "localidade": "Pomerode",
+   "latitude": -26.7389409,
+   "longitude": -49.17316368,
+   "fontes": [
+    "meta (CDLA-Permissive-2.0)",
+    "Overture (CDLA-Permissive-2.0)"
+   ]
+  },
+  {
+   "idOverture": "ef52e2e6-efdf-4883-b55a-065e39f1ee56",
+   "nome": "Familien Haus Pousada - Family Room",
+   "categoriaOverture": "inn",
+   "confianca": 0.979,
+   "sites": [],
+   "telefones": [
+    "+5547992373439"
+   ],
+   "redesSociais": [
+    "https://www.facebook.com/1647687595538867"
+   ],
+   "endereco": "",
+   "localidade": "Pomerode",
+   "latitude": -26.75134118,
+   "longitude": -49.17409103,
+   "fontes": [
+    "meta (CDLA-Permissive-2.0)",
+    "Overture (CDLA-Permissive-2.0)"
+   ]
+  },
+  {
+   "idOverture": "d0a7b4f8-c43d-4ee6-ba05-227f752405c3",
+   "nome": "Garten Chalés",
+   "categoriaOverture": "cabin",
+   "confianca": 0.639,
+   "sites": [
+    "https://www.instagram.com/gartenchales/"
+   ],
+   "telefones": [
+    "+5547999262996"
+   ],
+   "redesSociais": [
+    "https://www.facebook.com/114318273796920"
+   ],
+   "endereco": "R. Hermann Guenther, 123",
+   "localidade": "Pomerode",
+   "latitude": -26.75304863,
+   "longitude": -49.17459206,
+   "fontes": [
+    "meta (CDLA-Permissive-2.0)",
+    "Overture (CDLA-Permissive-2.0)"
+   ]
+  },
+  {
+   "idOverture": "4d0672e5-1357-43e4-8c20-e601b08c063b",
+   "nome": "Schoen Restaurante e Pizzaria",
+   "categoriaOverture": "pizza_restaurant",
+   "confianca": 0.993,
+   "sites": [],
+   "telefones": [
+    "+554733871238"
+   ],
+   "redesSociais": [
+    "https://www.facebook.com/1572478393044971"
+   ],
+   "endereco": "R. XV de Novembro, 1098",
+   "localidade": "Pomerode",
+   "latitude": -26.74656112,
+   "longitude": -49.17415299,
+   "fontes": [
+    "meta (CDLA-Permissive-2.0)",
+    "Overture (CDLA-Permissive-2.0)"
+   ]
+  },
+  {
+   "idOverture": "f3af6ccf-a639-4fea-830b-8f1a1259ad0e",
+   "nome": "Kaffee Ecke Pomerode",
+   "categoriaOverture": "cafe",
+   "confianca": 0.825,
+   "sites": [],
+   "telefones": [
+    "+5547999978697"
+   ],
+   "redesSociais": [
+    "https://www.facebook.com/505737085945169"
+   ],
+   "endereco": "R. XV de Novembro, 1473",
+   "localidade": "Pomerode",
+   "latitude": -26.74991022,
+   "longitude": -49.17354122,
+   "fontes": [
+    "meta (CDLA-Permissive-2.0)",
+    "Overture (CDLA-Permissive-2.0)"
+   ]
+  },
+  {
+   "idOverture": "3f29b422-4000-4e2b-afef-e13acfcd3ed7",
+   "nome": "Hostel Stettin",
+   "categoriaOverture": "hostel",
+   "confianca": 0.964,
+   "sites": [
+    "http://www.hostelstettin.com.br/"
+   ],
+   "telefones": [
+    "+5547996311313"
+   ],
+   "redesSociais": [
+    "https://www.facebook.com/371960202998366"
+   ],
+   "endereco": "Rua XV de Novembro, 1269",
+   "localidade": "Pomerode",
+   "latitude": -26.74777123,
+   "longitude": -49.17360387,
+   "fontes": [
+    "meta (CDLA-Permissive-2.0)",
+    "Overture (CDLA-Permissive-2.0)"
+   ]
+  },
+  {
+   "idOverture": "5127cfbb-47ce-4f7b-920e-5d5b45417c46",
+   "nome": "Pomerode Piscinas",
+   "categoriaOverture": "pool_cleaning",
+   "confianca": 0.671,
+   "sites": [],
+   "telefones": [
+    "+554733872715"
+   ],
+   "redesSociais": [
+    "https://www.facebook.com/171172706636958"
+   ],
+   "endereco": "R. XV de Novembro, 1211",
+   "localidade": "Pomerode",
+   "latitude": -26.74730369,
+   "longitude": -49.17369142,
+   "fontes": [
+    "meta (CDLA-Permissive-2.0)",
+    "Overture (CDLA-Permissive-2.0)"
+   ]
+  },
+  {
+   "idOverture": "de5524b4-b397-42be-8826-1e19c2d1acc7",
+   "nome": "Pomerode Brauer Geschäft",
+   "categoriaOverture": "liquor_store",
+   "confianca": 0.919,
+   "sites": [
+    "http://www.pomerodebrauer.com.br/"
+   ],
+   "telefones": [
+    "+5547996644024"
+   ],
+   "redesSociais": [
+    "https://www.facebook.com/105172493498825"
+   ],
+   "endereco": "R. XV de Novembro, 991",
+   "localidade": "Pomerode",
+   "latitude": -26.74525667,
+   "longitude": -49.17421903,
+   "fontes": [
+    "meta (CDLA-Permissive-2.0)",
+    "Overture (CDLA-Permissive-2.0)"
+   ]
+  },
+  {
+   "idOverture": "1997b6b6-44a3-4abc-a955-d4e9cc8a294e",
+   "nome": "Pórtico Sul de Pomerode",
+   "categoriaOverture": "travel_service",
+   "confianca": 0.642,
+   "sites": [
+    "www.vemprapomerode.com.br"
+   ],
+   "telefones": [
+    "+554733802594"
+   ],
+   "redesSociais": [
+    "https://www.facebook.com/359292874229392"
+   ],
+   "endereco": "Ac. Jorge Lacerda, 821",
+   "localidade": "Pomerode",
+   "latitude": -26.7440469,
+   "longitude": -49.17449715,
+   "fontes": [
+    "meta (CDLA-Permissive-2.0)",
+    "Overture (CDLA-Permissive-2.0)"
+   ]
+  },
+  {
+   "idOverture": "40ac9277-01fb-4035-a975-a3af31904611",
+   "nome": "Tarthurel Pizzaria",
+   "categoriaOverture": "pizza_restaurant",
+   "confianca": 0.989,
+   "sites": [],
+   "telefones": [
+    "+5547999818995"
+   ],
+   "redesSociais": [
+    "https://www.facebook.com/1578105545804660"
+   ],
+   "endereco": "Rua Quinze de Novembro, 821",
+   "localidade": "Pomerode",
+   "latitude": -26.74413823,
+   "longitude": -49.17434875,
+   "fontes": [
+    "meta (CDLA-Permissive-2.0)",
+    "Overture (CDLA-Permissive-2.0)"
+   ]
+  },
+  {
+   "idOverture": "edc882ce-33c4-42e3-847a-89a3485d1f66",
+   "nome": "Pomerode Auto Center Serviços",
+   "categoriaOverture": "automotive_repair",
+   "confianca": 0.989,
+   "sites": [
+    "http://www.pomerodeautocenter.com.br/"
+   ],
+   "telefones": [
+    "+554733872391"
+   ],
+   "redesSociais": [
+    "https://www.facebook.com/737768229603381"
+   ],
+   "endereco": "Rua 15 de Novembro, 964",
+   "localidade": "Pomerode",
+   "latitude": -26.74513981,
+   "longitude": -49.17447729,
+   "fontes": [
+    "meta (CDLA-Permissive-2.0)",
+    "Overture (CDLA-Permissive-2.0)"
+   ]
+  },
+  {
+   "idOverture": "7937c133-966a-4b2b-a195-6283d3e8cf58",
+   "nome": "Café Me Expresso",
+   "categoriaOverture": "coffee_shop",
+   "confianca": 0.896,
+   "sites": [
+    "https://www.instagram.com/cafeteria_cafemeexpresso/"
+   ],
+   "telefones": [
+    "+5547992400840"
+   ],
+   "redesSociais": [
+    "https://www.facebook.com/303295390134534"
+   ],
+   "endereco": "R. XV de Novembro, 828 - Sl 03",
+   "localidade": "Pomerode",
+   "latitude": -26.74405742,
+   "longitude": -49.17479148,
+   "fontes": [
+    "meta (CDLA-Permissive-2.0)",
+    "Overture (CDLA-Permissive-2.0)"
+   ]
+  },
+  {
+   "idOverture": "0fb39c0f-0571-4f72-8c86-5222c29a3a57",
+   "nome": "Pikoka Brinquedos - Pomerode",
+   "categoriaOverture": "toy_store",
+   "confianca": 0.869,
+   "sites": [],
+   "telefones": [
+    "+5547997737827"
+   ],
+   "redesSociais": [
+    "https://www.facebook.com/239348329255656"
+   ],
+   "endereco": "R. XV de Novembro, 828 - Lojas 1 e 2",
+   "localidade": "Pomerode",
+   "latitude": -26.74412442,
+   "longitude": -49.17472305,
+   "fontes": [
+    "meta (CDLA-Permissive-2.0)",
+    "Overture (CDLA-Permissive-2.0)"
+   ]
+  },
+  {
+   "idOverture": "45525bbc-668f-47e2-a407-5601b677d483",
+   "nome": "Pomerode Jeep Tour",
+   "categoriaOverture": "tour_operator",
+   "confianca": 0.602,
+   "sites": [
+    "http://www.pomerodejeeptour.com.br/"
+   ],
+   "telefones": [
+    "+5547991500003"
+   ],
+   "redesSociais": [
+    "https://www.facebook.com/335855689927232"
+   ],
+   "endereco": "R. XV de Novembro, 818",
+   "localidade": "Pomerode",
+   "latitude": -26.74406118,
+   "longitude": -49.17457335,
+   "fontes": [
+    "meta (CDLA-Permissive-2.0)",
+    "Overture (CDLA-Permissive-2.0)"
+   ]
+  },
+  {
+   "idOverture": "0c7ef861-fa15-4592-bea5-d2eacaf6e542",
+   "nome": "Fundação Cultural De Pomerode",
+   "categoriaOverture": "cultural_center",
+   "confianca": 0.771,
+   "sites": [
+    "http://www.vemprapomerode.com.br/"
+   ],
+   "telefones": [
+    "+554733066234"
+   ],
+   "redesSociais": [
+    "https://www.facebook.com/981341288626365"
+   ],
+   "endereco": "Prefeitura de Pomerode - R. XV de Novembro, 525",
+   "localidade": "Pomerode",
+   "latitude": -26.7415774,
+   "longitude": -49.17527898,
+   "fontes": [
+    "meta (CDLA-Permissive-2.0)",
+    "Overture (CDLA-Permissive-2.0)"
+   ]
+  },
+  {
+   "idOverture": "fccb60f0-14f9-423d-9133-7f4d4743729f",
+   "nome": "Prefeitura Municipal de Pomerode",
+   "categoriaOverture": "town_hall",
+   "confianca": 0.995,
+   "sites": [
+    "http://www.pomerode.sc.gov.br/"
+   ],
+   "telefones": [
+    "+554733877200"
+   ],
+   "redesSociais": [
+    "https://www.facebook.com/1371614542870381"
+   ],
+   "endereco": "R. XV de Novembro, 525",
+   "localidade": "Pomerode",
+   "latitude": -26.74157465,
+   "longitude": -49.17518558,
+   "fontes": [
+    "meta (CDLA-Permissive-2.0)",
+    "Overture (CDLA-Permissive-2.0)"
+   ]
+  },
+  {
+   "idOverture": "42761fb2-d93b-4d76-89dd-496c889b6450",
+   "nome": "Pomerode Empreende",
+   "categoriaOverture": "professional_service",
+   "confianca": 0.73,
+   "sites": [
+    "https://www.instagram.com/saladoempreendedorpomerode/"
+   ],
+   "telefones": [
+    "+554733877215"
+   ],
+   "redesSociais": [
+    "https://www.facebook.com/514582685671612"
+   ],
+   "endereco": "Rua Quinze de Novembro, 555",
+   "localidade": "Pomerode",
+   "latitude": -26.7418474,
+   "longitude": -49.1751169,
+   "fontes": [
+    "meta (CDLA-Permissive-2.0)",
+    "Overture (CDLA-Permissive-2.0)"
+   ]
+  },
+  {
+   "idOverture": "52ed2df6-f1fc-463c-9490-f81e170f3bb8",
+   "nome": "Centro Oftalmolo'gico Pomerode",
+   "categoriaOverture": "eyewear_store",
+   "confianca": 0.859,
+   "sites": [],
+   "telefones": [
+    "+554733874221"
+   ],
+   "redesSociais": [
+    "https://www.facebook.com/390879728036903"
+   ],
+   "endereco": "R. XV de Novembro",
+   "localidade": "Pomerode",
+   "latitude": -26.7423669,
+   "longitude": -49.1749061,
+   "fontes": [
+    "meta (CDLA-Permissive-2.0)",
+    "Overture (CDLA-Permissive-2.0)"
+   ]
+  },
+  {
+   "idOverture": "319a526e-7c05-45f0-8e10-f211aae0b119",
+   "nome": "Fórum da Comarca de Pomerode",
+   "categoriaOverture": "courthouse",
+   "confianca": 0.97,
+   "sites": [
+    "www.tjsc.jus.br"
+   ],
+   "telefones": [
+    "+554733877400"
+   ],
+   "redesSociais": [
+    "https://www.facebook.com/244817392312644"
+   ],
+   "endereco": "Rua 15 de Novembro, 700",
+   "localidade": "Pomerode",
+   "latitude": -26.74313114,
+   "longitude": -49.17522718,
+   "fontes": [
+    "meta (CDLA-Permissive-2.0)",
+    "Overture (CDLA-Permissive-2.0)"
+   ]
+  },
+  {
+   "idOverture": "813e58a3-4c75-40ae-bcec-84791b6d3354",
+   "nome": "Universal Pomerode - SC",
+   "categoriaOverture": "religious_organization",
+   "confianca": 0.799,
+   "sites": [
+    "https://www.universal.org/"
+   ],
+   "telefones": [
+    "+551135733501"
+   ],
+   "redesSociais": [
+    "https://www.facebook.com/262533330269599"
+   ],
+   "endereco": "Rua Quinze de Novembro, 560",
+   "localidade": "Pomerode",
+   "latitude": -26.74202121,
+   "longitude": -49.17554653,
+   "fontes": [
+    "meta (CDLA-Permissive-2.0)",
+    "Overture (CDLA-Permissive-2.0)"
+   ]
+  },
+  {
+   "idOverture": "1daa13da-2dc7-4b78-b10e-1d6ab8be4cc7",
+   "nome": "Hotel Schroeder",
+   "categoriaOverture": "hotel",
+   "confianca": 0.986,
+   "sites": [
+    "http://hotelschroeder.com.br/"
+   ],
+   "telefones": [
+    "+554733870933"
+   ],
+   "redesSociais": [
+    "https://www.facebook.com/904086706438806"
+   ],
+   "endereco": "R. XV de Novembro, 514",
+   "localidade": "Pomerode",
+   "latitude": -26.74158352,
+   "longitude": -49.17572914,
+   "fontes": [
+    "meta (CDLA-Permissive-2.0)",
+    "Overture (CDLA-Permissive-2.0)"
+   ]
+  },
+  {
+   "idOverture": "0044ca55-69bb-4d96-b30e-53b87a4df8c4",
+   "nome": "Sorveteria 60 Sabores",
+   "categoriaOverture": "ice_cream_shop",
+   "confianca": 0.879,
+   "sites": [
+    "https://60sabores.com.br/unidade/60-sabores-pomerode?utm_medium=biodaunidade"
+   ],
+   "telefones": [
+    "+554733067488"
+   ],
+   "redesSociais": [
+    "https://www.facebook.com/1025097994010442"
+   ],
+   "endereco": "R. XV de Novembro, 426",
+   "localidade": "Pomerode",
+   "latitude": -26.74092458,
+   "longitude": -49.17598866,
+   "fontes": [
+    "meta (CDLA-Permissive-2.0)",
+    "Overture (CDLA-Permissive-2.0)"
+   ]
+  },
+  {
+   "idOverture": "f8cbcf3f-6f09-431e-abd9-47c9edcacb01",
+   "nome": "Cooepe Pomerode",
+   "categoriaOverture": "school",
+   "confianca": 0.875,
+   "sites": [
+    "https://cooepe.com.br/"
+   ],
+   "telefones": [
+    "+554733801221"
+   ],
+   "redesSociais": [
+    "https://www.facebook.com/104864037744137"
+   ],
+   "endereco": "R. Arno Weege, 89 - BLOCO C, Salas 7 e 8",
+   "localidade": "Pomerode",
+   "latitude": -26.74256552,
+   "longitude": -49.17644861,
+   "fontes": [
+    "meta (CDLA-Permissive-2.0)",
+    "Overture (CDLA-Permissive-2.0)"
+   ]
+  },
+  {
+   "idOverture": "49c78264-63ef-486e-b462-362e06bbff8e",
+   "nome": "Sociedade Espírita Cristã de Pomerode",
+   "categoriaOverture": "religious_organization",
+   "confianca": 0.901,
+   "sites": [],
+   "telefones": [
+    "+5547999634300"
+   ],
+   "redesSociais": [
+    "https://www.facebook.com/1193335080785649"
+   ],
+   "endereco": "Avenida 21 de Janeiro, 1845 Piso Inferior",
+   "localidade": "Pomerode",
+   "latitude": -26.74553,
+   "longitude": -49.17616,
+   "fontes": [
+    "meta (CDLA-Permissive-2.0)",
+    "Overture (CDLA-Permissive-2.0)"
+   ]
+  },
+  {
+   "idOverture": "50adfb34-46d5-4665-bddb-fa162e660aa6",
+   "nome": "Hemos Laboratório Médico (Unidade Pomerode)",
+   "categoriaOverture": null,
+   "confianca": 0.85,
+   "sites": [
+    "https://hemos.com.br/"
+   ],
+   "telefones": [
+    "4733041455"
+   ],
+   "redesSociais": [],
+   "endereco": "Av. Vinte e Um de Janeiro 1863",
+   "localidade": "Pomerode",
+   "latitude": -26.74561297,
+   "longitude": -49.17624253,
+   "fontes": [
+    "Microsoft (CDLA-Permissive-2.0)",
+    "Overture (CDLA-Permissive-2.0)"
+   ]
+  },
+  {
+   "idOverture": "a5cc1099-48ab-49b1-9a19-ed184d537f70",
+   "nome": "Pomerhof",
+   "categoriaOverture": "german_restaurant",
+   "confianca": 0.92,
+   "sites": [
+    "https://www.instagram.com/pomerhofrestaurante"
+   ],
+   "telefones": [
+    "+554722041232"
+   ],
+   "redesSociais": [
+    "https://www.facebook.com/437411439687536"
+   ],
+   "endereco": "R. Juergen Weege, 151",
+   "localidade": "Pomerode",
+   "latitude": -26.74687831,
+   "longitude": -49.17556307,
+   "fontes": [
+    "meta (CDLA-Permissive-2.0)",
+    "Overture (CDLA-Permissive-2.0)"
+   ]
+  },
+  {
+   "idOverture": "542d44c7-1a55-437b-97aa-e600d68a4246",
+   "nome": "Breithaupt Pomerode",
+   "categoriaOverture": "hardware_store",
+   "confianca": 0.699,
+   "sites": [],
+   "telefones": [
+    "+554733875418"
+   ],
+   "redesSociais": [
+    "https://www.facebook.com/1534305520160857"
+   ],
+   "endereco": "Rua Quinze de Novembro, 1144",
+   "localidade": "Pomerode",
+   "latitude": -26.74818893175,
+   "longitude": -49.17489621875001,
+   "fontes": [
+    "meta (CDLA-Permissive-2.0)",
+    "Overture (CDLA-Permissive-2.0)"
+   ]
+  },
+  {
+   "idOverture": "ab1803a7-787d-4392-87b6-326028e46377",
+   "nome": "Pousada Harmonia Pomerana",
+   "categoriaOverture": "bed_and_breakfast",
+   "confianca": 0.982,
+   "sites": [
+    "https://linktr.ee/harmoniapomerana"
+   ],
+   "telefones": [
+    "+5547991961401"
+   ],
+   "redesSociais": [
+    "https://www.facebook.com/1556965981281962"
+   ],
+   "endereco": "Av. 21 de Janeiro, 2833",
+   "localidade": "Pomerode",
+   "latitude": -26.74867866,
+   "longitude": -49.17514154,
+   "fontes": [
+    "meta (CDLA-Permissive-2.0)",
+    "Overture (CDLA-Permissive-2.0)"
+   ]
+  },
+  {
+   "idOverture": "e63810f0-942f-41f3-b4e9-32c36fcf08b6",
+   "nome": "Pomerode Brinquedos",
+   "categoriaOverture": "toy_store",
+   "confianca": 0.894,
+   "sites": [
+    "http://www.pomerodebrinquedos.com.br/"
+   ],
+   "telefones": [
+    "+5547997202969"
+   ],
+   "redesSociais": [
+    "https://www.facebook.com/103939024996299"
+   ],
+   "endereco": "Av. 21 de Janeiro, 2833",
+   "localidade": "Pomerode",
+   "latitude": -26.74879645,
+   "longitude": -49.1752639,
+   "fontes": [
+    "meta (CDLA-Permissive-2.0)",
+    "Overture (CDLA-Permissive-2.0)"
+   ]
+  },
+  {
+   "idOverture": "c7e06e59-280a-4b4b-bf36-6800063fd485",
+   "nome": "Pousada Blauberg",
+   "categoriaOverture": "bed_and_breakfast",
+   "confianca": 0.99,
+   "sites": [
+    "http://www.pousadablauberg.com.br/"
+   ],
+   "telefones": [
+    "+554733875064"
+   ],
+   "redesSociais": [
+    "https://www.facebook.com/150313211345"
+   ],
+   "endereco": "Avenida 21 de Janeiro, 2600",
+   "localidade": "Pomerode",
+   "latitude": -26.75250514,
+   "longitude": -49.17515886,
+   "fontes": [
+    "meta (CDLA-Permissive-2.0)",
+    "Overture (CDLA-Permissive-2.0)"
+   ]
+  },
+  {
+   "idOverture": "f3ae598a-bee1-4e94-940d-effd313a9f5a",
+   "nome": "Bella Pousada",
+   "categoriaOverture": "inn",
+   "confianca": 0.929,
+   "sites": [],
+   "telefones": [
+    "+5548988298047"
+   ],
+   "redesSociais": [
+    "https://www.facebook.com/110021818722259"
+   ],
+   "endereco": "R. Albrecht Guenther, 61",
+   "localidade": "Pomerode",
+   "latitude": -26.75150491,
+   "longitude": -49.17570037,
+   "fontes": [
+    "meta (CDLA-Permissive-2.0)",
+    "Overture (CDLA-Permissive-2.0)"
+   ]
+  },
+  {
+   "idOverture": "d1d49ad6-5348-478c-a7ed-a7c0fc9260e5",
+   "nome": "Casa Branca Pousada",
+   "categoriaOverture": "bed_and_breakfast",
+   "confianca": 0.994,
+   "sites": [
+    "http://www.casabrancapousadaboutique.com.br/"
+   ],
+   "telefones": [
+    "+5547988551177"
+   ],
+   "redesSociais": [
+    "https://www.facebook.com/1554663108086665"
+   ],
+   "endereco": "Av. 21 de Janeiro, 4200",
+   "localidade": "Pomerode",
+   "latitude": -26.76044576,
+   "longitude": -49.1750679,
+   "fontes": [
+    "meta (CDLA-Permissive-2.0)",
+    "Overture (CDLA-Permissive-2.0)"
+   ]
+  },
+  {
+   "idOverture": "6ae0c8a1-5522-4889-99e8-66bb50a8fa3c",
+   "nome": "Pizzaria Pizzen Platz",
+   "categoriaOverture": "pizza_restaurant",
+   "confianca": 0.958,
+   "sites": [],
+   "telefones": [
+    "+5547999557337"
+   ],
+   "redesSociais": [
+    "https://www.facebook.com/700440410410099"
+   ],
+   "endereco": "R. Karl Guenter, 295 - Sal a 1",
+   "localidade": "Pomerode",
+   "latitude": -26.75073439,
+   "longitude": -49.17648395,
+   "fontes": [
+    "meta (CDLA-Permissive-2.0)",
+    "Overture (CDLA-Permissive-2.0)"
+   ]
+  },
+  {
+   "idOverture": "80b59a3d-535e-482c-920a-6be677bbc3b0",
+   "nome": "Hotel Bergblick",
+   "categoriaOverture": "hotel",
+   "confianca": 0.987,
+   "sites": [
+    "http://www.bergblick.com.br/"
+   ],
+   "telefones": [
+    "+554733870952"
+   ],
+   "redesSociais": [
+    "https://www.facebook.com/333520686792826"
+   ],
+   "endereco": "R. Georg Zeplin, 120",
+   "localidade": "Pomerode",
+   "latitude": -26.75679752,
+   "longitude": -49.1772581,
+   "fontes": [
+    "meta (CDLA-Permissive-2.0)",
+    "Overture (CDLA-Permissive-2.0)"
+   ]
+  },
+  {
+   "idOverture": "a838ef91-ec32-4dae-8690-d6c53cc876c8",
+   "nome": "Pousada Infinity Gasthaus",
+   "categoriaOverture": "lodging",
+   "confianca": 0.942,
+   "sites": [
+    "https://www.instagram.com/pousada_infinity_gasthaus/"
+   ],
+   "telefones": [
+    "+5547999333711"
+   ],
+   "redesSociais": [
+    "https://www.facebook.com/750935115074305"
+   ],
+   "endereco": "Rua Emília Behling, 202",
+   "localidade": "Pomerode",
+   "latitude": -26.74912814,
+   "longitude": -49.17741806,
+   "fontes": [
+    "meta (CDLA-Permissive-2.0)",
+    "Overture (CDLA-Permissive-2.0)"
+   ]
+  },
+  {
+   "idOverture": "7d590481-6fdd-4165-b217-4d6ed0b24c13",
+   "nome": "Pavilhao De Eventos Pomerode",
+   "categoriaOverture": "party_and_event_planning",
+   "confianca": 0.869,
+   "sites": [
+    "www.pomerode.com.br"
+   ],
+   "telefones": [],
+   "redesSociais": [
+    "https://www.facebook.com/391199267664458"
+   ],
+   "endereco": "Avenida Vinte e Um de Janeiro, 2150",
+   "localidade": "Pomerode",
+   "latitude": -26.74718404792027,
+   "longitude": -49.17710353861564,
+   "fontes": [
+    "meta (CDLA-Permissive-2.0)",
+    "Overture (CDLA-Permissive-2.0)"
+   ]
+  },
+  {
+   "idOverture": "01987ba7-64a3-4b52-9a7a-487a6b47b5cb",
+   "nome": "Democrata Restaurante",
+   "categoriaOverture": "brazilian_restaurant",
+   "confianca": 0.985,
+   "sites": [],
+   "telefones": [
+    "+554733871627"
+   ],
+   "redesSociais": [
+    "https://www.facebook.com/793318504063295"
+   ],
+   "endereco": "Avenida Vinte e Um de Janeiro, 1600",
+   "localidade": "Pomerode",
+   "latitude": -26.742199,
+   "longitude": -49.178688,
+   "fontes": [
+    "meta (CDLA-Permissive-2.0)",
+    "Overture (CDLA-Permissive-2.0)"
+   ]
+  },
+  {
+   "idOverture": "ee9ec8eb-6811-43ec-a7f3-d85a6e1e07b7",
+   "nome": "Pousada Lena Rosa",
+   "categoriaOverture": "hotel",
+   "confianca": 0.997,
+   "sites": [
+    "http://www.pousadalenarosa.com.br/"
+   ],
+   "telefones": [
+    "+554733872300"
+   ],
+   "redesSociais": [
+    "https://www.facebook.com/289684311195487"
+   ],
+   "endereco": "Rua Heinrich Passold, 277",
+   "localidade": "Pomerode",
+   "latitude": -26.739995169630227,
+   "longitude": -49.178960845201594,
+   "fontes": [
+    "meta (CDLA-Permissive-2.0)",
+    "Overture (CDLA-Permissive-2.0)"
+   ]
+  },
+  {
+   "idOverture": "7fc009b6-469f-4990-93db-ae21bcc334ce",
+   "nome": "Restaurante Schroeder",
+   "categoriaOverture": "fast_food_restaurant",
+   "confianca": 0.984,
+   "sites": [
+    "http://restauranteschroeder2.placeweb.site"
+   ],
+   "telefones": [
+    "+554733870493"
+   ],
+   "redesSociais": [
+    "https://www.facebook.com/145927865477396"
+   ],
+   "endereco": "R. Luiz Abry, 45",
+   "localidade": "Pomerode",
+   "latitude": -26.73701131,
+   "longitude": -49.17665705,
+   "fontes": [
+    "meta (CDLA-Permissive-2.0)",
+    "Overture (CDLA-Permissive-2.0)"
+   ]
+  },
+  {
+   "idOverture": "f1eaa836-29d6-4c2c-bf14-02d83ac96e33",
+   "nome": "Lunge",
+   "categoriaOverture": "buffet_restaurant",
+   "confianca": 0.995,
+   "sites": [
+    "http://lanchoneteerestaurantelunge1.placeweb.site"
+   ],
+   "telefones": [
+    "+554733870064"
+   ],
+   "redesSociais": [
+    "https://www.facebook.com/154257441299775"
+   ],
+   "endereco": "R. Luiz Abry, 187",
+   "localidade": "Pomerode",
+   "latitude": -26.73568945,
+   "longitude": -49.17677762,
+   "fontes": [
+    "meta (CDLA-Permissive-2.0)",
+    "Overture (CDLA-Permissive-2.0)"
+   ]
+  },
+  {
+   "idOverture": "c9bec0bd-b513-4cf0-b757-b8792f5c435b",
+   "nome": "Sabor do café",
+   "categoriaOverture": "coffee_shop",
+   "confianca": 0.801,
+   "sites": [],
+   "telefones": [
+    "+14733871258"
+   ],
+   "redesSociais": [
+    "https://www.facebook.com/202122976900444"
+   ],
+   "endereco": "Rua Hermann Weege",
+   "localidade": "Pomerode",
+   "latitude": -26.7372432,
+   "longitude": -49.1762545,
+   "fontes": [
+    "meta (CDLA-Permissive-2.0)",
+    "Overture (CDLA-Permissive-2.0)"
+   ]
+  },
+  {
+   "idOverture": "6d170e38-da74-45b7-8ed9-d5f14c11edbe",
+   "nome": "Glamping Pomerode",
+   "categoriaOverture": "cabin",
+   "confianca": 0.708,
+   "sites": [
+    "https://www.booking.com/hotel/br/glamping-pomerode.pt-br.html?aid=304142&label=gen173nr-1FCAEoggI46AdIM1gEaCCIAQKYAS24AQfIAQ3YAQHoAQH4AQyIAgGoAgO4ArTE67sGwAIB0gIkYzYxMmEwOWUtZjE0NC00NjY1LTk3NmYtNTMwNzMwZTcwN2Ey2AIG4AIB&sid=8c8f11958494fa8cff4d091ba87b76c0&all_sr_blocks=1314518401_406051400_2_0_0&checkin=2025-01-05&checkout=2025-01-06&dest_id=13145184&dest_type=hotel&dist=0&group_adults=2&group_children=0&hapos=1&highlighted_blocks=1314518401_406051400_2_0_0&hpos=1&matching_block_id=1314518401_406051400_2_0_0&no_rooms=1&req_adults=2&req_children=0&room1=A%2CA&sb_price_type=total&sr_order=popularity&sr_pri_blocks=1314518401_406051400_2_0_0__21375&srepoch=1736106577&srpvid=5cb78b671abf0dd2&type=total&ucfs=1&"
+   ],
+   "telefones": [
+    "+5547996801788"
+   ],
+   "redesSociais": [
+    "https://www.facebook.com/539461795913901"
+   ],
+   "endereco": "R. Luiz Abry, 84",
+   "localidade": "Pomerode",
+   "latitude": -26.73656578,
+   "longitude": -49.17633337,
+   "fontes": [
+    "meta (CDLA-Permissive-2.0)",
+    "Overture (CDLA-Permissive-2.0)"
+   ]
+  },
+  {
+   "idOverture": "f53ddcf3-41d4-4203-8c7f-638b5f46e600",
+   "nome": "Museu Interativo Brasil Alemanha",
+   "categoriaOverture": "museum",
+   "confianca": 0.922,
+   "sites": [
+    "http://museubrasilalemanha.com.br/"
+   ],
+   "telefones": [],
+   "redesSociais": [
+    "https://www.facebook.com/112440318495910"
+   ],
+   "endereco": "Rua Paulo Zimmermann, 65",
+   "localidade": "Pomerode",
+   "latitude": -26.736994330587,
+   "longitude": -49.175879317066,
+   "fontes": [
+    "meta (CDLA-Permissive-2.0)",
+    "Overture (CDLA-Permissive-2.0)"
+   ]
+  },
+  {
+   "idOverture": "9000eb09-0dff-4f44-993c-6a1ec4a684e1",
+   "nome": "Confeitaria Torten Paradies",
+   "categoriaOverture": "bakery",
+   "confianca": 0.998,
+   "sites": [
+    "http://www.torten.com.br/"
+   ],
+   "telefones": [
+    "+554733870950"
+   ],
+   "redesSociais": [
+    "https://www.facebook.com/1707035126174805"
+   ],
+   "endereco": "R. XV de Novembro, 350",
+   "localidade": "Pomerode",
+   "latitude": -26.74027031,
+   "longitude": -49.17632521,
+   "fontes": [
+    "meta (CDLA-Permissive-2.0)",
+    "Overture (CDLA-Permissive-2.0)"
+   ]
+  },
+  {
+   "idOverture": "53334d9f-ae2f-4c68-91a6-663298b80ee6",
+   "nome": "Biergarten Pomerânia",
+   "categoriaOverture": "german_restaurant",
+   "confianca": 0.99,
+   "sites": [
+    "https://www.biergartenpomerania.com.br/"
+   ],
+   "telefones": [
+    "+554733063995"
+   ],
+   "redesSociais": [
+    "https://www.facebook.com/110870818322860"
+   ],
+   "endereco": "R. XV de Novembro, 367",
+   "localidade": "Pomerode",
+   "latitude": -26.74044958,
+   "longitude": -49.17591748,
+   "fontes": [
+    "meta (CDLA-Permissive-2.0)",
+    "Overture (CDLA-Permissive-2.0)"
+   ]
+  },
+  {
+   "idOverture": "9dcaaca0-2739-4bd5-8c9a-5a8d8622552d",
+   "nome": "Funiculi Funicula",
+   "categoriaOverture": "italian_restaurant",
+   "confianca": 0.77,
+   "sites": [
+    "http://www.funiculifunicula.com.br"
+   ],
+   "telefones": [
+    "(47) 3037-2901"
+   ],
+   "redesSociais": [],
+   "endereco": "Rua Hermann Weege, 243",
+   "localidade": "Pomerode",
+   "latitude": -26.736919371111746,
+   "longitude": -49.1748421591443,
+   "fontes": [
+    "Foursquare (Apache-2.0)",
+    "Overture (CDLA-Permissive-2.0)"
+   ]
+  },
+  {
+   "idOverture": "aa3b9b16-5891-4772-85f3-d8279eb6c512",
+   "nome": "Pousada Dein Haus",
+   "categoriaOverture": "lodging",
+   "confianca": 0.997,
+   "sites": [
+    "http://www.deinhaus.com.br/"
+   ],
+   "telefones": [
+    "+554733875954"
+   ],
+   "redesSociais": [
+    "https://www.facebook.com/507627319357134"
+   ],
+   "endereco": "",
+   "localidade": "Pomerode",
+   "latitude": -26.73176874,
+   "longitude": -49.17659106,
+   "fontes": [
+    "meta (CDLA-Permissive-2.0)",
+    "Overture (CDLA-Permissive-2.0)"
+   ]
+  },
+  {
+   "idOverture": "fe58f1d5-ed9e-440a-b338-dc5313fe7895",
+   "nome": "Quintal Toillier Restaurante",
+   "categoriaOverture": "brazilian_restaurant",
+   "confianca": 0.994,
+   "sites": [
+    "https://popupburguer.menudino.com/"
+   ],
+   "telefones": [
+    "+554733333870"
+   ],
+   "redesSociais": [
+    "https://www.facebook.com/106350525290964"
+   ],
+   "endereco": "R. Luiz Abry, 694",
+   "localidade": "Pomerode",
+   "latitude": -26.73125896,
+   "longitude": -49.17675287,
+   "fontes": [
+    "meta (CDLA-Permissive-2.0)",
+    "Overture (CDLA-Permissive-2.0)"
+   ]
+  },
+  {
+   "idOverture": "fc372ea2-c566-4dfa-a3eb-c03912905564",
+   "nome": "Memorial Arthur Schmidt",
+   "categoriaOverture": "museum",
+   "confianca": 0.917,
+   "sites": [
+    "http://www.porcelanaschmidt.com.br"
+   ],
+   "telefones": [
+    "+554733870665"
+   ],
+   "redesSociais": [
+    "https://www.facebook.com/1328741130491787"
+   ],
+   "endereco": "R. Luiz Abry, 848",
+   "localidade": "Pomerode",
+   "latitude": -26.73005216,
+   "longitude": -49.1765779,
+   "fontes": [
+    "meta (CDLA-Permissive-2.0)",
+    "Overture (CDLA-Permissive-2.0)"
+   ]
+  },
+  {
+   "idOverture": "f06b86d6-8719-48c8-86fb-dce7dfb23f61",
+   "nome": "Pousada Oma Helga Pomerode",
+   "categoriaOverture": "hotel",
+   "confianca": 0.997,
+   "sites": [
+    "http://www.pousadaoma.com/"
+   ],
+   "telefones": [
+    "+554733872256"
+   ],
+   "redesSociais": [
+    "https://www.facebook.com/151331291680353"
+   ],
+   "endereco": "Rua Luiz Abry, 945",
+   "localidade": "Pomerode",
+   "latitude": -26.729115038136516,
+   "longitude": -49.17589043421359,
+   "fontes": [
+    "meta (CDLA-Permissive-2.0)",
+    "Overture (CDLA-Permissive-2.0)"
+   ]
+  },
+  {
+   "idOverture": "95f0a850-4ba6-4ea4-95a8-9596e01aab35",
+   "nome": "Pousada Casarão Schmidt",
+   "categoriaOverture": "lodge",
+   "confianca": 0.987,
+   "sites": [
+    "http://www.casaraoschmidt.com.br/"
+   ],
+   "telefones": [
+    "+554733061137"
+   ],
+   "redesSociais": [
+    "https://www.facebook.com/184591482092818"
+   ],
+   "endereco": "Av. 21 de Janeiro, 840",
+   "localidade": "Pomerode",
+   "latitude": -26.73035378,
+   "longitude": -49.17952184,
+   "fontes": [
+    "meta (CDLA-Permissive-2.0)",
+    "Overture (CDLA-Permissive-2.0)"
+   ]
+  },
+  {
+   "idOverture": "03b964e8-9b93-4926-b071-cd5d9e752729",
+   "nome": "Morro Da Turquia",
+   "categoriaOverture": "mountain",
+   "confianca": 0.771,
+   "sites": [],
+   "telefones": [],
+   "redesSociais": [
+    "https://www.facebook.com/477492738951984"
+   ],
+   "endereco": null,
+   "localidade": "Pomerode",
+   "latitude": -26.7403008062,
+   "longitude": -49.1863749112,
+   "fontes": [
+    "meta (CDLA-Permissive-2.0)",
+    "Overture (CDLA-Permissive-2.0)"
+   ]
+  },
+  {
+   "idOverture": "7902ff85-ddbf-42df-ade4-228ab1ba48aa",
+   "nome": "La Nonna Di Tutti",
+   "categoriaOverture": "pizza_restaurant",
+   "confianca": 0.974,
+   "sites": [],
+   "telefones": [
+    "+554733040703"
+   ],
+   "redesSociais": [
+    "https://www.facebook.com/104181088356472"
+   ],
+   "endereco": "R. Ribeirão Areia, 2131",
+   "localidade": "Pomerode",
+   "latitude": -26.71220912,
+   "longitude": -49.18487777,
+   "fontes": [
+    "meta (CDLA-Permissive-2.0)",
+    "Overture (CDLA-Permissive-2.0)"
+   ]
+  },
+  {
+   "idOverture": "182882e3-2348-42fe-957e-031067b9a8fa",
+   "nome": "Pousada Rural Mundo Antigo",
+   "categoriaOverture": "hotel",
+   "confianca": 0.853,
+   "sites": [],
+   "telefones": [
+    "+554733951179"
+   ],
+   "redesSociais": [
+    "https://www.facebook.com/134168323922700"
+   ],
+   "endereco": "Rua Ribeirão Areia, 1830",
+   "localidade": "Pomerode",
+   "latitude": -26.71501,
+   "longitude": -49.18484,
+   "fontes": [
+    "meta (CDLA-Permissive-2.0)",
+    "Overture (CDLA-Permissive-2.0)"
+   ]
+  },
+  {
+   "idOverture": "aad548e7-782d-4e06-b4e2-206e3ecb3a06",
+   "nome": "Restaurante Rancho Lemke",
+   "categoriaOverture": "german_restaurant",
+   "confianca": 0.947,
+   "sites": [
+    "https://instagram.com/restauranterancholemke"
+   ],
+   "telefones": [
+    "+554733081699"
+   ],
+   "redesSociais": [
+    "https://www.facebook.com/101225022963746"
+   ],
+   "endereco": "Rua Testo Alto, 4895",
+   "localidade": "Pomerode",
+   "latitude": -26.67686531,
+   "longitude": -49.18382635,
+   "fontes": [
+    "meta (CDLA-Permissive-2.0)",
+    "Overture (CDLA-Permissive-2.0)"
+   ]
+  },
+  {
+   "idOverture": "148e968a-c47f-42b8-837b-7ff13fac613d",
+   "nome": "Tour Nugali Chocolates",
+   "categoriaOverture": "chocolatier",
+   "confianca": 0.991,
+   "sites": [
+    "https://www.nugali.com.br/tour"
+   ],
+   "telefones": [
+    "+554733873468"
+   ],
+   "redesSociais": [
+    "https://www.facebook.com/550858932076394"
+   ],
+   "endereco": "Rua Testo Alto, 4848",
+   "localidade": "Pomerode",
+   "latitude": -26.67724076,
+   "longitude": -49.18251488,
+   "fontes": [
+    "meta (CDLA-Permissive-2.0)",
+    "Overture (CDLA-Permissive-2.0)"
+   ]
+  },
+  {
+   "idOverture": "102864c2-6abd-45c0-8ec4-92f7d2c89d95",
+   "nome": "Hotel Fazenda Pommernland",
+   "categoriaOverture": "hotel",
+   "confianca": 0.962,
+   "sites": [
+    "https://wa.me/5547992118477"
+   ],
+   "telefones": [
+    "+554733828477"
+   ],
+   "redesSociais": [
+    "https://www.facebook.com/528157687225627"
+   ],
+   "endereco": "Rua Rega II",
+   "localidade": "Pomerode",
+   "latitude": -26.66290222,
+   "longitude": -49.1571102,
+   "fontes": [
+    "meta (CDLA-Permissive-2.0)",
+    "Overture (CDLA-Permissive-2.0)"
+   ]
+  },
+  {
+   "idOverture": "4885bd68-363f-42c8-b7f6-ea901892cf94",
+   "nome": "Casa Siewert",
+   "categoriaOverture": "historic_site",
+   "confianca": 0.912,
+   "sites": [
+    "http://www.rotadoenxaimel.com.br/"
+   ],
+   "telefones": [
+    "+5547996837043"
+   ],
+   "redesSociais": [
+    "https://www.facebook.com/224586807943695"
+   ],
+   "endereco": "Rua Testo Alto, 8019",
+   "localidade": "Pomerode",
+   "latitude": -26.64731661,
+   "longitude": -49.18799071,
+   "fontes": [
+    "meta (CDLA-Permissive-2.0)",
+    "Overture (CDLA-Permissive-2.0)"
+   ]
+  },
+  {
+   "idOverture": "826e2c28-121c-4732-8571-091845c3ffe8",
+   "nome": "Trilha da Natureza",
+   "categoriaOverture": "hiking_trail",
+   "confianca": 0.921,
+   "sites": [
+    "http://instagram.com/trilhadanaturezasc"
+   ],
+   "telefones": [
+    "+5547992860173"
+   ],
+   "redesSociais": [
+    "https://www.facebook.com/107495447602775"
+   ],
+   "endereco": "R. Progresso, 7728-7738",
+   "localidade": "Pomerode",
+   "latitude": -26.65399125,
+   "longitude": -49.19049706,
+   "fontes": [
+    "meta (CDLA-Permissive-2.0)",
+    "Overture (CDLA-Permissive-2.0)"
+   ]
+  },
+  {
+   "idOverture": "62543a74-5009-4aba-8871-99b8f1e1e814",
+   "nome": "Mahlzeit Café Colonial",
+   "categoriaOverture": "german_restaurant",
+   "confianca": 0.69,
+   "sites": [
+    "http://mahlzeit.com.br/"
+   ],
+   "telefones": [
+    "+5547992831497"
+   ],
+   "redesSociais": [
+    "https://www.facebook.com/858748543996957"
+   ],
+   "endereco": "Rua Testo Alto, 7097",
+   "localidade": "Pomerode",
+   "latitude": -26.65603529,
+   "longitude": -49.1895281,
+   "fontes": [
+    "meta (CDLA-Permissive-2.0)",
+    "Overture (CDLA-Permissive-2.0)"
+   ]
+  },
+  {
+   "idOverture": "a6275172-9cce-4272-91e7-88f5afd669ff",
+   "nome": "Camping Recanto do Vale- Pomerode",
+   "categoriaOverture": "campground",
+   "confianca": 0.981,
+   "sites": [
+    "https://camping-recanto-do-vale.negocio.site/"
+   ],
+   "telefones": [
+    "+5547996383216"
+   ],
+   "redesSociais": [
+    "https://www.facebook.com/177565586401426"
+   ],
+   "endereco": "Rua Vale do Selke, 416",
+   "localidade": "Pomerode",
+   "latitude": -26.83199066,
+   "longitude": -49.1446065,
+   "fontes": [
+    "meta (CDLA-Permissive-2.0)",
+    "Overture (CDLA-Permissive-2.0)"
+   ]
+  }
+ ]
+}

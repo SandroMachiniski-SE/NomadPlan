@@ -3,7 +3,7 @@ import { Link, useParams } from "react-router-dom";
 import api from "../services/api";
 import type { RoteiroPublico as RoteiroPublicoTipo } from "../types/roteiro";
 import MapaRoteiroCarregavel from "../components/MapaRoteiroCarregavel";
-import { agruparPorDia, contarDias, corDoDia, descreverTrecho, rotuloDoDia } from "../utils/roteiro";
+import { agruparPorDia, cidadesDoDia, contarDias, corDoDia, descreverTrecho, nomeDoItem, ROTULO_PERIODO, rotuloDoDia } from "../utils/roteiro";
 import Icone from "../components/Icone";
 
 function RoteiroPublico() {
@@ -60,10 +60,10 @@ function RoteiroPublico() {
             <h1>{roteiro.nome}</h1>
 
             <div className="roteiro-meta">
-              {roteiro.cidade && (
+              {((roteiro.cidades?.length ?? 0) > 0 || roteiro.cidade) && (
                 <span>
                   <Icone nome="pin" />
-                  {roteiro.cidade}
+                  {roteiro.cidades?.length ? roteiro.cidades.join(" → ") : roteiro.cidade}
                 </span>
               )}
               <span>
@@ -80,35 +80,56 @@ function RoteiroPublico() {
               <MapaRoteiroCarregavel
                 comLinks={false}
                 paradas={dias.flatMap((grupo) =>
-                  grupo.itens.map((item, indice) => ({
-                    idPonto: item.ponto.id,
-                    nome: item.ponto.nome,
-                    categoria: item.ponto.categoria,
-                    dia: grupo.dia,
-                    numero: indice + 1,
-                    latitude: item.ponto.latitude,
-                    longitude: item.ponto.longitude,
-                  })),
+                  grupo.itens.flatMap((item, indice) =>
+                    item.ponto
+                      ? [
+                          {
+                            idPonto: item.ponto.id,
+                            nome: item.ponto.nome,
+                            categoria: item.ponto.categoria,
+                            dia: grupo.dia,
+                            numero: item.pernoite ? 999 : indice + 1,
+                            pernoite: item.pernoite,
+                            latitude: item.ponto.latitude,
+                            longitude: item.ponto.longitude,
+                          },
+                        ]
+                      : [],
+                  ),
                 )}
               />
             </div>
           )}
 
           <section>
-            <h2 className="section__title">Pontos do roteiro</h2>
+            <h2 className="section__title">Dia a dia</h2>
 
             <div className="stack stack--lg">
               {dias.map((grupo) => (
                 <div key={grupo.dia} className="dia" style={{ ["--cor-dia" as string]: corDoDia(grupo.dia) }}>
                   {(dias.length > 1 || grupo.dia > 1) && (
                     <div className="dia__cabecalho">
-                      <h3 className="dia__titulo">{rotuloDoDia(grupo.dia, roteiro.dataInicio)}</h3>
+                      <h3 className="dia__titulo">
+                        {rotuloDoDia(grupo.dia, roteiro.dataInicio)}
+                        {cidadesDoDia(grupo.itens).length > 0 && (
+                          <span className="dia__cidades"> · {cidadesDoDia(grupo.itens).join(", ")}</span>
+                        )}
+                      </h3>
                     </div>
                   )}
 
+                  {roteiro.viagensEntreDias
+                    ?.filter((v) => v.dia === grupo.dia)
+                    .map((v) => (
+                      <p key={v.dia} className="dia__viagem">
+                        <Icone nome="avancar" />
+                        Viagem de {v.de} para {v.para}: {descreverTrecho(v)} pela estrada (estimativa)
+                      </p>
+                    ))}
+
                   <ol className="paradas">
-                    {grupo.itens.map((item, indice) => (
-                      <li key={item.id} className="parada">
+                    {grupo.itens.filter((item) => !item.pernoite).map((item, indice) => (
+                      <li key={item.id} className={item.ponto ? "parada" : "parada parada--atividade"}>
                         <span className="parada__num" style={{ background: corDoDia(grupo.dia) }}>
                           {indice + 1}
                         </span>
@@ -122,10 +143,17 @@ function RoteiroPublico() {
                           )}
 
                           <div className="stack stack--sm">
-                            <h3>{item.ponto.nome}</h3>
+                            <h3>{nomeDoItem(item)}</h3>
                             <div className="cluster">
-                              <span className="badge badge--primary">{item.ponto.categoria}</span>
-                              <span className="muted small">{item.ponto.cidade}</span>
+                              {item.periodo && <span className="badge badge--accent">{ROTULO_PERIODO[item.periodo]}</span>}
+                              {item.ponto ? (
+                                <>
+                                  <span className="badge badge--primary">{item.ponto.categoria}</span>
+                                  <span className="muted small">{item.ponto.cidade}</span>
+                                </>
+                              ) : (
+                                <span className="badge">Atividade livre</span>
+                              )}
                             </div>
                           </div>
 
@@ -134,6 +162,16 @@ function RoteiroPublico() {
                       </li>
                     ))}
                   </ol>
+
+                  {grupo.itens
+                    .filter((item) => item.pernoite)
+                    .map((item) => (
+                      <div key={item.id} className="card pernoite">
+                        <span className="pernoite__rotulo">Onde dormir</span>
+                        <h3>{nomeDoItem(item)}</h3>
+                        {item.ponto && <span className="muted small">{item.ponto.cidade}</span>}
+                      </div>
+                    ))}
                 </div>
               ))}
             </div>

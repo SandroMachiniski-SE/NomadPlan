@@ -88,6 +88,30 @@ describe("busca de pontos turísticos", () => {
       assert.deepEqual(nomes(await api("GET", "/pontos")), ["C verificado", "B com foto", "D com horário", "A sem nada"]);
     });
 
+    it("acha a cidade sem acento ou com a UF, e um trecho do nome continua valendo", async () => {
+      await criarPonto({ nome: "Mercado Público", cidade: "Florianópolis" });
+      await criarPonto({ nome: "Museu", cidade: "Joinville" });
+
+      for (const cidade of ["Florianopolis", "FLORIANÓPOLIS", "Florianópolis, SC", "Florian"]) {
+        assert.deepEqual(nomes(await api("GET", `/pontos?cidade=${encodeURIComponent(cidade)}`)), ["Mercado Público"], cidade);
+      }
+    });
+
+    it("lista as cidades com pontos publicados e quantos pontos cada uma tem", async () => {
+      await criarPonto({ cidade: "Joinville" });
+      await criarPonto({ cidade: "joinville" });
+      await criarPonto({ cidade: "Blumenau" });
+      await criarPonto({ cidade: "Pomerode", status: StatusPonto.RASCUNHO });
+
+      const r = await api("GET", "/pontos/cidades");
+
+      assert.equal(r.status, 200);
+      assert.deepEqual(r.corpo.dados, [
+        { cidade: "Blumenau", pontos: 1 },
+        { cidade: "Joinville", pontos: 2 },
+      ]);
+    });
+
     it("trata % e _ digitados como texto comum, não como curinga", async () => {
       await criarPonto({ nome: "Promoção 100% off" });
       await criarPonto({ nome: "Praça Central" });

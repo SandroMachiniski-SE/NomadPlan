@@ -3,6 +3,7 @@ import { Link, useNavigate } from "react-router-dom";
 import { useAuth } from "../context/useAuth";
 import { extrairMensagemErro } from "../utils/erro";
 import AuthShell from "../components/AuthShell";
+import SugestoesDeCidade from "../components/SugestoesDeCidade";
 import type { DadosRegistro } from "../context/auth-context";
 
 function Registrar() {
@@ -111,7 +112,9 @@ function Registrar() {
             maxLength={120}
             value={cidadeBase}
             onChange={(e) => setCidadeBase(e.target.value)}
+            list="cidades-do-cadastro"
           />
+          <SugestoesDeCidade id="cidades-do-cadastro" />
         </label>
 
         <label className="field">

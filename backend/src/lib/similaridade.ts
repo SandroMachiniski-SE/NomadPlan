@@ -23,6 +23,8 @@ export async function pontosDeUsuariosSemelhantes(idUsuario: number, limite: num
       UNION ALL
       SELECT r.id_usuario, i.id_ponto, 1
       FROM item_roteiro i JOIN roteiro r ON r.id = i.id_roteiro
+      -- Atividades livres não têm ponto (e um NULL no NOT IN abaixo anularia tudo).
+      WHERE i.id_ponto IS NOT NULL
     ),
     meus AS (
       SELECT p, SUM(w) AS w FROM sinais WHERE u = ${idUsuario} GROUP BY p

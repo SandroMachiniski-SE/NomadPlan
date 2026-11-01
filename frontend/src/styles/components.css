@@ -51,6 +51,8 @@
 
 .stack {
   display: grid;
+  /* minmax(0, 1fr): sem isso um filho largo (seletor de dias, tabela) estica a coluna além da tela. */
+  grid-template-columns: minmax(0, 1fr);
   gap: 1rem;
 }
 
@@ -150,8 +152,16 @@
     transform 0.1s;
 }
 
-.btn:active:not(:disabled) {
-  transform: translateY(1px);
+.btn:active:not(:disabled),
+.chip:active {
+  transform: scale(0.96);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .btn:active:not(:disabled),
+  .chip:active {
+    transform: none;
+  }
 }
 
 .btn:disabled,
@@ -537,13 +547,18 @@
 
 .segmented {
   display: inline-flex;
+  max-width: 100%;
   padding: 4px;
   gap: 2px;
+  overflow-x: auto;
   border-radius: var(--radius);
   background: var(--surface-3);
+  scrollbar-width: thin;
 }
 
 .segmented button {
+  flex: 0 0 auto;
+  white-space: nowrap;
   display: inline-flex;
   align-items: center;
   gap: 0.4rem;
@@ -589,7 +604,7 @@
   font-size: 0.875rem;
   font-weight: 500;
   cursor: pointer;
-  transition: background-color 0.15s, border-color 0.15s, color 0.15s;
+  transition: background-color 0.15s, border-color 0.15s, color 0.15s, transform 0.1s;
 }
 
 .chip:hover {

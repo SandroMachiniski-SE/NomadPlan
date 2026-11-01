@@ -26,6 +26,8 @@ export interface Ponto {
   origem?: OrigemPonto;
   /** Elemento do OpenStreetMap de onde vieram os dados ("node/123"). */
   idOsm?: string | null;
+  /** Lugar do Overture Maps que completou telefone/site (ou de onde veio a hospedagem). */
+  idOverture?: string | null;
   sincronizadoEm?: string | null;
   motivoRejeicao?: string | null;
   dataCriacao?: string;
@@ -40,6 +42,19 @@ export interface Ponto {
   salvo?: boolean;
   /** Só nas recomendações para o usuário. */
   motivoRecomendacao?: "usuarios_semelhantes" | "interesses";
+}
+
+/** O que o Google Maps sabe do ponto, consultado na hora (GET /pontos/:id/google). */
+export interface InformacoesGoogle {
+  disponivel: true;
+  horario: string | null;
+  nota: number | null;
+  totalAvaliacoes: number | null;
+  telefone: string | null;
+  site: string | null;
+  urlGoogleMaps: string | null;
+  acessibilidade: string | null;
+  foto: { url: string; autor: string | null; urlAutor: string | null } | null;
 }
 
 export interface RespostaPontos {

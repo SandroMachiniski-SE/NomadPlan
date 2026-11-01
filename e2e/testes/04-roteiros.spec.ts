@@ -25,7 +25,7 @@ test.describe("roteiros", () => {
     await criarRoteiro(page, "Fim de semana em Joinville");
 
     await expect(page.getByRole("heading", { name: "Fim de semana em Joinville", level: 1 })).toBeVisible();
-    await expect(page.getByText("Este roteiro ainda não tem pontos")).toBeVisible();
+    await expect(page.getByText("Este roteiro ainda não tem paradas")).toBeVisible();
 
     await adicionarPonto(page, MUSEU, "Chegar cedo");
     await adicionarPonto(page, PARQUE);
@@ -146,12 +146,27 @@ test.describe("roteiros", () => {
 });
 
 test.describe("roteiro sugerido", () => {
+  test("a busca de qualquer cidade do Brasil preenche a etapa do roteiro sem enviar o formulário", async ({ page }) => {
+    await cadastrar(page);
+    await page.goto("/roteiros/gerar");
+
+    await page.getByLabel("Cidade *").fill("");
+    await page.getByRole("button", { name: "Buscar outra cidade do Brasil" }).click();
+    await page.getByLabel("Nome da cidade").fill("Joinville");
+    await page.getByLabel("Nome da cidade").press("Enter");
+    await page.getByRole("button", { name: "Usar no roteiro" }).first().click();
+
+    await expect(page.getByLabel("Cidade *")).toHaveValue("Joinville");
+    await expect(page.getByRole("heading", { name: "Qualquer cidade do Brasil" })).toBeHidden();
+    await expect(page.getByRole("heading", { name: "Roteiro sugerido", exact: true })).toBeHidden();
+  });
+
   test("gera um roteiro com horários e salva com todas as paradas", async ({ page }) => {
     await cadastrar(page);
     await page.goto("/roteiros/gerar");
 
     await page.getByLabel("Cidade *").fill("Joinville");
-    await page.getByLabel("Tempo disponível (horas)").fill("8");
+    await page.getByLabel("Tempo disponível por dia (horas)").fill("8");
     await page.getByRole("button", { name: "Gerar roteiro" }).click();
 
     await expect(page.getByRole("heading", { name: "Roteiro sugerido", exact: true })).toBeVisible();
@@ -195,6 +210,19 @@ test.describe("roteiro sugerido", () => {
     await page.getByLabel("Cidade *").fill("Cidade Inexistente");
     await page.getByRole("button", { name: "Gerar roteiro" }).click();
 
-    await expect(page.getByRole("alert")).toContainText(/Nenhum ponto/);
+    await expect(page.getByRole("alert")).toContainText(
+      /Ainda não há pontos cadastrados em "Cidade Inexistente"\. Cidades disponíveis: .*Joinville/,
+    );
+  });
+
+  test("acha a cidade digitada sem maiúscula e com a UF", async ({ page }) => {
+    await cadastrar(page);
+    await page.goto("/roteiros/gerar");
+
+    await page.getByLabel("Cidade *").fill("joinville, sc");
+    await page.getByRole("button", { name: "Gerar roteiro" }).click();
+
+    await expect(page.locator(".parada").first()).toBeVisible();
+    await expect(page.getByRole("alert")).toHaveCount(0);
   });
 });

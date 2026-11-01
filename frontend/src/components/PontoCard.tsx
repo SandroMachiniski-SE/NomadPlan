@@ -9,6 +9,10 @@ import Icone from "./Icone";
 interface PontoCardProps {
   ponto: Ponto;
   compacto?: boolean;
+  /** Avisa qual cartão está sob o mouse ou com foco (o mapa realça o pino correspondente). */
+  aoDestacar?: (id: number | null) => void;
+  /** Realça o cartão (o pino do mapa está sob o mouse). */
+  destacado?: boolean;
 }
 
 const ROTULO_MOTIVO: Record<NonNullable<Ponto["motivoRecomendacao"]>, string> = {
@@ -16,11 +20,17 @@ const ROTULO_MOTIVO: Record<NonNullable<Ponto["motivoRecomendacao"]>, string> = 
   interesses: "Combina com seus interesses",
 };
 
-function PontoCard({ ponto, compacto = false }: PontoCardProps) {
+function PontoCard({ ponto, compacto = false, aoDestacar, destacado = false }: PontoCardProps) {
   const temNota = ponto.mediaAvaliacao != null && (ponto.totalAvaliacoes ?? 0) > 0;
 
   return (
-    <div className="ponto-card-wrap">
+    <div
+      className={destacado ? "ponto-card-wrap ponto-card-wrap--destaque" : "ponto-card-wrap"}
+      onMouseEnter={aoDestacar && (() => aoDestacar(ponto.id))}
+      onMouseLeave={aoDestacar && (() => aoDestacar(null))}
+      onFocus={aoDestacar && (() => aoDestacar(ponto.id))}
+      onBlur={aoDestacar && (() => aoDestacar(null))}
+    >
       <Link
         to={`/pontos/${ponto.id}`}
         className={compacto ? "card card--interactive ponto-card ponto-card--compacto" : "card card--interactive ponto-card"}

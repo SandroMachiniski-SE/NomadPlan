@@ -1,4 +1,4 @@
-import type { ItemRoteiro, Trecho } from "../types/roteiro";
+import type { ItemRoteiro, PeriodoDoDia, Trecho } from "../types/roteiro";
 import { formatarDistancia, formatarDuracao } from "./formatar";
 
 export const MAX_DIAS = 30;
@@ -14,8 +14,28 @@ export function corDoDia(dia: number): string {
 export function agruparPorDia(itens: ItemRoteiro[], totalDias: number): { dia: number; itens: ItemRoteiro[] }[] {
   return Array.from({ length: totalDias }, (_, i) => ({
     dia: i + 1,
-    itens: itens.filter((item) => item.dia === i + 1).sort((a, b) => a.ordem - b.ordem),
+    // A pernoite fecha o dia.
+    itens: itens
+      .filter((item) => item.dia === i + 1)
+      .sort((a, b) => Number(a.pernoite) - Number(b.pernoite) || a.ordem - b.ordem),
   }));
+}
+
+export const ROTULO_PERIODO: Record<PeriodoDoDia, string> = {
+  MANHA: "Manhã",
+  TARDE: "Tarde",
+  NOITE: "Noite",
+  DIA_INTEIRO: "Dia inteiro",
+};
+
+/** Nome que aparece para a parada: o do ponto ou o título da atividade. */
+export function nomeDoItem(item: ItemRoteiro): string {
+  return item.ponto?.nome ?? item.titulo ?? "Atividade";
+}
+
+/** Cidades dos pontos do dia, sem repetir (atividades livres não têm cidade). */
+export function cidadesDoDia(itens: ItemRoteiro[]): string[] {
+  return [...new Set(itens.flatMap((item) => (item.ponto ? [item.ponto.cidade] : [])))];
 }
 
 /** Quantos dias mostrar: o maior dia em uso, o período do roteiro (se houver datas) ou o pedido pelo usuário. */

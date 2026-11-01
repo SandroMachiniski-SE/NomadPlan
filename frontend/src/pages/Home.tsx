@@ -1,13 +1,17 @@
-import { useEffect, useState, type FormEvent } from "react";
+import { useEffect, useRef, useState, type FormEvent } from "react";
 import { Link } from "react-router-dom";
 import api from "../services/api";
 import type { Ordenacao, Ponto, RespostaPontos } from "../types/ponto";
 import MapaCarregavel from "../components/MapaCarregavel";
+import type { AreaDoMapa } from "../components/MapaPontos";
+import EscolherCidade from "../components/EscolherCidade";
 import PontoCard from "../components/PontoCard";
 import Icone from "../components/Icone";
+import SugestoesDeCidade from "../components/SugestoesDeCidade";
 import { useAuth } from "../context/useAuth";
 import { CATEGORIAS_PONTOS, iconeDaCategoria } from "../constants/categorias";
 import { extrairMensagemErro } from "../utils/erro";
+import { useTelaLarga } from "../utils/useTelaLarga";
 
 function Home() {
   const { autenticado } = useAuth();
@@ -48,20 +52,35 @@ function Home() {
   const [buscou, setBuscou] = useState(false);
   const [desatualizado, setDesatualizado] = useState(false);
   const [visualizacao, setVisualizacao] = useState<"lista" | "mapa">("lista");
+  const [escolhendoCidade, setEscolhendoCidade] = useState(false);
+  // Busca pelo texto (cidade, nome...) ou pela região enquadrada no mapa.
+  const [buscaPelaArea, setBuscaPelaArea] = useState(false);
+  const [ultimaAreaBuscada, setUltimaAreaBuscada] = useState<AreaDoMapa | null>(null);
+  const [destacandoMapa, setDestacandoMapa] = useState(false);
+  // Em tela larga, a lista e o mapa ficam lado a lado e um realça o outro.
+  const telaLarga = useTelaLarga();
+  const [pontoDoCartao, setPontoDoCartao] = useState<number | null>(null);
+  const [pontoDoPino, setPontoDoPino] = useState<number | null>(null);
+  const resultadosRef = useRef<HTMLElement | null>(null);
+  const mapaAberto = buscou && visualizacao === "mapa";
+  // Sem resultados só divide quando a busca veio do mapa: ele precisa continuar na tela para a pessoa buscar de novo.
+  const dividido = telaLarga && visualizacao === "lista" && !erro && (pontos.length > 0 || buscaPelaArea);
 
-  async function buscarPontos(event?: FormEvent, categoriaEscolhida?: string) {
+  async function buscarPontos(event?: FormEvent, categoriaEscolhida?: string, cidadeEscolhida?: string) {
     event?.preventDefault();
 
     const categoriaFiltro = categoriaEscolhida ?? categoria;
+    const cidadeFiltro = cidadeEscolhida ?? cidade;
 
     setCarregando(true);
     setErro(null);
     setDesatualizado(false);
     setBuscou(true);
+    setBuscaPelaArea(false);
 
     try {
       const params: Record<string, string> = {};
-      if (cidade.trim()) params.cidade = cidade.trim();
+      if (cidadeFiltro.trim()) params.cidade = cidadeFiltro.trim();
       if (categoriaFiltro.trim()) params.categoria = categoriaFiltro.trim();
       if (busca.trim()) params.busca = busca.trim();
       if (acessibilidade.trim()) params.acessibilidade = acessibilidade.trim();
@@ -86,6 +105,74 @@ function Home() {
     } finally {
       setCarregando(false);
     }
+  }
+
+  /** Busca o que está dentro da região enquadrada no mapa (os filtros valem; a cidade digitada não). */
+  async function buscarNaArea(area: AreaDoMapa) {
+    setCarregando(true);
+    setErro(null);
+    setDesatualizado(false);
+    setBuscou(true);
+    setBuscaPelaArea(true);
+    setUltimaAreaBuscada(area);
+
+    try {
+      const params: Record<string, string> = {
+        lat: String(area.latitude),
+        lng: String(area.longitude),
+        raioKm: String(Math.min(200, Math.max(0.3, Number(area.raioKm.toFixed(2))))),
+        limite: "100",
+      };
+      if (categoria.trim()) params.categoria = categoria.trim();
+      if (busca.trim()) params.busca = busca.trim();
+      if (acessibilidade.trim()) params.acessibilidade = acessibilidade.trim();
+      if (faixaPreco.trim()) params.faixaPreco = faixaPreco.trim();
+      if (notaMinima) params.notaMinima = notaMinima;
+      if (abertoAgora) params.abertoAgora = "true";
+
+      const resposta = await api.get<RespostaPontos>("/pontos", { params });
+      setPontos(resposta.data.dados);
+      setDesatualizado(Boolean(resposta.data.desatualizado));
+    } catch (error) {
+      console.error("Erro ao buscar pontos na área do mapa:", error);
+      setErro(extrairMensagemErro(error, "Não foi possível carregar os pontos desta área. Tente novamente."));
+      setPontos([]);
+    } finally {
+      setCarregando(false);
+    }
+  }
+
+  /**
+   * Abre o mapa livre para a pessoa navegar e escolher onde quer ir. O mapa nasce abaixo da
+   * busca, então a página rola até ele e ele pulsa por um instante: sem isso, o clique parecia não fazer nada.
+   */
+  function explorarPeloMapa() {
+    if (!mapaAberto) {
+      setBuscou(true);
+      setVisualizacao("mapa");
+      setBuscaPelaArea(true);
+      setErro(null);
+      setPontos([]);
+      setUltimaAreaBuscada(null);
+    }
+
+    setDestacandoMapa(true);
+    window.setTimeout(() => {
+      resultadosRef.current?.scrollIntoView({ behavior: "smooth", block: "start" });
+    }, 60);
+    window.setTimeout(() => setDestacandoMapa(false), 1500);
+  }
+
+  function abrirEscolhaDeCidade() {
+    setEscolhendoCidade(true);
+    window.scrollTo({ top: 0, behavior: "smooth" });
+  }
+
+  function aoEscolherCidade(nome: string) {
+    setCidade(nome);
+    setEscolhendoCidade(false);
+    setVisualizacao("lista");
+    void buscarPontos(undefined, undefined, nome);
   }
 
   function aoEscolherCategoria(nova: string) {
@@ -133,7 +220,7 @@ function Home() {
 
           <form className="busca" onSubmit={buscarPontos} role="search">
             <div className="busca__linha">
-              <label className="busca__campo">
+              <label className="busca__campo busca__campo--com-acao">
                 <Icone nome="pin" />
                 <input
                   type="text"
@@ -141,7 +228,19 @@ function Home() {
                   onChange={(event) => setCidade(event.target.value)}
                   placeholder="Para onde você vai?"
                   aria-label="Cidade"
+                  list="cidades-da-busca"
                 />
+                <SugestoesDeCidade id="cidades-da-busca" />
+                <button
+                  type="button"
+                  className="busca__mapa"
+                  onClick={explorarPeloMapa}
+                  aria-pressed={mapaAberto}
+                  aria-label="Escolher o destino no mapa"
+                  title="Escolher o destino no mapa"
+                >
+                  <Icone nome="mapa" />
+                </button>
               </label>
 
               <label className="busca__campo busca__campo--grande">
@@ -264,11 +363,35 @@ function Home() {
               </button>
             ))}
           </div>
+
+          <div className="hero__acoes">
+            <button type="button" className="btn btn--outline" onClick={explorarPeloMapa} aria-pressed={mapaAberto}>
+              <Icone nome={mapaAberto ? "check" : "mapa"} />
+              {mapaAberto ? "Mapa aberto" : "Explorar pelo mapa"}
+            </button>
+            <button
+              type="button"
+              className="btn btn--outline"
+              onClick={() => setEscolhendoCidade((aberto) => !aberto)}
+              aria-expanded={escolhendoCidade}
+            >
+              <Icone nome="globo" />
+              Buscar outra cidade do Brasil
+            </button>
+          </div>
+
+          {escolhendoCidade && (
+            <EscolherCidade
+              textoInicial={cidade}
+              aoEscolher={aoEscolherCidade}
+              aoFechar={() => setEscolhendoCidade(false)}
+            />
+          )}
         </div>
       </section>
 
       <div className="container home">
-        {recomendados.length > 0 && (
+        {recomendados.length > 0 && !buscou && (
           <section className="section" aria-labelledby="titulo-recomendados">
             <div className="section__cabecalho">
               <h2 id="titulo-recomendados">Recomendados para você</h2>
@@ -286,11 +409,19 @@ function Home() {
         )}
 
         {buscou && (
-          <section className="section" aria-live="polite">
+          <section className="section resultados" aria-live="polite" ref={resultadosRef}>
             <div className="section__cabecalho section__cabecalho--linha">
-              <h2>{carregando ? "Buscando..." : erro ? "Resultados" : `${pontos.length} ${pontos.length === 1 ? "resultado" : "resultados"}`}</h2>
+              <h2>
+                {carregando
+                  ? "Buscando..."
+                  : erro
+                    ? "Resultados"
+                    : buscaPelaArea && !ultimaAreaBuscada
+                      ? "Escolha onde você quer ir"
+                      : `${pontos.length} ${pontos.length === 1 ? "resultado" : "resultados"}`}
+              </h2>
 
-              {!carregando && !erro && pontos.length > 0 && (
+              {!erro && (
                 <div className="segmented" role="group" aria-label="Modo de visualização">
                   <button
                     type="button"
@@ -331,23 +462,97 @@ function Home() {
               </div>
             )}
 
-            {!erro && !carregando && pontos.length === 0 && (
+            {!erro && !carregando && pontos.length === 0 && visualizacao === "lista" && !dividido && (
               <div className="empty">
                 <div className="empty__icon">
                   <Icone nome="busca" />
                 </div>
                 <p className="empty__title">Nenhum ponto turístico encontrado</p>
                 <p>Tente ajustar os filtros ou buscar por outra cidade.</p>
+                <button type="button" className="btn btn--primary" onClick={abrirEscolhaDeCidade}>
+                  <Icone nome="globo" />
+                  Buscar {cidade.trim() ? `“${cidade.trim()}”` : "uma cidade"} em todo o Brasil
+                </button>
               </div>
             )}
 
-            {!erro && !carregando && pontos.length > 0 && visualizacao === "mapa" && (
-              <div className="mapa-wrap">
-                <MapaCarregavel pontos={pontos} altura={520} />
+            {!erro && visualizacao === "mapa" && (
+              <>
+                <div className={destacandoMapa ? "mapa-wrap mapa-wrap--destaque" : "mapa-wrap"}>
+                  <MapaCarregavel
+                    pontos={pontos}
+                    altura={520}
+                    aoBuscarNestaArea={buscarNaArea}
+                    ajustarAosPontos={!buscaPelaArea}
+                    carregando={carregando}
+                    vistaInicial={
+                      localizacao
+                        ? { centro: [localizacao.lat, localizacao.lng], zoom: 12 }
+                        : { centro: [-14.2, -51.9], zoom: 4 }
+                    }
+                  />
+                </div>
+
+                {!carregando && pontos.length === 0 && (
+                  <p className="muted mapa-dica">
+                    {ultimaAreaBuscada
+                      ? "Não há lugares cadastrados nesta área. "
+                      : "Arraste e aproxime o mapa até a região que você quer conhecer e toque em “Buscar nesta área”. "}
+                    Se for uma cidade que ainda não temos,{" "}
+                    <button type="button" className="link-botao" onClick={abrirEscolhaDeCidade}>
+                      busque pelo nome
+                    </button>
+                    .
+                  </p>
+                )}
+              </>
+            )}
+
+            {dividido && (
+              <div className="resultados-dividido">
+                <div className={carregando ? "resultados-dividido__lista resultados-dividido__lista--carregando" : "resultados-dividido__lista"}>
+                  {pontos.length === 0 && !carregando ? (
+                    <p className="muted mapa-dica">
+                      Não há lugares cadastrados nesta área. Mova o mapa e busque de novo, ou{" "}
+                      <button type="button" className="link-botao" onClick={abrirEscolhaDeCidade}>
+                        busque uma cidade pelo nome
+                      </button>
+                      .
+                    </p>
+                  ) : (
+                    <div className="grid-cards">
+                      {pontos.map((ponto) => (
+                        <PontoCard
+                          key={ponto.id}
+                          ponto={ponto}
+                          aoDestacar={setPontoDoCartao}
+                          destacado={ponto.id === pontoDoPino}
+                        />
+                      ))}
+                    </div>
+                  )}
+                </div>
+
+                <div className="resultados-dividido__mapa mapa-wrap">
+                  <MapaCarregavel
+                    pontos={pontos}
+                    altura="calc(100vh - var(--header-height) - 2rem)"
+                    aoBuscarNestaArea={buscarNaArea}
+                    ajustarAosPontos={!buscaPelaArea}
+                    carregando={carregando}
+                    destacadoId={pontoDoCartao}
+                    aoDestacarPonto={setPontoDoPino}
+                    vistaInicial={
+                      localizacao
+                        ? { centro: [localizacao.lat, localizacao.lng], zoom: 12 }
+                        : { centro: [-14.2, -51.9], zoom: 4 }
+                    }
+                  />
+                </div>
               </div>
             )}
 
-            {!erro && !carregando && pontos.length > 0 && visualizacao === "lista" && (
+            {!dividido && !erro && !carregando && pontos.length > 0 && visualizacao === "lista" && (
               <div className="grid-cards">
                 {pontos.map((ponto) => (
                   <PontoCard key={ponto.id} ponto={ponto} />
