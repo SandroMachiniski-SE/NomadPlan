@@ -146,6 +146,21 @@ test.describe("roteiros", () => {
 });
 
 test.describe("roteiro sugerido", () => {
+  test("a busca de qualquer cidade do Brasil preenche a etapa do roteiro sem enviar o formulário", async ({ page }) => {
+    await cadastrar(page);
+    await page.goto("/roteiros/gerar");
+
+    await page.getByLabel("Cidade *").fill("");
+    await page.getByRole("button", { name: "Buscar outra cidade do Brasil" }).click();
+    await page.getByLabel("Nome da cidade").fill("Joinville");
+    await page.getByLabel("Nome da cidade").press("Enter");
+    await page.getByRole("button", { name: "Usar no roteiro" }).first().click();
+
+    await expect(page.getByLabel("Cidade *")).toHaveValue("Joinville");
+    await expect(page.getByRole("heading", { name: "Qualquer cidade do Brasil" })).toBeHidden();
+    await expect(page.getByRole("heading", { name: "Roteiro sugerido", exact: true })).toBeHidden();
+  });
+
   test("gera um roteiro com horários e salva com todas as paradas", async ({ page }) => {
     await cadastrar(page);
     await page.goto("/roteiros/gerar");

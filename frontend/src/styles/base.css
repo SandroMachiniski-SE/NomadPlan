@@ -232,6 +232,8 @@ tbody tr:hover td {
 .leaflet-container {
   font-family: var(--font-body);
   border-radius: inherit;
+  /* Mantém as camadas internas do mapa (z-index 400+) abaixo do cabeçalho fixo. */
+  isolation: isolate;
 }
 
 .marcador-pin {

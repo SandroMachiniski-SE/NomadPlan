@@ -5,6 +5,7 @@ import type { Roteiro, RespostaRecomendacao } from "../types/roteiro";
 import { useAuth } from "../context/useAuth";
 import { extrairMensagemErro } from "../utils/erro";
 import { CATEGORIAS_PONTOS, iconeDaCategoria } from "../constants/categorias";
+import EscolherCidade from "../components/EscolherCidade";
 import Icone from "../components/Icone";
 import SugestoesDeCidade from "../components/SugestoesDeCidade";
 import { useCidadesDisponiveis } from "../services/cidades";
@@ -36,6 +37,7 @@ function GerarRoteiro() {
   const [resultado, setResultado] = useState<RespostaRecomendacao | null>(null);
 
   const [salvando, setSalvando] = useState(false);
+  const [escolhendoCidade, setEscolhendoCidade] = useState(false);
   const cidadesDisponiveis = useCidadesDisponiveis();
 
   const totalDias = etapas.reduce((soma, etapa) => soma + etapa.dias, 0);
@@ -48,6 +50,20 @@ function GerarRoteiro() {
 
   function atualizarEtapa(indice: number, mudanca: Partial<Etapa>) {
     setEtapas((atual) => atual.map((etapa, i) => (i === indice ? { ...etapa, ...mudanca } : etapa)));
+  }
+
+  /** A cidade escolhida na busca vai para a primeira etapa vazia; se não houver, vira uma nova etapa. */
+  function aoEscolherCidade(nome: string) {
+    setEtapas((atual) => {
+      const vazia = atual.findIndex((etapa) => !etapa.cidade.trim());
+
+      if (vazia >= 0) {
+        return atual.map((etapa, i) => (i === vazia ? { ...etapa, cidade: nome } : etapa));
+      }
+
+      return atual.length >= MAX_ETAPAS ? atual : [...atual, { cidade: nome, dias: 1 }];
+    });
+    setEscolhendoCidade(false);
   }
 
   function aoUsarLocalizacao() {
@@ -221,6 +237,15 @@ function GerarRoteiro() {
               <Icone nome="mais" />
               Adicionar outra cidade
             </button>
+            <button
+              type="button"
+              className="btn btn--outline btn--sm"
+              onClick={() => setEscolhendoCidade((aberto) => !aberto)}
+              aria-expanded={escolhendoCidade}
+            >
+              <Icone nome="globo" />
+              Buscar outra cidade do Brasil
+            </button>
             <span className="field__hint">
               {totalDias} {totalDias === 1 ? "dia" : "dias"} no total
               {cidadesDisponiveis.length > 0 &&
@@ -229,6 +254,14 @@ function GerarRoteiro() {
             </span>
           </div>
         </fieldset>
+
+        {escolhendoCidade && (
+          <EscolherCidade
+            aoEscolher={aoEscolherCidade}
+            aoFechar={() => setEscolhendoCidade(false)}
+            rotuloDeEscolha="Usar no roteiro"
+          />
+        )}
 
         <div className="form-grid">
           <label className="field">

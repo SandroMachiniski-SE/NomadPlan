@@ -157,6 +157,23 @@ test.describe("explorar pelo mapa e escolher qualquer cidade", () => {
     await expect(page.getByRole("button", { name: "Aproxime o mapa para buscar" })).toBeDisabled();
   });
 
+  test("o ícone de mapa no campo de destino abre o mapa, leva a página até ele e marca o botão", async ({ page }) => {
+    await page.goto("/");
+    await page.getByRole("button", { name: "Escolher o destino no mapa" }).click();
+
+    await expect(page.locator(".leaflet-container")).toBeInViewport();
+    await expect(page.getByRole("heading", { name: "Escolha onde você quer ir" })).toBeVisible();
+    await expect(page.getByRole("button", { name: "Mapa aberto" })).toHaveAttribute("aria-pressed", "true");
+  });
+
+  test("o botão Explorar pelo mapa também rola até o mapa e vira Mapa aberto", async ({ page }) => {
+    await page.goto("/");
+    await page.getByRole("button", { name: "Explorar pelo mapa" }).click();
+
+    await expect(page.locator(".leaflet-container")).toBeInViewport();
+    await expect(page.getByRole("button", { name: "Mapa aberto" })).toBeVisible();
+  });
+
   test("a busca de cidade abre o painel e pede ao menos 2 letras", async ({ page }) => {
     await page.goto("/");
     await page.getByRole("button", { name: "Buscar outra cidade do Brasil" }).click();
