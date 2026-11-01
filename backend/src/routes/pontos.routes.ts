@@ -32,6 +32,7 @@ import { pontosDeUsuariosSemelhantes } from "../lib/similaridade";
 import { bonusDeCadastro } from "../lib/recomendacao";
 import { cidadesComPontos, variantesDaCidade } from "../lib/cidades";
 import { preferenciasAtendidas } from "../lib/preferencias";
+import { MENSAGEM_URL_HTTP, normalizarUrlHttp } from "../lib/urlHttp";
 
 const pontosRouter = Router();
 
@@ -61,7 +62,21 @@ const criarPontoSchema = z.object({
   longitude: z.coerce.number().min(-180).max(180).optional(),
   faixaPreco: z.string().trim().max(60).optional(),
   acessibilidade: z.string().trim().max(200).optional(),
-  siteOficial: z.string().trim().max(200).optional(),
+  siteOficial: z
+    .string()
+    .trim()
+    .max(200)
+    .transform((valor, ctx) => {
+      const site = normalizarUrlHttp(valor);
+
+      if (site === null) {
+        ctx.addIssue({ code: "custom", message: MENSAGEM_URL_HTTP });
+        return z.NEVER;
+      }
+
+      return site;
+    })
+    .optional(),
   telefoneContato: z.string().trim().max(40).optional(),
   horarioFuncionamento: z.string().trim().max(200).optional(),
   confirmarDuplicidade: z.coerce.boolean().default(false),
@@ -1270,6 +1285,18 @@ pontosRouter.post(
         return res.status(400).json({
           erro: `Campos não permitidos para sugestão: ${camposInvalidos.join(", ")}.`,
         });
+      }
+
+      // O site vira um link na página: só http/https (um "javascript:" não conteria "http"
+      // e escaparia do filtro de links suspeitos, entrando direto para usuários de confiança).
+      if (campos.siteOficial !== undefined) {
+        const site = normalizarUrlHttp(campos.siteOficial);
+
+        if (!site) {
+          return res.status(400).json({ erro: `Site inválido. ${MENSAGEM_URL_HTTP}` });
+        }
+
+        campos.siteOficial = site;
       }
 
       const ponto = await prisma.pontoTuristico.findFirst({

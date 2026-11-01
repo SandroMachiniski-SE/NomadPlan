@@ -1,6 +1,6 @@
 import { describe, it } from "node:test";
 import assert from "node:assert/strict";
-import { analisarCsv, linhasParaObjetos, objetosParaCsv } from "./csv";
+import { analisarCsv, linhasParaObjetos, neutralizarFormula, objetosParaCsv } from "./csv";
 
 describe("analisarCsv", () => {
   it("separa linhas e campos simples", () => {
@@ -61,5 +61,26 @@ describe("objetosParaCsv", () => {
     const volta = linhasParaObjetos(analisarCsv(objetosParaCsv(["nome", "cidade"], original)));
 
     assert.deepEqual(volta, original);
+  });
+});
+
+describe("neutralizarFormula", () => {
+  it("prefixa com apóstrofo o texto que uma planilha executaria como fórmula", () => {
+    assert.equal(neutralizarFormula('=HYPERLINK("http://x","clique")'), `'=HYPERLINK("http://x","clique")`);
+    assert.equal(neutralizarFormula("@SUM(A1:A2)"), "'@SUM(A1:A2)");
+    assert.equal(neutralizarFormula("+cmd|' /C calc'!A0"), "'+cmd|' /C calc'!A0");
+    assert.equal(neutralizarFormula("-2+3+cmd"), "'-2+3+cmd");
+  });
+
+  it("não mexe em texto comum, telefones e números", () => {
+    assert.equal(neutralizarFormula("Museu Nacional"), "Museu Nacional");
+    assert.equal(neutralizarFormula("+55 (47) 3433-0000"), "+55 (47) 3433-0000");
+    assert.equal(neutralizarFormula("-26.3045"), "-26.3045");
+  });
+
+  it("vale na exportação, só para texto", () => {
+    const csv = objetosParaCsv(["nome", "latitude"], [{ nome: "=1+1", latitude: -26.3 }]);
+
+    assert.equal(csv, ["nome,latitude", "'=1+1,-26.3"].join("\n"));
   });
 });

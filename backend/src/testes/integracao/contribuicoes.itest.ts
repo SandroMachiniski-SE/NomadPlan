@@ -92,6 +92,34 @@ describe("contribuições dos usuários", () => {
       assert.equal((await prisma.usuario.findUniqueOrThrow({ where: { id: usuario.id } })).reputacao, 7);
     });
 
+    it("recusa site que não seja http/https, mesmo de usuário de confiança (nada de javascript:)", async () => {
+      const { token } = await criarUsuario({ reputacao: 50 });
+      const ponto = await criarPonto({ descricao: "Original" });
+
+      for (const site of ["javascript:alert(document.cookie)", "data:text/html,x", "vbscript:x"]) {
+        const r = await sugerir(token, ponto.id, { siteOficial: site });
+
+        assert.equal(r.status, 400, site);
+      }
+
+      const depois = await prisma.pontoTuristico.findUniqueOrThrow({ where: { id: ponto.id } });
+      assert.equal(depois.siteOficial, null);
+      assert.equal(await prisma.sugestaoEdicao.count({ where: { idPonto: ponto.id } }), 0);
+    });
+
+    it("completa o protocolo de um site digitado sem ele", async () => {
+      const { token } = await criarUsuario({ reputacao: 50 });
+      const ponto = await criarPonto({ descricao: "Original" });
+
+      const r = await sugerir(token, ponto.id, { siteOficial: "museu.com.br" });
+
+      assert.equal(r.status, 201);
+      const depois = await prisma.pontoTuristico.findUniqueOrThrow({ where: { id: ponto.id } });
+      assert.equal(depois.siteOficial, null, "sugestão com link vai para a moderação, não é aplicada");
+      const guardada = await prisma.sugestaoEdicao.findFirstOrThrow({ where: { idPonto: ponto.id } });
+      assert.deepEqual(guardada.camposPropostos, { siteOficial: "https://museu.com.br" });
+    });
+
     it("conteúdo suspeito nunca é aplicado sozinho, nem de usuário de confiança, e avisa a moderação (AF05)", async () => {
       const { token } = await criarUsuario({ reputacao: 50 });
       const moderador = await criarUsuario({ tipoConta: TipoConta.MODERADOR });

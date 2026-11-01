@@ -7,6 +7,7 @@ import { validarSegredoJwt } from "./segredoJwt";
 const JWT_SECRET = validarSegredoJwt(process.env.JWT_SECRET, process.env.NODE_ENV);
 const JWT_EXPIRES_IN = process.env.JWT_EXPIRES_IN || "1d";
 const RESET_TOKEN_EXPIRES_IN = "15m";
+const ALGORITMO_JWT = "HS256";
 
 const SALT_ROUNDS = 10;
 
@@ -57,11 +58,24 @@ export async function verificarSenhaOuFalso(
 }
 
 export function gerarToken(payload: TokenPayload): string {
-  return jwt.sign(payload, JWT_SECRET, { expiresIn: JWT_EXPIRES_IN } as jwt.SignOptions);
+  return jwt.sign(payload, JWT_SECRET, { algorithm: ALGORITMO_JWT, expiresIn: JWT_EXPIRES_IN } as jwt.SignOptions);
 }
 
+/**
+ * Valida um token de sessão. O token de redefinição de senha é assinado com o mesmo
+ * segredo e também leva "sub"; sem esta recusa, quem tivesse o link do e-mail poderia
+ * usá-lo como sessão e entrar na conta sem a senha e sem o segundo fator.
+ */
 export function verificarToken(token: string): TokenPayload {
-  return jwt.verify(token, JWT_SECRET) as unknown as TokenPayload;
+  const payload = jwt.verify(token, JWT_SECRET, { algorithms: [ALGORITMO_JWT] }) as unknown as TokenPayload & {
+    tipo?: unknown;
+  };
+
+  if (payload.tipo !== undefined) {
+    throw new Error("Token não é de sessão.");
+  }
+
+  return payload;
 }
 
 export function impressaoSenha(senhaHash: string): string {
@@ -88,12 +102,13 @@ export function gerarTokenRedefinicaoSenha(idUsuario: number, senhaHashAtual: st
   };
 
   return jwt.sign(payload, JWT_SECRET, {
+    algorithm: ALGORITMO_JWT,
     expiresIn: RESET_TOKEN_EXPIRES_IN,
   });
 }
 
 export function verificarTokenRedefinicaoSenha(token: string): TokenRedefinicaoSenha {
-  const payload = jwt.verify(token, JWT_SECRET) as unknown as ResetTokenPayload;
+  const payload = jwt.verify(token, JWT_SECRET, { algorithms: [ALGORITMO_JWT] }) as unknown as ResetTokenPayload;
 
   if (payload.tipo !== "reset-senha" || typeof payload.v !== "string") {
     throw new Error("Token não é válido para redefinição de senha.");
