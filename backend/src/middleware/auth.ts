@@ -9,6 +9,7 @@ declare global {
       usuario?: {
         id: number;
         tipoConta: TipoConta;
+        versaoSessao: number;
       };
     }
   }
@@ -25,23 +26,35 @@ async function carregarUsuarioDoToken(cabecalho: string | undefined) {
   }
 
   let idUsuario: number;
+  let versaoDoToken: number;
 
   try {
-    idUsuario = verificarToken(cabecalho.slice("Bearer ".length)).sub;
+    const token = verificarToken(cabecalho.slice("Bearer ".length));
+
+    idUsuario = token.sub;
+    versaoDoToken = token.v ?? 0;
   } catch {
     return { motivo: "invalido" as const };
   }
 
   const usuario = await prisma.usuario.findUnique({
     where: { id: idUsuario },
-    select: { id: true, tipoConta: true, ativo: true },
+    select: { id: true, tipoConta: true, ativo: true, versaoSessao: true },
   });
 
   if (!usuario || !usuario.ativo) {
     return { motivo: "desativada" as const };
   }
 
-  return { motivo: "ok" as const, usuario: { id: usuario.id, tipoConta: usuario.tipoConta } };
+  // Quem redefiniu a senha (por exemplo, por ter perdido o acesso) derruba as sessões antigas.
+  if (versaoDoToken !== usuario.versaoSessao) {
+    return { motivo: "invalido" as const };
+  }
+
+  return {
+    motivo: "ok" as const,
+    usuario: { id: usuario.id, tipoConta: usuario.tipoConta, versaoSessao: usuario.versaoSessao },
+  };
 }
 
 export async function autenticar(req: Request, res: Response, next: NextFunction) {

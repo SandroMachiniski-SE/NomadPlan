@@ -9,6 +9,18 @@ const semLimite = () => process.env.RATE_LIMIT_OFF === "1";
 // RB10: limites de taxa para operações sensíveis a abuso (spam de contas,
 // sugestões ou avaliações em massa). Limite por IP — simplificação aceitável para
 // o escopo acadêmico; não tenta distinguir usuários atrás do mesmo NAT/IP.
+// Teto geral por endereço para a API inteira: não atrapalha o uso normal (a página consulta a API
+// de tempos em tempos, e o limite é folgado), mas impede que um único IP afogue o servidor.
+// Os limites específicos abaixo continuam valendo para as operações caras ou sujeitas a abuso.
+export const limiteGeral = rateLimit({
+  windowMs: 60 * 1000,
+  limit: 600,
+  standardHeaders: true,
+  skip: semLimite,
+  legacyHeaders: false,
+  message: { erro: "Muitas requisições em pouco tempo. Aguarde um instante e tente novamente." },
+});
+
 export const limiteCriacaoConta = rateLimit({
   windowMs: 15 * 60 * 1000,
   limit: 10,
