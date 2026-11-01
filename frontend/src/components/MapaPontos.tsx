@@ -15,6 +15,14 @@ const iconeMarcador = L.divIcon({
   popupAnchor: [0, -36],
 });
 
+const iconeMarcadorDestacado = L.divIcon({
+  className: "marcador-pin marcador-pin--destaque",
+  html: iconeMarcador.options.html as string,
+  iconSize: [32, 42],
+  iconAnchor: [16, 42],
+  popupAnchor: [0, -36],
+});
+
 export interface PontoNoMapa {
   id: number;
   nome: string;
@@ -33,7 +41,11 @@ export interface AreaDoMapa {
 
 export interface MapaPontosProps {
   pontos: PontoNoMapa[];
-  altura?: number;
+  altura?: number | string;
+  /** Ponto realçado (o cartão correspondente está sob o mouse). */
+  destacadoId?: number | null;
+  /** Avisa qual pino está sob o mouse, para realçar o cartão. */
+  aoDestacarPonto?: (id: number | null) => void;
   /**
    * Liga o modo de exploração: o mapa fica livre para arrastar e aproximar, com o botão
    * "Buscar nesta área", e os marcadores ganham "Adicionar ao roteiro".
@@ -62,9 +74,9 @@ function areaVisivel(mapa: L.Map): AreaDoMapa {
 const TAMANHO_DA_CELULA_PX = 84;
 const ZOOM_SEM_AGRUPAR = 17;
 
-const iconeDoGrupo = (quantidade: number) =>
+const iconeDoGrupo = (quantidade: number, destacado: boolean) =>
   L.divIcon({
-    className: "marcador-grupo",
+    className: destacado ? "marcador-grupo marcador-grupo--destaque" : "marcador-grupo",
     html: `<span>${quantidade}</span>`,
     iconSize: [44, 44],
     iconAnchor: [22, 22],
@@ -75,7 +87,17 @@ const iconeDoGrupo = (quantidade: number) =>
  * Junta pinos que ficariam um por cima do outro. Agrupa por células de tela no zoom atual, então ao
  * aproximar o mapa os grupos se desfazem sozinhos.
  */
-function PinosAgrupados({ pontos, explorando }: { pontos: PontoComCoordenadas[]; explorando: boolean }) {
+function PinosAgrupados({
+  pontos,
+  explorando,
+  destacadoId,
+  aoDestacarPonto,
+}: {
+  pontos: PontoComCoordenadas[];
+  explorando: boolean;
+  destacadoId: number | null;
+  aoDestacarPonto?: (id: number | null) => void;
+}) {
   const mapa = useMap();
   const [zoom, setZoom] = useState(() => mapa.getZoom());
 
@@ -101,7 +123,17 @@ function PinosAgrupados({ pontos, explorando }: { pontos: PontoComCoordenadas[];
           const ponto = grupo[0];
 
           return (
-            <Marker key={ponto.id} position={[ponto.latitude, ponto.longitude]} icon={iconeMarcador}>
+            <Marker
+              key={ponto.id}
+              position={[ponto.latitude, ponto.longitude]}
+              icon={ponto.id === destacadoId ? iconeMarcadorDestacado : iconeMarcador}
+              zIndexOffset={ponto.id === destacadoId ? 1000 : 0}
+              eventHandlers={
+                aoDestacarPonto
+                  ? { mouseover: () => aoDestacarPonto(ponto.id), mouseout: () => aoDestacarPonto(null) }
+                  : undefined
+              }
+            >
               <Popup>
                 <BalaoDoPonto ponto={ponto} explorando={explorando} />
               </Popup>
@@ -119,7 +151,7 @@ function PinosAgrupados({ pontos, explorando }: { pontos: PontoComCoordenadas[];
           <Marker
             key={chave}
             position={centro}
-            icon={iconeDoGrupo(grupo.length)}
+            icon={iconeDoGrupo(grupo.length, grupo.some((p) => p.id === destacadoId))}
             title={`${grupo.length} lugares: aproxime para ver`}
             eventHandlers={{
               click: () => {
@@ -311,6 +343,8 @@ function BalaoDoPonto({ ponto, explorando }: { ponto: PontoNoMapa; explorando: b
 function MapaPontos({
   pontos,
   altura = 420,
+  destacadoId = null,
+  aoDestacarPonto,
   aoBuscarNestaArea,
   ajustarAosPontos = true,
   vistaInicial,
@@ -343,7 +377,12 @@ function MapaPontos({
             jaMostraPontos={comCoordenadas.length > 0}
           />}
 
-        <PinosAgrupados pontos={comCoordenadas} explorando={explorando} />
+        <PinosAgrupados
+          pontos={comCoordenadas}
+          explorando={explorando}
+          destacadoId={destacadoId}
+          aoDestacarPonto={aoDestacarPonto}
+        />
       </MapContainer>
     </div>
   );
