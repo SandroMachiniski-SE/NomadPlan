@@ -78,6 +78,28 @@ test.describe("explorar pontos turísticos", () => {
     await expect(page.locator(".marcador-pin, .marcador-grupo").first()).toBeVisible();
   });
 
+  test("em tela larga a lista e o mapa ficam lado a lado e o cartão realça o pino", async ({ page }) => {
+    await buscarCidade(page, "Joinville");
+
+    const dividido = page.locator(".resultados-dividido");
+
+    await expect(dividido.locator(".leaflet-container")).toBeVisible();
+    await expect(dividido.locator(".ponto-card").first()).toBeVisible();
+    await expect(dividido.getByRole("button", { name: /nesta área|Mova o mapa|Aproxime/ })).toBeVisible();
+
+    await dividido.locator(".ponto-card").first().hover();
+    await expect(page.locator(".marcador-pin--destaque, .marcador-grupo--destaque")).toHaveCount(1);
+  });
+
+  test("em tela estreita só a lista aparece, com o mapa em outra aba", async ({ page }) => {
+    await page.setViewportSize({ width: 800, height: 900 });
+    await buscarCidade(page, "Joinville");
+
+    await expect(page.locator(".grid-cards .ponto-card").first()).toBeVisible();
+    await expect(page.locator(".resultados-dividido")).toHaveCount(0);
+    await expect(page.locator(".leaflet-container")).toHaveCount(0);
+  });
+
   test("visitante sem login não vê o botão de favoritar nem o de avaliar", async ({ page }) => {
     await buscarCidade(page, "Joinville");
 

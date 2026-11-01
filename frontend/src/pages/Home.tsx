@@ -11,6 +11,7 @@ import SugestoesDeCidade from "../components/SugestoesDeCidade";
 import { useAuth } from "../context/useAuth";
 import { CATEGORIAS_PONTOS, iconeDaCategoria } from "../constants/categorias";
 import { extrairMensagemErro } from "../utils/erro";
+import { useTelaLarga } from "../utils/useTelaLarga";
 
 function Home() {
   const { autenticado } = useAuth();
@@ -56,8 +57,14 @@ function Home() {
   const [buscaPelaArea, setBuscaPelaArea] = useState(false);
   const [ultimaAreaBuscada, setUltimaAreaBuscada] = useState<AreaDoMapa | null>(null);
   const [destacandoMapa, setDestacandoMapa] = useState(false);
+  // Em tela larga, a lista e o mapa ficam lado a lado e um realça o outro.
+  const telaLarga = useTelaLarga();
+  const [pontoDoCartao, setPontoDoCartao] = useState<number | null>(null);
+  const [pontoDoPino, setPontoDoPino] = useState<number | null>(null);
   const resultadosRef = useRef<HTMLElement | null>(null);
   const mapaAberto = buscou && visualizacao === "mapa";
+  // Sem resultados só divide quando a busca veio do mapa: ele precisa continuar na tela para a pessoa buscar de novo.
+  const dividido = telaLarga && visualizacao === "lista" && !erro && (pontos.length > 0 || buscaPelaArea);
 
   async function buscarPontos(event?: FormEvent, categoriaEscolhida?: string, cidadeEscolhida?: string) {
     event?.preventDefault();
@@ -455,7 +462,7 @@ function Home() {
               </div>
             )}
 
-            {!erro && !carregando && pontos.length === 0 && visualizacao === "lista" && (
+            {!erro && !carregando && pontos.length === 0 && visualizacao === "lista" && !dividido && (
               <div className="empty">
                 <div className="empty__icon">
                   <Icone nome="busca" />
@@ -501,7 +508,51 @@ function Home() {
               </>
             )}
 
-            {!erro && !carregando && pontos.length > 0 && visualizacao === "lista" && (
+            {dividido && (
+              <div className="resultados-dividido">
+                <div className={carregando ? "resultados-dividido__lista resultados-dividido__lista--carregando" : "resultados-dividido__lista"}>
+                  {pontos.length === 0 && !carregando ? (
+                    <p className="muted mapa-dica">
+                      Não há lugares cadastrados nesta área. Mova o mapa e busque de novo, ou{" "}
+                      <button type="button" className="link-botao" onClick={abrirEscolhaDeCidade}>
+                        busque uma cidade pelo nome
+                      </button>
+                      .
+                    </p>
+                  ) : (
+                    <div className="grid-cards">
+                      {pontos.map((ponto) => (
+                        <PontoCard
+                          key={ponto.id}
+                          ponto={ponto}
+                          aoDestacar={setPontoDoCartao}
+                          destacado={ponto.id === pontoDoPino}
+                        />
+                      ))}
+                    </div>
+                  )}
+                </div>
+
+                <div className="resultados-dividido__mapa mapa-wrap">
+                  <MapaCarregavel
+                    pontos={pontos}
+                    altura="calc(100vh - var(--header-height) - 2rem)"
+                    aoBuscarNestaArea={buscarNaArea}
+                    ajustarAosPontos={!buscaPelaArea}
+                    carregando={carregando}
+                    destacadoId={pontoDoCartao}
+                    aoDestacarPonto={setPontoDoPino}
+                    vistaInicial={
+                      localizacao
+                        ? { centro: [localizacao.lat, localizacao.lng], zoom: 12 }
+                        : { centro: [-14.2, -51.9], zoom: 4 }
+                    }
+                  />
+                </div>
+              </div>
+            )}
+
+            {!dividido && !erro && !carregando && pontos.length > 0 && visualizacao === "lista" && (
               <div className="grid-cards">
                 {pontos.map((ponto) => (
                   <PontoCard key={ponto.id} ponto={ponto} />

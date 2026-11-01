@@ -20,7 +20,8 @@ test.describe("Dados reais do OpenStreetMap", () => {
     const credito = page.getByRole("link", { name: "Foto: Autora de Teste (CC BY-SA 4.0), via Wikimedia Commons" });
 
     await expect(credito).toHaveAttribute("href", "https://commons.wikimedia.org/wiki/File:Teste.jpg");
-    await expect(page.getByRole("link", { name: "OpenStreetMap", exact: true })).toHaveAttribute(
+    // A atribuição do mapa (Leaflet) também tem um link "OpenStreetMap": a fonte dos dados fica na coluna lateral.
+    await expect(page.getByRole("complementary").getByRole("link", { name: "OpenStreetMap", exact: true })).toHaveAttribute(
       "href",
       "https://www.openstreetmap.org/node/999999001",
     );

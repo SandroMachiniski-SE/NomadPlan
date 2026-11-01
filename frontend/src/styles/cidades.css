@@ -270,3 +270,51 @@
     text-align: center;
   }
 }
+
+/* Tela larga: lista de resultados à esquerda e o mapa fixo à direita. */
+.resultados-dividido {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(380px, 42%);
+  gap: 1.25rem;
+  align-items: start;
+}
+
+.resultados-dividido__lista {
+  min-width: 0;
+  transition: opacity 0.15s;
+}
+
+.resultados-dividido__lista--carregando {
+  opacity: 0.55;
+  pointer-events: none;
+}
+
+.resultados-dividido__mapa {
+  position: sticky;
+  top: calc(var(--header-height) + 1rem);
+}
+
+/* Na coluna estreita, os cartões cabem dois por linha. */
+.resultados-dividido .grid-cards {
+  grid-template-columns: repeat(auto-fill, minmax(min(100%, 240px), 1fr));
+}
+
+/* Cartão e pino se realçam: passar o mouse num mostra o outro. */
+.ponto-card-wrap--destaque .ponto-card {
+  border-color: var(--coral-500);
+  box-shadow: 0 0 0 3px color-mix(in srgb, var(--coral-500) 35%, transparent);
+}
+
+.marcador-pin--destaque svg {
+  transform: scale(1.3);
+  transform-origin: 50% 100%;
+}
+
+.marcador-pin--destaque path {
+  fill: var(--primary);
+}
+
+.marcador-grupo--destaque span {
+  background: var(--primary);
+  transform: scale(1.18);
+}
