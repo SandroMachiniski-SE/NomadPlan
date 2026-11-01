@@ -2,7 +2,8 @@ import "../ambiente";
 import { afterEach, beforeEach, describe, it } from "node:test";
 import assert from "node:assert/strict";
 import prisma from "../../lib/prisma";
-import { buscarRota, ErroRota } from "../../lib/rotas";
+import { buscarRota, ErroRota, gravarRotaEmCache, lerRespostaOsrm } from "../../lib/rotas";
+import { candidatosDaRota, tracadoEntre } from "../../lib/corredor";
 import { criarMunicipio, limparBanco } from "../suporte";
 import { instalarMapasFalsos, rotaOsrm } from "../mapasFalsos";
 
@@ -91,5 +92,65 @@ describe("rotas de carro", () => {
     const [chamada] = chamadasAoOsrm();
     assert.ok(chamada.url.includes("/route/v1/driving/-48.85,-26.3;-47.93,-15.78"), chamada.url);
     assert.ok(chamada.url.includes("annotations=distance,duration"), chamada.url);
+  });
+});
+
+// Rota sintética no meridiano 48° O, da latitude −26 à −12,5 (~1.500 km), com um ponto a cada 0,5°.
+const MERIDIANO: [number, number][] = Array.from({ length: 28 }, (_, i) => [-48, -26 + i * 0.5]);
+const KM_POR_GRAU = 111.2;
+
+/** Município sintético no km informado da rota, a `desvioKm` a leste da estrada. */
+function noKm(codigoIbge: number, cidade: string, km: number, desvioKm: number) {
+  const latitude = -26 + km / KM_POR_GRAU;
+  const longitude = -48 + desvioKm / (111.32 * Math.cos((latitude * Math.PI) / 180));
+
+  return { codigoIbge, cidade, uf: "GO", latitude, longitude };
+}
+
+describe("corredor", () => {
+  let idRota: number;
+  const ORIGEM = noKm(1000001, "Origem", 0, 0);
+  const DESTINO = noKm(1000002, "Destino", 1501, 0);
+
+  beforeEach(async () => {
+    await limparBanco();
+    await criarMunicipio(ORIGEM);
+    await criarMunicipio(DESTINO);
+    await criarMunicipio(noKm(1000010, "A", 500, 5));
+    await criarMunicipio(noKm(1000011, "B", 1000, 15));
+    await criarMunicipio(noKm(1000012, "C", 700, 30));
+    idRota = await gravarRotaEmCache(ORIGEM.codigoIbge, DESTINO.codigoIbge, lerRespostaOsrm(rotaOsrm(MERIDIANO)));
+  });
+
+  it("pega só as cidades a até 20 km da estrada, com o km de cada uma", async () => {
+    const lista = await candidatosDaRota(idRota, [ORIGEM.codigoIbge, DESTINO.codigoIbge]);
+
+    assert.deepEqual(
+      lista.map((c) => c.cidade),
+      ["A", "B"],
+    );
+    assert.ok(Math.abs(lista[0].km - 500) < 3, `km de A: ${lista[0].km}`);
+    assert.ok(Math.abs(lista[0].desvioKm - 5) < 0.5, `desvio de A: ${lista[0].desvioKm}`);
+    assert.ok(Math.abs(lista[1].km - 1000) < 5, `km de B: ${lista[1].km}`);
+    assert.ok(lista[0].fracao > 0.3 && lista[0].fracao < 0.37, `fração de A: ${lista[0].fracao}`);
+  });
+
+  it("deixa de fora as pontas da perna", async () => {
+    const lista = await candidatosDaRota(idRota, [ORIGEM.codigoIbge, DESTINO.codigoIbge, 1000010]);
+
+    assert.deepEqual(
+      lista.map((c) => c.cidade),
+      ["B"],
+    );
+  });
+
+  it("tracadoEntre devolve [lat, lon] do pedaço e no máximo 400 pontos", async () => {
+    const pedaco = await tracadoEntre(idRota, 0, 0.5);
+    const [primeiro] = pedaco;
+    const ultimo = pedaco[pedaco.length - 1];
+
+    assert.ok(pedaco.length >= 2 && pedaco.length <= 400);
+    assert.ok(Math.abs(primeiro[0] + 26) < 0.01 && Math.abs(primeiro[1] + 48) < 0.01, `primeiro ${primeiro}`);
+    assert.ok(Math.abs(ultimo[0] + 19.25) < 0.05, `último ${ultimo}`);
   });
 });
