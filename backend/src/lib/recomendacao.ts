@@ -71,6 +71,12 @@ export interface PontoRecomendado extends Omit<CandidatoRoteiro, "mediaAvaliacao
 export interface EtapaDoRoteiro {
   cidade: string;
   dias: number;
+  /** Viagem de carro: número do 1º dia da etapa no roteiro (há dias só de estrada antes). */
+  primeiroDia?: number;
+  /** Viagem de carro: estrada real até a cidade, descontada do 1º dia no lugar da linha reta (null = sem desconto). */
+  chegada?: { de: string; metros: number; minutos: number } | null;
+  /** Viagem de carro: minutos de direção da volta curta, descontados do fim do último dia. */
+  minutosNoFimDoUltimoDia?: number;
 }
 
 export interface DiaDoRoteiroGerado {
@@ -546,10 +552,13 @@ export async function gerarRoteiroSugerido(
       const centro = calcularCentroide(daCidade);
 
       for (let i = 0; i < etapa.dias; i += 1) {
-        numeroDoDia += 1;
+        numeroDoDia = i === 0 && etapa.primeiroDia ? etapa.primeiroDia : numeroDoDia + 1;
         let viagem: DiaDoRoteiroGerado["viagem"] = null;
 
-        if (cidadeAnterior && cidadeAnterior !== etapa.nome && centro && posicaoAnterior) {
+        if (i === 0 && etapa.chegada !== undefined) {
+          // Viagem de carro: a estrada real (ou nenhuma, quando a chegada foi num dia só de estrada).
+          viagem = etapa.chegada;
+        } else if (cidadeAnterior && cidadeAnterior !== etapa.nome && centro && posicaoAnterior) {
           const metros = Math.round(
             distanciaMetros(posicaoAnterior.latitude, posicaoAnterior.longitude, centro.latitude, centro.longitude),
           );
@@ -558,7 +567,8 @@ export async function gerarRoteiroSugerido(
 
         const minutosDeEstrada = viagem?.minutos ?? 0;
         const inicioDoDia = new Date(params.dataHoraInicio.getTime() + (numeroDoDia - 1) * 86_400_000 + minutosDeEstrada * 60_000);
-        const horas = params.horasDisponiveis - minutosDeEstrada / 60;
+        const minutosNoFim = i === etapa.dias - 1 ? (etapa.minutosNoFimDoUltimoDia ?? 0) : 0;
+        const horas = params.horasDisponiveis - minutosDeEstrada / 60 - minutosNoFim / 60;
         const restantes = daCidade.filter((c) => !usados.has(c.id));
 
         dias.push({ dia: numeroDoDia, cidade: etapa.nome, inicio: inicioDoDia.toISOString(), viagem });
