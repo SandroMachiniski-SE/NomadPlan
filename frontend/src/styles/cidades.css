@@ -134,3 +134,82 @@
   color: var(--danger-text, #8a1c10);
   font-size: 0.85rem;
 }
+
+/* Botão de mapa dentro do campo de destino. */
+.busca__campo--com-acao input {
+  padding-right: 3.4rem;
+}
+
+.busca__mapa {
+  position: absolute;
+  top: 50%;
+  right: 0.5rem;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 38px;
+  height: 38px;
+  padding: 0;
+  border: 0;
+  border-radius: var(--radius-sm);
+  background: var(--primary-soft);
+  color: var(--primary-text);
+  cursor: pointer;
+  transform: translateY(-50%);
+  transition: background-color 0.15s, color 0.15s, transform 0.1s;
+}
+
+.busca__mapa:hover {
+  background: var(--primary);
+  color: var(--on-primary);
+}
+
+.busca__mapa:active {
+  transform: translateY(-50%) scale(0.92);
+}
+
+.busca__mapa[aria-pressed="true"] {
+  background: var(--primary);
+  color: var(--on-primary);
+}
+
+/* Botão "Explorar pelo mapa" já aberto: fica marcado, para não restar dúvida. */
+.hero__acoes .btn[aria-pressed="true"] {
+  border-color: var(--coral-500);
+  background: var(--coral-600);
+  color: #fff;
+}
+
+.hero__acoes .btn[aria-pressed="true"]:hover:not(:disabled) {
+  background: var(--coral-600);
+  border-color: var(--coral-500);
+}
+
+/* A seção de resultados para onde a página rola ao abrir o mapa (deixa o cabeçalho fixo de fora). */
+.resultados {
+  scroll-margin-top: 5rem;
+}
+
+/* Pulso curto no mapa recém-aberto. */
+.mapa-wrap--destaque {
+  animation: mapa-destaque 1.4s ease-out;
+}
+
+@keyframes mapa-destaque {
+  0% {
+    box-shadow: 0 0 0 0 color-mix(in srgb, var(--coral-500) 70%, transparent);
+  }
+  60% {
+    box-shadow: 0 0 0 14px color-mix(in srgb, var(--coral-500) 0%, transparent);
+  }
+  100% {
+    box-shadow: var(--shadow-sm);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .mapa-wrap--destaque {
+    animation: none;
+    outline: 3px solid var(--coral-500);
+  }
+}

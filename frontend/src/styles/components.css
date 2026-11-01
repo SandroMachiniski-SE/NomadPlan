@@ -150,8 +150,16 @@
     transform 0.1s;
 }
 
-.btn:active:not(:disabled) {
-  transform: translateY(1px);
+.btn:active:not(:disabled),
+.chip:active {
+  transform: scale(0.96);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .btn:active:not(:disabled),
+  .chip:active {
+    transform: none;
+  }
 }
 
 .btn:disabled,
@@ -589,7 +597,7 @@
   font-size: 0.875rem;
   font-weight: 500;
   cursor: pointer;
-  transition: background-color 0.15s, border-color 0.15s, color 0.15s;
+  transition: background-color 0.15s, border-color 0.15s, color 0.15s, transform 0.1s;
 }
 
 .chip:hover {

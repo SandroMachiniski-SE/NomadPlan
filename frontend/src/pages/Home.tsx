@@ -1,4 +1,4 @@
-import { useEffect, useState, type FormEvent } from "react";
+import { useEffect, useRef, useState, type FormEvent } from "react";
 import { Link } from "react-router-dom";
 import api from "../services/api";
 import type { Ordenacao, Ponto, RespostaPontos } from "../types/ponto";
@@ -55,6 +55,9 @@ function Home() {
   // Busca pelo texto (cidade, nome...) ou pela região enquadrada no mapa.
   const [buscaPelaArea, setBuscaPelaArea] = useState(false);
   const [ultimaAreaBuscada, setUltimaAreaBuscada] = useState<AreaDoMapa | null>(null);
+  const [destacandoMapa, setDestacandoMapa] = useState(false);
+  const resultadosRef = useRef<HTMLElement | null>(null);
+  const mapaAberto = buscou && visualizacao === "mapa";
 
   async function buscarPontos(event?: FormEvent, categoriaEscolhida?: string, cidadeEscolhida?: string) {
     event?.preventDefault();
@@ -132,14 +135,25 @@ function Home() {
     }
   }
 
-  /** Abre o mapa livre para a pessoa navegar e escolher onde quer ir. */
+  /**
+   * Abre o mapa livre para a pessoa navegar e escolher onde quer ir. O mapa nasce abaixo da
+   * busca, então a página rola até ele e ele pulsa por um instante: sem isso, o clique parecia não fazer nada.
+   */
   function explorarPeloMapa() {
-    setBuscou(true);
-    setVisualizacao("mapa");
-    setBuscaPelaArea(true);
-    setErro(null);
-    setPontos([]);
-    setUltimaAreaBuscada(null);
+    if (!mapaAberto) {
+      setBuscou(true);
+      setVisualizacao("mapa");
+      setBuscaPelaArea(true);
+      setErro(null);
+      setPontos([]);
+      setUltimaAreaBuscada(null);
+    }
+
+    setDestacandoMapa(true);
+    window.setTimeout(() => {
+      resultadosRef.current?.scrollIntoView({ behavior: "smooth", block: "start" });
+    }, 60);
+    window.setTimeout(() => setDestacandoMapa(false), 1500);
   }
 
   function abrirEscolhaDeCidade() {
@@ -199,7 +213,7 @@ function Home() {
 
           <form className="busca" onSubmit={buscarPontos} role="search">
             <div className="busca__linha">
-              <label className="busca__campo">
+              <label className="busca__campo busca__campo--com-acao">
                 <Icone nome="pin" />
                 <input
                   type="text"
@@ -210,6 +224,16 @@ function Home() {
                   list="cidades-da-busca"
                 />
                 <SugestoesDeCidade id="cidades-da-busca" />
+                <button
+                  type="button"
+                  className="busca__mapa"
+                  onClick={explorarPeloMapa}
+                  aria-pressed={mapaAberto}
+                  aria-label="Escolher o destino no mapa"
+                  title="Escolher o destino no mapa"
+                >
+                  <Icone nome="mapa" />
+                </button>
               </label>
 
               <label className="busca__campo busca__campo--grande">
@@ -334,9 +358,9 @@ function Home() {
           </div>
 
           <div className="hero__acoes">
-            <button type="button" className="btn btn--outline" onClick={explorarPeloMapa}>
-              <Icone nome="mapa" />
-              Explorar pelo mapa
+            <button type="button" className="btn btn--outline" onClick={explorarPeloMapa} aria-pressed={mapaAberto}>
+              <Icone nome={mapaAberto ? "check" : "mapa"} />
+              {mapaAberto ? "Mapa aberto" : "Explorar pelo mapa"}
             </button>
             <button
               type="button"
@@ -360,7 +384,7 @@ function Home() {
       </section>
 
       <div className="container home">
-        {recomendados.length > 0 && (
+        {recomendados.length > 0 && !buscou && (
           <section className="section" aria-labelledby="titulo-recomendados">
             <div className="section__cabecalho">
               <h2 id="titulo-recomendados">Recomendados para você</h2>
@@ -378,9 +402,17 @@ function Home() {
         )}
 
         {buscou && (
-          <section className="section" aria-live="polite">
+          <section className="section resultados" aria-live="polite" ref={resultadosRef}>
             <div className="section__cabecalho section__cabecalho--linha">
-              <h2>{carregando ? "Buscando..." : erro ? "Resultados" : `${pontos.length} ${pontos.length === 1 ? "resultado" : "resultados"}`}</h2>
+              <h2>
+                {carregando
+                  ? "Buscando..."
+                  : erro
+                    ? "Resultados"
+                    : buscaPelaArea && !ultimaAreaBuscada
+                      ? "Escolha onde você quer ir"
+                      : `${pontos.length} ${pontos.length === 1 ? "resultado" : "resultados"}`}
+              </h2>
 
               {!erro && (
                 <div className="segmented" role="group" aria-label="Modo de visualização">
@@ -439,7 +471,7 @@ function Home() {
 
             {!erro && visualizacao === "mapa" && (
               <>
-                <div className="mapa-wrap">
+                <div className={destacandoMapa ? "mapa-wrap mapa-wrap--destaque" : "mapa-wrap"}>
                   <MapaCarregavel
                     pontos={pontos}
                     altura={520}

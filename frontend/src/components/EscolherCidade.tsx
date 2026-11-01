@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState, type FormEvent } from "react";
+import { useEffect, useRef, useState, type KeyboardEvent } from "react";
 import { Link } from "react-router-dom";
 import { useAuth } from "../context/useAuth";
 import {
@@ -16,6 +16,8 @@ interface EscolherCidadeProps {
   /** Chamada quando a cidade escolhida já tem dados e pode ser buscada. */
   aoEscolher: (cidade: string) => void;
   aoFechar: () => void;
+  /** Texto do botão das cidades que já têm dados. */
+  rotuloDeEscolha?: string;
 }
 
 const INTERVALO_DE_CONSULTA_MS = 3000;
@@ -26,7 +28,7 @@ const rotuloDaCidade = (c: CidadeDaBusca) => (c.uf ? `${c.cidade}, ${c.uf}` : c.
  * Busca qualquer município do Brasil. Os que já têm dados abrem direto; os outros são
  * preparados na hora (os lugares vêm do OpenStreetMap), com o andamento na tela.
  */
-function EscolherCidade({ textoInicial = "", aoEscolher, aoFechar }: EscolherCidadeProps) {
+function EscolherCidade({ textoInicial = "", aoEscolher, aoFechar, rotuloDeEscolha = "Ver lugares" }: EscolherCidadeProps) {
   const { autenticado } = useAuth();
   const [texto, setTexto] = useState(textoInicial);
   const [buscando, setBuscando] = useState(false);
@@ -40,9 +42,7 @@ function EscolherCidade({ textoInicial = "", aoEscolher, aoFechar }: EscolherCid
     aoEscolherRef.current = aoEscolher;
   }, [aoEscolher]);
 
-  async function buscar(evento?: FormEvent) {
-    evento?.preventDefault();
-
+  async function buscar() {
     if (texto.trim().length < 2) {
       setErro("Digite ao menos 2 letras do nome da cidade.");
       return;
@@ -64,6 +64,13 @@ function EscolherCidade({ textoInicial = "", aoEscolher, aoFechar }: EscolherCid
       setErro(extrairMensagemErro(err, "Não foi possível buscar cidades agora. Tente novamente."));
     } finally {
       setBuscando(false);
+    }
+  }
+
+  function aoApertarEnter(evento: KeyboardEvent<HTMLInputElement>) {
+    if (evento.key === "Enter") {
+      evento.preventDefault();
+      void buscar();
     }
   }
 
@@ -138,19 +145,21 @@ function EscolherCidade({ textoInicial = "", aoEscolher, aoFechar }: EscolherCid
         </button>
       </div>
 
-      <form className="escolher-cidade__form" onSubmit={buscar} role="search">
+      {/* Não é um <form>: o painel também abre dentro de outros formulários (Gerar roteiro). */}
+      <div className="escolher-cidade__form" role="search">
         <input
           type="text"
           value={texto}
           onChange={(evento) => setTexto(evento.target.value)}
+          onKeyDown={aoApertarEnter}
           placeholder="Ex.: Gramado, Paraty, Bonito"
           aria-label="Nome da cidade"
           maxLength={80}
         />
-        <button type="submit" className="btn btn--primary" disabled={buscando}>
+        <button type="button" className="btn btn--primary" onClick={() => void buscar()} disabled={buscando}>
           {buscando ? "Buscando..." : "Buscar cidade"}
         </button>
-      </form>
+      </div>
 
       {erro && (
         <div className="alert alert--error" role="alert">
@@ -196,7 +205,7 @@ function EscolherCidade({ textoInicial = "", aoEscolher, aoFechar }: EscolherCid
                   </span>
                 ) : cidade.disponivel ? (
                   <button type="button" className="btn btn--primary" onClick={() => escolher(cidade)}>
-                    Ver lugares
+                    {rotuloDeEscolha}
                   </button>
                 ) : autenticado ? (
                   <button type="button" className="btn btn--accent" onClick={() => escolher(cidade)}>
