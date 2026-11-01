@@ -4,6 +4,7 @@ import assert from "node:assert/strict";
 import prisma from "../../lib/prisma";
 import { buscarRota, ErroRota, gravarRotaEmCache, lerRespostaOsrm } from "../../lib/rotas";
 import { candidatosDaRota, tracadoEntre } from "../../lib/corredor";
+import { resumirCidades, type ResumoOsm } from "../../lib/resumoOsm";
 import { criarMunicipio, limparBanco } from "../suporte";
 import { instalarMapasFalsos, rotaOsrm } from "../mapasFalsos";
 
@@ -152,5 +153,68 @@ describe("corredor", () => {
     assert.ok(pedaco.length >= 2 && pedaco.length <= 400);
     assert.ok(Math.abs(primeiro[0] + 26) < 0.01 && Math.abs(primeiro[1] + 48) < 0.01, `primeiro ${primeiro}`);
     assert.ok(Math.abs(ultimo[0] + 19.25) < 0.05, `último ${ultimo}`);
+  });
+});
+
+describe("resumos das cidades", () => {
+  let mapas: ReturnType<typeof instalarMapasFalsos> | null = null;
+  const A = { codigoIbge: 1000020, cidade: "Cidade A", uf: "GO", latitude: -20, longitude: -48 };
+  const B = { codigoIbge: 1000021, cidade: "Cidade B", uf: "GO", latitude: -18, longitude: -48 };
+  const RESUMO_DE_A: ResumoOsm = { hospedagens: [], atracoes: [], totalHospedagens: 3, totalAtracoes: 1 };
+
+  beforeEach(async () => {
+    await limparBanco();
+    await criarMunicipio(A);
+    await criarMunicipio(B);
+  });
+
+  afterEach(() => {
+    mapas?.desinstalar();
+    mapas = null;
+  });
+
+  async function guardarResumoDeA(diasAtras: number) {
+    await prisma.$executeRaw`
+      UPDATE municipio SET resumo_osm = ${JSON.stringify(RESUMO_DE_A)}::jsonb, resumo_em = ${new Date(Date.now() - diasAtras * DIA_MS)}
+      WHERE codigo_ibge = ${A.codigoIbge}
+    `;
+  }
+
+  it("busca só as cidades sem resumo válido e grava resumo_osm e resumo_em", async () => {
+    await guardarResumoDeA(10);
+    mapas = instalarMapasFalsos({
+      overpass: () => ({
+        corpo: { elements: [{ type: "node", id: 5, lat: -18.01, lon: -48, tags: { name: "Hotel de B", tourism: "hotel" } }] },
+      }),
+    });
+
+    const resumos = await resumirCidades([A.codigoIbge, B.codigoIbge]);
+
+    const consulta = mapas.chamadas.find((c) => c.servico === "overpass")!.corpo!;
+    assert.ok(consulta.includes("around:8000,-18,-48)"), consulta);
+    assert.ok(!consulta.includes("around:8000,-20,-48)"), consulta);
+    assert.equal(resumos.get(A.codigoIbge)!.totalHospedagens, 3);
+    assert.equal(resumos.get(B.codigoIbge)!.totalHospedagens, 1);
+
+    const gravado = await prisma.municipio.findUnique({ where: { codigoIbge: B.codigoIbge } });
+    assert.equal((gravado!.resumoOsm as unknown as ResumoOsm).hospedagens[0].nome, "Hotel de B");
+    assert.ok(gravado!.resumoEm);
+  });
+
+  it("resumo vencido e Overpass fora do ar: usa o vencido", async () => {
+    await guardarResumoDeA(40);
+    mapas = instalarMapasFalsos({ overpass: () => ({ status: 504, corpo: {} }) });
+
+    const resumos = await resumirCidades([A.codigoIbge]);
+
+    assert.equal(resumos.get(A.codigoIbge)!.totalHospedagens, 3);
+  });
+
+  it("sem resumo e Overpass fora do ar: devolve null", async () => {
+    mapas = instalarMapasFalsos({ overpass: () => ({ status: 504, corpo: {} }) });
+
+    const resumos = await resumirCidades([B.codigoIbge]);
+
+    assert.equal(resumos.get(B.codigoIbge), null);
   });
 });
