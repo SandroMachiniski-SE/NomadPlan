@@ -147,3 +147,32 @@ test.describe("explorar pontos turísticos", () => {
     expect(titulos).toEqual(ordenados);
   });
 });
+
+test.describe("explorar pelo mapa e escolher qualquer cidade", () => {
+  test("o mapa livre começa afastado e só busca depois de aproximar da região", async ({ page }) => {
+    await page.goto("/");
+    await page.getByRole("button", { name: "Explorar pelo mapa" }).click();
+
+    await expect(page.locator(".leaflet-container")).toBeVisible();
+    await expect(page.getByRole("button", { name: "Aproxime o mapa para buscar" })).toBeDisabled();
+  });
+
+  test("a busca de cidade abre o painel e pede ao menos 2 letras", async ({ page }) => {
+    await page.goto("/");
+    await page.getByRole("button", { name: "Buscar outra cidade do Brasil" }).click();
+
+    await expect(page.getByRole("heading", { name: "Qualquer cidade do Brasil" })).toBeVisible();
+    await page.getByLabel("Nome da cidade").fill("a");
+    await page.getByRole("button", { name: "Buscar cidade" }).click();
+
+    await expect(page.getByText("Digite ao menos 2 letras do nome da cidade.")).toBeVisible();
+  });
+
+  test("sem resultados, a busca por cidade oferece procurar em todo o Brasil", async ({ page }) => {
+    await page.goto("/");
+    await page.getByLabel("Cidade", { exact: true }).fill("Cidade Que Nao Existe");
+    await page.getByRole("button", { name: "Buscar", exact: true }).click();
+
+    await expect(page.getByRole("button", { name: /em todo o Brasil/ })).toBeVisible();
+  });
+});

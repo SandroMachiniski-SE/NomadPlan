@@ -39,6 +39,27 @@ export const limiteGoogle = rateLimit({
   message: { erro: "Muitas consultas ao Google em pouco tempo. Tente novamente mais tarde." },
 });
 
+// Busca de cidade: cada consulta nova vai ao Nominatim, que permite 1 por segundo no total.
+export const limiteBuscaCidade = rateLimit({
+  windowMs: 60 * 1000,
+  limit: 20,
+  standardHeaders: true,
+  skip: semLimite,
+  legacyHeaders: false,
+  message: { erro: "Muitas buscas de cidade em pouco tempo. Aguarde um instante e tente novamente." },
+});
+
+// Preparar uma cidade nova baixa milhares de lugares de servidores públicos (Overpass,
+// Wikidata, Wikimedia): poucos pedidos por hora e por endereço.
+export const limitePrepararCidade = rateLimit({
+  windowMs: 60 * 60 * 1000,
+  limit: 6,
+  standardHeaders: true,
+  skip: semLimite,
+  legacyHeaders: false,
+  message: { erro: "Você pediu muitas cidades novas em pouco tempo. Tente novamente mais tarde." },
+});
+
 // AF01: bloqueio temporário do login por excesso de tentativas. O limite por conta é
 // o do RFC (3 falhas); o limite por IP é mais folgado porque vários usuários podem
 // compartilhar o mesmo endereço (rede da faculdade, por exemplo).

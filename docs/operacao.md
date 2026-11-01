@@ -98,6 +98,15 @@ Com `GOOGLE_MAPS_API_KEY` no `backend/.env`, a página do ponto mostra nota, hor
 
 Cada consulta conta na cota do Google: a busca do `place_id` (uma vez por ponto, pedindo só o id), os detalhes e a foto. A rota `/pontos/:id/google` tem limite de 60 consultas por IP em 15 minutos. Sem a chave, nada disso é usado.
 
+### Qualquer cidade do Brasil, sob demanda
+
+Além dos comandos acima, qualquer pessoa logada pode carregar uma cidade nova pela tela inicial ("Buscar outra cidade do Brasil"):
+
+1. `GET /cidades/buscar?q=` acha municípios pelo nome no [Nominatim](https://nominatim.openstreetmap.org) (1 consulta por segundo, com cache de 1 hora) e diz quais já têm lugares.
+2. `POST /cidades/preparar` baixa os lugares da cidade do OpenStreetMap (Overpass, com fotos do Wikidata/Commons) e grava no banco, em segundo plano; `GET /cidades/preparar?cidade=&uf=` acompanha o andamento. Uma cidade pequena leva cerca de 30 s; as grandes podem levar alguns minutos ou falhar se o Overpass estiver ocupado (a tela avisa e pode-se tentar de novo).
+3. Limites para não sobrecarregar os servidores públicos: 6 cidades novas por hora por endereço, no máximo 2 preparos ao mesmo tempo, busca de cidade limitada a 20 por minuto por endereço. O estado dos preparos fica em memória (se a API reiniciar no meio, basta pedir de novo; nada é duplicado).
+4. `OVERPASS_URL` e `NOMINATIM_URL` trocam os servidores (por exemplo, por espelhos ou instâncias próprias). Cidades de mesmo nome em estados diferentes são distinguidas pela distância dos pontos já gravados; os lugares delas compartilham o nome da cidade na busca por texto.
+
 ## Rollback (RNF24)
 
 A API é compilada e versionada pelo git, então voltar de versão é voltar o código:
