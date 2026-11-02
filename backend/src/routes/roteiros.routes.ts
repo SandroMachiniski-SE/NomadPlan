@@ -427,6 +427,7 @@ roteirosRouter.post("/gerar", async (req: Request, res: Response) => {
       etapas = plano.etapasDoGerador;
       viagemDeCarro = {
         origem: entrada.origem,
+        etapas: entrada.etapas.map(({ codigoIbge, cidade, uf, dias }) => ({ codigoIbge, cidade, uf, dias })),
         kmPorDia: entrada.kmPorDia,
         horasPorDia: entrada.horasPorDia,
         comVolta: entrada.comVolta,
