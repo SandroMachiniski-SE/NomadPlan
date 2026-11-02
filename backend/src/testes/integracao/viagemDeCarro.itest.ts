@@ -3,6 +3,7 @@ import { after, afterEach, before, beforeEach, describe, it } from "node:test";
 import assert from "node:assert/strict";
 import prisma from "../../lib/prisma";
 import type { Municipio } from "../../lib/municipios";
+import { planejarViagemDeCarro, resolverEntradaDaViagem } from "../../lib/viagemDeCarro";
 import { criarCliente, criarMunicipio, criarPonto, criarUsuario, iniciarServidor, limparBanco, type ServidorDeTeste } from "../suporte";
 import { BRASILIA, estradaReta, instalarViagemFalsa, JOINVILLE, noKm, prepararBrasilia, type ViagemFalsa } from "../viagemFalsa";
 
@@ -388,6 +389,17 @@ describe("viagem de carro no gerador de roteiro", () => {
       assert.equal(r.corpo.viagemDeCarro.pernas[0].trechos[0].litros, null);
       assert.ok(r.corpo.viagemDeCarro.avisos.includes("Informe o consumo e o preço do litro para estimar o combustível."));
     });
+  });
+
+  it("o preparo para a banca espera mais pelo Overpass", async () => {
+    await prepararBrasilia(viagem);
+    const { usuario } = await comCasa(JOINVILLE);
+    const entrada = await resolverEntradaDaViagem({}, [{ cidade: "Brasília/DF", dias: 1 }], usuario.id, 6);
+
+    await planejarViagemDeCarro(entrada, { tempoLimiteDosResumosMs: 175_000 });
+
+    const [consulta] = viagem.chamadas("overpass");
+    assert.ok(consulta.corpo!.startsWith("[out:json][timeout:170];"), consulta.corpo!);
   });
 
   it("sem viagemDeCarro a resposta é a de hoje, com viagemDeCarro null", async () => {

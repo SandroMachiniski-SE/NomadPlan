@@ -259,6 +259,8 @@ interface PernaDividida {
 /** Compartilhado entre as pernas: depois de uma falha do Overpass, não se tenta de novo nesta viagem. */
 interface EstadoDoOverpass {
   falhou: boolean;
+  /** Quanto esperar por cada consulta (o preparo antes da banca espera bem mais que a tela). */
+  tempoLimiteMs?: number;
 }
 
 async function dividirPerna(
@@ -293,7 +295,7 @@ async function dividirPerna(
   for (let rodada = 0; rodada < RODADAS_DE_RESUMO && divisao.semResumo.length > 0; rodada += 1) {
     const pedidos = divisao.semResumo;
     // Com o Overpass fora do ar, as cidades ficam sem contagem (só pela distância) sem nova espera.
-    const resumos = overpass.falhou ? new Map<number, null>() : await resumirCidades(pedidos);
+    const resumos = overpass.falhou ? new Map<number, null>() : await resumirCidades(pedidos, new Date(), overpass.tempoLimiteMs);
 
     if (pedidos.some((codigo) => !resumos.get(codigo))) overpass.falhou = true;
 
@@ -391,7 +393,10 @@ async function planejarTrechos(
 }
 
 /** Planeja as pernas de carro e devolve, além delas, as etapas no formato do gerador de roteiro. */
-export async function planejarViagemDeCarro(entrada: EntradaDaViagem): Promise<PlanoDaViagem> {
+export async function planejarViagemDeCarro(
+  entrada: EntradaDaViagem,
+  opcoes: { tempoLimiteDosResumosMs?: number } = {},
+): Promise<PlanoDaViagem> {
   const { etapas, origem } = entrada;
   // Perna i chega à etapa i (a 0 sai de casa); com volta, a perna depois da última volta para casa.
   const pontas: { de: Municipio; para: Municipio }[] = etapas.map((para, i) => ({ de: i === 0 ? origem : etapas[i - 1], para }));
@@ -400,7 +405,7 @@ export async function planejarViagemDeCarro(entrada: EntradaDaViagem): Promise<P
     pontas.push({ de: etapas[etapas.length - 1], para: origem });
   }
 
-  const overpass: EstadoDoOverpass = { falhou: false };
+  const overpass: EstadoDoOverpass = { falhou: false, tempoLimiteMs: opcoes.tempoLimiteDosResumosMs };
   const divididas: PernaDividida[] = [];
   const pernasDaAgenda: (PernaParaAgenda | null)[] = [];
 

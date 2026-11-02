@@ -107,6 +107,14 @@ Além dos comandos acima, qualquer pessoa logada pode carregar uma cidade nova p
 3. Limites para não sobrecarregar os servidores públicos: 6 cidades novas por hora por endereço, no máximo 2 preparos ao mesmo tempo, busca de cidade limitada a 20 por minuto por endereço. O estado dos preparos fica em memória (se a API reiniciar no meio, basta pedir de novo; nada é duplicado).
 4. `OVERPASS_URL` e `NOMINATIM_URL` trocam os servidores (por exemplo, por espelhos ou instâncias próprias). Cidades de mesmo nome em estados diferentes são distinguidas pela distância dos pontos já gravados; os lugares delas compartilham o nome da cidade na busca por texto.
 
+### Viagem de carro (municípios, rotas e pernoites)
+
+- `npm run municipios:baixar` grava `backend/prisma/dados/municipios.json` (5.571 municípios com a sede, de kelvins/municipios-brasileiros, MIT, a partir do IBGE); o arquivo já está versionado, então só é preciso de novo se o IBGE criar municípios. `npm run municipios:importar` (e o seed) levam ao banco.
+- Rotas pelo OSRM (`OSRM_URL`; padrão `https://router.project-osrm.org`, servidor de demonstração, uso leve; alternativa `https://routing.openstreetmap.de/routed-car` ou um OSRM próprio). Ficam em `rota_em_cache` por 90 dias e uma vencida ainda serve se o OSRM cair.
+- Hospedagens e atrações das cidades de pernoite pelo Overpass (`OVERPASS_URL`), guardadas no município por 30 dias. Na tela, cada consulta espera até 30 s; se falhar, as cidades vêm só pela distância.
+- **Antes de uma apresentação**: `npm run viagem:preparar -- "Joinville/SC" "Brasília/DF" [--km 500]` busca a ida e a volta e os resumos de todas as faixas de pernoite, esperando até 175 s por consulta (os servidores públicos às vezes levam quase um minuto). Prepare também as cidades de destino (preparo sob demanda ou `osm:baixar`) para os dias de passeio terem pontos. Depois disso a viagem funciona pelo cache.
+- Créditos: "Rotas: OSRM · dados © colaboradores do OpenStreetMap" (na tela do resultado).
+
 ## Rollback (RNF24)
 
 A API é compilada e versionada pelo git, então voltar de versão é voltar o código:
