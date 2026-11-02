@@ -104,6 +104,7 @@ model Municipio {
   geom            Unsupported("geography(Point,4326)")?
 
   moradores     Usuario[]
+  roteirosSaindo Roteiro[]
   rotasSaindo   RotaEmCache[] @relation("origemDaRota")
   rotasChegando RotaEmCache[] @relation("destinoDaRota")
 
@@ -310,6 +311,14 @@ model Roteiro {
   notas              String?
   orcamentoCentavos  Int?      @map("orcamento_centavos")
 
+  // Viagem de carro (nulos nos roteiros sem ela): de onde sai, alvo por dia, volta e dados do carro.
+  viagemOrigem       Int?      @map("viagem_origem")
+  kmPorDia           Int?      @map("km_por_dia")
+  horasPorDia        Decimal?  @map("horas_por_dia") @db.Decimal(3, 1)
+  viagemVolta        Boolean?  @map("viagem_volta")
+  consumoKmPorLitro  Decimal?  @map("consumo_km_por_litro") @db.Decimal(4, 1)
+  precoLitroCentavos Int?      @map("preco_litro_centavos")
+
   dataCriacao     DateTime  @default(now()) @map("data_criacao")
   dataAtualizacao DateTime  @updatedAt @map("data_atualizacao")
 
@@ -321,8 +330,35 @@ model Roteiro {
   colaboradores ColaboradorRoteiro[]
   convites      ConviteRoteiro[]
 
+  municipioDeOrigem Municipio?      @relation(fields: [viagemOrigem], references: [codigoIbge])
+  trechosEstrada    TrechoEstrada[]
+
   @@index([idUsuario])
   @@map("roteiro")
+}
+
+// Trecho dirigido de uma viagem de carro salva: um dia só de estrada ou um trecho curto
+// descontado de um dia na cidade. Fica preso ao número do dia; o traçado é [lat, lon][].
+model TrechoEstrada {
+  id                       Int      @id @default(autoincrement())
+  idRoteiro                Int      @map("id_roteiro")
+  dia                      Int
+  perna                    Int
+  noite                    Int?
+  deNome                   String   @map("de_nome")
+  paraNome                 String   @map("para_nome")
+  metros                   Int
+  segundos                 Int
+  ocupaODia                Boolean  @map("ocupa_o_dia")
+  noFimDoDia               Boolean  @default(false) @map("no_fim_do_dia")
+  litros                   Decimal? @db.Decimal(6, 1)
+  custoCombustivelCentavos Int?     @map("custo_combustivel_centavos")
+  tracado                  Json
+
+  roteiro Roteiro @relation(fields: [idRoteiro], references: [id], onDelete: Cascade)
+
+  @@index([idRoteiro, dia])
+  @@map("trecho_estrada")
 }
 
 // Período do dia de uma parada, para quem planeja sem horário ("trilha à noite").

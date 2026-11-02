@@ -1,6 +1,6 @@
 import { describe, it } from "node:test";
 import assert from "node:assert/strict";
-import { comTrechos, distanciaDoPercurso, minutosParaPercorrer, otimizarOrdem, trechoEntre } from "./trajeto";
+import { comTrechos, distanciaDoPercurso, minutosParaPercorrer, otimizarOrdem, trechoEntre, viagensComEstrada } from "./trajeto";
 
 // Pontos numa linha de leste a oeste, a ~1,1 km um do outro (0,01° de longitude no equador).
 const P = (id: number, lng: number) => ({ id, latitude: 0, longitude: lng });
@@ -83,5 +83,58 @@ describe("comTrechos", () => {
     assert.ok(r[1].deslocamento && r[1].deslocamento.metros > 11000);
     assert.equal(r[2].deslocamento, null, "o primeiro de cada dia não tem trecho");
     assert.ok(r[3].deslocamento && r[3].deslocamento.metros < 12000);
+  });
+});
+
+describe("viagensComEstrada", () => {
+  const trecho = (dia: number, noFimDoDia = false) => ({
+    dia,
+    perna: 0,
+    de: "Joinville/SC",
+    para: "Cidade A/GO",
+    metros: 500_000,
+    segundos: 21_600,
+    noFimDoDia,
+  });
+
+  it("troca a estimativa do dia pelo trecho real e marca estrada", () => {
+    const viagens = viagensComEstrada([{ dia: 2, de: "Joinville", para: "Cidade A", metros: 1000, minutos: 10 }], [trecho(2)]);
+
+    assert.deepEqual(viagens, [{ dia: 2, de: "Joinville/SC", para: "Cidade A/GO", metros: 500_000, minutos: 360, estrada: true }]);
+  });
+
+  it("dia de estrada sem viagem estimada ganha a do trecho", () => {
+    assert.deepEqual(
+      viagensComEstrada([], [trecho(1)]).map((v) => [v.dia, v.estrada]),
+      [[1, true]],
+    );
+  });
+
+  it("a estimativa logo depois de um dia de estrada sai (a estrada já chegou)", () => {
+    const viagens = viagensComEstrada([{ dia: 4, de: "Uberaba", para: "Brasília", metros: 400_000, minutos: 300 }], [trecho(3)]);
+
+    assert.deepEqual(
+      viagens.map((v) => v.dia),
+      [3],
+    );
+  });
+
+  it("estimativa longe dos dias de estrada continua", () => {
+    const viagens = viagensComEstrada([{ dia: 6, de: "Brasília", para: "Goiânia", metros: 200_000, minutos: 150 }], [trecho(1)]);
+
+    assert.deepEqual(
+      viagens.map((v) => [v.dia, v.estrada ?? false]),
+      [
+        [1, true],
+        [6, false],
+      ],
+    );
+  });
+
+  it("trecho no fim do dia entra separado, com noFimDoDia", () => {
+    const [volta] = viagensComEstrada([], [trecho(2, true)]);
+
+    assert.equal(volta.noFimDoDia, true);
+    assert.equal(volta.estrada, true);
   });
 });
