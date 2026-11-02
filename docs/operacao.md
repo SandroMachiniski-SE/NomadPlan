@@ -1,6 +1,6 @@
 # Operação: implantação, backup, recuperação e monitoramento
 
-Procedimentos para quem executa o NomadPlan fora do ambiente de desenvolvimento (atende às RNF07, RNF08, RNF23, RNF24 e RNF25).
+Procedimentos para quem executa o NomadPlan fora do ambiente de desenvolvimento (atende às RNF07, RNF08, RNF23, RNF24 e RNF25). Para colocar o sistema na internet com domínio próprio, HTTPS e Brevo, siga o passo a passo em [implantacao-web.md](implantacao-web.md).
 
 ## Componentes
 
