@@ -412,10 +412,6 @@ roteirosRouter.post("/gerar", async (req: Request, res: Response) => {
     let viagemDeCarro = null;
 
     if (dados.viagemDeCarro) {
-      if (dados.viagemDeCarro.comVolta) {
-        return res.status(400).json({ erro: "A volta ainda não está disponível." });
-      }
-
       const entrada = await resolverEntradaDaViagem(
         dados.viagemDeCarro,
         dados.etapas ?? [{ cidade: dados.cidade!, dias: 1 }],
@@ -579,10 +575,6 @@ roteirosRouter.post("/", async (req: Request, res: Response) => {
     } | null = null;
 
     if (pedidoDaViagem) {
-      if (pedidoDaViagem.comVolta) {
-        return res.status(400).json({ erro: "A volta ainda não está disponível." });
-      }
-
       const entrada = await resolverEntradaDaViagem(
         pedidoDaViagem,
         pedidoDaViagem.etapas.map((e) => ({ cidade: String(e.codigoIbge), codigoIbge: e.codigoIbge, dias: e.dias })),

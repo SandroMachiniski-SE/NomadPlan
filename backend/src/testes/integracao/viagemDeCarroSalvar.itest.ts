@@ -3,7 +3,7 @@ import { after, afterEach, before, beforeEach, describe, it } from "node:test";
 import assert from "node:assert/strict";
 import prisma from "../../lib/prisma";
 import { criarCliente, criarUsuario, iniciarServidor, limparBanco, type ServidorDeTeste } from "../suporte";
-import { instalarViagemFalsa, JOINVILLE, prepararBrasilia, type ViagemFalsa } from "../viagemFalsa";
+import { estradaReta, instalarViagemFalsa, JOINVILLE, prepararBrasilia, type ViagemFalsa } from "../viagemFalsa";
 
 const INICIO = new Date(2026, 9, 26, 9, 0, 0).toISOString();
 
@@ -42,10 +42,10 @@ describe("salvar e ler a viagem de carro", () => {
   });
 
   /** Gera Joinville → Brasília (4 dias) e monta o pedido de salvamento como o front faz. */
-  async function gerarEMontar(hotelDaNoite1 = true) {
+  async function gerarEMontar(hotelDaNoite1 = true, { dias = 4, comVolta = false } = {}) {
     const gerado = await api("POST", "/roteiros/gerar", {
       token,
-      json: { etapas: [{ cidade: "Brasília, DF", dias: 4 }], horasDisponiveis: 6, dataHoraInicio: INICIO, viagemDeCarro: {} },
+      json: { etapas: [{ cidade: "Brasília, DF", dias }], horasDisponiveis: 6, dataHoraInicio: INICIO, viagemDeCarro: { comVolta } },
     });
     assert.equal(gerado.status, 200, JSON.stringify(gerado.corpo));
 
@@ -68,10 +68,10 @@ describe("salvar e ler a viagem de carro", () => {
         pontos: gerado.corpo.pontos.map((p: { id: number; dia: number }) => ({ idPonto: p.id, dia: p.dia })),
         viagemDeCarro: {
           origem: JOINVILLE.codigoIbge,
-          etapas: [{ codigoIbge: 5300108, dias: 4 }],
+          etapas: [{ codigoIbge: 5300108, dias }],
           horasDisponiveis: 6,
           kmPorDia: 500,
-          comVolta: false,
+          comVolta,
           escolhas: [],
           decisoes: [],
           noites,
@@ -124,6 +124,30 @@ describe("salvar e ler a viagem de carro", () => {
     assert.equal(hoteis.length, 11);
     assert.ok(hoteis.every((h) => h.origem === "API" && h.idOsm && h.status === "PUBLICADO"));
     assert.deepEqual([...new Set(hoteis.map((h) => h.cidade))].sort(), ["Cidade A", "Cidade B"]);
+  });
+
+  it("salvar com volta grava os trechos de todas as pernas", async () => {
+    viagem.naEstrada(JOINVILLE, () => ({ corpo: estradaReta(1501) }));
+    const { pedido } = await gerarEMontar(false, { dias: 2, comVolta: true });
+
+    const r = await salvar(pedido);
+    assert.equal(r.status, 201, JSON.stringify(r.corpo));
+
+    const trechos = await prisma.trechoEstrada.findMany({ where: { idRoteiro: r.corpo.id }, orderBy: [{ dia: "asc" }] });
+    assert.deepEqual(
+      trechos.map((t) => [t.dia, t.perna]),
+      [
+        [1, 0],
+        [2, 0],
+        [3, 0],
+        [6, 1],
+        [7, 1],
+        [8, 1],
+      ],
+    );
+    assert.equal(trechos[5].paraNome, "Joinville/SC");
+    assert.equal((await prisma.roteiro.findUnique({ where: { id: r.corpo.id } }))?.viagemVolta, true);
+    assert.equal(await prisma.itemRoteiro.count({ where: { idRoteiro: r.corpo.id, pernoite: true } }), 4);
   });
 
   it("idOsm que não está no resumo da cidade dá 400", async () => {

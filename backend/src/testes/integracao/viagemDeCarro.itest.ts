@@ -263,6 +263,98 @@ describe("viagem de carro no gerador de roteiro", () => {
     );
   });
 
+  describe("várias pernas e volta", () => {
+    const GOIANIA = { codigoIbge: 5208707, cidade: "Goiânia", uf: "GO", latitude: -16.6869, longitude: -49.2648 };
+    const nomesDasNoites = (perna: { trechos: { noite: number | null; pernoite: { cidade: string } | null }[] }) =>
+      perna.trechos.filter((t) => t.noite !== null).map((t) => t.pernoite?.cidade);
+
+    it("Brasília 2 dias → Goiânia 2 dias com volta: pernas 0, 1 e 2 com dias numerados em sequência", async () => {
+      await prepararBrasilia(viagem);
+      await criarMunicipio(GOIANIA);
+      for (let i = 0; i < 6; i += 1) {
+        await criarPonto({ nome: `Goiânia ${i}`, cidade: "Goiânia", latitude: -16.68 - i * 0.002, longitude: -49.26 });
+      }
+      viagem.naEstrada(GOIANIA, () => ({ corpo: estradaReta(200) }));
+      viagem.naEstrada(JOINVILLE, () => ({ corpo: estradaReta(1100) }));
+      const { token } = await comCasa(JOINVILLE);
+
+      const r = await gerar(token, {
+        etapas: [
+          { cidade: "Brasília, DF", dias: 2 },
+          { cidade: "Goiânia", dias: 2 },
+        ],
+        viagemDeCarro: { comVolta: true },
+      });
+
+      assert.equal(r.status, 200, JSON.stringify(r.corpo));
+      const pernas = r.corpo.viagemDeCarro.pernas;
+      assert.deepEqual(
+        pernas.map((p: { perna: number }) => p.perna),
+        [0, 1, 2],
+      );
+      assert.deepEqual(
+        pernas.map((p: { trechos: { dia: number }[] }) => p.trechos.map((t) => t.dia)),
+        [[1, 2, 3], [6], [8, 9]],
+      );
+      assert.equal(pernas[1].trechos[0].ocupaODia, false);
+      assert.equal(pernas[2].para.codigoIbge, JOINVILLE.codigoIbge);
+      assert.deepEqual(
+        r.corpo.dias.map((d: { dia: number }) => d.dia),
+        [4, 5, 6, 7],
+      );
+      // A chegada a Goiânia usa o tempo real da estrada, não a estimativa em linha reta.
+      assert.deepEqual(r.corpo.dias[2].viagem, {
+        de: "Brasília/DF",
+        metros: pernas[1].metros,
+        minutos: Math.round(pernas[1].segundos / 60),
+      });
+    });
+
+    it("o limite de 21 dias conta a estrada de ida e a de volta", async () => {
+      await prepararBrasilia(viagem);
+      viagem.naEstrada(JOINVILLE, () => ({ corpo: estradaReta(1501) }));
+      const { token } = await comCasa(JOINVILLE);
+      const etapas = [{ cidade: "Brasília, DF", dias: 12 }];
+
+      // 300 km por dia: 5 dias de estrada em cada sentido. Só a ida: 5 + 12 = 17; com a volta, 22.
+      const soIda = await gerar(token, { etapas, viagemDeCarro: { kmPorDia: 300 } });
+      assert.equal(soIda.status, 200, JSON.stringify(soIda.corpo));
+
+      const comVolta = await gerar(token, { etapas, viagemDeCarro: { kmPorDia: 300, comVolta: true } });
+      assert.equal(comVolta.status, 400);
+      assert.match(comVolta.corpo.erro, /passa de 21 dias/);
+    });
+
+    it("escolhas e decisões de uma perna não mexem nas outras", async () => {
+      const { a2 } = await prepararBrasilia(viagem);
+      viagem.naEstrada(JOINVILLE, () => ({ corpo: estradaReta(1501) }));
+      const { token } = await comCasa(JOINVILLE);
+
+      const r = await gerar(token, {
+        etapas: [{ cidade: "Brasília, DF", dias: 1 }],
+        viagemDeCarro: { comVolta: true, escolhas: [{ perna: 1, noite: 1, codigoIbge: a2.codigoIbge }] },
+      });
+
+      assert.equal(r.status, 200, JSON.stringify(r.corpo));
+      const [ida, volta] = r.corpo.viagemDeCarro.pernas;
+      assert.deepEqual(nomesDasNoites(ida), ["Cidade A", "Cidade B"]);
+      assert.deepEqual(nomesDasNoites(volta), ["Cidade A2", "Cidade B"]);
+    });
+
+    it("Overpass fora do ar numa viagem com volta: uma consulta só", async () => {
+      await prepararBrasilia(viagem);
+      viagem.naEstrada(JOINVILLE, () => ({ corpo: estradaReta(1501) }));
+      viagem.estado.overpassFora = true;
+      const { token } = await comCasa(JOINVILLE);
+
+      const r = await gerar(token, { etapas: [{ cidade: "Brasília, DF", dias: 1 }], viagemDeCarro: { comVolta: true } });
+
+      assert.equal(r.status, 200, JSON.stringify(r.corpo));
+      assert.equal(r.corpo.viagemDeCarro.pernas.length, 2);
+      assert.equal(viagem.chamadas("overpass").length, 1);
+    });
+  });
+
   it("sem viagemDeCarro a resposta é a de hoje, com viagemDeCarro null", async () => {
     await criarPonto({ nome: "Museu de Joinville", cidade: "Joinville" });
     const { token } = await comCasa(null);

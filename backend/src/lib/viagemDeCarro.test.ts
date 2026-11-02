@@ -56,4 +56,55 @@ describe("montarAgenda", () => {
     assert.equal(r.etapas[1].chegada, undefined);
     assert.equal(r.totalDeDias, 7);
   });
+
+  it("volta curta fica no fim do último dia da última etapa", () => {
+    const r = montarAgenda([null, { trechos: [t(180, 8100, null)], terminaEmCasa: true }], [2], 6);
+
+    assert.deepEqual(
+      r.trechos[1].map((x) => [x.dia, x.ocupaODia, x.noFimDoDia]),
+      [[2, false, true]],
+    );
+    assert.equal(r.etapas[0].minutosNoFimDoUltimoDia, 135);
+    assert.equal(r.totalDeDias, 2);
+  });
+
+  it("volta curta que não deixa 2 h vira dia só de estrada", () => {
+    const r = montarAgenda([null, { trechos: [t(400, 5 * 3600, null)], terminaEmCasa: true }], [2], 6);
+
+    assert.deepEqual(
+      r.trechos[1].map((x) => [x.dia, x.ocupaODia, x.noFimDoDia]),
+      [[3, true, false]],
+    );
+    assert.equal(r.etapas[0].minutosNoFimDoUltimoDia, 0);
+    assert.equal(r.totalDeDias, 3);
+  });
+
+  it("volta longa: noites e chegada em casa como dias de estrada, mesmo se a chegada for curta", () => {
+    const r = montarAgenda([null, { trechos: [t(500, 22000, 1), t(120, 5400, null)], terminaEmCasa: true }], [2], 6);
+
+    assert.deepEqual(
+      r.trechos[1].map((x) => [x.dia, x.noite, x.ocupaODia]),
+      [
+        [3, 1, true],
+        [4, null, true],
+      ],
+    );
+    assert.equal(r.totalDeDias, 4);
+  });
+
+  it("perna entre etapas maior que um dia entra entre os dias das duas cidades", () => {
+    const r = montarAgenda([null, { trechos: [t(500, 22000, 1), t(150, 6750, null)], terminaEmCasa: false }], [2, 2], 6);
+
+    assert.equal(r.etapas[0].primeiroDia, 1);
+    assert.deepEqual(
+      r.trechos[1].map((x) => [x.dia, x.ocupaODia]),
+      [
+        [3, true],
+        [4, false],
+      ],
+    );
+    assert.equal(r.etapas[1].primeiroDia, 4);
+    assert.equal(r.etapas[1].chegada?.dia, 4);
+    assert.equal(r.totalDeDias, 5);
+  });
 });

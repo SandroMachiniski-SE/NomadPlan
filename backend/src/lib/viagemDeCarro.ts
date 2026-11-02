@@ -172,6 +172,26 @@ export function montarAgenda(
     dia += diasDaEtapa;
   });
 
+  // A volta para casa: curta e sem noites, fica no fim do último dia na cidade (se sobrarem 2 h
+  // de passeio); senão cada trecho vira um dia só de estrada, até a chegada em casa.
+  const indiceDaVolta = diasDasEtapas.length;
+  const volta = pernas[indiceDaVolta];
+
+  if (volta) {
+    const [unico] = volta.trechos;
+    const ultimaEtapa = etapas[etapas.length - 1];
+
+    if (volta.trechos.length === 1 && unico.noite === null && ultimaEtapa && sobraPasseio(unico)) {
+      trechos[indiceDaVolta].push({ ...unico, dia, ocupaODia: false, noFimDoDia: true });
+      ultimaEtapa.minutosNoFimDoUltimoDia = Math.round(unico.segundos / 60);
+    } else {
+      for (const trecho of volta.trechos) {
+        dia += 1;
+        trechos[indiceDaVolta].push({ ...trecho, dia, ocupaODia: true, noFimDoDia: false });
+      }
+    }
+  }
+
   return { trechos, etapas, totalDeDias: dia };
 }
 
@@ -235,7 +255,18 @@ interface PernaDividida {
   trechos: TrechoParaAgenda[];
 }
 
-async function dividirPerna(numero: number, de: Municipio, para: Municipio, entrada: EntradaDaViagem): Promise<PernaDividida> {
+/** Compartilhado entre as pernas: depois de uma falha do Overpass, não se tenta de novo nesta viagem. */
+interface EstadoDoOverpass {
+  falhou: boolean;
+}
+
+async function dividirPerna(
+  numero: number,
+  de: Municipio,
+  para: Municipio,
+  entrada: EntradaDaViagem,
+  overpass: EstadoDoOverpass,
+): Promise<PernaDividida> {
   let rota: Rota;
 
   try {
@@ -260,7 +291,10 @@ async function dividirPerna(numero: number, de: Municipio, para: Municipio, entr
 
   for (let rodada = 0; rodada < RODADAS_DE_RESUMO && divisao.semResumo.length > 0; rodada += 1) {
     const pedidos = divisao.semResumo;
-    const resumos = await resumirCidades(pedidos);
+    // Com o Overpass fora do ar, as cidades ficam sem contagem (só pela distância) sem nova espera.
+    const resumos = overpass.falhou ? new Map<number, null>() : await resumirCidades(pedidos);
+
+    if (pedidos.some((codigo) => !resumos.get(codigo))) overpass.falhou = true;
 
     for (const c of candidatos) {
       if (pedidos.includes(c.codigoIbge)) c.resumo = resumos.get(c.codigoIbge) ?? null;
@@ -349,16 +383,33 @@ async function planejarTrechos(d: PernaDividida, naAgenda: TrechoNaAgenda[], res
 
 /** Planeja as pernas de carro e devolve, além delas, as etapas no formato do gerador de roteiro. */
 export async function planejarViagemDeCarro(entrada: EntradaDaViagem): Promise<PlanoDaViagem> {
-  const [primeira] = entrada.etapas;
-  const divididas: PernaDividida[] = [];
+  const { etapas, origem } = entrada;
+  // Perna i chega à etapa i (a 0 sai de casa); com volta, a perna depois da última volta para casa.
+  const pontas: { de: Municipio; para: Municipio }[] = etapas.map((para, i) => ({ de: i === 0 ? origem : etapas[i - 1], para }));
 
-  if (primeira && primeira.codigoIbge !== entrada.origem.codigoIbge) {
-    divididas.push(await dividirPerna(0, entrada.origem, primeira, entrada));
+  if (entrada.comVolta && etapas.length > 0) {
+    pontas.push({ de: etapas[etapas.length - 1], para: origem });
+  }
+
+  const overpass: EstadoDoOverpass = { falhou: false };
+  const divididas: PernaDividida[] = [];
+  const pernasDaAgenda: (PernaParaAgenda | null)[] = [];
+
+  for (const [numero, { de, para }] of pontas.entries()) {
+    if (de.codigoIbge === para.codigoIbge) {
+      pernasDaAgenda.push(null);
+      continue;
+    }
+
+    const dividida = await dividirPerna(numero, de, para, entrada, overpass);
+
+    divididas.push(dividida);
+    pernasDaAgenda.push({ trechos: dividida.trechos, terminaEmCasa: numero === etapas.length });
   }
 
   const agenda = montarAgenda(
-    [divididas[0] ? { trechos: divididas[0].trechos, terminaEmCasa: false } : null],
-    entrada.etapas.map((e) => e.dias),
+    pernasDaAgenda,
+    etapas.map((e) => e.dias),
     entrada.horasDisponiveis,
   );
 
@@ -371,8 +422,8 @@ export async function planejarViagemDeCarro(entrada: EntradaDaViagem): Promise<P
   const resumos = new Map<number, ResumoOsm>();
   const pernas: PernaPlanejada[] = [];
 
-  for (const [indice, d] of divididas.entries()) {
-    const trechos = await planejarTrechos(d, agenda.trechos[indice], resumos);
+  for (const d of divididas) {
+    const trechos = await planejarTrechos(d, agenda.trechos[d.numero], resumos);
     const decisao = d.divisao.decisao;
 
     pernas.push({
@@ -398,7 +449,7 @@ export async function planejarViagemDeCarro(entrada: EntradaDaViagem): Promise<P
     if (chegada === undefined) return undefined;
     if (chegada === null) return null;
 
-    const trecho = pernas[indice]?.trechos.find((t) => t.noite === null && !t.ocupaODia);
+    const trecho = pernas.find((p) => p.perna === indice)?.trechos.find((t) => t.noite === null && !t.ocupaODia);
 
     return trecho ? { de: trecho.de, metros: trecho.metros, minutos: Math.round(trecho.segundos / 60) } : null;
   };
