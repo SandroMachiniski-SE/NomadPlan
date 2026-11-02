@@ -15,11 +15,12 @@ async function cadastrarEmJoinville(page: Page) {
   await expect(page.getByText("Perfil atualizado com sucesso.")).toBeVisible();
 }
 
-async function gerarDeCarro(page: Page, cidade: string, dias: number) {
+async function gerarDeCarro(page: Page, cidade: string, dias: number, { comVolta = false } = {}) {
   await page.goto("/roteiros/gerar");
   await page.getByLabel("Cidade *").fill(cidade);
   await page.getByLabel("Dias", { exact: true }).fill(String(dias));
   await page.getByLabel("Vou de carro saindo de casa").check();
+  if (comVolta) await page.getByLabel("Planejar a volta").check();
   await expect(page.getByRole("textbox", { name: "Saindo de" })).toHaveValue("Joinville, SC");
   await page.getByRole("button", { name: "Gerar roteiro" }).click();
 }
@@ -121,5 +122,19 @@ test.describe("viagem de carro", () => {
 
     await expect(page.getByLabel(/^Esticar e chegar hoje/)).toBeChecked();
     await expect(page.getByLabel(/^Dormir no caminho e chegar amanhã/)).not.toBeChecked();
+  });
+
+  test("viagem com volta mostra a estrada de volta e chega em casa", async ({ page }) => {
+    await cadastrarEmJoinville(page);
+    await gerarDeCarro(page, "Brasília", 2, { comVolta: true });
+
+    await expect(cabecalhoDoDia1(page)).toBeVisible();
+    // Ida nos dias 1 a 3, Brasília nos dias 4 e 5, volta do 6 ao 8 terminando em casa.
+    await expect(page.getByRole("heading", { name: /^Dia 6 · Estrada · Brasília\/DF →/ })).toBeVisible();
+    await expect(page.getByRole("heading", { name: /^Dia 8 · Estrada · .+ → Joinville\/SC/ })).toBeVisible();
+
+    await page.getByRole("button", { name: "Salvar como meu roteiro" }).click();
+    await expect(page).toHaveURL(/\/roteiros\/\d+$/);
+    await expect(page.locator(".dia__viagem--estrada", { hasText: /→ Joinville\/SC/ })).toBeVisible();
   });
 });

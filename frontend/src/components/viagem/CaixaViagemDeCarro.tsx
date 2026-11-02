@@ -51,6 +51,11 @@ function CaixaViagemDeCarro({ valor, aoMudar }: CaixaViagemDeCarroProps) {
               <span className="field__hint">O dia termina no limite que chegar primeiro.</span>
             </label>
           </div>
+
+          <label className="checkbox">
+            <input type="checkbox" checked={valor.comVolta} onChange={(e) => mudar({ comVolta: e.target.checked })} />
+            <span>Planejar a volta</span>
+          </label>
         </div>
       )}
     </fieldset>
