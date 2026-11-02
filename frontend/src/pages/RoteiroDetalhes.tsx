@@ -828,6 +828,8 @@ function RoteiroDetalhes() {
                 const cidades = cidadesDoDia(grupo.itens);
                 const viagem = roteiro?.viagensEntreDias?.find((v) => v.dia === grupo.dia && !v.noFimDoDia);
                 const volta = roteiro?.viagensEntreDias?.find((v) => v.dia === grupo.dia && v.noFimDoDia);
+                const trechoDoDia = (noFim: boolean) =>
+                  roteiro?.trechosDeEstrada?.find((t) => t.dia === grupo.dia && t.noFimDoDia === noFim);
 
                 return (
                   <div
@@ -882,7 +884,14 @@ function RoteiroDetalhes() {
                     )}
 
                     {viagem?.estrada ? (
-                      <TrechoNaEstrada de={viagem.de} para={viagem.para} metros={viagem.metros} segundos={viagem.minutos * 60} />
+                      <TrechoNaEstrada
+                        de={viagem.de}
+                        para={viagem.para}
+                        metros={viagem.metros}
+                        segundos={viagem.minutos * 60}
+                        litros={trechoDoDia(false)?.litros}
+                        custoCentavos={trechoDoDia(false)?.custoCentavos}
+                      />
                     ) : (
                       viagem && (
                         <p className="dia__viagem">
@@ -1024,7 +1033,15 @@ function RoteiroDetalhes() {
                     )}
 
                     {volta && (
-                      <TrechoNaEstrada de={volta.de} para={volta.para} metros={volta.metros} segundos={volta.minutos * 60} noDia="volta" />
+                      <TrechoNaEstrada
+                        de={volta.de}
+                        para={volta.para}
+                        metros={volta.metros}
+                        segundos={volta.minutos * 60}
+                        litros={trechoDoDia(true)?.litros}
+                        custoCentavos={trechoDoDia(true)?.custoCentavos}
+                        noDia="volta"
+                      />
                     )}
                     </div>
                   </div>

@@ -62,6 +62,8 @@ export interface ResumoOrcamentoRoteiro {
   /** Quanto ainda cabe no teto (negativo se estourou). */
   restanteCentavos: number | null;
   paradasSemCusto: number;
+  /** Parte do total que é combustível da viagem de carro. */
+  combustivelCentavos?: number;
 }
 
 export interface ResumoOtimizacao {

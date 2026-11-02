@@ -1,5 +1,5 @@
 import CampoMinhaCidade from "../CampoMinhaCidade";
-import type { OpcoesViagemDeCarro } from "../../utils/viagem";
+import { lerNumero, type OpcoesViagemDeCarro } from "../../utils/viagem";
 
 interface CaixaViagemDeCarroProps {
   valor: OpcoesViagemDeCarro;
@@ -9,6 +9,7 @@ interface CaixaViagemDeCarroProps {
 /** "Vou de carro saindo de casa": de onde sai e quanto dirigir por dia. */
 function CaixaViagemDeCarro({ valor, aoMudar }: CaixaViagemDeCarroProps) {
   const mudar = (mudanca: Partial<OpcoesViagemDeCarro>) => aoMudar({ ...valor, ...mudanca });
+  const semCombustivel = lerNumero(valor.consumo) === null || lerNumero(valor.preco) === null;
 
   return (
     <fieldset className="field viagem-carro">
@@ -51,6 +52,37 @@ function CaixaViagemDeCarro({ valor, aoMudar }: CaixaViagemDeCarroProps) {
               <span className="field__hint">O dia termina no limite que chegar primeiro.</span>
             </label>
           </div>
+
+          <div className="form-grid">
+            <label className="field">
+              <span>Consumo do carro (km/l)</span>
+              <input
+                type="text"
+                inputMode="decimal"
+                maxLength={5}
+                value={valor.consumo}
+                onChange={(e) => mudar({ consumo: e.target.value })}
+                placeholder="ex.: 12"
+              />
+              <span className="field__hint">Vem do seu Perfil; dá para mudar só nesta viagem.</span>
+            </label>
+
+            <label className="field">
+              <span>Preço do litro (R$)</span>
+              <input
+                type="text"
+                inputMode="decimal"
+                maxLength={6}
+                value={valor.preco}
+                onChange={(e) => mudar({ preco: e.target.value })}
+                placeholder="ex.: 6,29"
+              />
+            </label>
+          </div>
+
+          {semCombustivel && (
+            <p className="field__hint">Informe o consumo e o preço do litro para estimar o combustível.</p>
+          )}
 
           <label className="checkbox">
             <input type="checkbox" checked={valor.comVolta} onChange={(e) => mudar({ comVolta: e.target.checked })} />

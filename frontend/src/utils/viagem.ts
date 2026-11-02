@@ -1,4 +1,5 @@
 import type { MunicipioEscolhido } from "../services/cidades";
+import { formatarMoeda } from "./formatar";
 import type { DiaDoRoteiroGerado, RespostaRecomendacao } from "../types/roteiro";
 import type {
   DecisaoDaPerna,
@@ -113,6 +114,32 @@ export function formatarDirecao(segundos: number): string {
 }
 
 export const formatarKm = (metros: number) => `${Math.round(metros / 1000).toLocaleString("pt-BR")} km`;
+
+/** " · ~41,8 l · ~R$ 262,92" quando há estimativa de combustível; vazio sem ela. */
+export function formatarCombustivel(litros: number | null | undefined, custoCentavos: number | null | undefined): string {
+  if (litros == null || custoCentavos == null) return "";
+
+  return ` · ~${litros.toLocaleString("pt-BR", { maximumFractionDigits: 1 })} l · ~${formatarMoeda(custoCentavos)}`;
+}
+
+const CHAVE_DO_PRECO = "nomadplan.precoDoLitro";
+
+/** Último preço do litro usado neste navegador (vazio se não houver ou se o armazenamento falhar). */
+export function precoLembrado(): string {
+  try {
+    return localStorage.getItem(CHAVE_DO_PRECO) ?? "";
+  } catch {
+    return "";
+  }
+}
+
+export function lembrarPreco(preco: string): void {
+  try {
+    if (preco.trim()) localStorage.setItem(CHAVE_DO_PRECO, preco.trim());
+  } catch {
+    // Sem armazenamento (navegação privada): só não lembra na próxima vez.
+  }
+}
 
 /** A estrada de cada dia para o mapa do roteiro salvo, com o pernoite no fim das noites de estrada. */
 export function estradasNoMapa(trechos: TrechoDeEstrada[] | undefined) {

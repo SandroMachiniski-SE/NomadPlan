@@ -137,4 +137,28 @@ test.describe("viagem de carro", () => {
     await expect(page).toHaveURL(/\/roteiros\/\d+$/);
     await expect(page.locator(".dia__viagem--estrada", { hasText: /→ Joinville\/SC/ })).toBeVisible();
   });
+
+  test("combustível: pede consumo e preço, estima a viagem e entra no orçamento do roteiro", async ({ page }) => {
+    await cadastrarEmJoinville(page);
+    await page.goto("/perfil");
+    await page.getByLabel("Consumo do meu carro (km/l)").fill("12");
+    await page.getByRole("button", { name: "Salvar alterações" }).click();
+    await expect(page.getByText("Perfil atualizado com sucesso.")).toBeVisible();
+
+    await page.goto("/roteiros/gerar");
+    await page.getByLabel("Cidade *").fill("Brasília");
+    await page.getByLabel("Vou de carro saindo de casa").check();
+    await expect(page.getByLabel("Consumo do carro (km/l)")).toHaveValue("12");
+    await expect(page.getByText("Informe o consumo e o preço do litro para estimar o combustível")).toBeVisible();
+
+    await page.getByLabel("Preço do litro (R$)").fill("6,29");
+    await page.getByRole("button", { name: "Gerar roteiro" }).click();
+
+    await expect(page.getByText(/^Combustível estimado: 1\.501 km · ~[\d.,]+ l · ~R\$/)).toBeVisible();
+    await expect(cabecalhoDoDia1(page)).toContainText(/ l · ~R\$/);
+
+    await page.getByRole("button", { name: "Salvar como meu roteiro" }).click();
+    await expect(page).toHaveURL(/\/roteiros\/\d+$/);
+    await expect(page.locator("#titulo-orcamento").locator("..").getByText("Combustível")).toBeVisible();
+  });
 });

@@ -19,14 +19,17 @@ import type { DecisaoDaPerna, EscolhaDaNoite } from "../types/viagem";
 import {
   chaveDaNoite,
   diasDaViagem,
+  formatarCombustivel,
   formatarDirecao,
   formatarKm,
+  lembrarPreco,
   lerNumero,
   noitesParaSalvar,
   pedidoDaViagem,
+  precoLembrado,
   type OpcoesViagemDeCarro,
 } from "../utils/viagem";
-import { formatarDistancia, formatarDuracao, formatarHora } from "../utils/formatar";
+import { formatarDistancia, formatarDuracao, formatarHora, formatarMoeda } from "../utils/formatar";
 import { corDoDia } from "../utils/roteiro";
 
 // Uma parte da viagem: a cidade e quantos dias ficar nela ("Joinville, 2 dias"). O código IBGE
@@ -62,7 +65,7 @@ function GerarRoteiro() {
     horasPorDia: "",
     comVolta: false,
     consumo: usuario?.consumoKmPorLitro != null ? String(usuario.consumoKmPorLitro).replace(".", ",") : "",
-    preco: "",
+    preco: precoLembrado(),
   });
   // Trocas de pernoite e decisões de chegada feitas sobre o resultado (refazem a geração).
   const [escolhas, setEscolhas] = useState<EscolhaDaNoite[]>([]);
@@ -404,7 +407,13 @@ function GerarRoteiro() {
           />
         )}
 
-        <CaixaViagemDeCarro valor={viagem} aoMudar={setViagem} />
+        <CaixaViagemDeCarro
+          valor={viagem}
+          aoMudar={(opcoes) => {
+            setViagem(opcoes);
+            lembrarPreco(opcoes.preco);
+          }}
+        />
 
         <div className="form-grid">
           <label className="field">
@@ -503,6 +512,15 @@ function GerarRoteiro() {
             </div>
           )}
 
+          {planejada?.combustivel && (
+            <p className="alert alert--info" role="status">
+              <Icone nome="dinheiro" />
+              Combustível estimado: {formatarKm(planejada.pernas.reduce((soma, p) => soma + p.metros, 0))} · ~
+              {planejada.combustivel.litros.toLocaleString("pt-BR", { maximumFractionDigits: 1 })} l · ~
+              {formatarMoeda(planejada.combustivel.custoCentavos)}
+            </p>
+          )}
+
           {planejada && planejada.pernas.length > 0 && (
             <div className="viagem-carro__mapa">
               <MapaRoteiroCarregavel paradas={paradasNoMapa} estradas={estradas} altura={360} />
@@ -531,6 +549,7 @@ function GerarRoteiro() {
                         <span className="dia__estrada">
                           {daEstrada.trecho.de} → {daEstrada.trecho.para} · {formatarKm(daEstrada.trecho.metros)} ·{" "}
                           {formatarDirecao(daEstrada.trecho.segundos)}
+                          {formatarCombustivel(daEstrada.trecho.litros, daEstrada.trecho.custoCentavos)}
                         </span>
                       </h3>
                       <p className="muted small">Tempo de direção, sem paradas.</p>
@@ -562,6 +581,8 @@ function GerarRoteiro() {
                       para={chegada.trecho.para}
                       metros={chegada.trecho.metros}
                       segundos={chegada.trecho.segundos}
+                      litros={chegada.trecho.litros}
+                      custoCentavos={chegada.trecho.custoCentavos}
                       noDia="chegada"
                     />
                   )}
@@ -640,6 +661,8 @@ function GerarRoteiro() {
                       para={volta.trecho.para}
                       metros={volta.trecho.metros}
                       segundos={volta.trecho.segundos}
+                      litros={volta.trecho.litros}
+                      custoCentavos={volta.trecho.custoCentavos}
                       noDia="volta"
                     />
                   )}
