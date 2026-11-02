@@ -174,6 +174,10 @@ export interface ViagemEntreDias extends Trecho {
   dia: number;
   de: string;
   para: string;
+  /** Viagem de carro: km e tempo reais da estrada (não a estimativa em linha reta). */
+  estrada?: boolean;
+  /** Volta curta para casa, no fim do dia em vez do começo. */
+  noFimDoDia?: boolean;
 }
 
 /**
@@ -223,4 +227,35 @@ export function comTrechos<T extends { dia: number; ponto: ParadaGeografica | nu
 
     return { ...item, deslocamento: anterior ? trechoEntre(anterior, item.ponto) : null };
   });
+}
+
+/** Trecho de estrada gravado de uma viagem de carro (ver trecho_estrada). */
+export interface TrechoSalvo {
+  dia: number;
+  perna: number;
+  de: string;
+  para: string;
+  metros: number;
+  segundos: number;
+  noFimDoDia: boolean;
+}
+
+/**
+ * Junta às viagens estimadas os trechos de estrada da viagem de carro: no dia que tem trecho, ou
+ * logo depois de um (a estrada já chegou), vale o trecho real; a volta curta entra no fim do dia.
+ */
+export function viagensComEstrada(viagens: ViagemEntreDias[], trechos: TrechoSalvo[]): ViagemEntreDias[] {
+  const diasComEstrada = new Set(trechos.filter((t) => !t.noFimDoDia).map((t) => t.dia));
+  const estimadas = viagens.filter((v) => !diasComEstrada.has(v.dia) && !diasComEstrada.has(v.dia - 1));
+  const daEstrada = trechos.map((t) => ({
+    dia: t.dia,
+    de: t.de,
+    para: t.para,
+    metros: t.metros,
+    minutos: Math.round(t.segundos / 60),
+    estrada: true,
+    ...(t.noFimDoDia ? { noFimDoDia: true } : {}),
+  }));
+
+  return [...estimadas, ...daEstrada].sort((a, b) => a.dia - b.dia || Number(a.noFimDoDia ?? false) - Number(b.noFimDoDia ?? false));
 }

@@ -24,6 +24,8 @@ Banco PostgreSQL 16 com a extensão PostGIS. O esquema é definido em `backend/p
 | `senha_hash` | texto | Hash bcrypt (10 rodadas). Nunca trafega pela API. |
 | `tipo_conta` | `TipoConta` | Papel; padrão `VISITANTE`. |
 | `cidade_base`, `interesses[]` | texto, texto[] | Preferências usadas nas recomendações. |
+| `codigo_municipio_base` | inteiro, FK → `municipio` | Município de casa (saída da viagem de carro). Gravado junto com `cidade_base`. |
+| `consumo_km_por_litro` | decimal(4,1) | Consumo do carro (3 a 40 km/l), para estimar o combustível. |
 | `idioma` | texto | `pt-BR`, `en` ou `es`. |
 | `preferencias_acessibilidade[]` | texto[] | `mobilidade_reduzida`, `deficiencia_visual`, `deficiencia_auditiva`, `banheiro_adaptado`, `estacionamento_reservado`. |
 | `reputacao` | inteiro | +2 por sugestão aprovada, +1 por avaliação aprovada. A partir de 5, as sugestões são aplicadas direto. |
@@ -76,8 +78,20 @@ Histórico de alterações (RF26). `id`, `id_ponto`/`id_roteiro` (FK, cascata), 
 
 ### `roteiro` e `item_roteiro`
 
-`roteiro`: `id`, `nome`, `descricao`, `cidade`, `data_inicio`, `data_fim`, `id_usuario` (FK), `publico`, `slug_publico` (único; link de compartilhamento), `notas` (anotações livres, só do dono), `orcamento_centavos` (teto de gastos), `data_criacao`, `data_atualizacao`.
+`roteiro`: `id`, `nome`, `descricao`, `cidade`, `data_inicio`, `data_fim`, `id_usuario` (FK), `publico`, `slug_publico` (único; link de compartilhamento), `notas` (anotações livres, só do dono), `orcamento_centavos` (teto de gastos), `data_criacao`, `data_atualizacao`. Viagem de carro (nulos sem ela): `viagem_origem` (FK → `municipio`), `km_por_dia`, `horas_por_dia`, `viagem_volta`, `consumo_km_por_litro`, `preco_litro_centavos`.
 `item_roteiro`: `id`, `id_roteiro` (FK, cascata), `id_ponto` (FK, nulo nas atividades livres), `titulo` (nome da atividade livre), `dia` (1 a 30; padrão 1), `ordem` (vale dentro de cada dia), `periodo` (`PeriodoDoDia`), `pernoite` (onde se dorme naquela noite), `observacao`, `custo_centavos` (custo previsto; dinheiro em centavos inteiros), `data_criacao`. Regras no banco: toda parada tem ponto ou título (CHECK); uma pernoite por dia (índice único parcial); como visita, cada ponto entra uma vez por roteiro, mas o mesmo hotel pode ser a pernoite de várias noites (índice único parcial em (`id_roteiro`, `id_ponto`) onde não é pernoite).
+
+### `trecho_estrada`
+
+Um trecho dirigido da viagem de carro de um roteiro salvo: um dia só de estrada ou um trecho curto descontado de um dia na cidade. `id`, `id_roteiro` (FK, cascata), `dia`, `perna` (0 = casa → 1ª cidade), `noite` (nulo no trecho que chega ao fim da perna), `de_nome`, `para_nome` ("Cidade/UF"), `metros`, `segundos`, `ocupa_o_dia`, `no_fim_do_dia` (volta curta), `litros`, `custo_combustivel_centavos`, `tracado` (JSON `[lat, lon][]`, até 400 pontos, só para o mapa). Índice em (`id_roteiro`, `dia`). Fica preso ao número do dia.
+
+### `municipio`
+
+Os 5.571 municípios do IBGE (`npm run municipios:importar`, de `backend/prisma/dados/municipios.json`; fonte: kelvins/municipios-brasileiros, MIT, a partir do IBGE). `codigo_ibge` (PK), `nome`, `nome_normalizado` (sem acento, para a busca), `uf`, `latitude`, `longitude` (sede), `geom` (gerada, GIST), `resumo_osm` (JSON com até 40 hospedagens e 10 atrações a até 8 km da sede, e os totais) e `resumo_em` (o resumo vale 30 dias). Índice comum em (`nome_normalizado`, `uf`).
+
+### `rota_em_cache`
+
+Rotas de carro do OSRM, uma por sentido: `id`, `codigo_origem` e `codigo_destino` (FK → `municipio`; únicos juntos), `metros`, `segundos`, `tracado` (LineString PostGIS simplificada), `perfil` (JSON `[km, segundos]` a cada 5 km) e `buscada_em` (vale 90 dias; vencida é usada se o OSRM falhar).
 
 ### `item_checklist`
 
@@ -111,9 +125,10 @@ usuario 1──* roteiro                                ponto_turistico 1──*
 usuario 1──* ponto_salvo *──1 ponto_turistico       ponto_turistico 1──* solicitacao_verificacao
 usuario 1──* notificacao                            ponto_turistico 1──* versao_ponto
 usuario 1──* log_auditoria                          roteiro 1──* item_roteiro *──1 ponto_turistico
-                                                    roteiro 1──* versao_roteiro
+usuario *──1 municipio (codigo_municipio_base)      roteiro 1──* versao_roteiro
+municipio 1──* rota_em_cache (origem e destino)     roteiro 1──* trecho_estrada
 ```
 
 ## Dados pessoais (LGPD)
 
-Dados pessoais ficam em `usuario` (nome, e-mail, cidade, preferências), em `log_auditoria.detalhes` (endereço IP de tentativas de login) e nas fotos de avaliações. `GET /auth/me/dados` exporta tudo isso; `DELETE /auth/me` anonimiza a conta (a linha é mantida, sem dados pessoais, para preservar o histórico), apaga roteiros, favoritos, notificações e fotos de avaliação, e remove os rascunhos e pontos rejeitados do usuário; os pontos já publicados continuam no inventário, sem responsável. Nome e e-mail são trocados por valores neutros (`Usuário removido`, `removido-<id>@anonimo.invalid`), o 2FA é desligado e a senha vira um hash inutilizável. O endereço IP das tentativas de login falhas é apagado do log.
+Dados pessoais ficam em `usuario` (nome, e-mail, cidade e município de casa, consumo do carro, preferências), em `log_auditoria.detalhes` (endereço IP de tentativas de login) e nas fotos de avaliações. `GET /auth/me/dados` exporta tudo isso; `DELETE /auth/me` anonimiza a conta (a linha é mantida, sem dados pessoais, para preservar o histórico), apaga roteiros, favoritos, notificações e fotos de avaliação, e remove os rascunhos e pontos rejeitados do usuário; os pontos já publicados continuam no inventário, sem responsável. Nome e e-mail são trocados por valores neutros (`Usuário removido`, `removido-<id>@anonimo.invalid`), o 2FA é desligado e a senha vira um hash inutilizável. O endereço IP das tentativas de login falhas é apagado do log.

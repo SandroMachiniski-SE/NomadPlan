@@ -4,7 +4,8 @@ import { extrairMensagemErro } from "../utils/erro";
 import { CATEGORIAS_PONTOS, iconeDaCategoria } from "../constants/categorias";
 import type { Idioma, PreferenciaAcessibilidade } from "../types/usuario";
 import Icone from "../components/Icone";
-import SugestoesDeCidade from "../components/SugestoesDeCidade";
+import CampoMinhaCidade from "../components/CampoMinhaCidade";
+import type { MunicipioEscolhido } from "../services/cidades";
 import SecaoMfa from "../components/perfil/SecaoMfa";
 import SecaoPrivacidade from "../components/perfil/SecaoPrivacidade";
 
@@ -35,7 +36,11 @@ function Perfil() {
   const { usuario, atualizarPerfil } = useAuth();
 
   const [nome, setNome] = useState(usuario?.nome ?? "");
-  const [cidadeBase, setCidadeBase] = useState(usuario?.cidadeBase ?? "");
+  const [municipio, setMunicipio] = useState<MunicipioEscolhido | null>(usuario?.municipioBase ?? null);
+  const [municipioMudou, setMunicipioMudou] = useState(false);
+  const [consumo, setConsumo] = useState(
+    usuario?.consumoKmPorLitro != null ? String(usuario.consumoKmPorLitro).replace(".", ",") : "",
+  );
   const [interesses, setInteresses] = useState<string[]>(usuario?.interesses ?? []);
   const [idioma, setIdioma] = useState<Idioma>(usuario?.idioma ?? "pt-BR");
   const [acessibilidade, setAcessibilidade] = useState<PreferenciaAcessibilidade[]>(
@@ -71,12 +76,21 @@ function Perfil() {
       return;
     }
 
+    const consumoKmPorLitro = consumo.trim() ? Number(consumo.trim().replace(",", ".")) : null;
+
+    if (consumoKmPorLitro !== null && !(consumoKmPorLitro >= 3 && consumoKmPorLitro <= 40)) {
+      setErro("Informe o consumo do carro em km/l, entre 3 e 40.");
+      return;
+    }
+
     try {
       setSalvando(true);
 
       await atualizarPerfil({
         nome: nome.trim(),
-        cidadeBase: cidadeBase.trim() || null,
+        // Só manda o município quando ele mudou: quem tem só a cidade digitada antes não a perde.
+        ...(municipioMudou ? { codigoMunicipioBase: municipio?.codigoIbge ?? null } : {}),
+        consumoKmPorLitro,
         interesses,
         idioma,
         preferenciasAcessibilidade: acessibilidade,
@@ -132,16 +146,33 @@ function Perfil() {
             />
           </label>
 
+          <CampoMinhaCidade
+            rotulo="Onde você mora"
+            valor={municipio}
+            aoMudar={(m) => {
+              setMunicipio(m);
+              setMunicipioMudou(true);
+            }}
+            dica={
+              !municipio && usuario.cidadeBase
+                ? `Cidade informada antes: ${usuario.cidadeBase}. Escolha o município para usar na viagem de carro.`
+                : null
+            }
+          />
+
           <label className="field">
-            <span>Cidade base</span>
+            <span>
+              Consumo do meu carro (km/l) <span className="field__optional">(opcional)</span>
+            </span>
             <input
               type="text"
-              maxLength={120}
-              value={cidadeBase}
-              onChange={(e) => setCidadeBase(e.target.value)}
-              list="cidades-do-perfil"
+              inputMode="decimal"
+              maxLength={5}
+              value={consumo}
+              onChange={(e) => setConsumo(e.target.value)}
+              placeholder="ex.: 12"
             />
-            <SugestoesDeCidade id="cidades-do-perfil" />
+            <span className="field__hint">Usado para estimar o combustível da viagem de carro.</span>
           </label>
 
           <label className="field">

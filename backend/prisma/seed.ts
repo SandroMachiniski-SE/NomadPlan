@@ -7,6 +7,7 @@ import { importarPontosOsm } from "../src/lib/importacaoOsm";
 import { importarOverture, lerDadosOverture } from "../src/lib/importacaoOverture";
 import { aplicarCuradoria, lerCuradoria } from "../src/lib/curadoria";
 import { criarRoteiroDeExemplo } from "../src/lib/roteiroExemplo";
+import { importarMunicipios, lerMunicipios } from "../src/lib/municipios";
 
 const SENHA_DEMONSTRACAO = "senha-temporaria";
 
@@ -15,6 +16,9 @@ async function main() {
   if (process.env.NODE_ENV === "production") {
     throw new Error("O seed cria contas de demonstração com senha conhecida e não deve rodar em produção.");
   }
+
+  // Municípios do IBGE (prisma/dados/municipios.json), antes de tudo: contas e roteiros podem apontar para eles.
+  const municipios = await importarMunicipios(lerMunicipios());
 
   const usuario = await prisma.usuario.upsert({
     where: {
@@ -46,6 +50,7 @@ async function main() {
   await criarRoteiroDeExemplo(morador.id);
 
   console.log("Dados iniciais inseridos com sucesso.");
+  console.log(`Municípios do IBGE: ${municipios}.`);
   console.log(
     `Pontos do OpenStreetMap (${cidades.map((c) => c.cidade).join(", ")}): ${resumo.criados} novos, ` +
       `${resumo.complementados + resumo.vinculados + resumo.semMudanca} já existiam.`,

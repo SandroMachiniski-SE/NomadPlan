@@ -13,8 +13,8 @@ import Icone from "./Icone";
 
 interface EscolherCidadeProps {
   textoInicial?: string;
-  /** Chamada quando a cidade escolhida já tem dados e pode ser buscada. */
-  aoEscolher: (cidade: string) => void;
+  /** Chamada quando a cidade escolhida já tem dados e pode ser buscada (com o município da busca). */
+  aoEscolher: (cidade: string, municipio?: CidadeDaBusca) => void;
   aoFechar: () => void;
   /** Texto do botão das cidades que já têm dados. */
   rotuloDeEscolha?: string;
@@ -100,7 +100,7 @@ function EscolherCidade({ textoInicial = "", aoEscolher, aoFechar, rotuloDeEscol
         setPreparando({ cidade, preparo });
 
         if (preparo.estado === "pronta") {
-          aoEscolherRef.current(cidade.cidade);
+          aoEscolherRef.current(cidade.cidade, cidade);
         }
       } catch (err) {
         setPreparando({ cidade, preparo: { estado: "erro", erro: extrairMensagemErro(err, "Perdemos o contato com o servidor.") } });
@@ -114,7 +114,7 @@ function EscolherCidade({ textoInicial = "", aoEscolher, aoFechar, rotuloDeEscol
     setErro(null);
 
     if (cidade.disponivel) {
-      aoEscolher(cidade.cidade);
+      aoEscolher(cidade.cidade, cidade);
       return;
     }
 
@@ -124,7 +124,7 @@ function EscolherCidade({ textoInicial = "", aoEscolher, aoFechar, rotuloDeEscol
       setPreparando({ cidade, preparo });
 
       if (preparo.estado === "pronta") {
-        aoEscolher(cidade.cidade);
+        aoEscolher(cidade.cidade, cidade);
       }
     } catch (err) {
       setErro(extrairMensagemErro(err, "Não foi possível preparar esta cidade agora."));

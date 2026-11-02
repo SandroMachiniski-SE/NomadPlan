@@ -1,3 +1,5 @@
+import type { MunicipioEscolhido } from "../services/cidades";
+
 export type TipoConta =
   | "VISITANTE"
   | "MORADOR"
@@ -21,6 +23,10 @@ export interface Usuario {
   email: string;
   tipoConta: TipoConta;
   cidadeBase: string | null;
+  /** Município de casa (IBGE), usado como saída da viagem de carro. */
+  municipioBase: MunicipioEscolhido | null;
+  /** Consumo do carro da pessoa, para estimar o combustível. */
+  consumoKmPorLitro: number | null;
   interesses: string[];
   idioma: Idioma;
   preferenciasAcessibilidade: PreferenciaAcessibilidade[];

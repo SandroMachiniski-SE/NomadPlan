@@ -42,6 +42,10 @@ export default defineConfig({
         RATE_LIMIT_OFF: "1",
         METRICAS_INTERVALO_MS: "500",
         SMTP_HOST: "",
+        // Nenhum teste vai à internet: sem o Nominatim, a busca de cidades usa os municípios do banco.
+        NOMINATIM_URL: "http://127.0.0.1:9/search",
+        // Rotas só do cache gravado pelo e2e:preparar: uma rota fora dele falha em vez de ir à internet.
+        OSRM_URL: "http://127.0.0.1:9",
       },
     },
     {

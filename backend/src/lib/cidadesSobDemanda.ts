@@ -50,7 +50,11 @@ export function consultarPreparo(cidade: string, uf: string): PreparoDeCidade | 
   return preparos.get(chaveDe(cidade, uf));
 }
 
-/** Quantos pontos publicados a cidade tem perto do centro informado (separa cidades de mesmo nome em estados diferentes). */
+/**
+ * Quantos pontos publicados a cidade tem perto do centro informado (separa cidades de mesmo nome
+ * em estados diferentes). Hospedagens não contam: as das cidades de pernoite da viagem de carro
+ * entram no catálogo e não fazem a cidade estar "pronta" para um roteiro.
+ */
 export async function pontosDaCidade(cidade: string, latitude: number, longitude: number): Promise<number> {
   const nomes = await variantesDaCidade(cidade);
 
@@ -62,6 +66,7 @@ export async function pontosDaCidade(cidade: string, latitude: number, longitude
     SELECT COUNT(*)::bigint AS total
     FROM ponto_turistico p
     WHERE p.status = 'PUBLICADO'
+      AND p.categoria <> 'Hospedagem'
       AND p.cidade IN (${Prisma.join(nomes)})
       AND p.geom IS NOT NULL
       AND ST_DWithin(p.geom, ST_SetSRID(ST_MakePoint(${longitude}, ${latitude}), 4326)::geography, ${RAIO_DA_CIDADE_METROS})

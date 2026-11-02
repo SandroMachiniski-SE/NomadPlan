@@ -6,6 +6,7 @@ export interface DadosRegistro {
   email: string;
   senha: string;
   cidadeBase?: string;
+  codigoMunicipioBase?: number;
   tipoConta?: Extract<TipoConta, "VISITANTE" | "MORADOR" | "NEGOCIO" | "GESTOR">;
   aceitouPolitica: boolean;
 }
@@ -13,6 +14,8 @@ export interface DadosRegistro {
 export interface DadosPerfil {
   nome?: string;
   cidadeBase?: string | null;
+  codigoMunicipioBase?: number | null;
+  consumoKmPorLitro?: number | null;
   interesses?: string[];
   idioma?: Idioma;
   preferenciasAcessibilidade?: PreferenciaAcessibilidade[];

@@ -4,6 +4,7 @@ import { autenticar } from "../middleware/auth";
 import { limiteBuscaCidade, limitePrepararCidade } from "../middleware/rateLimit";
 import { cidadesComPontos, normalizarCidade } from "../lib/cidades";
 import { buscarCidadesNoBrasil, UFS, type CidadeEncontrada } from "../lib/geocodificacao";
+import { buscarMunicipiosPorNome, municipioMaisProximo, procurarMunicipio } from "../lib/municipios";
 import {
   consultarPreparo,
   PONTOS_PARA_CIDADE_PRONTA,
@@ -29,6 +30,14 @@ const prepararSchema = z.object({
   longitude: z.coerce.number().min(-74).max(-28),
 });
 
+const pertoSchema = z.object({
+  latitude: z.number().min(-90).max(90),
+  longitude: z.number().min(-180).max(180),
+});
+
+// Mais longe que isso da sede mais próxima, a pessoa não está no Brasil (ou está no mar).
+const DISTANCIA_MAXIMA_DA_SEDE_KM = 50;
+
 const consultaSchema = z.object({
   cidade: z.string().trim().min(2).max(80),
   uf: z.enum(UFS),
@@ -52,23 +61,26 @@ cidadesRouter.get("/buscar", limiteBuscaCidade, async (req: Request, res: Respon
 
     const texto = consulta.data.q;
     const alvo = normalizarCidade(texto);
-    let encontradas: CidadeEncontrada[] = [];
+    let encontradas: (CidadeEncontrada & { codigoIbge?: number })[] = [];
     let semServidorDeMapas = false;
 
     try {
       encontradas = await buscarCidadesNoBrasil(texto);
     } catch (erro) {
-      // Sem o serviço de busca, ainda dá para escolher entre as cidades que já têm dados.
+      // Sem o serviço de busca, os municípios do IBGE no banco (e as cidades que já têm dados).
       console.error("Erro ao buscar cidades:", erro);
       semServidorDeMapas = true;
+      encontradas = await buscarMunicipiosPorNome(texto);
     }
 
     const dados = await Promise.all(
       encontradas.map(async (c) => {
         const pontos = await pontosDaCidade(c.cidade, c.latitude, c.longitude);
+        const codigoIbge = c.codigoIbge ?? (await procurarMunicipio(`${c.cidade}/${c.uf}`))[0]?.codigoIbge ?? null;
 
         return {
           ...c,
+          codigoIbge,
           pontos,
           disponivel: pontos >= PONTOS_PARA_CIDADE_PRONTA,
           preparo: resumoDoPreparo(consultarPreparo(c.cidade, c.uf)),
@@ -85,6 +97,7 @@ cidadesRouter.get("/buscar", limiteBuscaCidade, async (req: Request, res: Respon
         uf: null,
         latitude: null,
         longitude: null,
+        codigoIbge: null,
         pontos: c.pontos,
         disponivel: true,
         preparo: null,
@@ -95,6 +108,33 @@ cidadesRouter.get("/buscar", limiteBuscaCidade, async (req: Request, res: Respon
     console.error("Erro ao buscar cidades:", error);
 
     return res.status(500).json({ erro: "Erro interno ao buscar cidades." });
+  }
+});
+
+// Município de quem usa o GPS: a sede mais próxima das coordenadas. É POST para que as
+// coordenadas não apareçam na URL (e no log de acesso); elas não são gravadas.
+cidadesRouter.post("/perto", limiteBuscaCidade, async (req: Request, res: Response) => {
+  try {
+    const pedido = pertoSchema.safeParse(req.body);
+
+    if (!pedido.success) {
+      return res.status(400).json({ erro: "Coordenadas inválidas." });
+    }
+
+    const municipio = await municipioMaisProximo(pedido.data.latitude, pedido.data.longitude);
+
+    if (!municipio || municipio.distanciaKm > DISTANCIA_MAXIMA_DA_SEDE_KM) {
+      return res.status(404).json({ erro: "Não encontramos um município do Brasil perto de você." });
+    }
+
+    const { distanciaKm: _distancia, ...dados } = municipio;
+
+    return res.json(dados);
+  } catch {
+    // Sem o erro no log: ele pode carregar as coordenadas da consulta.
+    console.error("Erro ao procurar o município mais próximo.");
+
+    return res.status(500).json({ erro: "Erro interno ao procurar a sua cidade." });
   }
 });
 

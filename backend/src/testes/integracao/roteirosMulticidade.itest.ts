@@ -3,6 +3,7 @@ import { after, before, beforeEach, describe, it } from "node:test";
 import assert from "node:assert/strict";
 import prisma from "../../lib/prisma";
 import { criarRoteiroDeExemplo, DIAS_DO_EXEMPLO } from "../../lib/roteiroExemplo";
+import { gerarRoteiroSugerido, type EtapaDoRoteiro } from "../../lib/recomendacao";
 import { criarCliente, criarPonto, criarUsuario, iniciarServidor, limparBanco, type ServidorDeTeste } from "../suporte";
 
 // Segunda-feira 10h (local) fixa, para o resultado não depender de quando o teste roda.
@@ -173,5 +174,67 @@ describe("roteiro como caderno de viagem: atividades, pernoites e várias cidade
     const noitesNoHotel = roteiro.itens.filter((i) => i.pernoite && i.idPonto !== null);
     assert.deepEqual(noitesNoHotel.map((i) => i.dia).sort(), [1, 2, 3]);
     assert.ok(roteiro.itens.some((i) => i.idPonto === null && i.titulo === "Trekking até a Pedra Furada"));
+  });
+});
+
+describe("gerador com os dias da viagem de carro", () => {
+  const INICIO = new Date(2026, 9, 26, 9, 0, 0);
+  const HORA_MS = 60 * 60 * 1000;
+
+  beforeEach(async () => {
+    await limparBanco();
+
+    for (let i = 0; i < 8; i += 1) {
+      await criarPonto({ nome: `Joinville ${i}`, cidade: "Joinville", latitude: -26.3 - i * 0.002, longitude: -48.85 });
+    }
+
+    for (let i = 0; i < 6; i += 1) {
+      await criarPonto({ nome: `Blumenau ${i}`, cidade: "Blumenau", latitude: -26.92 - i * 0.002, longitude: -49.07 });
+    }
+  });
+
+  const gerar = (etapas: EtapaDoRoteiro[], horasDisponiveis = 6) =>
+    gerarRoteiroSugerido({ cidade: etapas[0].cidade, etapas, horasDisponiveis, interesses: [], dataHoraInicio: INICIO });
+
+  it("etapa com primeiroDia pula os números dos dias de estrada", async () => {
+    const r = await gerar([{ cidade: "Joinville", dias: 2, primeiroDia: 4 }]);
+
+    assert.deepEqual(
+      r.dias.map((d) => d.dia),
+      [4, 5],
+    );
+    assert.ok(r.pontos.length > 0 && r.pontos.every((p) => p.dia === 4 || p.dia === 5));
+    assert.equal(new Date(r.dias[0].inicio).getTime(), INICIO.getTime() + 3 * 24 * HORA_MS);
+  });
+
+  it("chegada real é descontada do 1º dia no lugar da linha reta", async () => {
+    const chegada = { de: "Joinville/SC", metros: 180_000, minutos: 135 };
+
+    const r = await gerar([
+      { cidade: "Joinville", dias: 1 },
+      { cidade: "Blumenau", dias: 1, chegada },
+    ]);
+
+    assert.deepEqual(r.dias[1].viagem, chegada);
+    assert.equal(new Date(r.dias[1].inicio).getTime(), INICIO.getTime() + 24 * HORA_MS + 135 * 60 * 1000);
+  });
+
+  it("chegada null não desconta nada mesmo trocando de cidade", async () => {
+    const r = await gerar([
+      { cidade: "Joinville", dias: 1 },
+      { cidade: "Blumenau", dias: 1, chegada: null },
+    ]);
+
+    assert.equal(r.dias[1].viagem, null);
+    assert.equal(new Date(r.dias[1].inicio).getTime(), INICIO.getTime() + 24 * HORA_MS);
+  });
+
+  it("minutosNoFimDoUltimoDia reduz as horas do último dia", async () => {
+    const sem = await gerar([{ cidade: "Joinville", dias: 1 }]);
+    const com = await gerar([{ cidade: "Joinville", dias: 1, minutosNoFimDoUltimoDia: 240 }]);
+
+    // 6 h de passeio menos 4 h de estrada no fim do dia: cabe uma visita de 1h30.
+    assert.ok(sem.pontos.length >= 3, `sem: ${sem.pontos.length}`);
+    assert.equal(com.pontos.length, 1);
   });
 });

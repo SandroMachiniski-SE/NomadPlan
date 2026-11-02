@@ -7,6 +7,7 @@ import prisma from "../lib/prisma";
 import { criarApp } from "../app";
 import { gerarToken } from "../lib/auth";
 import { PASTA_UPLOADS_TESTE } from "./ambiente";
+import { importarMunicipios, type Municipio } from "../lib/municipios";
 
 export interface ServidorDeTeste {
   base: string;
@@ -192,4 +193,11 @@ export function formularioComArquivo(
   const form = new FormData();
   form.append(campo, new Blob([new Uint8Array(conteudo)], { type: tipo }), nomeArquivo);
   return form;
+}
+
+/** Grava um município (as tabelas são limpas entre os testes, então cada teste cria os seus). */
+export async function criarMunicipio(dados: Municipio): Promise<Municipio> {
+  await importarMunicipios([dados]);
+
+  return dados;
 }

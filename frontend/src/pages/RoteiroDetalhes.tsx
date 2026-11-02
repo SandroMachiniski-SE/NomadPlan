@@ -6,6 +6,8 @@ import type { Ponto, RespostaPontos } from "../types/ponto";
 import { extrairMensagemErro } from "../utils/erro";
 import Icone from "../components/Icone";
 import MapaRoteiroCarregavel from "../components/MapaRoteiroCarregavel";
+import TrechoNaEstrada from "../components/viagem/TrechoNaEstrada";
+import { estradasNoMapa, ultimoDiaDeEstrada } from "../utils/viagem";
 import DetalhesDaParada from "../components/roteiro/DetalhesDaParada";
 import PainelOrcamento from "../components/roteiro/PainelOrcamento";
 import ChecklistDoRoteiro from "../components/roteiro/ChecklistDoRoteiro";
@@ -301,7 +303,10 @@ function RoteiroDetalhes() {
   const podeEditar = meuPapel !== "LEITOR";
 
   const itens: ItemRoteiro[] = roteiro?.itens ?? [];
-  const totalDias = roteiro ? contarDias(roteiro.itens, roteiro.dataInicio, roteiro.dataFim, diasMinimos) : 1;
+  // Um dia só de estrada pode não ter parada nenhuma: conta até o último trecho da viagem de carro.
+  const totalDias = roteiro
+    ? contarDias(roteiro.itens, roteiro.dataInicio, roteiro.dataFim, Math.max(diasMinimos, ultimoDiaDeEstrada(roteiro.trechosDeEstrada)))
+    : 1;
   const dias = agruparPorDia(itens, totalDias);
   const itensEmOrdem = dias.flatMap((grupo) => grupo.itens);
   const quantidadeDeDias = dias.length;
@@ -716,6 +721,7 @@ function RoteiroDetalhes() {
               <div className="mapa-wrap">
                 <MapaRoteiroCarregavel
                   dia={diaNoMapa}
+                  estradas={estradasNoMapa(roteiro?.trechosDeEstrada)}
                   paradas={dias.flatMap((grupo) =>
                     // O número no mapa é o mesmo da lista; atividades sem lugar não aparecem.
                     grupo.itens.flatMap((item, indice) =>
@@ -820,7 +826,10 @@ function RoteiroDetalhes() {
                 const paradas = grupo.itens.filter((item) => !item.pernoite);
                 const pernoite = grupo.itens.find((item) => item.pernoite);
                 const cidades = cidadesDoDia(grupo.itens);
-                const viagem = roteiro?.viagensEntreDias?.find((v) => v.dia === grupo.dia);
+                const viagem = roteiro?.viagensEntreDias?.find((v) => v.dia === grupo.dia && !v.noFimDoDia);
+                const volta = roteiro?.viagensEntreDias?.find((v) => v.dia === grupo.dia && v.noFimDoDia);
+                const trechoDoDia = (noFim: boolean) =>
+                  roteiro?.trechosDeEstrada?.find((t) => t.dia === grupo.dia && t.noFimDoDia === noFim);
 
                 return (
                   <div
@@ -874,11 +883,22 @@ function RoteiroDetalhes() {
                       </div>
                     )}
 
-                    {viagem && (
-                      <p className="dia__viagem">
-                        <Icone nome="avancar" />
-                        Viagem de {viagem.de} para {viagem.para}: {descreverTrecho(viagem)} pela estrada (estimativa)
-                      </p>
+                    {viagem?.estrada ? (
+                      <TrechoNaEstrada
+                        de={viagem.de}
+                        para={viagem.para}
+                        metros={viagem.metros}
+                        segundos={viagem.minutos * 60}
+                        litros={trechoDoDia(false)?.litros}
+                        custoCentavos={trechoDoDia(false)?.custoCentavos}
+                      />
+                    ) : (
+                      viagem && (
+                        <p className="dia__viagem">
+                          <Icone nome="avancar" />
+                          Viagem de {viagem.de} para {viagem.para}: {descreverTrecho(viagem)} pela estrada (estimativa)
+                        </p>
+                      )
                     )}
 
                     {paradas.length === 0 ? (
@@ -1010,6 +1030,18 @@ function RoteiroDetalhes() {
                           somenteLeitura={!podeEditar}
                         />
                       </div>
+                    )}
+
+                    {volta && (
+                      <TrechoNaEstrada
+                        de={volta.de}
+                        para={volta.para}
+                        metros={volta.metros}
+                        segundos={volta.minutos * 60}
+                        litros={trechoDoDia(true)?.litros}
+                        custoCentavos={trechoDoDia(true)?.custoCentavos}
+                        noDia="volta"
+                      />
                     )}
                     </div>
                   </div>

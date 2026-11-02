@@ -25,6 +25,13 @@ Este documento resume os controles de segurança do sistema, organizados pelo OW
 - Minimização: o e-mail nunca é exibido a outros usuários; a localização usada em buscas "perto de mim" não é gravada.
 - Serviços de terceiros carregados pelo navegador: as imagens do mapa (OpenStreetMap), as fotos importadas do Wikimedia Commons e, com a integração ligada, as fotos do Google vêm direto desses servidores, que recebem o endereço IP de quem visualiza a página, como em qualquer site que usa esses serviços. Nenhum dado da conta é enviado a eles.
 
+### Localização e viagem de carro
+
+- O GPS do navegador só serve para achar o município de casa: o front arredonda as coordenadas para 2 casas (~1 km) e as envia por `POST /cidades/perto` (corpo, não URL, para não irem ao log de acesso); o servidor não grava nem registra as coordenadas, nem nos erros.
+- Fica gravado só o município (`codigo_municipio_base`) e o consumo do carro, ambos na exportação de dados e apagados na anonimização.
+- Rotas e resumos de cidades vêm de serviços públicos (OSRM e Overpass) com User-Agent identificado, uma consulta por segundo e cache no banco; nenhum dado da pessoa é enviado a eles (só coordenadas de sedes de municípios).
+- Ao salvar, a viagem é recalculada no servidor: km, traçados e hotéis vindos do navegador não são aceitos como estão.
+
 ## Riscos aceitos
 
 Decisões tomadas por serem adequadas ao escopo acadêmico ou por dependerem da infraestrutura de implantação. Todas devem ser revistas antes de um uso em produção real.

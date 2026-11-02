@@ -57,6 +57,25 @@ export interface CidadeDaBusca {
   pontos: number;
   disponivel: boolean;
   preparo: PreparoDaCidade | null;
+  /** Código IBGE do município; nulo nas cidades que só existem nos pontos cadastrados. */
+  codigoIbge: number | null;
+}
+
+/** Um município do Brasil escolhido pela pessoa (onde mora, de onde sai de carro). */
+export interface MunicipioEscolhido {
+  codigoIbge: number;
+  cidade: string;
+  uf: string;
+}
+
+/** Município cuja sede é a mais próxima das coordenadas (o servidor não as guarda). */
+export async function cidadePerto(latitude: number, longitude: number) {
+  const resposta = await api.post<MunicipioEscolhido & { latitude: number; longitude: number }>("/cidades/perto", {
+    latitude,
+    longitude,
+  });
+
+  return resposta.data;
 }
 
 export async function buscarCidadesDoBrasil(texto: string) {

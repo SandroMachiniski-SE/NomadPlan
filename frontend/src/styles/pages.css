@@ -1336,6 +1336,54 @@ fieldset.field {
   flex-shrink: 0;
 }
 
+/* Viagem de carro: dias só de estrada, pernoites sugeridos e a decisão de chegada. */
+.dia__viagem--estrada {
+  flex-wrap: wrap;
+}
+
+.dia--estrada {
+  border-left-style: dashed;
+}
+
+/* Cidades, km e tempo no título do dia de estrada, sem o "capitalize" do título ("497 km"). */
+.dia__estrada {
+  text-transform: none;
+}
+
+.pernoite-estrada {
+  padding: 0.85rem 1rem;
+  margin-top: 0.75rem;
+}
+
+.pernoite-estrada__titulo {
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+  font-size: 1rem;
+}
+
+.pernoite-estrada__alternativas {
+  display: grid;
+  gap: 0.4rem;
+  margin: 0.5rem 0 0;
+  padding: 0;
+  list-style: none;
+}
+
+.decisao-chegada {
+  display: grid;
+  gap: 0.35rem;
+  padding: 0.85rem 1rem;
+  margin-bottom: 0.75rem;
+  border: 1px solid var(--accent, var(--primary));
+}
+
+.viagem-carro__mapa {
+  display: grid;
+  gap: 0.35rem;
+  margin-bottom: 1.25rem;
+}
+
 .parada--atividade .parada__card {
   border-style: dashed;
 }

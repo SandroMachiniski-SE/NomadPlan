@@ -1,10 +1,12 @@
+import { distanciaMetros } from "../lib/geo";
+
 // Servidores de mapas de mentira para os testes: intercepta o Nominatim (busca de cidades),
-// o Overpass (lugares do OpenStreetMap) e o Wikidata/Commons (fotos). O resto, como o cliente
-// HTTP dos testes de integração, segue para o fetch de verdade.
+// o Overpass (lugares do OpenStreetMap), o OSRM (rotas de carro) e o Wikidata/Commons (fotos).
+// O resto, como o cliente HTTP dos testes de integração, segue para o fetch de verdade.
 
 export interface ChamadaDeMapa {
   url: string;
-  servico: "nominatim" | "overpass" | "wikidata" | "commons";
+  servico: "nominatim" | "overpass" | "osrm" | "wikidata" | "commons";
   corpo: string | null;
 }
 
@@ -15,6 +17,8 @@ export interface MapasFalsos {
   nominatim?: (texto: string) => RespostaDeMapa;
   /** Elementos devolvidos pelo Overpass para a consulta recebida. */
   overpass?: (consulta: string) => RespostaDeMapa;
+  /** Rota do OSRM para a URL pedida (".../route/v1/driving/lon,lat;lon,lat?..."). */
+  osrm?: (url: string) => RespostaDeMapa;
 }
 
 export function instalarMapasFalsos(respostas: MapasFalsos) {
@@ -31,6 +35,9 @@ export function instalarMapasFalsos(respostas: MapasFalsos) {
     if (url.startsWith("https://nominatim.openstreetmap.org/")) {
       servico = "nominatim";
       resposta = respostas.nominatim?.(new URL(url).searchParams.get("q") ?? "");
+    } else if (url.includes("/route/v1/driving/")) {
+      servico = "osrm";
+      resposta = respostas.osrm?.(url);
     } else if (url.includes("overpass")) {
       servico = "overpass";
       resposta = respostas.overpass?.(corpo ?? "");
@@ -58,6 +65,32 @@ export function instalarMapasFalsos(respostas: MapasFalsos) {
     desinstalar: () => {
       globalThis.fetch = original;
     },
+  };
+}
+
+/**
+ * Resposta "Ok" do OSRM para um traçado: distância de cada trecho em linha reta e duração a uma
+ * velocidade constante (80 km/h se não informada), com as anotações por trecho.
+ */
+export function rotaOsrm(coordenadas: [lon: number, lat: number][], kmPorHora = 80) {
+  const distancias = coordenadas.slice(1).map(([lon, lat], i) => {
+    const [lonAnterior, latAnterior] = coordenadas[i];
+
+    return distanciaMetros(latAnterior, lonAnterior, lat, lon);
+  });
+  const duracoes = distancias.map((metros) => metros / (kmPorHora / 3.6));
+  const somar = (valores: number[]) => valores.reduce((soma, v) => soma + v, 0);
+
+  return {
+    code: "Ok",
+    routes: [
+      {
+        distance: somar(distancias),
+        duration: somar(duracoes),
+        geometry: { type: "LineString", coordinates: coordenadas },
+        legs: [{ annotation: { distance: distancias, duration: duracoes } }],
+      },
+    ],
   };
 }
 

@@ -26,7 +26,32 @@ export interface DadosVersaoRoteiro {
     periodo?: "MANHA" | "TARDE" | "NOITE" | "DIA_INTEIRO" | null;
     pernoite?: boolean;
   }[];
+  // A viagem de carro veio depois: versões antigas não têm estes campos (e não mexem neles).
+  viagemDeCarro?: {
+    viagemOrigem: number | null;
+    kmPorDia: number | null;
+    horasPorDia: number | null;
+    viagemVolta: boolean | null;
+    consumoKmPorLitro: number | null;
+    precoLitroCentavos: number | null;
+  };
+  trechos?: {
+    dia: number;
+    perna: number;
+    noite: number | null;
+    deNome: string;
+    paraNome: string;
+    metros: number;
+    segundos: number;
+    ocupaODia: boolean;
+    noFimDoDia: boolean;
+    litros: number | null;
+    custoCombustivelCentavos: number | null;
+    tracado: unknown;
+  }[];
 }
+
+const decimal = (valor: Prisma.Decimal | null) => (valor === null ? null : Number(valor));
 
 export async function registrarVersaoRoteiro(
   idRoteiro: number,
@@ -50,6 +75,7 @@ export async function registrarVersaoRoteiro(
           pernoite: true,
         },
       },
+      trechosEstrada: { orderBy: [{ dia: "asc" }, { perna: "asc" }] },
     },
   });
 
@@ -64,6 +90,15 @@ export async function registrarVersaoRoteiro(
     dataInicio: roteiro.dataInicio ? roteiro.dataInicio.toISOString() : null,
     dataFim: roteiro.dataFim ? roteiro.dataFim.toISOString() : null,
     itens: roteiro.itens,
+    viagemDeCarro: {
+      viagemOrigem: roteiro.viagemOrigem,
+      kmPorDia: roteiro.kmPorDia,
+      horasPorDia: decimal(roteiro.horasPorDia),
+      viagemVolta: roteiro.viagemVolta,
+      consumoKmPorLitro: decimal(roteiro.consumoKmPorLitro),
+      precoLitroCentavos: roteiro.precoLitroCentavos,
+    },
+    trechos: roteiro.trechosEstrada.map(({ id: _id, idRoteiro: _roteiro, litros, ...t }) => ({ ...t, litros: decimal(litros) })),
   };
 
   await cliente.versaoRoteiro.create({
