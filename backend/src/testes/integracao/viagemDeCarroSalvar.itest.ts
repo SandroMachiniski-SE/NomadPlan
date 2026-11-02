@@ -42,10 +42,18 @@ describe("salvar e ler a viagem de carro", () => {
   });
 
   /** Gera Joinville → Brasília (4 dias) e monta o pedido de salvamento como o front faz. */
-  async function gerarEMontar(hotelDaNoite1 = true, { dias = 4, comVolta = false } = {}) {
+  async function gerarEMontar(
+    hotelDaNoite1 = true,
+    { dias = 4, comVolta = false, combustivel = {} as { consumoKmPorLitro?: number; precoLitroCentavos?: number } } = {},
+  ) {
     const gerado = await api("POST", "/roteiros/gerar", {
       token,
-      json: { etapas: [{ cidade: "Brasília, DF", dias }], horasDisponiveis: 6, dataHoraInicio: INICIO, viagemDeCarro: { comVolta } },
+      json: {
+        etapas: [{ cidade: "Brasília, DF", dias }],
+        horasDisponiveis: 6,
+        dataHoraInicio: INICIO,
+        viagemDeCarro: { comVolta, ...combustivel },
+      },
     });
     assert.equal(gerado.status, 200, JSON.stringify(gerado.corpo));
 
@@ -72,6 +80,7 @@ describe("salvar e ler a viagem de carro", () => {
           horasDisponiveis: 6,
           kmPorDia: 500,
           comVolta,
+          ...combustivel,
           escolhas: [],
           decisoes: [],
           noites,
@@ -148,6 +157,22 @@ describe("salvar e ler a viagem de carro", () => {
     assert.equal(trechos[5].paraNome, "Joinville/SC");
     assert.equal((await prisma.roteiro.findUnique({ where: { id: r.corpo.id } }))?.viagemVolta, true);
     assert.equal(await prisma.itemRoteiro.count({ where: { idRoteiro: r.corpo.id, pernoite: true } }), 4);
+  });
+
+  it("salvar grava litros e custo de cada trecho e o orçamento do roteiro mostra o combustível", async () => {
+    const { pedido } = await gerarEMontar(false, { combustivel: { consumoKmPorLitro: 12, precoLitroCentavos: 629 } });
+    const { corpo: criado } = await salvar(pedido);
+
+    const trechos = await prisma.trechoEstrada.findMany({ where: { idRoteiro: criado.id } });
+    assert.ok(trechos.every((t) => t.litros !== null && t.custoCombustivelCentavos !== null));
+
+    const r = await api("GET", `/roteiros/${criado.id}`, { token });
+    const combustivel = trechos.reduce((soma, t) => soma + t.custoCombustivelCentavos!, 0);
+    assert.equal(r.corpo.orcamento.combustivelCentavos, combustivel);
+    assert.equal(r.corpo.orcamento.porDia[1], trechos.find((t) => t.dia === 1)!.custoCombustivelCentavos);
+    assert.equal(r.corpo.viagemDeCarro.consumoKmPorLitro, 12);
+    assert.equal(r.corpo.viagemDeCarro.precoLitroCentavos, 629);
+    assert.equal(r.corpo.trechosDeEstrada[0].litros, Number(trechos.find((t) => t.dia === 1)!.litros));
   });
 
   it("idOsm que não está no resumo da cidade dá 400", async () => {

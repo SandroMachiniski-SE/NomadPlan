@@ -5,6 +5,7 @@ import { candidatosDaRota, tracadoEntre } from "./corredor";
 import { resumirCidades, type ResumoOsm } from "./resumoOsm";
 import { dividirEmDias, type CandidatoDePernoite, type DivisaoDaPerna } from "./divisaoEmDias";
 import type { EtapaDoRoteiro } from "./recomendacao";
+import { estimarCombustivel } from "./combustivel";
 
 // Viagem de carro saindo de casa: cada perna (casa → 1ª cidade, …) é dividida em dias de estrada
 // com pernoite, e o trecho que chega a uma cidade é descontado do 1º dia nela quando sobram ao
@@ -345,7 +346,12 @@ function pernoiteNoKm(km: number): CidadeDePernoite {
   };
 }
 
-async function planejarTrechos(d: PernaDividida, naAgenda: TrechoNaAgenda[], resumos: Map<number, ResumoOsm>) {
+async function planejarTrechos(
+  d: PernaDividida,
+  naAgenda: TrechoNaAgenda[],
+  resumos: Map<number, ResumoOsm>,
+  entrada: EntradaDaViagem,
+) {
   const nomeDoMarco = (j: number) => {
     if (j === 0) return rotulo(d.de);
     if (j === d.marcos.length - 1) return rotulo(d.para);
@@ -361,17 +367,20 @@ async function planejarTrechos(d: PernaDividida, naAgenda: TrechoNaAgenda[], res
 
     if (noite?.cidade?.resumo) resumos.set(noite.cidade.codigoIbge, noite.cidade.resumo);
 
+    const metros = Math.round(t.km * 1000);
+    const combustivel = estimarCombustivel(metros / 1000, entrada.consumoKmPorLitro, entrada.precoLitroCentavos);
+
     trechos.push({
       dia: t.dia,
       noite: t.noite,
       de: nomeDoMarco(j),
       para: nomeDoMarco(j + 1),
-      metros: Math.round(t.km * 1000),
+      metros,
       segundos: t.segundos,
       ocupaODia: t.ocupaODia,
       noFimDoDia: t.noFimDoDia,
-      litros: null,
-      custoCentavos: null,
+      litros: combustivel?.litros ?? null,
+      custoCentavos: combustivel?.custoCentavos ?? null,
       tracado: await tracadoEntre(d.rota.id, d.marcos[j].fracao, d.marcos[j + 1].fracao),
       pernoite: !noite ? null : noite.cidade ? cidadeDePernoite(noite.cidade, noite.kmAlvo, noite.aDefinir) : pernoiteNoKm(noite.km),
       alternativas: noite ? noite.alternativas.map((c) => cidadeDePernoite(c, noite.kmAlvo, false)) : [],
@@ -423,7 +432,7 @@ export async function planejarViagemDeCarro(entrada: EntradaDaViagem): Promise<P
   const pernas: PernaPlanejada[] = [];
 
   for (const d of divididas) {
-    const trechos = await planejarTrechos(d, agenda.trechos[d.numero], resumos);
+    const trechos = await planejarTrechos(d, agenda.trechos[d.numero], resumos, entrada);
     const decisao = d.divisao.decisao;
 
     pernas.push({
@@ -473,5 +482,20 @@ export async function planejarViagemDeCarro(entrada: EntradaDaViagem): Promise<P
     avisos.push("Nenhuma perna passa de um dia de estrada.");
   }
 
-  return { pernas, etapasDoGerador, totalDeDias: agenda.totalDeDias, combustivel: null, avisos, resumos };
+  const comCarro = entrada.consumoKmPorLitro !== null && entrada.precoLitroCentavos !== null;
+
+  if (pernas.length > 0 && !comCarro && (entrada.consumoKmPorLitro !== null || entrada.precoLitroCentavos !== null)) {
+    avisos.push("Informe o consumo e o preço do litro para estimar o combustível.");
+  }
+
+  const todosOsTrechos = pernas.flatMap((p) => p.trechos);
+  const combustivel =
+    comCarro && todosOsTrechos.length > 0
+      ? {
+          litros: Math.round(todosOsTrechos.reduce((soma, t) => soma + (t.litros ?? 0), 0) * 10) / 10,
+          custoCentavos: todosOsTrechos.reduce((soma, t) => soma + (t.custoCentavos ?? 0), 0),
+        }
+      : null;
+
+  return { pernas, etapasDoGerador, totalDeDias: agenda.totalDeDias, combustivel, avisos, resumos };
 }

@@ -508,7 +508,7 @@ roteirosRouter.get("/:id", async (req: Request, res: Response) => {
       itens: comTrechos(roteiro.itens),
       cidades: cidadesDosItens(roteiro.itens),
       viagensEntreDias: viagensComEstrada(viagensEntreDias(roteiro.itens), trechos),
-      orcamento: resumirOrcamento(roteiro.itens, roteiro.orcamentoCentavos),
+      orcamento: resumirOrcamento(roteiro.itens, roteiro.orcamentoCentavos, trechosEstrada),
       viagemDeCarro: viagemDoRoteiro(roteiro),
       trechosDeEstrada: trechos,
     });

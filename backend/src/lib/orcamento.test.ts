@@ -36,4 +36,21 @@ describe("resumirOrcamento", () => {
     assert.deepEqual(vazio.porDia, {});
     assert.equal(vazio.restanteCentavos, 1000);
   });
+
+  it("o combustível da viagem de carro entra no dia do trecho, no total e no que sobra do teto", () => {
+    const r = resumirOrcamento([{ dia: 1, custoCentavos: 5000 }], 100_000, [
+      { dia: 1, custoCombustivelCentavos: 26_292 },
+      { dia: 2, custoCombustivelCentavos: null },
+    ]);
+
+    assert.deepEqual(r.porDia, { 1: 31_292 });
+    assert.equal(r.totalCentavos, 31_292);
+    assert.equal(r.combustivelCentavos, 26_292);
+    assert.equal(r.restanteCentavos, 68_708);
+    assert.equal(r.paradasSemCusto, 0);
+  });
+
+  it("sem viagem de carro o combustível é zero", () => {
+    assert.equal(resumirOrcamento([], null).combustivelCentavos, 0);
+  });
 });

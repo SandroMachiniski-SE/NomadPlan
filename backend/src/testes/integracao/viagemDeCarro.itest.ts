@@ -355,6 +355,41 @@ describe("viagem de carro no gerador de roteiro", () => {
     });
   });
 
+  describe("combustível", () => {
+    it("consumo e preço dão litros e custo em cada trecho e o total da viagem", async () => {
+      await prepararBrasilia(viagem);
+      const { token } = await comCasa(JOINVILLE);
+
+      const r = await gerar(token, {
+        etapas: [{ cidade: "Brasília, DF", dias: 1 }],
+        viagemDeCarro: { consumoKmPorLitro: 12, precoLitroCentavos: 629 },
+      });
+
+      assert.equal(r.status, 200, JSON.stringify(r.corpo));
+      const trechos = r.corpo.viagemDeCarro.pernas[0].trechos as { metros: number; litros: number; custoCentavos: number }[];
+      for (const t of trechos) {
+        assert.equal(t.litros, Math.round((t.metros / 1000 / 12) * 10) / 10);
+        assert.equal(t.custoCentavos, Math.round(t.litros * 629));
+      }
+      assert.deepEqual(r.corpo.viagemDeCarro.combustivel, {
+        litros: Math.round(trechos.reduce((soma, t) => soma + t.litros, 0) * 10) / 10,
+        custoCentavos: trechos.reduce((soma, t) => soma + t.custoCentavos, 0),
+      });
+    });
+
+    it("só o consumo, sem o preço: sem estimativa e com aviso", async () => {
+      await prepararBrasilia(viagem);
+      const { token } = await comCasa(JOINVILLE);
+
+      const r = await gerar(token, { etapas: [{ cidade: "Brasília, DF", dias: 1 }], viagemDeCarro: { consumoKmPorLitro: 12 } });
+
+      assert.equal(r.status, 200);
+      assert.equal(r.corpo.viagemDeCarro.combustivel, null);
+      assert.equal(r.corpo.viagemDeCarro.pernas[0].trechos[0].litros, null);
+      assert.ok(r.corpo.viagemDeCarro.avisos.includes("Informe o consumo e o preço do litro para estimar o combustível."));
+    });
+  });
+
   it("sem viagemDeCarro a resposta é a de hoje, com viagemDeCarro null", async () => {
     await criarPonto({ nome: "Museu de Joinville", cidade: "Joinville" });
     const { token } = await comCasa(null);
