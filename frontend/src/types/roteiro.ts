@@ -153,6 +153,8 @@ export interface RoteiroPublico {
   itens: ItemRoteiro[];
   cidades?: string[];
   viagensEntreDias?: ViagemEntreDias[];
+  viagemDeCarro?: ViagemDoRoteiro | null;
+  trechosDeEstrada?: TrechoDeEstrada[];
 }
 
 export interface PontoRecomendado extends PontoResumo {

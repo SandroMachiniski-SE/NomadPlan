@@ -1345,6 +1345,11 @@ fieldset.field {
   border-left-style: dashed;
 }
 
+/* Cidades, km e tempo no título do dia de estrada, sem o "capitalize" do título ("497 km"). */
+.dia__estrada {
+  text-transform: none;
+}
+
 .pernoite-estrada {
   padding: 0.85rem 1rem;
   margin-top: 0.75rem;

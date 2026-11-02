@@ -6,6 +6,7 @@ import type {
   NoiteSalva,
   PedidoDeViagem,
   PernaPlanejada,
+  TrechoDeEstrada,
   TrechoPlanejado,
 } from "../types/viagem";
 
@@ -112,3 +113,12 @@ export function formatarDirecao(segundos: number): string {
 }
 
 export const formatarKm = (metros: number) => `${Math.round(metros / 1000).toLocaleString("pt-BR")} km`;
+
+/** A estrada de cada dia para o mapa do roteiro salvo, com o pernoite no fim das noites de estrada. */
+export function estradasNoMapa(trechos: TrechoDeEstrada[] | undefined) {
+  return (trechos ?? []).map((t) => ({ dia: t.dia, tracado: t.tracado, pernoite: t.noite !== null ? t.para : null }));
+}
+
+/** Último dia com trecho de estrada (um dia só de estrada pode não ter nenhuma parada). */
+export const ultimoDiaDeEstrada = (trechos: TrechoDeEstrada[] | undefined) =>
+  Math.max(1, ...(trechos ?? []).map((t) => t.dia));

@@ -5,6 +5,8 @@ import type { RoteiroPublico as RoteiroPublicoTipo } from "../types/roteiro";
 import MapaRoteiroCarregavel from "../components/MapaRoteiroCarregavel";
 import { agruparPorDia, cidadesDoDia, contarDias, corDoDia, descreverTrecho, nomeDoItem, ROTULO_PERIODO, rotuloDoDia } from "../utils/roteiro";
 import Icone from "../components/Icone";
+import TrechoNaEstrada from "../components/viagem/TrechoNaEstrada";
+import { estradasNoMapa, ultimoDiaDeEstrada } from "../utils/viagem";
 
 function RoteiroPublico() {
   const { slug } = useParams<{ slug: string }>();
@@ -29,8 +31,13 @@ function RoteiroPublico() {
     buscar();
   }, [slug]);
 
-  const totalDias = roteiro ? contarDias(roteiro.itens, roteiro.dataInicio, roteiro.dataFim) : 1;
-  const dias = agruparPorDia(roteiro?.itens ?? [], totalDias).filter((grupo) => grupo.itens.length > 0);
+  const totalDias = roteiro
+    ? contarDias(roteiro.itens, roteiro.dataInicio, roteiro.dataFim, ultimoDiaDeEstrada(roteiro.trechosDeEstrada))
+    : 1;
+  // Dias sem paradas somem, a não ser os de estrada da viagem de carro.
+  const dias = agruparPorDia(roteiro?.itens ?? [], totalDias).filter(
+    (grupo) => grupo.itens.length > 0 || roteiro?.trechosDeEstrada?.some((t) => t.dia === grupo.dia),
+  );
 
   return (
     <div className="container container--narrow page">
@@ -79,6 +86,7 @@ function RoteiroPublico() {
             <div className="mapa-wrap">
               <MapaRoteiroCarregavel
                 comLinks={false}
+                estradas={estradasNoMapa(roteiro.trechosDeEstrada)}
                 paradas={dias.flatMap((grupo) =>
                   grupo.itens.flatMap((item, indice) =>
                     item.ponto
@@ -120,12 +128,23 @@ function RoteiroPublico() {
 
                   {roteiro.viagensEntreDias
                     ?.filter((v) => v.dia === grupo.dia)
-                    .map((v) => (
-                      <p key={v.dia} className="dia__viagem">
-                        <Icone nome="avancar" />
-                        Viagem de {v.de} para {v.para}: {descreverTrecho(v)} pela estrada (estimativa)
-                      </p>
-                    ))}
+                    .map((v) =>
+                      v.estrada ? (
+                        <TrechoNaEstrada
+                          key={`${v.dia}-${v.noFimDoDia ? "fim" : "inicio"}`}
+                          de={v.de}
+                          para={v.para}
+                          metros={v.metros}
+                          segundos={v.minutos * 60}
+                          noDia={v.noFimDoDia ? "volta" : undefined}
+                        />
+                      ) : (
+                        <p key={v.dia} className="dia__viagem">
+                          <Icone nome="avancar" />
+                          Viagem de {v.de} para {v.para}: {descreverTrecho(v)} pela estrada (estimativa)
+                        </p>
+                      ),
+                    )}
 
                   <ol className="paradas">
                     {grupo.itens.filter((item) => !item.pernoite).map((item, indice) => (

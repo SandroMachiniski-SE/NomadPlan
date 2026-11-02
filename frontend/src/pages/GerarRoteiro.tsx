@@ -527,8 +527,11 @@ function GerarRoteiro() {
                   {tipo === "ESTRADA" && daEstrada ? (
                     <div className="dia__cabecalho">
                       <h3 className="dia__titulo">
-                        Dia {numero} · Estrada · {daEstrada.trecho.de} → {daEstrada.trecho.para} ·{" "}
-                        {formatarKm(daEstrada.trecho.metros)} · {formatarDirecao(daEstrada.trecho.segundos)}
+                        Dia {numero} · Estrada ·{" "}
+                        <span className="dia__estrada">
+                          {daEstrada.trecho.de} → {daEstrada.trecho.para} · {formatarKm(daEstrada.trecho.metros)} ·{" "}
+                          {formatarDirecao(daEstrada.trecho.segundos)}
+                        </span>
                       </h3>
                       <p className="muted small">Tempo de direção, sem paradas.</p>
                     </div>
