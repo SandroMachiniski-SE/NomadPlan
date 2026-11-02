@@ -14,6 +14,8 @@ import { resumirOrcamento } from "../lib/orcamento";
 import { MAX_PARTICIPANTES, nivelExigido, papelNoRoteiro, papelPermite, type Papel } from "../lib/colaboracao";
 import { criarNotificacao } from "../lib/notificacoes";
 import { enviarEmailConvite } from "../lib/email";
+import { ErroDaViagem, planejarViagemDeCarro, resolverEntradaDaViagem } from "../lib/viagemDeCarro";
+import { ErroRota, SemEstrada } from "../lib/rotas";
 
 const roteirosRouter = Router();
 
@@ -209,12 +211,36 @@ const reordenarSchema = z.object({
   idsItensEmOrdem: z.array(z.coerce.number().int().positive()).min(1),
 });
 
+const pernaSchema = z.number().int().min(0).max(7);
+
+// Viagem de carro saindo de casa: divide a estrada em dias com pernoites sugeridos.
+const viagemDeCarroSchema = z.object({
+  origem: z.number().int().positive().optional(),
+  kmPorDia: z.number().min(150).max(1000).optional(),
+  horasPorDia: z.number().min(2).max(14).optional(),
+  comVolta: z.boolean().optional(),
+  consumoKmPorLitro: z.number().min(3).max(40).optional(),
+  precoLitroCentavos: z.number().int().min(100).max(2000).optional(),
+  escolhas: z
+    .array(z.object({ perna: pernaSchema, noite: z.number().int().min(1).max(30), codigoIbge: z.number().int().positive() }))
+    .max(60)
+    .optional(),
+  decisoes: z.array(z.object({ perna: pernaSchema, esticar: z.boolean() })).max(8).optional(),
+});
+
 const gerarRoteiroSchema = z
   .object({
     cidade: z.string().trim().min(1).max(120).optional(),
     // Viagem por várias cidades: "Joinville, 2 dias → Blumenau, 1 dia".
     etapas: z
-      .array(z.object({ cidade: z.string().trim().min(1).max(120), dias: z.coerce.number().int().min(1).max(MAX_DIAS_GERADOS) }))
+      .array(
+        z.object({
+          cidade: z.string().trim().min(1).max(120),
+          // Município escolhido na busca (viagem de carro); sem ele, é procurado pelo nome.
+          codigoIbge: z.number().int().positive().optional(),
+          dias: z.coerce.number().int().min(1).max(MAX_DIAS_GERADOS),
+        }),
+      )
       .min(1)
       .max(6)
       .optional(),
@@ -224,6 +250,7 @@ const gerarRoteiroSchema = z
     dataHoraInicio: z.coerce.date().optional(),
     latitude: z.coerce.number().min(-90).max(90).optional(),
     longitude: z.coerce.number().min(-180).max(180).optional(),
+    viagemDeCarro: viagemDeCarroSchema.optional(),
   })
   .refine((d) => d.cidade || (d.etapas && d.etapas.length > 0), { message: "Informe a cidade ou as etapas da viagem." })
   .refine((d) => !d.etapas || d.etapas.reduce((soma, e) => soma + e.dias, 0) <= MAX_DIAS_GERADOS, {
@@ -311,11 +338,41 @@ roteirosRouter.post("/gerar", async (req: Request, res: Response) => {
     const interesses =
       dados.interesses && dados.interesses.length > 0 ? dados.interesses : (usuario?.interesses ?? []);
 
+    let etapas = dados.etapas;
+    let viagemDeCarro = null;
+
+    if (dados.viagemDeCarro) {
+      if (dados.viagemDeCarro.comVolta) {
+        return res.status(400).json({ erro: "A volta ainda não está disponível." });
+      }
+
+      const entrada = await resolverEntradaDaViagem(
+        dados.viagemDeCarro,
+        dados.etapas ?? [{ cidade: dados.cidade!, dias: 1 }],
+        req.usuario!.id,
+        dados.horasDisponiveis,
+      );
+      const plano = await planejarViagemDeCarro(entrada);
+
+      etapas = plano.etapasDoGerador;
+      viagemDeCarro = {
+        origem: entrada.origem,
+        kmPorDia: entrada.kmPorDia,
+        horasPorDia: entrada.horasPorDia,
+        comVolta: entrada.comVolta,
+        consumoKmPorLitro: entrada.consumoKmPorLitro,
+        precoLitroCentavos: entrada.precoLitroCentavos,
+        pernas: plano.pernas,
+        combustivel: plano.combustivel,
+        avisos: plano.avisos,
+      };
+    }
+
     // Sem horário de início informado, começa no próximo horário comercial: de madrugada
     // ou à noite quase tudo estaria fechado e o roteiro sairia vazio.
     const recomendacao = await gerarRoteiroSugerido({
-      cidade: dados.cidade ?? dados.etapas![0].cidade,
-      etapas: dados.etapas,
+      cidade: etapas?.[0].cidade ?? dados.cidade!,
+      etapas,
       horasDisponiveis: dados.horasDisponiveis,
       interesses,
       preferenciasAcessibilidade: usuario?.preferenciasAcessibilidade ?? [],
@@ -326,8 +383,20 @@ roteirosRouter.post("/gerar", async (req: Request, res: Response) => {
 
     registrarEvento("roteiro_gerado");
 
-    return res.json(recomendacao);
+    return res.json({ ...recomendacao, viagemDeCarro });
   } catch (error) {
+    if (error instanceof ErroDaViagem) {
+      return res.status(400).json({ erro: error.message });
+    }
+
+    if (error instanceof SemEstrada) {
+      return res.status(422).json({ erro: error.message });
+    }
+
+    if (error instanceof ErroRota) {
+      return res.status(503).json({ erro: "Não consegui calcular a rota agora; tente de novo em alguns minutos." });
+    }
+
     console.error("Erro ao gerar roteiro sugerido:", error);
 
     return res.status(500).json({ erro: "Erro interno ao gerar roteiro sugerido." });
