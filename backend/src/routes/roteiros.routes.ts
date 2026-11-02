@@ -104,6 +104,9 @@ roteirosRouter.get("/publico/:slug", async (req: Request, res: Response) => {
             id: true,
             dia: true,
             ordem: true,
+            titulo: true,
+            periodo: true,
+            pernoite: true,
             observacao: true,
             ponto: { select: pontoResumoSelecao },
           },
@@ -424,6 +427,8 @@ roteirosRouter.post("/gerar", async (req: Request, res: Response) => {
       viagemDeCarro = {
         origem: entrada.origem,
         etapas: entrada.etapas.map(({ codigoIbge, cidade, uf, dias }) => ({ codigoIbge, cidade, uf, dias })),
+        // O salvamento manda de volta as mesmas horas: com outras, os dias da viagem mudam.
+        horasDisponiveis: entrada.horasDisponiveis,
         kmPorDia: entrada.kmPorDia,
         horasPorDia: entrada.horasPorDia,
         comVolta: entrada.comVolta,
@@ -583,7 +588,14 @@ roteirosRouter.post("/", async (req: Request, res: Response) => {
       );
       const plano = await planejarViagemDeCarro(entrada);
 
-      if (!conferirNoites(plano, pedidoDaViagem.noites)) {
+      // As paradas têm de cair nos dias das cidades do plano recalculado (outras horas de passeio,
+      // por exemplo, podem tirar um dia só de estrada e deslocar tudo).
+      const diasNasCidades = new Set(
+        plano.etapasDoGerador.flatMap((e) => Array.from({ length: e.dias }, (_, i) => (e.primeiroDia ?? 1) + i)),
+      );
+      const paradasForaDosDias = paradas.some((p) => !p.pernoite && !diasNasCidades.has(p.dia ?? 1));
+
+      if (!conferirNoites(plano, pedidoDaViagem.noites) || paradasForaDosDias) {
         return res.status(409).json({ erro: "A rota mudou desde a geração; gere de novo." });
       }
 

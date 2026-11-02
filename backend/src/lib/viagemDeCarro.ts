@@ -182,7 +182,13 @@ export function montarAgenda(
     const [unico] = volta.trechos;
     const ultimaEtapa = etapas[etapas.length - 1];
 
-    if (volta.trechos.length === 1 && unico.noite === null && ultimaEtapa && sobraPasseio(unico)) {
+    // Cidade de um dia só com a chegada descontada: a volta divide o mesmo dia com ela.
+    const chegadaNoMesmoDia =
+      ultimaEtapa && diasDasEtapas[diasDasEtapas.length - 1] === 1 && ultimaEtapa.chegada ? ultimaEtapa.chegada.segundos : 0;
+    const sobraDepoisDasDuas = (t: TrechoParaAgenda) =>
+      horasDisponiveis - (t.segundos + chegadaNoMesmoDia) / 3600 >= HORAS_MINIMAS_DE_PASSEIO_NA_CHEGADA;
+
+    if (volta.trechos.length === 1 && unico.noite === null && ultimaEtapa && sobraDepoisDasDuas(unico)) {
       trechos[indiceDaVolta].push({ ...unico, dia, ocupaODia: false, noFimDoDia: true });
       ultimaEtapa.minutosNoFimDoUltimoDia = Math.round(unico.segundos / 60);
     } else {

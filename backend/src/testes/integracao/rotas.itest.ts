@@ -219,6 +219,20 @@ describe("resumos das cidades", () => {
     assert.ok(consulta.startsWith("[out:json][timeout:170];"), consulta);
   });
 
+  it("Overpass que estoura o próprio tempo (remark) não vira zero no cache: usa o vencido", async () => {
+    await guardarResumoDeA(40);
+    mapas = instalarMapasFalsos({
+      overpass: () => ({ corpo: { elements: [], remark: 'runtime error: Query timed out in "query" at line 3 after 26 seconds.' } }),
+    });
+
+    const resumos = await resumirCidades([A.codigoIbge, B.codigoIbge]);
+
+    assert.equal(resumos.get(A.codigoIbge)!.totalHospedagens, 3);
+    assert.equal(resumos.get(B.codigoIbge), null);
+    const b = await prisma.municipio.findUnique({ where: { codigoIbge: B.codigoIbge } });
+    assert.equal(b?.resumoEm, null, "nada foi gravado para B");
+  });
+
   it("sem resumo e Overpass fora do ar: devolve null", async () => {
     mapas = instalarMapasFalsos({ overpass: () => ({ status: 504, corpo: {} }) });
 

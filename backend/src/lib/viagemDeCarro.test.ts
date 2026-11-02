@@ -68,6 +68,19 @@ describe("montarAgenda", () => {
     assert.equal(r.totalDeDias, 2);
   });
 
+  it("cidade de 1 dia com chegada e volta curtas: a volta só fica no mesmo dia se sobrarem 2 h depois das duas", () => {
+    // 250 km para cada lado (~3h08 cada) com 6 h de passeio: a chegada cabe, as duas juntas não.
+    const r = montarAgenda([{ trechos: [t(250, 11250, null)], terminaEmCasa: false }, { trechos: [t(250, 11250, null)], terminaEmCasa: true }], [1], 6);
+
+    assert.equal(r.trechos[0][0].ocupaODia, false);
+    assert.deepEqual(
+      r.trechos[1].map((x) => [x.dia, x.ocupaODia, x.noFimDoDia]),
+      [[2, true, false]],
+    );
+    assert.equal(r.etapas[0].minutosNoFimDoUltimoDia, 0);
+    assert.equal(r.totalDeDias, 2);
+  });
+
   it("volta curta que não deixa 2 h vira dia só de estrada", () => {
     const r = montarAgenda([null, { trechos: [t(400, 5 * 3600, null)], terminaEmCasa: true }], [2], 6);
 

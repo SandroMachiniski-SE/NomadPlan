@@ -198,6 +198,19 @@ describe("dividirEmDias", () => {
     );
   });
 
+  it("a faixa pede resumo das mesmas 10 cidades uma vez só, não das 10 seguintes depois", () => {
+    const candidatos = Array.from({ length: 25 }, (_, i) => cidade(i + 1, 452 + i * 4, undefined));
+    const primeira = dividir(candidatos, { totalKm: 900 });
+
+    // Chegam os resumos pedidos (sem hotel): a próxima rodada não pede outras 10 da mesma faixa.
+    for (const c of candidatos) {
+      if (primeira.semResumo.includes(c.codigoIbge)) c.resumo = resumo(0, 0);
+    }
+
+    assert.equal(primeira.semResumo.length, 10);
+    assert.deepEqual(dividir(candidatos, { totalKm: 900 }).semResumo, []);
+  });
+
   it("limite de 7 h por dia encurta o alvo pelo perfil", () => {
     const candidatos = [cidade(1, 445, 5, 1), cidade(2, 545, 5, 1), cidade(3, 990, 5, 1), cidade(4, 1040, 5, 1)];
 

@@ -340,6 +340,8 @@ async function buscarCandidatos(cidades: string[]): Promise<CandidatoRoteiro[]> 
     where: {
       cidade: { in: cidades },
       status: StatusPonto.PUBLICADO,
+      // Hotel não é parada de passeio: o pernoite se escolhe à parte ("Onde dormir").
+      categoria: { not: "Hospedagem" },
     },
     select: {
       id: true,

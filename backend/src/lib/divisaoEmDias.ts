@@ -97,10 +97,11 @@ export function dividirEmDias(entrada: EntradaDaDivisao): DivisaoDaPerna {
 
   // Quem tem hospedagem conhecida, ou não tem contagem (não dá para descartar sem saber).
   const elegiveis = (lista: CandidatoDePernoite[], kmAlvo: number) => {
-    lista
-      .filter((c) => c.resumo === undefined)
+    // As 10 mais perto do alvo, tenham resumo ou não: assim a rodada seguinte não pede outras 10.
+    [...lista]
       .sort((a, b) => Math.abs(a.km - kmAlvo) - Math.abs(b.km - kmAlvo) || a.km - b.km)
       .slice(0, MAX_RESUMOS_POR_FAIXA)
+      .filter((c) => c.resumo === undefined)
       .forEach((c) => semResumo.add(c.codigoIbge));
 
     if (lista.some((c) => !temResumo(c))) {

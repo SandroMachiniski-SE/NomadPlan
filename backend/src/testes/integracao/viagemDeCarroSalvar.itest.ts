@@ -3,6 +3,9 @@ import { after, afterEach, before, beforeEach, describe, it } from "node:test";
 import assert from "node:assert/strict";
 import prisma from "../../lib/prisma";
 import { criarCliente, criarUsuario, iniciarServidor, limparBanco, type ServidorDeTeste } from "../suporte";
+import { pontosDaCidade } from "../../lib/cidadesSobDemanda";
+import { cidadesComPontos } from "../../lib/cidades";
+import { gerarRoteiroSugerido } from "../../lib/recomendacao";
 import { estradaReta, instalarViagemFalsa, JOINVILLE, prepararBrasilia, type ViagemFalsa } from "../viagemFalsa";
 
 const INICIO = new Date(2026, 9, 26, 9, 0, 0).toISOString();
@@ -175,6 +178,22 @@ describe("salvar e ler a viagem de carro", () => {
     assert.equal(r.corpo.trechosDeEstrada[0].litros, Number(trechos.find((t) => t.dia === 1)!.litros));
   });
 
+  it("depois de salvar, a cidade de pernoite não parece preparada nem vira roteiro de hotéis", async () => {
+    const { pedido } = await gerarEMontar(false);
+    assert.equal((await salvar(pedido)).status, 201);
+    const a = await prisma.municipio.findUnique({ where: { codigoIbge: 1000010 } });
+
+    assert.equal(await pontosDaCidade("Cidade A", a!.latitude, a!.longitude), 0);
+    assert.ok(!(await cidadesComPontos()).some((c) => c.cidade === "Cidade A"));
+    const roteiro = await gerarRoteiroSugerido({
+      cidade: "Cidade A",
+      horasDisponiveis: 6,
+      interesses: [],
+      dataHoraInicio: new Date(INICIO),
+    });
+    assert.deepEqual(roteiro.pontos, []);
+  });
+
   it("idOsm que não está no resumo da cidade dá 400", async () => {
     const { pedido } = await gerarEMontar();
     pedido.viagemDeCarro.noites[0] = { ...pedido.viagemDeCarro.noites[0], idOsm: "node/999999" };
@@ -196,6 +215,17 @@ describe("salvar e ler a viagem de carro", () => {
     assert.equal(r.corpo.erro, "A rota mudou desde a geração; gere de novo.");
     assert.equal(await prisma.roteiro.count(), 0);
     assert.equal(await prisma.trechoEstrada.count(), 0);
+  });
+
+  it("salvar com horas de passeio diferentes das da geração, que mudam os dias, dá 409", async () => {
+    const { pedido } = await gerarEMontar(false);
+    // Com 9 h, a chegada de ~500 km (~6h15) é descontada do 1º dia em Brasília e tudo anda um dia.
+    pedido.viagemDeCarro.horasDisponiveis = 9;
+
+    const r = await salvar(pedido);
+
+    assert.equal(r.status, 409);
+    assert.equal(await prisma.roteiro.count(), 0);
   });
 
   it("pernoite enviado nas paradas num dia de estrada dá 400", async () => {
@@ -251,6 +281,15 @@ describe("salvar e ler a viagem de carro", () => {
     assert.ok(!("litros" in r.corpo.trechosDeEstrada[0]) && !("custoCentavos" in r.corpo.trechosDeEstrada[0]));
     assert.ok(!("consumoKmPorLitro" in r.corpo.viagemDeCarro) && !("precoLitroCentavos" in r.corpo.viagemDeCarro));
     assert.equal(r.corpo.viagemDeCarro.kmPorDia, 500);
+    // Os pernoites da estrada aparecem como pernoites, com o título, e não como atividades.
+    const pernoites = r.corpo.itens.filter((i: { pernoite?: boolean }) => i.pernoite);
+    assert.deepEqual(
+      pernoites.map((i: { dia: number; titulo: string }) => [i.dia, i.titulo]),
+      [
+        [1, "Pernoite em Cidade A (hotel a definir)"],
+        [2, "Pernoite em Cidade B (hotel a definir)"],
+      ],
+    );
   });
 
   it("restaurar uma versão traz de volta os trechos e os campos da viagem", async () => {

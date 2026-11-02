@@ -79,6 +79,8 @@ describe("viagem de carro no gerador de roteiro", () => {
     assert.equal(r.corpo.viagemDeCarro.origem.codigoIbge, 4209102);
     // As etapas voltam resolvidas nos municípios, para o salvamento mandar os códigos.
     assert.deepEqual(r.corpo.viagemDeCarro.etapas, [{ codigoIbge: 5300108, cidade: "Brasília", uf: "DF", dias: 4 }]);
+    // As horas de passeio usadas no plano, para o salvamento mandar as mesmas.
+    assert.equal(r.corpo.viagemDeCarro.horasDisponiveis, 6);
   });
 
   it("sem casa e sem origem dá 400 'Informe de onde você sai.'", async () => {

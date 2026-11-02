@@ -37,10 +37,11 @@ export interface CidadeComPontos {
 }
 
 /** Cidades que têm pontos publicados, com a quantidade de pontos de cada uma. */
+/** Cidades com pontos para visitar (hospedagens não contam: são onde dormir, não um passeio). */
 export async function cidadesComPontos(): Promise<CidadeComPontos[]> {
   const grupos = await prisma.pontoTuristico.groupBy({
     by: ["cidade"],
-    where: { status: StatusPonto.PUBLICADO },
+    where: { status: StatusPonto.PUBLICADO, categoria: { not: "Hospedagem" } },
     _count: { _all: true },
   });
 

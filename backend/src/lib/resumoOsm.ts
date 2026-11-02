@@ -176,7 +176,15 @@ async function consultarOverpass(cidades: CidadeParaResumo[], tempoLimiteMs: num
       throw new Error(`O Overpass respondeu ${resposta.status}.`);
     }
 
-    return ((await resposta.json()) as { elements?: ElementoOsm[] }).elements ?? [];
+    const corpo = (await resposta.json()) as { elements?: ElementoOsm[]; remark?: string };
+
+    // Quando estoura o próprio tempo limite, o Overpass responde 200 com os elementos vazios (ou
+    // pela metade) e o aviso no "remark": isso é falha, não "nenhum hotel" (que ficaria 30 dias).
+    if (/runtime error/i.test(corpo.remark ?? "")) {
+      throw new Error(`O Overpass não terminou a consulta: ${corpo.remark}`);
+    }
+
+    return corpo.elements ?? [];
   });
 }
 

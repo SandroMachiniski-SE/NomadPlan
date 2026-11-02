@@ -78,6 +78,8 @@ export interface ViagemDeCarroPlanejada {
   origem: MunicipioEscolhido;
   /** As etapas resolvidas nos municípios (o salvamento manda os códigos). */
   etapas: (MunicipioEscolhido & { dias: number })[];
+  /** Horas de passeio por dia usadas no plano (o salvamento manda as mesmas). */
+  horasDisponiveis: number;
   kmPorDia: number;
   horasPorDia: number | null;
   comVolta: boolean;

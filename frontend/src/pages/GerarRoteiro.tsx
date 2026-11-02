@@ -265,7 +265,7 @@ function GerarRoteiro() {
               viagemDeCarro: {
                 origem: planejada.origem.codigoIbge,
                 etapas: planejada.etapas.map(({ codigoIbge, dias }) => ({ codigoIbge, dias })),
-                horasDisponiveis: Number(horasDisponiveis),
+                horasDisponiveis: planejada.horasDisponiveis,
                 kmPorDia: planejada.kmPorDia,
                 ...(planejada.horasPorDia !== null ? { horasPorDia: planejada.horasPorDia } : {}),
                 comVolta: planejada.comVolta,
