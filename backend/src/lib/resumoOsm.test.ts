@@ -79,12 +79,26 @@ describe("distribuirElementos", () => {
 });
 
 describe("consultaDoResumo", () => {
-  it("procura em 8 km de cada cidade, com timeout de 25 s e o centro das áreas", () => {
+  it("procura num retângulo de 8 km em volta de cada cidade, com timeout de 25 s e o centro das áreas", () => {
     const consulta = consultaDoResumo([A, B]);
 
-    assert.ok(consulta.includes("around:8000,0,0)"), consulta);
-    assert.ok(consulta.includes("around:8000,0,0.072)"), consulta);
+    // 8 km ≈ 0,0719° no equador; o "around" era lento demais nos servidores públicos.
+    assert.ok(consulta.includes("(-0.0719,-0.0719,0.0719,0.0719)"), consulta);
+    assert.ok(consulta.includes("(-0.0719,0.0001,0.0719,0.1439)"), consulta);
+    assert.ok(!consulta.includes("around"), consulta);
     assert.ok(consulta.startsWith("[out:json][timeout:25];"), consulta);
     assert.ok(consulta.trimEnd().endsWith("out center tags;"), consulta);
+  });
+
+  it("aceita um timeout maior (preparo antes da banca)", () => {
+    assert.ok(consultaDoResumo([A], 170).startsWith("[out:json][timeout:170];"));
+  });
+
+  it("não procura monumentos nem praças, que são numerosos demais nas cidades grandes", () => {
+    const consulta = consultaDoResumo([A]);
+
+    assert.ok(!consulta.includes("historic"), consulta);
+    assert.ok(!consulta.includes("leisure"), consulta);
+    assert.ok(consulta.includes("museum"), consulta);
   });
 });

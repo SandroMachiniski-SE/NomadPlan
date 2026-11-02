@@ -186,6 +186,18 @@ describe("dividirEmDias", () => {
     assert.deepEqual(d.semResumo, [1]);
   });
 
+  it("pede resumo só das 10 cidades mais perto do alvo em cada faixa", () => {
+    // 14 cidades sem resumo entre os km 455 e 520: as 10 mais perto do km 500 são as de 470 a 520.
+    const candidatos = Array.from({ length: 14 }, (_, i) => cidade(i + 1, 455 + i * 5, undefined));
+
+    const d = dividir(candidatos, { totalKm: 900 });
+
+    assert.deepEqual(
+      [...d.semResumo].sort((a, b) => a - b),
+      [5, 6, 7, 8, 9, 10, 11, 12, 13, 14],
+    );
+  });
+
   it("limite de 7 h por dia encurta o alvo pelo perfil", () => {
     const candidatos = [cidade(1, 445, 5, 1), cidade(2, 545, 5, 1), cidade(3, 990, 5, 1), cidade(4, 1040, 5, 1)];
 

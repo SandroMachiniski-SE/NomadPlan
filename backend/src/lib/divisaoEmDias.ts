@@ -12,6 +12,9 @@ export const FAIXA_KM = 50;
 export const FAIXA_ALARGADA_KM = 100;
 export const FRACAO_DIA_CURTO = 0.3;
 export const MAX_ALTERNATIVAS = 3;
+// Cidades de cada faixa cujo resumo é buscado (as mais perto do alvo): numa região metropolitana a
+// faixa tem dezenas de municípios e a consulta ao Overpass ficaria pesada demais.
+export const MAX_RESUMOS_POR_FAIXA = 10;
 const PESOS = { proximidade: 0.4, hospedagens: 0.35, atracoes: 0.25 };
 const HOSPEDAGENS_PARA_NOTA_CHEIA = 20;
 const ATRACOES_PARA_NOTA_CHEIA = 10;
@@ -93,10 +96,15 @@ export function dividirEmDias(entrada: EntradaDaDivisao): DivisaoDaPerna {
   const naFaixa = (inicio: number, fim: number) => candidatos.filter((c) => c.km >= inicio && c.km <= fim);
 
   // Quem tem hospedagem conhecida, ou não tem contagem (não dá para descartar sem saber).
-  const elegiveis = (lista: CandidatoDePernoite[]) => {
-    for (const c of lista) {
-      if (c.resumo === undefined) semResumo.add(c.codigoIbge);
-      if (!temResumo(c)) avisar("Não foi possível contar os hotéis agora; as cidades estão só pela distância.");
+  const elegiveis = (lista: CandidatoDePernoite[], kmAlvo: number) => {
+    lista
+      .filter((c) => c.resumo === undefined)
+      .sort((a, b) => Math.abs(a.km - kmAlvo) - Math.abs(b.km - kmAlvo) || a.km - b.km)
+      .slice(0, MAX_RESUMOS_POR_FAIXA)
+      .forEach((c) => semResumo.add(c.codigoIbge));
+
+    if (lista.some((c) => !temResumo(c))) {
+      avisar("Não foi possível contar os hotéis agora; as cidades estão só pela distância.");
     }
 
     return lista.filter((c) => !temResumo(c) || c.resumo.totalHospedagens >= 1);
@@ -117,11 +125,11 @@ export function dividirEmDias(entrada: EntradaDaDivisao): DivisaoDaPerna {
 
     const kmAlvo = pos + alvoDoDia;
     let largura = FAIXA_KM;
-    let opcoes = elegiveis(naFaixa(kmAlvo - FAIXA_KM, kmAlvo + FAIXA_KM));
+    let opcoes = elegiveis(naFaixa(kmAlvo - FAIXA_KM, kmAlvo + FAIXA_KM), kmAlvo);
 
     if (opcoes.length === 0) {
       largura = FAIXA_ALARGADA_KM;
-      opcoes = elegiveis(naFaixa(kmAlvo - FAIXA_ALARGADA_KM, kmAlvo + FAIXA_ALARGADA_KM));
+      opcoes = elegiveis(naFaixa(kmAlvo - FAIXA_ALARGADA_KM, kmAlvo + FAIXA_ALARGADA_KM), kmAlvo);
     }
 
     const ordenadas = [...opcoes].sort(

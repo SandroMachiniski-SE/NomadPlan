@@ -36,6 +36,7 @@ describe("viagem de carro no gerador de roteiro", () => {
   let ofertas: { municipio: Municipio; hoteis: number; atracoes: number }[] = [];
   // Estrada de cada destino, achado pelas coordenadas na URL do OSRM.
   let estradas: { destino: Municipio; responder: () => { status?: number; corpo: unknown } }[] = [];
+  let overpassFora = false;
 
   before(async () => {
     servidor = await iniciarServidor();
@@ -46,6 +47,7 @@ describe("viagem de carro no gerador de roteiro", () => {
     await limparBanco();
     ofertas = [];
     estradas = [];
+    overpassFora = false;
     mapas = instalarMapasFalsos({
       osrm: (url) => {
         // O banco devolve as coordenadas com 15 dígitos: compara com tolerância.
@@ -54,6 +56,7 @@ describe("viagem de carro no gerador de roteiro", () => {
         return estrada?.responder() ?? { status: 500, corpo: {} };
       },
       overpass: () => ({
+        ...(overpassFora ? { status: 504 } : {}),
         corpo: {
           elements: ofertas.flatMap(({ municipio, hoteis, atracoes }, i) => [
             ...Array.from({ length: hoteis }, (_, j) => ({
@@ -319,6 +322,22 @@ describe("viagem de carro no gerador de roteiro", () => {
 
     assert.equal(r.status, 503);
     assert.equal(r.corpo.erro, "Não consegui calcular a rota agora; tente de novo em alguns minutos.");
+  });
+
+  it("Overpass fora do ar: uma consulta só e as cidades pela distância", async () => {
+    await prepararBrasilia();
+    overpassFora = true;
+    const { token } = await comCasa(JOINVILLE);
+
+    const r = await gerar(token, { etapas: [{ cidade: "Brasília, DF", dias: 1 }], viagemDeCarro: {} });
+
+    assert.equal(r.status, 200, JSON.stringify(r.corpo));
+    assert.equal(mapas!.chamadas.filter((c) => c.servico === "overpass").length, 1);
+    assert.ok(r.corpo.viagemDeCarro.avisos.includes("Não foi possível contar os hotéis agora; as cidades estão só pela distância."));
+    assert.deepEqual(
+      r.corpo.viagemDeCarro.pernas[0].trechos.map((t: { pernoite: { cidade: string } | null }) => t.pernoite?.cidade ?? null),
+      ["Cidade A", "Cidade B", null],
+    );
   });
 
   it("sem viagemDeCarro a resposta é a de hoje, com viagemDeCarro null", async () => {

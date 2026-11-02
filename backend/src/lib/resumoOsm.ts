@@ -40,19 +40,32 @@ interface CidadeParaResumo {
   longitude: number;
 }
 
-export function consultaDoResumo(cidades: { latitude: number; longitude: number }[]): string {
+const grau = (valor: number) => Number(valor.toFixed(4));
+
+/** Retângulo (sul, oeste, norte, leste) que contém o círculo de `raioKm` em volta do ponto. */
+function retangulo(latitude: number, longitude: number, raioKm: number): string {
+  const dLat = raioKm / 111.32;
+  const dLon = raioKm / (111.32 * Math.cos((latitude * Math.PI) / 180));
+
+  return `${grau(latitude - dLat)},${grau(longitude - dLon)},${grau(latitude + dLat)},${grau(longitude + dLon)}`;
+}
+
+export function consultaDoResumo(cidades: { latitude: number; longitude: number }[], timeoutSegundos = 25): string {
+  // Monumentos (historic) e praças (leisure=park) ficam de fora: nas regiões metropolitanas são
+  // milhares e a consulta estourava o tempo limite do Overpass. Pelo mesmo motivo a busca é por
+  // retângulo, bem mais rápida que "around"; o raio de 8 km é conferido depois, no código.
   const filtros = [
     `["tourism"~"^(${[...TIPOS_DE_HOSPEDAGEM, ...TURISMO_ATRACAO].join("|")})$"]`,
-    `["historic"]`,
-    `["leisure"="park"]`,
     `["natural"~"^(beach|waterfall)$"]`,
     `["waterway"="waterfall"]`,
   ];
-  const linhas = cidades.flatMap(({ latitude, longitude }) =>
-    filtros.map((filtro) => `  nwr(around:${RAIO_DA_CIDADE_KM * 1000},${latitude},${longitude})${filtro}["name"];`),
-  );
+  const linhas = cidades.flatMap(({ latitude, longitude }) => {
+    const caixa = retangulo(latitude, longitude, RAIO_DA_CIDADE_KM);
 
-  return `[out:json][timeout:25];\n(\n${linhas.join("\n")}\n);\nout center tags;\n`;
+    return filtros.map((filtro) => `  nwr${filtro}["name"](${caixa});`);
+  });
+
+  return `[out:json][timeout:${timeoutSegundos}];\n(\n${linhas.join("\n")}\n);\nout center tags;\n`;
 }
 
 function ehAtracao(tags: Record<string, string>): boolean {
@@ -147,13 +160,16 @@ function naFila<T>(tarefa: () => Promise<T>): Promise<T> {
   return resultado;
 }
 
-async function consultarOverpass(cidades: CidadeParaResumo[]): Promise<ElementoOsm[]> {
+async function consultarOverpass(cidades: CidadeParaResumo[], tempoLimiteMs: number): Promise<ElementoOsm[]> {
+  // O servidor desiste 5 s antes de nós, para a resposta (mesmo vazia) ainda chegar.
+  const timeoutDoServidor = Math.max(5, Math.round(tempoLimiteMs / 1000) - 5);
+
   return naFila(async () => {
     const resposta = await fetch(OVERPASS_URL, {
       method: "POST",
-      body: new URLSearchParams({ data: consultaDoResumo(cidades) }),
+      body: new URLSearchParams({ data: consultaDoResumo(cidades, timeoutDoServidor) }),
       headers: { "User-Agent": AGENTE, Accept: "application/json" },
-      signal: AbortSignal.timeout(TEMPO_LIMITE_MS),
+      signal: AbortSignal.timeout(tempoLimiteMs),
     });
 
     if (!resposta.ok) {
@@ -173,7 +189,11 @@ interface MunicipioComResumo extends CidadeParaResumo {
  * Resumo de cada município pedido: do cache (30 dias) ou de uma consulta só ao Overpass para
  * todos os que faltam. Se o Overpass falhar, usa o resumo vencido; sem nenhum, `null`.
  */
-export async function resumirCidades(codigos: number[], agora: Date = new Date()): Promise<Map<number, ResumoOsm | null>> {
+export async function resumirCidades(
+  codigos: number[],
+  agora: Date = new Date(),
+  tempoLimiteMs = TEMPO_LIMITE_MS,
+): Promise<Map<number, ResumoOsm | null>> {
   const resultado = new Map<number, ResumoOsm | null>();
 
   if (codigos.length === 0) return resultado;
@@ -194,7 +214,7 @@ export async function resumirCidades(codigos: number[], agora: Date = new Date()
   if (faltando.length === 0) return resultado;
 
   try {
-    const resumos = distribuirElementos(await consultarOverpass(faltando), faltando);
+    const resumos = distribuirElementos(await consultarOverpass(faltando, tempoLimiteMs), faltando);
 
     for (const [codigo, resumo] of resumos) {
       await prisma.$executeRaw`

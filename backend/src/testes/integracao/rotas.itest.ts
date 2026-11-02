@@ -191,8 +191,8 @@ describe("resumos das cidades", () => {
     const resumos = await resumirCidades([A.codigoIbge, B.codigoIbge]);
 
     const consulta = mapas.chamadas.find((c) => c.servico === "overpass")!.corpo!;
-    assert.ok(consulta.includes("around:8000,-18,-48)"), consulta);
-    assert.ok(!consulta.includes("around:8000,-20,-48)"), consulta);
+    assert.ok(consulta.includes("(-18.0719,-48.0756,-17.9281,-47.9244)"), consulta);
+    assert.ok(!consulta.includes("(-20.0719,"), consulta);
     assert.equal(resumos.get(A.codigoIbge)!.totalHospedagens, 3);
     assert.equal(resumos.get(B.codigoIbge)!.totalHospedagens, 1);
 
@@ -208,6 +208,15 @@ describe("resumos das cidades", () => {
     const resumos = await resumirCidades([A.codigoIbge]);
 
     assert.equal(resumos.get(A.codigoIbge)!.totalHospedagens, 3);
+  });
+
+  it("o preparo antes da banca pode esperar mais pelo Overpass", async () => {
+    mapas = instalarMapasFalsos({ overpass: () => ({ corpo: { elements: [] } }) });
+
+    await resumirCidades([B.codigoIbge], new Date(), 175_000);
+
+    const consulta = mapas.chamadas.find((c) => c.servico === "overpass")!.corpo!;
+    assert.ok(consulta.startsWith("[out:json][timeout:170];"), consulta);
   });
 
   it("sem resumo e Overpass fora do ar: devolve null", async () => {
