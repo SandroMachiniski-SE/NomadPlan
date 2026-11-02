@@ -1,3 +1,5 @@
+import type { TrechoDeEstrada, ViagemDeCarroPlanejada, ViagemDoRoteiro } from "./viagem";
+
 export interface PontoResumo {
   id: number;
   nome: string;
@@ -73,6 +75,10 @@ export interface ViagemEntreDias extends Trecho {
   dia: number;
   de: string;
   para: string;
+  /** Viagem de carro: km e tempo reais da estrada. */
+  estrada?: boolean;
+  /** Volta curta para casa, no fim do dia. */
+  noFimDoDia?: boolean;
 }
 
 export interface Roteiro {
@@ -100,6 +106,8 @@ export interface Roteiro {
   /** Dono do roteiro (útil quando ele foi compartilhado). */
   usuario?: { id: number; nome: string };
   colaboradores?: Colaborador[];
+  viagemDeCarro?: ViagemDoRoteiro | null;
+  trechosDeEstrada?: TrechoDeEstrada[];
 }
 
 export type PapelColaborador = "EDITOR" | "LEITOR";
@@ -177,6 +185,7 @@ export interface RespostaRecomendacao {
   avisos: string[];
   inicio: string;
   fallbackUsado: boolean;
+  viagemDeCarro?: ViagemDeCarroPlanejada | null;
 }
 
 export interface VersaoRoteiro {
