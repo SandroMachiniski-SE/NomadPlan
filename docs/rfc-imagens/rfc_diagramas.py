@@ -162,19 +162,24 @@ def c4_contexto():
     caixa(ax, 52, 26, 38, 28, "NomadPlan", "Plataforma de turismo inteligente:\ninventário turístico colaborativo,\nbusca, recomendações e roteiros\npersonalizados e compartilháveis", TEAL, TEAL_CLARO, tam=12)
 
     externos = [
-        ("Servidor SMTP", "e-mails de recuperação\nde senha e de convites", 67),
-        ("OpenStreetMap", "mapas (tiles) e dados dos\npontos (Overpass API)", 50),
-        ("Wikimedia Commons", "fotos dos pontos importados,\ncom autor e licença", 33),
-        ("Aplicativo autenticador", "gera os códigos TOTP\nda verificação em 2 etapas", 16),
+        ("Servidor SMTP", "e-mails de recuperação\nde senha e de convites", "envia e-mails"),
+        ("OpenStreetMap", "mapas (tiles) e dados dos\npontos (Overpass API)", "mapas e\nimportação"),
+        ("Wikimedia Commons", "fotos dos pontos importados,\ncom autor e licença", "fotos"),
+        ("Overture Maps e IBGE", "telefones, sites e hospedagens;\nlista oficial de municípios", "dados abertos\n(importação)"),
+        ("OSRM", "rotas de carro entre as\ncidades (viagem de carro)", "rotas"),
+        ("Google Maps (opcional)", "nota, horário e foto\nconsultados na hora", "consulta"),
+        ("Aplicativo autenticador", "gera os códigos TOTP\nda verificação em 2 etapas", None),
     ]
-    for nome, desc, y in externos:
-        caixa(ax, 108, y - 5, 30, 11, nome, desc, CINZA, CINZA_CLARO, tam=8.5, tracejada=True)
-    seta(ax, (90, 48), (108, 67.5), "envia e-mails", pos=0.5)
-    seta(ax, (90, 43), (108, 50.5), "mapas e\nimportação", pos=0.5)
-    seta(ax, (90, 37), (108, 33.5), "fotos", pos=0.5)
-    seta(ax, (108, 16.5), (90, 30), "código de 6 dígitos\n(digitado pelo usuário)", pos=0.45)
+    topo, passo = 76, 11.2
+    for i, (nome, desc, rotulo) in enumerate(externos):
+        y = topo - i * passo
+        caixa(ax, 108, y - 4.75, 30, 9.5, nome, desc, CINZA, CINZA_CLARO, tam=8.5, tracejada=True)
+        if rotulo:
+            seta(ax, (90, 53 - i * 3), (108, y), rotulo, pos=0.55)
+        else:
+            seta(ax, (108, y), (90, 28), "código de 6 dígitos\n(digitado pelo usuário)", pos=0.5)
 
-    ax.text(70, 76, "Diagrama de contexto (C4 — nível 1)", ha="center", fontsize=11, fontweight="bold", color=TEXTO)
+    ax.text(52, 78, "Diagrama de contexto (C4 — nível 1)", ha="center", fontsize=11, fontweight="bold", color=TEXTO)
     salvar(fig, "c4_contexto.png")
 
 
@@ -189,24 +194,26 @@ def c4_containers():
 
     caixa(ax, 38, 46, 28, 18, "Aplicação web (SPA)", "React 19 + TypeScript + Vite\nReact Router · Leaflet · Axios\nservida como arquivos estáticos", TEAL, TEAL_CLARO, tam=9)
     caixa(ax, 80, 46, 28, 18, "API REST", "Node.js 22 + Express + TypeScript\nZod · JWT · bcrypt · Prisma\nrate limit · auditoria · métricas\nserve as imagens em /uploads", TEAL, TEAL_CLARO, tam=9)
-    caixa(ax, 80, 10, 28, 18, "Banco de dados", "PostgreSQL 16 + PostGIS\n(índice geográfico GiST)\n16 tabelas", TEAL, TEAL_CLARO, tam=9)
+    caixa(ax, 80, 10, 28, 18, "Banco de dados", "PostgreSQL 16 + PostGIS\n(índice geográfico GiST)\n19 tabelas", TEAL, TEAL_CLARO, tam=9)
     caixa(ax, 38, 10, 28, 18, "Arquivos enviados", "imagens de pontos e\nfotos de avaliações\n(pasta UPLOADS_DIR)", TEAL, TEAL_CLARO, tam=9)
 
-    caixa(ax, 122, 54, 26, 14, "Servidor SMTP", "Gmail, Brevo, Mailpit...", CINZA, CINZA_CLARO, tam=9, tracejada=True)
-    caixa(ax, 122, 20, 26, 14, "OpenStreetMap", "tiles do mapa · dados dos\npontos · fotos (Wikimedia)", CINZA, CINZA_CLARO, tam=9, tracejada=True)
+    caixa(ax, 122, 58, 26, 14, "Servidor SMTP", "Gmail, Brevo, Mailpit...", CINZA, CINZA_CLARO, tam=9, tracejada=True)
+    caixa(ax, 122, 14, 26, 14, "OpenStreetMap", "tiles do mapa · dados dos\npontos · fotos (Wikimedia)", CINZA, CINZA_CLARO, tam=9, tracejada=True)
+    caixa(ax, 122, 38, 26, 14, "Rotas e outras fontes", "OSRM · IBGE · Overture\nGoogle (opcional)", CINZA, CINZA_CLARO, tam=9, tracejada=True)
 
     seta(ax, (24, 49), (38, 55), "HTTPS", pos=0.5, desloc=(0, 3))
     seta(ax, (66, 55), (80, 55), None)
     ax.text(73, 59.5, "JSON / HTTPS\nBearer JWT", ha="center", fontsize=6.3, color=CINZA)
     seta(ax, (94, 46), (94, 28), "SQL (Prisma)", pos=0.5, desloc=(8, 0))
     seta(ax, (80, 50), (66, 24), "grava / lê", pos=0.45, desloc=(-5, 1.5))
-    seta(ax, (108, 58), (122, 60), "SMTP", pos=0.5, desloc=(0, 2.5))
+    seta(ax, (108, 58), (122, 64), "SMTP", pos=0.5, desloc=(0, 2.5))
     # Os pontos vêm de um script da própria API, rodado pela equipe (não a cada requisição).
-    seta(ax, (108, 49), (122, 30), "importação\n(npm run osm:baixar)", pos=0.5, desloc=(10, 0.5))
+    seta(ax, (108, 49), (122, 22), "importação\n(osm:baixar)", pos=0.5, desloc=(1, -5))
+    seta(ax, (108, 53), (122, 46), "rotas e\nmunicípios", pos=0.5, desloc=(0, 4.5))
 
     # O mapa é desenhado no navegador: os tiles vêm do OpenStreetMap direto para o usuário.
     ax.plot([13, 13, 135], [40, 0.5, 0.5], color=CINZA, linewidth=1.1, linestyle="--", solid_capstyle="butt")
-    ax.add_patch(FancyArrowPatch((135, 0.5), (135, 20), arrowstyle="-|>", mutation_scale=9, linewidth=1.1, color=CINZA,
+    ax.add_patch(FancyArrowPatch((135, 0.5), (135, 14), arrowstyle="-|>", mutation_scale=9, linewidth=1.1, color=CINZA,
                                  linestyle="--", shrinkA=0, shrinkB=2))
     ax.text(74, 0.5, "tiles do mapa e fotos (HTTPS, direto do navegador)", fontsize=6.3, color=CINZA, ha="center", va="center",
             bbox=dict(boxstyle="round,pad=0.25", facecolor="white", edgecolor="none"))
@@ -239,24 +246,24 @@ def c4_componentes():
         caixa(ax, 32 + i * 21, 68, 19.5, 16, t, s, CORAL, CORAL_CLARO, tam=7.5)
 
     grupo(30, 37, 128, 25, "Rotas (controladores)", TEAL)
-    rotas = ["/auth", "/pontos", "/roteiros", "/convites", "/salvos", "/sugestoes\n/verificacoes\n/avaliacoes", "/notificacoes", "/admin"]
+    rotas = ["/auth", "/pontos", "/roteiros", "/cidades", "/convites\n/salvos", "/sugestoes\n/verificacoes\n/avaliacoes", "/notificacoes", "/admin"]
     for i, t in enumerate(rotas):
         caixa(ax, 32 + i * 15.75, 39, 14.5, 17, t, None, TEAL, TEAL_CLARO, tam=7.5)
 
     grupo(30, 3, 128, 30, "Serviços e regras de negócio (src/lib)", ROXO)
     libs = [
         ("Busca", "filtros · cache de\ncontingência · timeout"),
-        ("Recomendação", "planejador com\nhorários e distância"),
-        ("Horários", "interpreta o texto de\nfuncionamento"),
+        ("Recomendação", "planejador com horários,\ndistância e similaridade"),
         ("Trajeto", "trechos e otimização\n(vizinho + 2-opt)"),
-        ("Similaridade", "usuários de\ngosto parecido"),
+        ("Viagem de carro", "dias por km ou horas,\npernoite e combustível"),
+        ("Cidades e rotas", "municípios (IBGE) ·\nOSRM · cache de rotas"),
+        ("Fontes de dados", "OSM · Overture · Google\ncuradoria oficial"),
         ("Orçamento", "custos por dia\ne teto"),
         ("Versionamento", "histórico de pontos\ne roteiros"),
         ("Privacidade", "exportar dados ·\nanonimizar conta"),
         ("TOTP + cripto", "2FA · AES-256-GCM"),
         ("E-mail", "senha e convites"),
-        ("Auditoria", "log de ações\nsensíveis"),
-        ("Métricas", "uso diário em lote"),
+        ("Auditoria e métricas", "log de ações sensíveis ·\nuso diário em lote"),
     ]
     for i, (t, s) in enumerate(libs):
         col, lin = i % 6, i // 6
@@ -274,7 +281,7 @@ def c4_componentes():
 # ---------------------------------------------------------------- modelo de dados
 def der():
     fig, ax = novo(18, 13)
-    ax.text(90, 126, "Modelo de dados (PostgreSQL) — 16 tabelas", ha="center", fontsize=12, fontweight="bold", color=TEXTO)
+    ax.text(90, 126, "Modelo de dados (PostgreSQL) — 19 tabelas", ha="center", fontsize=12, fontweight="bold", color=TEXTO)
 
     tabelas = {}
 
@@ -291,8 +298,8 @@ def der():
 
     # coluna central: conta e inventário
     tabela("log_auditoria", 48, 112, ["PK id", "FK id_usuario (opcional)", "acao · entidade · detalhes"], CINZA, CINZA_CLARO, w=36)
-    tabela("usuario", 48, 78, ["PK id", "email (único)", "senha_hash", "tipo_conta", "interesses[] · idioma", "preferencias_acessibilidade[]", "mfa_ativo · mfa_segredo (cifrado)", "consentimento_em · removido_em", "reputacao · ativo"], CORAL, CORAL_CLARO, w=36)
-    tabela("ponto_turistico", 48, 34, ["PK id", "FK id_responsavel → usuario", "nome · categoria · cidade", "latitude · longitude", "geom (PostGIS, gerada)", "horario_funcionamento", "status · selo_verificado", "versao (bloqueio otimista)"], w=36)
+    tabela("usuario", 48, 78, ["PK id", "email (único) · senha_hash", "tipo_conta", "interesses[] · idioma", "preferencias_acessibilidade[]", "mfa_ativo · mfa_segredo (cifrado)", "consentimento_em · removido_em", "reputacao · ativo · versao_sessao", "FK codigo_municipio_base · consumo_km_l"], CORAL, CORAL_CLARO, w=36)
+    tabela("ponto_turistico", 48, 34, ["PK id", "FK id_responsavel → usuario", "nome · categoria · cidade", "latitude · longitude", "geom (PostGIS, gerada)", "horario_funcionamento", "status · selo_verificado", "versao (bloqueio) · origem · id_osm"], w=36)
     tabela("versao_ponto", 48, 8, ["PK id", "FK id_ponto", "dados (JSON) · motivo"], w=36)
 
     # coluna esquerda
@@ -303,8 +310,13 @@ def der():
     tabela("solicitacao_verificacao", 4, 10, ["PK id", "FK id_ponto · FK id_solicitante", "comprovacao · status"], w=34)
 
     # coluna dos roteiros
-    tabela("roteiro", 98, 84, ["PK id", "FK id_usuario → usuario (dono)", "nome · cidade · datas", "publico · slug_publico", "notas · orcamento_centavos"], w=38)
-    tabela("item_roteiro", 98, 50, ["PK id", "FK id_roteiro · FK id_ponto", "dia · ordem", "observacao · custo_centavos"], w=38)
+    tabela("roteiro", 98, 84, ["PK id", "FK id_usuario → usuario (dono)", "nome · cidade · datas", "publico · slug_publico", "notas · orcamento_centavos", "FK viagem_origem · km_por_dia · horas", "viagem_volta · consumo · preco_litro"], w=38)
+    tabela("item_roteiro", 98, 52, ["PK id", "FK id_roteiro · FK id_ponto (opcional)", "titulo · periodo · pernoite", "dia · ordem", "observacao · custo_centavos"], w=38)
+
+    # viagem de carro: trechos da estrada, municípios do IBGE e rotas guardadas
+    tabela("trecho_estrada", 98, 29, ["PK id", "FK id_roteiro", "dia · perna · noite", "de_nome → para_nome", "metros · segundos · litros", "tracado (JSON)"], ROXO, ROXO_CLARO, w=38)
+    tabela("rota_em_cache", 98, 8, ["PK id", "FK codigo_origem · codigo_destino", "metros · segundos", "tracado (LineString)", "perfil (JSON) · buscada_em"], ROXO, ROXO_CLARO, w=38)
+    tabela("municipio", 146, 24, ["PK codigo_ibge", "nome · uf", "latitude · longitude", "geom (PostGIS)", "resumo_osm (JSON)"], ROXO, ROXO_CLARO, w=34)
 
     # coluna da colaboração e apoio ao roteiro
     tabela("colaborador_roteiro", 146, 108, ["PK id", "FK id_roteiro · FK id_usuario", "papel (EDITOR | LEITOR)"], ROXO, ROXO_CLARO, w=34)
@@ -342,9 +354,17 @@ def der():
     rel("roteiro", "d", 0.7, "convite_roteiro", "e", 0.5)
     rel("roteiro", "d", 0.4, "versao_roteiro", "e", 0.5)
     rel("roteiro", "d", 0.1, "item_checklist", "e", 0.5)
+    # roteiro -> trecho_estrada: ligação por fora das caixas, para não passar por trás de item_roteiro
+    xr, yr, _, hr = tabelas["roteiro"]
+    xt, yt, _, ht = tabelas["trecho_estrada"]
+    y1, y2 = yr + hr * 0.12, yt + ht * 0.55
+    ax.plot([xr, 94, 94, xt], [y1, y1, y2, y2], color=CINZA, linewidth=0.9, zorder=1, solid_joinstyle="miter")
+    ax.text(xr - 1, y1 + 1.6, "1", fontsize=6.4, color=CORAL, fontweight="bold", ha="right", va="center", zorder=6)
+    ax.text(xt - 1, y2 + 1.6, "N", fontsize=6.4, color=CORAL, fontweight="bold", ha="right", va="center", zorder=6)
+    rel("municipio", "e", 0.5, "rota_em_cache", "d", 0.7)
 
-    ax.text(4, 2, "Linhas: relação 1 → N. Laranja = conta; verde = inventário e roteiros; roxo = colaboração; cinza = apoio (notificações, auditoria, métricas).\n"
-                  "Além do mostrado, colaborador_roteiro e convite_roteiro também apontam para usuario (participante e convidante).",
+    ax.text(4, 2, "Linhas: relação 1 → N. Laranja = conta; verde = inventário e roteiros; roxo = colaboração e viagem de carro; cinza = apoio (notificações, auditoria, métricas).\n"
+                  "Além do mostrado, colaborador_roteiro e convite_roteiro apontam para usuario (participante e convidante), e municipio é referenciado por usuario (cidade de casa) e roteiro (origem da viagem).",
             fontsize=6.6, color=CINZA, va="bottom")
     salvar(fig, "modelo_de_dados.png")
 
