@@ -3,9 +3,11 @@ import prisma from "./prisma";
 import { distanciaMetros } from "./geo";
 import { estaAbertoNoHorario } from "./horarios";
 import { preferenciasAtendidas } from "./preferencias";
+import { cidadesComPontos, normalizarCidade, variantesDaCidade } from "./cidades";
+import { chaveGoogle, detalhesDoGoogle, idGoogleDoPonto } from "./googlePlaces";
+import { minutosEstimados, minutosParaPercorrer } from "./trajeto";
 
 export const DURACAO_VISITA_MIN = 90;
-export const VELOCIDADE_MEDIA_KMH = 25;
 const DESLOCAMENTO_SEM_COORDENADAS_MIN = 15;
 const MAX_PONTOS_ROTEIRO = 10;
 // Se o ponto abre em até 1 h depois da chegada, o passeio espera a abertura em vez de descartá-lo.
@@ -19,6 +21,9 @@ const MINUTOS_POR_PONTO_DE_SCORE = 30;
 // Cada parada já escolhida da mesma categoria tira 1,5 ponto: cinco restaurantes seguidos
 // combinam com o interesse "Gastronomia", mas não fazem um bom passeio.
 const PENALIDADE_CATEGORIA_REPETIDA = 1.5;
+// Quem pede o roteiro de outra cidade (de casa, da faculdade) não deve gastar o passeio inteiro
+// na estrada: além dessa distância do centro dos pontos, a localização é ignorada.
+const DISTANCIA_MAXIMA_DA_LOCALIZACAO_M = 30_000;
 
 export interface CandidatoRoteiro {
   id: number;
@@ -35,6 +40,11 @@ export interface CandidatoRoteiro {
   imagemCredito: string | null;
   seloVerificado: boolean;
   mediaAvaliacao: number | null;
+  /** Só para consultar o Google; não volta na resposta. */
+  idGoogle?: string | null;
+  googleBuscadoEm?: Date | null;
+  /** O horário foi consultado agora no Google Maps (não está no cadastro). */
+  horarioDoGoogle?: boolean;
 }
 
 export interface ParametrosRecomendacao {
@@ -47,7 +57,7 @@ export interface ParametrosRecomendacao {
   longitude?: number;
 }
 
-export interface PontoRecomendado extends Omit<CandidatoRoteiro, "mediaAvaliacao"> {
+export interface PontoRecomendado extends Omit<CandidatoRoteiro, "mediaAvaliacao" | "idGoogle" | "googleBuscadoEm"> {
   distanciaMetros: number | null;
   ordem: number;
   chegadaEstimada: string;
@@ -57,12 +67,40 @@ export interface PontoRecomendado extends Omit<CandidatoRoteiro, "mediaAvaliacao
   duracaoVisitaMin: number;
 }
 
+/** Uma parte da viagem: a cidade e quantos dias passar nela ("Joinville, 2 dias"). */
+export interface EtapaDoRoteiro {
+  cidade: string;
+  dias: number;
+  /** Viagem de carro: número do 1º dia da etapa no roteiro (há dias só de estrada antes). */
+  primeiroDia?: number;
+  /** Viagem de carro: estrada real até a cidade, descontada do 1º dia no lugar da linha reta (null = sem desconto). */
+  chegada?: { de: string; metros: number; minutos: number } | null;
+  /** Viagem de carro: minutos de direção da volta curta, descontados do fim do último dia. */
+  minutosNoFimDoUltimoDia?: number;
+}
+
+export interface DiaDoRoteiroGerado {
+  dia: number;
+  cidade: string;
+  /** Hora em que o passeio do dia começa (depois da viagem, se houver). */
+  inicio: string;
+  /** Estrada desde a cidade do dia anterior, quando ela muda. */
+  viagem: { de: string; metros: number; minutos: number } | null;
+}
+
+export type PontoDoRoteiroGerado = PontoRecomendado & { dia: number };
+
 export interface ResultadoRecomendacao {
-  pontos: PontoRecomendado[];
+  pontos: PontoDoRoteiroGerado[];
   avisos: string[];
   inicio: string;
   fallbackUsado: boolean;
+  dias: DiaDoRoteiroGerado[];
 }
+
+export const MAX_DIAS_GERADOS = 14;
+// Dia de viagem que deixa menos que isso livre fica só com a estrada.
+const HORAS_MINIMAS_PARA_PASSEIO = DURACAO_VISITA_MIN / 60;
 
 export function calcularMaxPontos(horasDisponiveis: number): number {
   const quantidade = Math.floor((horasDisponiveis * 60) / DURACAO_VISITA_MIN);
@@ -121,7 +159,7 @@ function minutosDeViagem(metros: number | null): number {
     return DESLOCAMENTO_SEM_COORDENADAS_MIN;
   }
 
-  return Math.round((metros / 1000 / VELOCIDADE_MEDIA_KMH) * 60);
+  return Math.round(minutosEstimados(metros));
 }
 
 export function pontuarCandidato(
@@ -189,7 +227,7 @@ function distanciaEntre(a: Coordenada | null, b: CandidatoRoteiro): number | nul
 export function planejarRoteiro(
   candidatos: CandidatoRoteiro[],
   params: ParametrosRecomendacao,
-): { pontos: PontoRecomendado[]; avisos: string[] } {
+): { pontos: PontoRecomendado[]; avisos: string[]; fechados: { id: number; texto: string; pontuacao: number }[] } {
   const maxPontos = calcularMaxPontos(params.horasDisponiveis);
   const preferencias = params.preferenciasAcessibilidade ?? [];
   const fimDoPasseio = new Date(params.dataHoraInicio.getTime() + params.horasDisponiveis * 3_600_000);
@@ -264,7 +302,7 @@ export function planejarRoteiro(
 
     const [{ candidato }] = restantes.splice(melhor.indice, 1);
     const saida = new Date(melhor.chegada.getTime() + DURACAO_VISITA_MIN * 60_000);
-    const { mediaAvaliacao: _media, ...dadosDoPonto } = candidato;
+    const { mediaAvaliacao: _media, idGoogle: _idGoogle, googleBuscadoEm: _buscadoEm, ...dadosDoPonto } = candidato;
 
     escolhidos.push({
       ...dadosDoPonto,
@@ -289,20 +327,21 @@ export function planejarRoteiro(
   // com a justificativa, em vez de sumirem sem explicação. Vêm primeiro os que mais
   // combinavam com a pessoa (numa cidade grande, dezenas de bares estão fechados de manhã).
   const idsEscolhidos = new Set(escolhidos.map((p) => p.id));
-  const avisos = [...fechados]
+  const naoEscolhidos = [...fechados]
     .filter(([id]) => !idsEscolhidos.has(id))
-    .sort(([, a], [, b]) => b.pontuacao - a.pontuacao)
-    .map(([, { texto }]) => texto)
-    .slice(0, 5);
+    .map(([id, aviso]) => ({ id, ...aviso }))
+    .sort((a, b) => b.pontuacao - a.pontuacao);
 
-  return { pontos: escolhidos, avisos };
+  return { pontos: escolhidos, avisos: naoEscolhidos.slice(0, 5).map((f) => f.texto), fechados: naoEscolhidos };
 }
 
-async function buscarCandidatos(cidade: string): Promise<CandidatoRoteiro[]> {
+async function buscarCandidatos(cidades: string[]): Promise<CandidatoRoteiro[]> {
   const pontos = await prisma.pontoTuristico.findMany({
     where: {
-      cidade: { equals: cidade, mode: "insensitive" },
+      cidade: { in: cidades },
       status: StatusPonto.PUBLICADO,
+      // Hotel não é parada de passeio: o pernoite se escolhe à parte ("Onde dormir").
+      categoria: { not: "Hospedagem" },
     },
     select: {
       id: true,
@@ -318,6 +357,8 @@ async function buscarCandidatos(cidade: string): Promise<CandidatoRoteiro[]> {
       imagemUrl: true,
       imagemCredito: true,
       seloVerificado: true,
+      idGoogle: true,
+      googleBuscadoEm: true,
     },
   });
 
@@ -386,21 +427,205 @@ export function planejarPorProximidade(
   });
 }
 
-export async function gerarRoteiroSugerido(
+/**
+ * Com a chave do Google configurada, consulta agora o horário dos pontos mais relevantes que não
+ * têm horário no cadastro, para o roteiro não contar com um lugar fechado. O horário vale só para
+ * este roteiro: não é gravado (termos do Google). Devolve quantos pontos ganharam horário.
+ */
+export async function completarHorariosPeloGoogle(
+  candidatos: CandidatoRoteiro[],
   params: ParametrosRecomendacao,
+): Promise<number> {
+  if (!chaveGoogle()) {
+    return 0;
+  }
+
+  const limite = Number(process.env.GOOGLE_PONTOS_POR_ROTEIRO ?? 8);
+  const preferencias = params.preferenciasAcessibilidade ?? [];
+  const escolhidos = candidatos
+    .filter((c) => !c.horarioFuncionamento?.trim())
+    .map((c) => ({ c, pontuacao: pontuarCandidato(c, params.interesses, preferencias) + bonusDeCadastro(c) }))
+    .sort((a, b) => b.pontuacao - a.pontuacao)
+    .slice(0, limite);
+
+  const completados = await Promise.all(
+    escolhidos.map(async ({ c }) => {
+      const idGoogle = await idGoogleDoPonto({ ...c, idGoogle: c.idGoogle ?? null, googleBuscadoEm: c.googleBuscadoEm ?? null });
+      const horario = idGoogle ? (await detalhesDoGoogle(idGoogle))?.horario : null;
+
+      if (!horario) return false;
+
+      c.horarioFuncionamento = horario;
+      c.horarioDoGoogle = true;
+      return true;
+    }),
+  );
+
+  return completados.filter(Boolean).length;
+}
+
+/** Ignora a localização de quem está longe da cidade do roteiro (e avisa por quê). */
+export function ajustarLocalizacao(
+  candidatos: CandidatoRoteiro[],
+  params: ParametrosRecomendacao,
+): { parametros: ParametrosRecomendacao; aviso: string | null } {
+  const centro = calcularCentroide(candidatos);
+
+  if (params.latitude === undefined || params.longitude === undefined || !centro) {
+    return { parametros: params, aviso: null };
+  }
+
+  const metros = distanciaMetros(params.latitude, params.longitude, centro.latitude, centro.longitude);
+
+  if (metros <= DISTANCIA_MAXIMA_DA_LOCALIZACAO_M) {
+    return { parametros: params, aviso: null };
+  }
+
+  const { latitude: _latitude, longitude: _longitude, ...semLocalizacao } = params;
+
+  return {
+    parametros: semLocalizacao,
+    aviso: `Você está a cerca de ${Math.round(metros / 1000)} km de ${params.cidade}: o roteiro começa pelo centro da cidade, sem contar a viagem até lá.`,
+  };
+}
+
+/**
+ * Gera o roteiro, de uma cidade ou de várias ("Joinville, 2 dias → Blumenau, 1 dia"). Cada dia é
+ * planejado na sua cidade, sem repetir pontos entre os dias. No dia em que a cidade muda, o
+ * passeio começa depois da viagem (estimada pela estrada desde a última parada do dia anterior),
+ * e o tempo de estrada sai das horas do dia.
+ */
+export async function gerarRoteiroSugerido(
+  params: ParametrosRecomendacao & { etapas?: EtapaDoRoteiro[] },
 ): Promise<ResultadoRecomendacao> {
   const inicio = params.dataHoraInicio.toISOString();
+  const etapas = params.etapas && params.etapas.length > 0 ? params.etapas : [{ cidade: params.cidade, dias: 1 }];
+  const nomes = new Map((await cidadesComPontos()).map((c) => [normalizarCidade(c.cidade), c.cidade]));
+  const resolvidas: (EtapaDoRoteiro & { nome: string; variantes: string[] })[] = [];
+
+  for (const etapa of etapas) {
+    const variantes = await variantesDaCidade(etapa.cidade);
+
+    // Sem nenhum ponto na cidade, o roteiro sairia vazio sem explicação: diz quais cidades existem.
+    if (variantes.length === 0) {
+      const disponiveis = [...nomes.values()];
+      const aviso =
+        disponiveis.length > 0
+          ? `Ainda não há pontos cadastrados em "${etapa.cidade}". Cidades disponíveis: ${disponiveis.join(", ")}.`
+          : "Ainda não há pontos publicados para montar um roteiro.";
+
+      return { pontos: [], avisos: [aviso], inicio, fallbackUsado: false, dias: [] };
+    }
+
+    resolvidas.push({ ...etapa, nome: nomes.get(normalizarCidade(etapa.cidade)) ?? variantes[0], variantes });
+  }
+
+  const candidatosPorCidade = new Map<string, CandidatoRoteiro[]>();
+
+  for (const etapa of resolvidas) {
+    if (!candidatosPorCidade.has(etapa.nome)) {
+      candidatosPorCidade.set(etapa.nome, await buscarCandidatos(etapa.variantes));
+    }
+  }
 
   try {
-    const candidatos = await buscarCandidatos(params.cidade);
-    const { pontos, avisos } = planejarRoteiro(candidatos, params);
+    let doGoogle = 0;
 
-    return { pontos, avisos, inicio, fallbackUsado: false };
+    for (const [cidade, candidatos] of candidatosPorCidade) {
+      doGoogle += await completarHorariosPeloGoogle(candidatos, { ...params, cidade });
+    }
+
+    const primeira = resolvidas[0].nome;
+    const { parametros: base, aviso: avisoLocal } = ajustarLocalizacao(candidatosPorCidade.get(primeira)!, {
+      ...params,
+      cidade: primeira,
+    });
+
+    const usados = new Set<number>();
+    const pontos: PontoDoRoteiroGerado[] = [];
+    const dias: DiaDoRoteiroGerado[] = [];
+    const fechados = new Map<number, { texto: string; pontuacao: number }>();
+    let cidadeAnterior: string | null = null;
+    let posicaoAnterior: Coordenada | null = null;
+    let numeroDoDia = 0;
+
+    for (const etapa of resolvidas) {
+      const daCidade = candidatosPorCidade.get(etapa.nome)!;
+      const centro = calcularCentroide(daCidade);
+
+      for (let i = 0; i < etapa.dias; i += 1) {
+        numeroDoDia = i === 0 && etapa.primeiroDia ? etapa.primeiroDia : numeroDoDia + 1;
+        let viagem: DiaDoRoteiroGerado["viagem"] = null;
+
+        if (i === 0 && etapa.chegada !== undefined) {
+          // Viagem de carro: a estrada real (ou nenhuma, quando a chegada foi num dia só de estrada).
+          viagem = etapa.chegada;
+        } else if (cidadeAnterior && cidadeAnterior !== etapa.nome && centro && posicaoAnterior) {
+          const metros = Math.round(
+            distanciaMetros(posicaoAnterior.latitude, posicaoAnterior.longitude, centro.latitude, centro.longitude),
+          );
+          viagem = { de: cidadeAnterior, metros, minutos: minutosParaPercorrer(metros) };
+        }
+
+        const minutosDeEstrada = viagem?.minutos ?? 0;
+        const inicioDoDia = new Date(params.dataHoraInicio.getTime() + (numeroDoDia - 1) * 86_400_000 + minutosDeEstrada * 60_000);
+        const minutosNoFim = i === etapa.dias - 1 ? (etapa.minutosNoFimDoUltimoDia ?? 0) : 0;
+        const horas = params.horasDisponiveis - minutosDeEstrada / 60 - minutosNoFim / 60;
+        const restantes = daCidade.filter((c) => !usados.has(c.id));
+
+        dias.push({ dia: numeroDoDia, cidade: etapa.nome, inicio: inicioDoDia.toISOString(), viagem });
+
+        if (horas >= HORAS_MINIMAS_PARA_PASSEIO && restantes.length > 0) {
+          const doDia = planejarRoteiro(restantes, {
+            ...base,
+            cidade: etapa.nome,
+            horasDisponiveis: horas,
+            dataHoraInicio: inicioDoDia,
+            // A localização de quem pede só vale para começar o primeiro dia.
+            latitude: numeroDoDia === 1 ? base.latitude : undefined,
+            longitude: numeroDoDia === 1 ? base.longitude : undefined,
+          });
+
+          for (const ponto of doDia.pontos) {
+            usados.add(ponto.id);
+            pontos.push({ ...ponto, dia: numeroDoDia });
+          }
+
+          for (const { id, texto, pontuacao } of doDia.fechados) {
+            if (!fechados.has(id)) fechados.set(id, { texto, pontuacao });
+          }
+        }
+
+        // A viagem do dia seguinte sai da última parada de hoje (ou do centro, num dia sem paradas).
+        const ultima = [...pontos].reverse().find((p) => p.dia === numeroDoDia && p.latitude !== null && p.longitude !== null);
+        posicaoAnterior = ultima ? { latitude: ultima.latitude!, longitude: ultima.longitude! } : (centro ?? posicaoAnterior);
+        cidadeAnterior = etapa.nome;
+      }
+    }
+
+    const avisosDeFechados = [...fechados]
+      .filter(([id]) => !usados.has(id))
+      .sort(([, a], [, b]) => b.pontuacao - a.pontuacao)
+      .slice(0, 5)
+      .map(([, { texto }]) => texto);
+    const avisosIniciais = [
+      ...(avisoLocal ? [avisoLocal] : []),
+      ...(doGoogle > 0 ? [`Horário de ${doGoogle} ${doGoogle === 1 ? "ponto consultado" : "pontos consultados"} agora no Google Maps.`] : []),
+    ];
+
+    return { pontos, avisos: [...avisosIniciais, ...avisosDeFechados], inicio, fallbackUsado: false, dias };
   } catch (erro) {
     console.error("Motor de recomendação falhou, aplicando fallback por proximidade:", erro);
 
-    const candidatos = await buscarCandidatos(params.cidade);
+    const primeira = resolvidas[0];
+    const pontos = planejarPorProximidade(candidatosPorCidade.get(primeira.nome)!, params).map((p) => ({ ...p, dia: 1 }));
 
-    return { pontos: planejarPorProximidade(candidatos, params), avisos: [], inicio, fallbackUsado: true };
+    return {
+      pontos,
+      avisos: [],
+      inicio,
+      fallbackUsado: true,
+      dias: [{ dia: 1, cidade: primeira.nome, inicio, viagem: null }],
+    };
   }
 }

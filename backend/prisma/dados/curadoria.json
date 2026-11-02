@@ -1,0 +1,108 @@
+{
+  "descricao": "Pontos conferidos pela equipe em fontes oficiais. Aplicados por npm run curadoria:aplicar (o seed também aplica). Substituem o que veio das importações, mas nunca o que a comunidade editou.",
+  "itens": [
+    {
+      "cidade": "Joinville",
+      "nome": "Museu de Arte de Joinville",
+      "fonte": "https://www.joinville.sc.gov.br/wp-content/uploads/2026/05/Guia-de-Museus-e-Espacos-de-Memoria-atualizado-06052026.pdf",
+      "conferidoEm": "2026-10-29",
+      "campos": {
+        "descricao": "Museu de arte instalado na casa histórica da família Doerffel, construída entre 1854 e 1864. O acervo reúne cerca de mil obras de artistas locais, catarinenses e nacionais, e o Porão do Museu recebe exposições de arte contemporânea.",
+        "endereco": "Rua XV de Novembro, 1400 - América",
+        "horarioFuncionamento": "Ter-Dom 10h-16h; Seg fechado",
+        "faixaPreco": "Gratuito",
+        "acessibilidade": "Banheiro adaptado para cadeira de rodas",
+        "telefoneContato": "(47) 3433-4677",
+        "siteOficial": "https://www.joinville.sc.gov.br/institucional/secult/upm/maj"
+      }
+    },
+    {
+      "cidade": "Joinville",
+      "nome": "Complexo Estação da Memória",
+      "fonte": "https://www.joinville.sc.gov.br/wp-content/uploads/2026/05/Guia-de-Museus-e-Espacos-de-Memoria-atualizado-06052026.pdf",
+      "conferidoEm": "2026-10-29",
+      "campos": {
+        "descricao": "Centro de memória no conjunto da antiga estação ferroviária, com acervo sobre a estrada de ferro e a história do trabalho em Joinville e região.",
+        "endereco": "Rua Leite Ribeiro, s/nº - Anita Garibaldi",
+        "horarioFuncionamento": "Ter-Dom 10h-16h; Seg fechado",
+        "faixaPreco": "Gratuito",
+        "acessibilidade": "Rampas e banheiro adaptado para cadeira de rodas",
+        "telefoneContato": "(47) 3422-5222",
+        "siteOficial": "https://www.joinville.sc.gov.br/institucional/secult/upm/eme"
+      }
+    },
+    {
+      "cidade": "Joinville",
+      "nome": "Museu Arqueológico de Sambaqui de Joinville",
+      "fonte": "https://www.joinville.sc.gov.br/wp-content/uploads/2026/05/Guia-de-Museus-e-Espacos-de-Memoria-atualizado-06052026.pdf",
+      "conferidoEm": "2026-10-29",
+      "campos": {
+        "descricao": "Museu dedicado aos povos que viveram no litoral antes da colonização, com acervo arqueológico e etnográfico e exposições sobre o modo de vida dos construtores de sambaquis.",
+        "endereco": "Rua Dona Francisca, 600 - Centro",
+        "horarioFuncionamento": "Ter-Dom 10h-16h; Seg fechado",
+        "faixaPreco": "Gratuito",
+        "acessibilidade": "Parcialmente acessível: recursos em Libras e braile, piso tátil e banheiro adaptado",
+        "telefoneContato": "(47) 3433-0114",
+        "siteOficial": "https://www.joinville.sc.gov.br/institucional/secult/upm/mas"
+      }
+    },
+    {
+      "cidade": "Joinville",
+      "nome": "Museu Nacional de Imigração e Colonização",
+      "fonte": "https://www.joinville.sc.gov.br/wp-content/uploads/2026/05/Guia-de-Museus-e-Espacos-de-Memoria-atualizado-06052026.pdf",
+      "conferidoEm": "2026-10-29",
+      "campos": {
+        "descricao": "Museu sobre a imigração no Sul do país, num casarão histórico tombado pelo Iphan, em frente à Rua das Palmeiras. O conjunto inclui uma casa enxaimel e o Auditório Dona Francisca.",
+        "endereco": "Rua Rio Branco, 229 - Centro",
+        "horarioFuncionamento": "Ter-Dom 10h-16h; Seg fechado",
+        "faixaPreco": "Gratuito",
+        "acessibilidade": "Rampas, elevador, banheiro adaptado, audiodescrição e objetos táteis",
+        "telefoneContato": "(47) 3453-3499",
+        "siteOficial": "https://www.joinville.sc.gov.br/institucional/secult/upm/mnic"
+      }
+    },
+    {
+      "cidade": "Joinville",
+      "nome": "Museu Fritz Alt",
+      "fonte": "https://www.joinville.sc.gov.br/wp-content/uploads/2026/05/Guia-de-Museus-e-Espacos-de-Memoria-atualizado-06052026.pdf",
+      "conferidoEm": "2026-10-29",
+      "campos": {
+        "descricao": "Casa e ateliê do escultor Fritz Alt, autor de monumentos e fachadas espalhados pela cidade. Tem um jardim amplo, usado para piqueniques e leitura.",
+        "endereco": "Servidão Fritz Alt, s/nº - Boa Vista",
+        "horarioFuncionamento": "Ter-Dom 10h-16h; Seg fechado",
+        "faixaPreco": "Gratuito",
+        "acessibilidade": "Rampas, banheiro adaptado para cadeira de rodas e objetos para experiência tátil",
+        "telefoneContato": "(47) 3433-3811",
+        "siteOficial": "https://www.joinville.sc.gov.br/institucional/secult/upm/mfa"
+      }
+    },
+    {
+      "cidade": "Joinville",
+      "nome": "Galeria de Arte Victor Kursancew",
+      "fonte": "https://www.joinville.sc.gov.br/wp-content/uploads/2026/05/Guia-de-Museus-e-Espacos-de-Memoria-atualizado-06052026.pdf",
+      "conferidoEm": "2026-10-29",
+      "campos": {
+        "descricao": "Galeria municipal de artes visuais, com exposições temporárias selecionadas por edital, dentro da Casa da Cultura Fausto Rocha Júnior.",
+        "endereco": "Rua Dona Francisca, 800 - Saguaçu",
+        "horarioFuncionamento": "Seg-Sex 8h-20h; Sáb-Dom fechado; Feriados: fechado",
+        "faixaPreco": "Gratuito",
+        "acessibilidade": "Rampa e banheiro adaptado para cadeira de rodas",
+        "telefoneContato": "(47) 3433-2266"
+      }
+    },
+    {
+      "cidade": "Joinville",
+      "nome": "Instituto Juarez Machado",
+      "fonte": "https://www.joinville.sc.gov.br/wp-content/uploads/2026/05/Guia-de-Museus-e-Espacos-de-Memoria-atualizado-06052026.pdf",
+      "conferidoEm": "2026-10-29",
+      "campos": {
+        "descricao": "Espaço com exposições permanentes de obras de Juarez Machado e mostras de outros artistas, em dois pavilhões e na casa onde o artista morou na infância. Ingresso pago, com meia-entrada e entrada gratuita para quem chega de bicicleta.",
+        "endereco": "Rua Lages, 994 - América",
+        "horarioFuncionamento": "Ter-Sáb 9h-18h; Dom-Seg fechado",
+        "faixaPreco": "$",
+        "acessibilidade": "Rampas, elevador e banheiro adaptado para cadeira de rodas",
+        "telefoneContato": "(47) 3433-3036"
+      }
+    }
+  ]
+}

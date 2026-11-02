@@ -4,6 +4,7 @@ import prisma from "./prisma";
 import { gerarHashSenha } from "./auth";
 import { registrarAuditoria } from "./auditoria";
 import { removerArquivoPublico } from "./arquivos";
+import { perfilPublico } from "./perfilPublico";
 
 // LGPD (RNF13, AF10): exportação dos dados pessoais e anonimização da conta.
 
@@ -89,6 +90,8 @@ export async function anonimizarUsuario(idUsuario: number): Promise<void> {
         senhaHash: hashInutilizavel,
         tipoConta: TipoConta.VISITANTE,
         cidadeBase: null,
+        codigoMunicipioBase: null,
+        consumoKmPorLitro: null,
         interesses: [],
         preferenciasAcessibilidade: [],
         idioma: "pt-BR",
@@ -131,6 +134,8 @@ export async function exportarDadosDoUsuario(idUsuario: number) {
           mfaAtivo: true,
           consentimentoEm: true,
           dataCriacao: true,
+          consumoKmPorLitro: true,
+          municipioBase: { select: { codigoIbge: true, nome: true, uf: true } },
         },
       }),
       prisma.roteiro.findMany({
@@ -189,7 +194,7 @@ export async function exportarDadosDoUsuario(idUsuario: number) {
 
   return {
     geradoEm: new Date().toISOString(),
-    perfil,
+    perfil: perfil && perfilPublico(perfil),
     roteiros,
     roteirosCompartilhadosComigo: participacoes,
     avaliacoes,

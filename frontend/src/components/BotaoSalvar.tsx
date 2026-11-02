@@ -5,8 +5,8 @@ import Icone from "./Icone";
 
 interface BotaoSalvarProps {
   idPonto: number;
-  /** "cartao": coração sobre o card. "completo": botão com texto. */
-  variante?: "cartao" | "completo";
+  /** "cartao": coração sobre o card. "completo": botão com texto. "barra": botão com texto, sem ocupar a linha toda. */
+  variante?: "cartao" | "completo" | "barra";
 }
 
 function BotaoSalvar({ idPonto, variante = "cartao" }: BotaoSalvarProps) {
@@ -31,11 +31,13 @@ function BotaoSalvar({ idPonto, variante = "cartao" }: BotaoSalvarProps) {
     }
   }
 
-  if (variante === "completo") {
+  if (variante === "completo" || variante === "barra") {
+    const bloco = variante === "completo" ? " btn--block" : "";
+
     return (
       <button
         type="button"
-        className={salvo ? "btn btn--primary btn--block" : "btn btn--outline btn--block"}
+        className={(salvo ? "btn btn--primary" : "btn btn--outline") + bloco}
         onClick={aoClicar}
         disabled={processando}
         aria-pressed={salvo}

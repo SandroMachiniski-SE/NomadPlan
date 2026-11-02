@@ -1,7 +1,7 @@
 import { useCallback, useEffect, useMemo, useRef, useState, type FormEvent } from "react";
 import { Link, useParams } from "react-router-dom";
 import api, { urlDoArquivo } from "../services/api";
-import type { Ponto, RespostaAvaliacoes, SugestaoCriada } from "../types/ponto";
+import type { InformacoesGoogle as DadosGoogle, Ponto, RespostaAvaliacoes, SugestaoCriada } from "../types/ponto";
 import type { RespostaRoteiros } from "../types/roteiro";
 import { useAuth } from "../context/useAuth";
 import { extrairMensagemErro } from "../utils/erro";
@@ -9,6 +9,7 @@ import MapaCarregavel from "../components/MapaCarregavel";
 import Icone from "../components/Icone";
 import Estrelas from "../components/Estrelas";
 import BotaoSalvar from "../components/BotaoSalvar";
+import InformacoesGoogle from "../components/InformacoesGoogle";
 import { iconeDaCategoria } from "../constants/categorias";
 
 const LIMITE_FOTO_BYTES = 5 * 1024 * 1024;
@@ -54,6 +55,8 @@ function PontoDetalhes() {
   const [enviandoSugestao, setEnviandoSugestao] = useState(false);
   const [sugestaoEnviada, setSugestaoEnviada] = useState<string | null>(null);
   const secaoSugestao = useRef<HTMLElement>(null);
+  // Foto do Google para pontos sem foto própria: exibida, nunca gravada.
+  const [fotoGoogle, setFotoGoogle] = useState<NonNullable<DadosGoogle["foto"]> | null>(null);
 
   const [solicitandoSelo, setSolicitandoSelo] = useState(false);
   const [seloSolicitado, setSeloSolicitado] = useState(false);
@@ -264,6 +267,14 @@ function PontoDetalhes() {
   const ehResponsavel = Boolean(usuario && ponto && usuario.id === ponto.idResponsavel);
   const podeSugerir = Boolean(autenticado && !ehResponsavel && ponto?.status === "PUBLICADO");
 
+  /** Leva até o cartão "Adicionar a um roteiro" e já deixa a lista de roteiros em foco. */
+  function aoIrParaRoteiro() {
+    const cartao = document.getElementById("adicionar-ao-roteiro");
+
+    cartao?.scrollIntoView({ behavior: "smooth", block: "center" });
+    cartao?.querySelector("select")?.focus({ preventScroll: true });
+  }
+
   function aoInformarHorario() {
     setCampoSugestao("horarioFuncionamento");
     setMostrarSugestao(true);
@@ -315,6 +326,18 @@ function PontoDetalhes() {
                       </a>
                     )}
                   </>
+                ) : fotoGoogle ? (
+                  <>
+                    <img src={fotoGoogle.url} alt={ponto.nome} />
+                    <a
+                      className="ponto-capa__credito"
+                      href={fotoGoogle.urlAutor ?? undefined}
+                      target="_blank"
+                      rel="noreferrer"
+                    >
+                      Foto{fotoGoogle.autor ? `: ${fotoGoogle.autor}` : ""} · Google Maps
+                    </a>
+                  </>
                 ) : (
                   <Icone nome={iconeDaCategoria(ponto.categoria)} className="ponto-capa__icone" />
                 )}
@@ -345,23 +368,43 @@ function PontoDetalhes() {
                 </p>
               </header>
 
+              {(ponto.latitude !== null || ponto.status === "PUBLICADO") && (
+                <div className="ponto-acoes" role="group" aria-label="Ações do ponto">
+                  {ponto.latitude !== null && ponto.longitude !== null && (
+                    <a
+                      href={`https://www.google.com/maps/dir/?api=1&destination=${ponto.latitude},${ponto.longitude}`}
+                      target="_blank"
+                      rel="noreferrer"
+                      className="btn btn--primary"
+                    >
+                      <Icone nome="localizar" />
+                      Como chegar
+                    </a>
+                  )}
+
+                  {ponto.status === "PUBLICADO" &&
+                    (autenticado ? (
+                      <>
+                        <BotaoSalvar idPonto={ponto.id} variante="barra" />
+                        <button type="button" className="btn btn--outline" onClick={aoIrParaRoteiro}>
+                          <Icone nome="mais" />
+                          Adicionar a um roteiro
+                        </button>
+                      </>
+                    ) : (
+                      <Link to="/login" className="btn btn--outline">
+                        Entre para salvar e montar roteiros
+                      </Link>
+                    ))}
+                </div>
+              )}
+
               {ponto.descricao && <p className="ponto-descricao">{ponto.descricao}</p>}
 
               {ponto.latitude !== null && ponto.longitude !== null && (
                 <section className="stack stack--sm" aria-label="Localização no mapa">
                   <div className="mapa-wrap">
                     <MapaCarregavel pontos={[ponto]} altura={300} />
-                  </div>
-                  <div>
-                    <a
-                      href={`https://www.google.com/maps/dir/?api=1&destination=${ponto.latitude},${ponto.longitude}`}
-                      target="_blank"
-                      rel="noreferrer"
-                      className="btn btn--outline btn--sm"
-                    >
-                      <Icone nome="localizar" />
-                      Como chegar
-                    </a>
                   </div>
                 </section>
               )}
@@ -436,6 +479,20 @@ function PontoDetalhes() {
                   )}
                 </ul>
 
+                {ponto.idOverture && (
+                  <p className="ponto-fonte muted small">
+                    {ponto.idOsm ? "Telefone e site complementados pelo" : "Dados do"}{" "}
+                    <a href="https://overturemaps.org" target="_blank" rel="noreferrer">
+                      Overture Maps
+                    </a>{" "}
+                    (licença{" "}
+                    <a href="https://cdla.dev/permissive-2-0/" target="_blank" rel="noreferrer">
+                      CDLA Permissive 2.0
+                    </a>
+                    ).
+                  </p>
+                )}
+
                 {ponto.idOsm && (
                   <p className="ponto-fonte muted small">
                     Dados do{" "}
@@ -454,12 +511,10 @@ function PontoDetalhes() {
                 )}
               </section>
 
-              {autenticado && ponto.status === "PUBLICADO" && (
-                <BotaoSalvar idPonto={ponto.id} variante="completo" />
-              )}
+              {ponto.status === "PUBLICADO" && <InformacoesGoogle ponto={ponto} aoReceberFoto={setFotoGoogle} />}
 
               {autenticado && ponto.status === "PUBLICADO" && (
-                <section className="card card--pad stack stack--sm">
+                <section id="adicionar-ao-roteiro" className="card card--pad stack stack--sm">
                   <h2 className="ponto-lateral__titulo">Adicionar a um roteiro</h2>
 
                   {adicionadoRoteiro ? (

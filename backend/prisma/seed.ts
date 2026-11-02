@@ -4,6 +4,10 @@ import prisma from "../src/lib/prisma";
 import { gerarHashSenha } from "../src/lib/auth";
 import { lerDadosOsm } from "../src/lib/dadosOsm";
 import { importarPontosOsm } from "../src/lib/importacaoOsm";
+import { importarOverture, lerDadosOverture } from "../src/lib/importacaoOverture";
+import { aplicarCuradoria, lerCuradoria } from "../src/lib/curadoria";
+import { criarRoteiroDeExemplo } from "../src/lib/roteiroExemplo";
+import { importarMunicipios, lerMunicipios } from "../src/lib/municipios";
 
 const SENHA_DEMONSTRACAO = "senha-temporaria";
 
@@ -12,6 +16,9 @@ async function main() {
   if (process.env.NODE_ENV === "production") {
     throw new Error("O seed cria contas de demonstração com senha conhecida e não deve rodar em produção.");
   }
+
+  // Municípios do IBGE (prisma/dados/municipios.json), antes de tudo: contas e roteiros podem apontar para eles.
+  const municipios = await importarMunicipios(lerMunicipios());
 
   const usuario = await prisma.usuario.upsert({
     where: {
@@ -34,12 +41,24 @@ async function main() {
   // Pontos reais do OpenStreetMap (prisma/dados/osm/), baixados com "npm run osm:baixar".
   const cidades = lerDadosOsm();
   const resumo = await importarPontosOsm(cidades.flatMap((c) => c.pontos));
+  // Overture Maps (prisma/dados/overture/): telefone e site que faltam e hospedagens.
+  const overture = await importarOverture(lerDadosOverture());
+  // Pontos conferidos pela equipe em fontes oficiais (prisma/dados/curadoria.json).
+  const curadoria = await aplicarCuradoria(lerCuradoria());
+  // Roteiro de demonstração no formato de caderno de viagem (vários dias e cidades, pernoites).
+  const morador = await prisma.usuario.findUniqueOrThrow({ where: { email: "morador@nomadplan.local" } });
+  await criarRoteiroDeExemplo(morador.id);
 
   console.log("Dados iniciais inseridos com sucesso.");
+  console.log(`Municípios do IBGE: ${municipios}.`);
   console.log(
     `Pontos do OpenStreetMap (${cidades.map((c) => c.cidade).join(", ")}): ${resumo.criados} novos, ` +
       `${resumo.complementados + resumo.vinculados + resumo.semMudanca} já existiam.`,
   );
+  console.log(
+    `Overture Maps: ${overture.complementados} pontos complementados, ${overture.criados} hospedagens novas.`,
+  );
+  console.log(`Curadoria: ${curadoria.aplicados} pontos conferidos em fontes oficiais.`);
   console.log(`Login de demonstração: ${usuario.email} / ${SENHA_DEMONSTRACAO} (e moderador@, negocio@ e morador@nomadplan.local).`);
 }
 

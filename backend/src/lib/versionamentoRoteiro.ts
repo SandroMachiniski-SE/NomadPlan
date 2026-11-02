@@ -14,9 +14,44 @@ export interface DadosVersaoRoteiro {
   cidade: string | null;
   dataInicio: string | null;
   dataFim: string | null;
-  // `dia` não existe nas versões gravadas antes do roteiro por dia: valem como dia 1.
-  itens: { idPonto: number; ordem: number; dia?: number; observacao: string | null; custoCentavos?: number | null }[];
+  // `dia` não existe nas versões gravadas antes do roteiro por dia: valem como dia 1. As
+  // atividades livres (sem idPonto), o período e a pernoite vieram depois e são opcionais.
+  itens: {
+    idPonto: number | null;
+    ordem: number;
+    dia?: number;
+    observacao: string | null;
+    custoCentavos?: number | null;
+    titulo?: string | null;
+    periodo?: "MANHA" | "TARDE" | "NOITE" | "DIA_INTEIRO" | null;
+    pernoite?: boolean;
+  }[];
+  // A viagem de carro veio depois: versões antigas não têm estes campos (e não mexem neles).
+  viagemDeCarro?: {
+    viagemOrigem: number | null;
+    kmPorDia: number | null;
+    horasPorDia: number | null;
+    viagemVolta: boolean | null;
+    consumoKmPorLitro: number | null;
+    precoLitroCentavos: number | null;
+  };
+  trechos?: {
+    dia: number;
+    perna: number;
+    noite: number | null;
+    deNome: string;
+    paraNome: string;
+    metros: number;
+    segundos: number;
+    ocupaODia: boolean;
+    noFimDoDia: boolean;
+    litros: number | null;
+    custoCombustivelCentavos: number | null;
+    tracado: unknown;
+  }[];
 }
+
+const decimal = (valor: Prisma.Decimal | null) => (valor === null ? null : Number(valor));
 
 export async function registrarVersaoRoteiro(
   idRoteiro: number,
@@ -28,9 +63,19 @@ export async function registrarVersaoRoteiro(
     where: { id: idRoteiro },
     include: {
       itens: {
-        orderBy: [{ dia: "asc" }, { ordem: "asc" }],
-        select: { idPonto: true, ordem: true, dia: true, observacao: true, custoCentavos: true },
+        orderBy: [{ dia: "asc" }, { pernoite: "asc" }, { ordem: "asc" }],
+        select: {
+          idPonto: true,
+          ordem: true,
+          dia: true,
+          observacao: true,
+          custoCentavos: true,
+          titulo: true,
+          periodo: true,
+          pernoite: true,
+        },
       },
+      trechosEstrada: { orderBy: [{ dia: "asc" }, { perna: "asc" }] },
     },
   });
 
@@ -45,6 +90,15 @@ export async function registrarVersaoRoteiro(
     dataInicio: roteiro.dataInicio ? roteiro.dataInicio.toISOString() : null,
     dataFim: roteiro.dataFim ? roteiro.dataFim.toISOString() : null,
     itens: roteiro.itens,
+    viagemDeCarro: {
+      viagemOrigem: roteiro.viagemOrigem,
+      kmPorDia: roteiro.kmPorDia,
+      horasPorDia: decimal(roteiro.horasPorDia),
+      viagemVolta: roteiro.viagemVolta,
+      consumoKmPorLitro: decimal(roteiro.consumoKmPorLitro),
+      precoLitroCentavos: roteiro.precoLitroCentavos,
+    },
+    trechos: roteiro.trechosEstrada.map(({ id: _id, idRoteiro: _roteiro, litros, ...t }) => ({ ...t, litros: decimal(litros) })),
   };
 
   await cliente.versaoRoteiro.create({

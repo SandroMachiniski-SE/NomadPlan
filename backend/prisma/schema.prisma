@@ -66,6 +66,15 @@ model Usuario {
   mfaSegredo String? @map("mfa_segredo")
   mfaAtivo   Boolean @default(false) @map("mfa_ativo")
 
+  // Sobe a cada redefinição de senha: tokens de login de uma versão anterior são recusados.
+  versaoSessao Int @default(0) @map("versao_sessao")
+
+  // Onde a pessoa mora (município do IBGE; `cidadeBase` recebe o nome dele) e o consumo do
+  // carro, para a viagem de carro.
+  codigoMunicipioBase Int?       @map("codigo_municipio_base")
+  consumoKmPorLitro   Decimal?   @map("consumo_km_por_litro") @db.Decimal(4, 1)
+  municipioBase       Municipio? @relation(fields: [codigoMunicipioBase], references: [codigoIbge])
+
   pontosResponsaveis  PontoTuristico[]
   roteiros            Roteiro[]
   sugestoesEdicao     SugestaoEdicao[]         @relation("autorSugestao")
@@ -78,6 +87,48 @@ model Usuario {
   convitesEnviados    ConviteRoteiro[]
 
   @@map("usuario")
+}
+
+// Municípios do Brasil (IBGE). `geom` é gerada pelo Postgres a partir de latitude/longitude e
+// `nome_normalizado` serve para buscar sem acento (ver migration municipios). `resumoOsm` guarda
+// por 30 dias as hospedagens e atrações perto da sede, para sugerir pernoites na estrada.
+model Municipio {
+  codigoIbge      Int       @id @map("codigo_ibge")
+  nome            String
+  nomeNormalizado String    @map("nome_normalizado")
+  uf              String    @db.Char(2)
+  latitude        Float
+  longitude       Float
+  resumoOsm       Json?     @map("resumo_osm")
+  resumoEm        DateTime? @map("resumo_em")
+  geom            Unsupported("geography(Point,4326)")?
+
+  moradores     Usuario[]
+  roteirosSaindo Roteiro[]
+  rotasSaindo   RotaEmCache[] @relation("origemDaRota")
+  rotasChegando RotaEmCache[] @relation("destinoDaRota")
+
+  @@index([nomeNormalizado, uf])
+  @@map("municipio")
+}
+
+// Rota de carro já consultada no OSRM (um registro por sentido). `tracado` é uma LineString do
+// PostGIS gravada por SQL (o Prisma não modela); `perfil` tem [km, segundos] a cada 5 km.
+model RotaEmCache {
+  id            Int      @id @default(autoincrement())
+  codigoOrigem  Int      @map("codigo_origem")
+  codigoDestino Int      @map("codigo_destino")
+  metros        Int
+  segundos      Int
+  tracado       Unsupported("geometry(LineString,4326)")
+  perfil        Json
+  buscadaEm     DateTime @default(now()) @map("buscada_em")
+
+  origem  Municipio @relation("origemDaRota", fields: [codigoOrigem], references: [codigoIbge], onDelete: Cascade)
+  destino Municipio @relation("destinoDaRota", fields: [codigoDestino], references: [codigoIbge], onDelete: Cascade)
+
+  @@unique([codigoOrigem, codigoDestino])
+  @@map("rota_em_cache")
 }
 
 model PontoTuristico {
@@ -108,6 +159,11 @@ model PontoTuristico {
   origem         OrigemRegistro @default(USUARIO)
   idOsm          String?        @unique @map("id_osm")
   sincronizadoEm DateTime?      @map("sincronizado_em")
+  // Overture Maps: lugar de onde vieram telefone/site (ou a hospedagem inteira).
+  idOverture     String?        @unique @map("id_overture")
+  // Google Places: só o place_id pode ser guardado; o resto é consultado na hora.
+  idGoogle        String?   @map("id_google")
+  googleBuscadoEm DateTime? @map("google_buscado_em")
   // Crédito e página de origem da foto quando ela não foi enviada por um usuário
   // (Wikimedia Commons: autor e licença precisam aparecer junto da imagem).
   imagemCredito String? @map("imagem_credito")
@@ -255,6 +311,14 @@ model Roteiro {
   notas              String?
   orcamentoCentavos  Int?      @map("orcamento_centavos")
 
+  // Viagem de carro (nulos nos roteiros sem ela): de onde sai, alvo por dia, volta e dados do carro.
+  viagemOrigem       Int?      @map("viagem_origem")
+  kmPorDia           Int?      @map("km_por_dia")
+  horasPorDia        Decimal?  @map("horas_por_dia") @db.Decimal(3, 1)
+  viagemVolta        Boolean?  @map("viagem_volta")
+  consumoKmPorLitro  Decimal?  @map("consumo_km_por_litro") @db.Decimal(4, 1)
+  precoLitroCentavos Int?      @map("preco_litro_centavos")
+
   dataCriacao     DateTime  @default(now()) @map("data_criacao")
   dataAtualizacao DateTime  @updatedAt @map("data_atualizacao")
 
@@ -266,14 +330,56 @@ model Roteiro {
   colaboradores ColaboradorRoteiro[]
   convites      ConviteRoteiro[]
 
+  municipioDeOrigem Municipio?      @relation(fields: [viagemOrigem], references: [codigoIbge])
+  trechosEstrada    TrechoEstrada[]
+
   @@index([idUsuario])
   @@map("roteiro")
 }
 
+// Trecho dirigido de uma viagem de carro salva: um dia só de estrada ou um trecho curto
+// descontado de um dia na cidade. Fica preso ao número do dia; o traçado é [lat, lon][].
+model TrechoEstrada {
+  id                       Int      @id @default(autoincrement())
+  idRoteiro                Int      @map("id_roteiro")
+  dia                      Int
+  perna                    Int
+  noite                    Int?
+  deNome                   String   @map("de_nome")
+  paraNome                 String   @map("para_nome")
+  metros                   Int
+  segundos                 Int
+  ocupaODia                Boolean  @map("ocupa_o_dia")
+  noFimDoDia               Boolean  @default(false) @map("no_fim_do_dia")
+  litros                   Decimal? @db.Decimal(6, 1)
+  custoCombustivelCentavos Int?     @map("custo_combustivel_centavos")
+  tracado                  Json
+
+  roteiro Roteiro @relation(fields: [idRoteiro], references: [id], onDelete: Cascade)
+
+  @@index([idRoteiro, dia])
+  @@map("trecho_estrada")
+}
+
+// Período do dia de uma parada, para quem planeja sem horário ("trilha à noite").
+enum PeriodoDoDia {
+  MANHA
+  TARDE
+  NOITE
+  DIA_INTEIRO
+}
+
+// Uma parada é um ponto cadastrado ou uma atividade livre (com título); a pernoite é onde se
+// dorme naquela noite. As migrations garantem "ponto ou título" (CHECK), uma pernoite por dia e
+// cada ponto uma vez só como visita, enquanto o mesmo hotel pode ser a pernoite de várias noites
+// (índices parciais, que o Prisma não modela).
 model ItemRoteiro {
   id          Int      @id @default(autoincrement())
   idRoteiro   Int      @map("id_roteiro")
-  idPonto     Int      @map("id_ponto")
+  idPonto     Int?     @map("id_ponto")
+  titulo      String?
+  periodo     PeriodoDoDia?
+  pernoite    Boolean  @default(false)
   // Dia do roteiro (1, 2, 3...) em que a parada acontece; a ordem vale dentro de cada dia.
   dia         Int      @default(1)
   ordem       Int      @default(0)
@@ -283,9 +389,8 @@ model ItemRoteiro {
   dataCriacao DateTime @default(now()) @map("data_criacao")
 
   roteiro Roteiro        @relation(fields: [idRoteiro], references: [id], onDelete: Cascade)
-  ponto   PontoTuristico @relation(fields: [idPonto], references: [id])
+  ponto   PontoTuristico? @relation(fields: [idPonto], references: [id])
 
-  @@unique([idRoteiro, idPonto])
   @@index([idRoteiro])
   @@map("item_roteiro")
 }

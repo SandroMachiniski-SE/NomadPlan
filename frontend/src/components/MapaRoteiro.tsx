@@ -14,6 +14,8 @@ export interface ParadaNoMapa {
   numero: number;
   latitude: number | null;
   longitude: number | null;
+  /** Onde se dorme no fim do dia: marcador com uma cama, fechando o trajeto do dia. */
+  pernoite?: boolean;
 }
 
 export interface MapaRoteiroProps {
@@ -23,12 +25,20 @@ export interface MapaRoteiroProps {
   dia?: number | null;
   /** Se verdadeiro, o popup liga para a página do ponto (rotas públicas também têm). */
   comLinks?: boolean;
+  /** Viagem de carro: a estrada de cada dia ([lat, lon]) e onde se dorme no fim dela. */
+  estradas?: EstradaNoMapa[];
 }
 
-function iconeNumerado(numero: number, cor: string) {
+export interface EstradaNoMapa {
+  dia: number;
+  tracado: [number, number][];
+  pernoite: string | null;
+}
+
+function iconeNumerado(rotulo: number | string, cor: string) {
   return L.divIcon({
     className: "marcador-numerado",
-    html: `<span style="background:${cor}">${numero}</span>`,
+    html: `<span style="background:${cor}">${rotulo}</span>`,
     iconSize: [30, 30],
     iconAnchor: [15, 15],
     popupAnchor: [0, -14],
@@ -60,13 +70,18 @@ type Localizada = ParadaNoMapa & { latitude: number; longitude: number };
 
 const CENTRO_PADRAO: [number, number] = [-26.3045, -48.8487];
 
-function MapaRoteiro({ paradas, altura = 420, dia = null, comLinks = true }: MapaRoteiroProps) {
+function MapaRoteiro({ paradas, altura = 420, dia = null, comLinks = true, estradas = [] }: MapaRoteiroProps) {
   const visiveis = paradas.filter(
     (p): p is Localizada => p.latitude !== null && p.longitude !== null && (dia === null || p.dia === dia),
   );
+  const estradasVisiveis = estradas.filter((e) => e.tracado.length > 1 && (dia === null || e.dia === dia));
 
   const dias = [...new Set(visiveis.map((p) => p.dia))].sort((a, b) => a - b);
-  const todas: [number, number][] = visiveis.map((p) => [p.latitude, p.longitude]);
+  const todas: [number, number][] = [
+    ...visiveis.map((p): [number, number] => [p.latitude, p.longitude]),
+    // Começo e fim de cada estrada bastam para enquadrar a viagem.
+    ...estradasVisiveis.flatMap((e) => [e.tracado[0], e.tracado[e.tracado.length - 1]]),
+  ];
 
   return (
     <div style={{ height: altura, overflow: "hidden" }}>
@@ -93,15 +108,36 @@ function MapaRoteiro({ paradas, altura = 420, dia = null, comLinks = true }: Map
           );
         })}
 
+        {estradasVisiveis.map((e) => (
+          <Polyline
+            key={`estrada-${e.dia}-${e.tracado[0].join(",")}`}
+            positions={e.tracado}
+            pathOptions={{ color: corDoDia(e.dia), weight: 5, opacity: 0.85 }}
+          />
+        ))}
+
+        {estradasVisiveis
+          .filter((e) => e.pernoite)
+          .map((e) => (
+            <Marker key={`pernoite-${e.dia}`} position={e.tracado[e.tracado.length - 1]} icon={iconeNumerado("🛏", corDoDia(e.dia))}>
+              <Popup>
+                <strong>Pernoite em {e.pernoite}</strong>
+                <br />
+                Dia {e.dia} · fim do dia de estrada
+              </Popup>
+            </Marker>
+          ))}
+
         {visiveis.map((p) => (
           <Marker
             key={`${p.dia}-${p.idPonto}`}
             position={[p.latitude, p.longitude]}
-            icon={iconeNumerado(p.numero, corDoDia(p.dia))}
+            icon={iconeNumerado(p.pernoite ? "🛏" : p.numero, corDoDia(p.dia))}
           >
             <Popup>
               <strong>
-                {p.numero}. {p.nome}
+                {p.pernoite ? "Pernoite: " : `${p.numero}. `}
+                {p.nome}
               </strong>
               <br />
               Dia {p.dia} · {p.categoria}

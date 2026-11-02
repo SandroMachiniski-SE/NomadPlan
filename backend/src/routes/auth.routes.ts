@@ -20,6 +20,8 @@ import { gerarSegredoTotp, urlOtpauth, verificarTotp } from "../lib/totp";
 import { anonimizarUsuario, ErroPrivacidade, exportarDadosDoUsuario } from "../lib/privacidade";
 import { IDIOMAS, PREFERENCIAS_ACESSIBILIDADE } from "../lib/preferencias";
 import { registrarEvento } from "../lib/metricasUso";
+import { municipioPorCodigo } from "../lib/municipios";
+import { perfilPublico } from "../lib/perfilPublico";
 import { autenticar } from "../middleware/auth";
 import {
   limiteCriacaoConta,
@@ -43,6 +45,8 @@ const registrarSchema = z.object({
   senha: z.string().min(8).max(72),
   tipoConta: z.enum(tiposContaPublicos).default(TipoConta.VISITANTE),
   cidadeBase: z.string().trim().max(120).optional(),
+  // Município de casa (IBGE): quando vem, a cidade base passa a ser o nome dele.
+  codigoMunicipioBase: z.number().int().positive().optional(),
   // LGPD: o cadastro só é aceito com o consentimento explícito do usuário.
   aceitouPolitica: z.literal(true, {
     error: "É necessário aceitar a Política de Privacidade para criar a conta.",
@@ -60,6 +64,8 @@ const loginSchema = z.object({
 const atualizarPerfilSchema = z.object({
   nome: z.string().trim().min(1).max(120).optional(),
   cidadeBase: z.string().trim().max(120).nullable().optional(),
+  codigoMunicipioBase: z.number().int().positive().nullable().optional(),
+  consumoKmPorLitro: z.number().min(3).max(40).nullable().optional(),
   interesses: z.array(z.string().trim().min(1).max(80)).max(20).optional(),
   idioma: z.enum(IDIOMAS).optional(),
   preferenciasAcessibilidade: z
@@ -97,7 +103,20 @@ const usuarioSelecaoPublica = {
   mfaAtivo: true,
   consentimentoEm: true,
   dataCriacao: true,
+  consumoKmPorLitro: true,
+  municipioBase: { select: { codigoIbge: true, nome: true, uf: true } },
 } as const;
+
+/** Campos do município de casa a gravar; null limpa; código inexistente → null (400 na rota). */
+async function camposDoMunicipioBase(codigo: number | null) {
+  if (codigo === null) {
+    return { codigoMunicipioBase: null, cidadeBase: null };
+  }
+
+  const municipio = await municipioPorCodigo(codigo);
+
+  return municipio ? { codigoMunicipioBase: municipio.codigoIbge, cidadeBase: municipio.cidade } : null;
+}
 
 // Último passo TOTP aceito por segredo: impede reaproveitar o mesmo código de 6 dígitos
 // enquanto ele ainda está dentro da janela de validade. A chave é o segredo cifrado (único
@@ -146,6 +165,12 @@ authRouter.post("/registrar", limiteCriacaoConta, async (req: Request, res: Resp
       });
     }
 
+    const municipio = dados.codigoMunicipioBase === undefined ? undefined : await camposDoMunicipioBase(dados.codigoMunicipioBase);
+
+    if (municipio === null) {
+      return res.status(400).json({ erro: "Município não encontrado." });
+    }
+
     const senhaHash = await gerarHashSenha(dados.senha);
 
     const usuario = await prisma.usuario.create({
@@ -155,6 +180,7 @@ authRouter.post("/registrar", limiteCriacaoConta, async (req: Request, res: Resp
         senhaHash,
         tipoConta: dados.tipoConta,
         cidadeBase: dados.cidadeBase || null,
+        ...municipio,
         consentimentoEm: new Date(),
       },
       select: usuarioSelecaoPublica,
@@ -164,7 +190,7 @@ authRouter.post("/registrar", limiteCriacaoConta, async (req: Request, res: Resp
 
     const token = gerarToken({ sub: usuario.id, tipoConta: usuario.tipoConta });
 
-    return res.status(201).json({ usuario, token });
+    return res.status(201).json({ usuario: perfilPublico(usuario), token });
   } catch (error) {
     console.error("Erro ao registrar usuário:", error);
 
@@ -226,7 +252,7 @@ authRouter.post("/login", limiteLogin, limiteLoginPorEmail, async (req: Request,
       }
     }
 
-    const token = gerarToken({ sub: usuario.id, tipoConta: usuario.tipoConta });
+    const token = gerarToken({ sub: usuario.id, tipoConta: usuario.tipoConta, v: usuario.versaoSessao });
 
     await registrarAuditoria({
       idUsuario: usuario.id,
@@ -241,7 +267,7 @@ authRouter.post("/login", limiteLogin, limiteLoginPorEmail, async (req: Request,
       select: usuarioSelecaoPublica,
     });
 
-    return res.json({ usuario: usuarioPublico, token });
+    return res.json({ usuario: usuarioPublico && perfilPublico(usuarioPublico), token });
   } catch (error) {
     console.error("Erro ao autenticar usuário:", error);
 
@@ -264,7 +290,10 @@ authRouter.post("/renovar", autenticar, async (req: Request, res: Response) => {
       return res.status(404).json({ erro: "Usuário não encontrado." });
     }
 
-    return res.json({ usuario, token: gerarToken({ sub: usuario.id, tipoConta: usuario.tipoConta }) });
+    return res.json({
+      usuario: perfilPublico(usuario),
+      token: gerarToken({ sub: usuario.id, tipoConta: usuario.tipoConta, v: req.usuario!.versaoSessao }),
+    });
   } catch (error) {
     console.error("Erro ao renovar sessão:", error);
 
@@ -285,7 +314,7 @@ authRouter.get("/me", autenticar, async (req: Request, res: Response) => {
       });
     }
 
-    return res.json(usuario);
+    return res.json(perfilPublico(usuario));
   } catch (error) {
     console.error("Erro ao buscar perfil:", error);
 
@@ -307,6 +336,12 @@ authRouter.put("/me", autenticar, async (req: Request, res: Response) => {
     }
 
     const dados = resultado.data;
+    const municipio =
+      dados.codigoMunicipioBase === undefined ? undefined : await camposDoMunicipioBase(dados.codigoMunicipioBase);
+
+    if (municipio === null) {
+      return res.status(400).json({ erro: "Município não encontrado." });
+    }
 
     const usuario = await prisma.usuario.update({
       where: { id: req.usuario!.id },
@@ -315,6 +350,8 @@ authRouter.put("/me", autenticar, async (req: Request, res: Response) => {
         ...(dados.cidadeBase !== undefined
           ? { cidadeBase: dados.cidadeBase || null }
           : {}),
+        ...municipio,
+        ...(dados.consumoKmPorLitro !== undefined ? { consumoKmPorLitro: dados.consumoKmPorLitro } : {}),
         ...(dados.interesses !== undefined ? { interesses: dados.interesses } : {}),
         ...(dados.idioma !== undefined ? { idioma: dados.idioma } : {}),
         ...(dados.preferenciasAcessibilidade !== undefined
@@ -324,7 +361,7 @@ authRouter.put("/me", autenticar, async (req: Request, res: Response) => {
       select: usuarioSelecaoPublica,
     });
 
-    return res.json(usuario);
+    return res.json(perfilPublico(usuario));
   } catch (error) {
     console.error("Erro ao atualizar perfil:", error);
 
@@ -348,7 +385,7 @@ authRouter.post("/consentimento", autenticar, async (req: Request, res: Response
       select: usuarioSelecaoPublica,
     });
 
-    return res.json(usuario);
+    return res.json(perfilPublico(usuario));
   } catch (error) {
     console.error("Erro ao registrar consentimento:", error);
 
@@ -591,7 +628,7 @@ authRouter.post("/redefinir-senha", limiteRecuperacaoSenha, async (req: Request,
 
     await prisma.usuario.update({
       where: { id: usuario.id },
-      data: { senhaHash },
+      data: { senhaHash, versaoSessao: { increment: 1 } },
     });
 
     await registrarAuditoria({

@@ -18,7 +18,7 @@ const SELETOR_DIAS = new RegExp(`^(${ITEM_DIAS}(?:\\s*,\\s*${ITEM_DIAS})*)(?:\\s
 const FAIXA = /^(\d{1,2}):(\d{2})\s*-\s*(\d{1,2}):(\d{2})$/;
 
 // Minutos desde a meia-noite; "fim" menor que "inicio" atravessa a meia-noite.
-type Faixa = [inicio: number, fim: number];
+export type Faixa = [inicio: number, fim: number];
 
 interface Regra {
   dias: number[]; // vazio = todos os dias
@@ -165,6 +165,15 @@ export function converterHorarioOsm(original: string): string | null {
     }
   }
 
+  return descreverSemana(semana, feriados);
+}
+
+/**
+ * Escreve o horário da semana no formato do sistema, juntando os dias seguidos com o mesmo
+ * horário. `semana` é indexada como Date.getDay() (0 = domingo); dia sem faixa = fechado.
+ * Também usada para o horário que vem do Google Places.
+ */
+export function descreverSemana(semana: Faixa[][], feriados: Faixa[] | null = null): string | null {
   // Agrupa os dias seguidos (de segunda a domingo) que têm o mesmo horário.
   const grupos: { dias: number[]; horario: string }[] = [];
 

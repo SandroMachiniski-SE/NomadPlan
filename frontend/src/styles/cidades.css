@@ -1,0 +1,320 @@
+/* Qualquer cidade do Brasil e mapa explorável (Home). */
+
+.hero__acoes {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.75rem;
+  margin-top: 1rem;
+}
+
+.hero__acoes .btn {
+  border-color: rgba(255, 255, 255, 0.35);
+  background: rgba(255, 255, 255, 0.1);
+  color: #fff;
+  backdrop-filter: blur(4px);
+}
+
+.hero__acoes .btn:hover:not(:disabled) {
+  border-color: rgba(255, 255, 255, 0.7);
+  background: rgba(255, 255, 255, 0.2);
+  color: #fff;
+}
+
+.escolher-cidade {
+  margin-top: 1.25rem;
+  color: var(--text);
+}
+
+.escolher-cidade h2 {
+  margin: 0 0 0.25rem;
+  font-size: 1.15rem;
+  color: var(--heading);
+}
+
+.escolher-cidade__topo {
+  display: flex;
+  justify-content: space-between;
+  gap: 1rem;
+  align-items: flex-start;
+}
+
+.escolher-cidade__form {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  margin: 1rem 0;
+}
+
+.escolher-cidade__form input {
+  flex: 1 1 14rem;
+  min-width: 0;
+  padding: 0.65rem 0.8rem;
+  border: 1px solid var(--border-strong);
+  border-radius: var(--radius-md, 0.5rem);
+  background: var(--surface);
+  color: var(--text);
+  font: inherit;
+}
+
+.escolher-cidade__lista {
+  display: grid;
+  gap: 0.5rem;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.escolher-cidade__lista li {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.75rem;
+  padding: 0.75rem 0.9rem;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-md, 0.5rem);
+  background: var(--surface-2);
+}
+
+.escolher-cidade__lista li > div {
+  display: grid;
+  gap: 0.1rem;
+}
+
+.escolher-cidade__andamento {
+  color: var(--primary-text);
+  font-size: 0.9rem;
+}
+
+.escolher-cidade__falha {
+  color: var(--danger-text, #8a1c10);
+  font-size: 0.9rem;
+}
+
+/* Botão "Buscar nesta área" sobre o mapa (acima das camadas do Leaflet). */
+.mapa-busca-area {
+  position: absolute;
+  top: 0.75rem;
+  left: 50%;
+  z-index: 1000;
+  transform: translateX(-50%);
+}
+
+.mapa-busca-area .btn {
+  box-shadow: var(--shadow-md, 0 4px 12px rgba(0, 0, 0, 0.25));
+}
+
+.mapa-dica {
+  margin-top: 0.75rem;
+}
+
+.link-botao {
+  padding: 0;
+  border: 0;
+  background: none;
+  color: var(--primary-text);
+  font: inherit;
+  text-decoration: underline;
+  cursor: pointer;
+}
+
+.balao-ponto__roteiro {
+  display: grid;
+  gap: 0.4rem;
+  margin-top: 0.6rem;
+}
+
+.balao-ponto__roteiro select {
+  width: 100%;
+  padding: 0.35rem 0.5rem;
+  font: inherit;
+}
+
+.balao-ponto__erro {
+  color: var(--danger-text, #8a1c10);
+  font-size: 0.85rem;
+}
+
+/* Botão de mapa dentro do campo de destino. */
+.busca__campo--com-acao input {
+  padding-right: 3.4rem;
+}
+
+.busca__mapa {
+  position: absolute;
+  top: 50%;
+  right: 0.5rem;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 38px;
+  height: 38px;
+  padding: 0;
+  border: 0;
+  border-radius: var(--radius-sm);
+  background: var(--primary-soft);
+  color: var(--primary-text);
+  cursor: pointer;
+  transform: translateY(-50%);
+  transition: background-color 0.15s, color 0.15s, transform 0.1s;
+}
+
+.busca__mapa:hover {
+  background: var(--primary);
+  color: var(--on-primary);
+}
+
+.busca__mapa:active {
+  transform: translateY(-50%) scale(0.92);
+}
+
+.busca__mapa[aria-pressed="true"] {
+  background: var(--primary);
+  color: var(--on-primary);
+}
+
+/* Botão "Explorar pelo mapa" já aberto: fica marcado, para não restar dúvida. */
+.hero__acoes .btn[aria-pressed="true"] {
+  border-color: var(--coral-500);
+  background: var(--coral-600);
+  color: #fff;
+}
+
+.hero__acoes .btn[aria-pressed="true"]:hover:not(:disabled) {
+  background: var(--coral-600);
+  border-color: var(--coral-500);
+}
+
+/* A seção de resultados para onde a página rola ao abrir o mapa (deixa o cabeçalho fixo de fora). */
+.resultados {
+  scroll-margin-top: 5rem;
+}
+
+/* Pulso curto no mapa recém-aberto. */
+.mapa-wrap--destaque {
+  animation: mapa-destaque 1.4s ease-out;
+}
+
+@keyframes mapa-destaque {
+  0% {
+    box-shadow: 0 0 0 0 color-mix(in srgb, var(--coral-500) 70%, transparent);
+  }
+  60% {
+    box-shadow: 0 0 0 14px color-mix(in srgb, var(--coral-500) 0%, transparent);
+  }
+  100% {
+    box-shadow: var(--shadow-sm);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .mapa-wrap--destaque {
+    animation: none;
+    outline: 3px solid var(--coral-500);
+  }
+}
+
+/* Celular: o topo da Home ocupa menos tela, e os chips viram uma linha rolável. */
+@media (max-width: 640px) {
+  .hero__inner {
+    padding-block: 1.25rem 1.5rem;
+  }
+
+  .hero__eyebrow {
+    display: none;
+  }
+
+  .hero__titulo {
+    max-width: none;
+    font-size: 1.85rem;
+  }
+
+  .hero__texto {
+    margin-top: 0.6rem;
+    font-size: 0.95rem;
+  }
+
+  .busca {
+    margin-top: 1.1rem;
+  }
+
+  .hero__chips {
+    flex-wrap: nowrap;
+    margin-inline: calc(var(--gutter, 1rem) * -1);
+    padding-inline: var(--gutter, 1rem);
+    padding-bottom: 0.25rem;
+    overflow-x: auto;
+    scroll-snap-type: x proximity;
+    scroll-padding-inline: var(--gutter, 1rem);
+    scrollbar-width: none;
+  }
+
+  .hero__chips::-webkit-scrollbar {
+    display: none;
+  }
+
+  .hero__chips .chip {
+    flex: 0 0 auto;
+    scroll-snap-align: start;
+  }
+
+  .hero__acoes {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+  }
+
+  .hero__acoes .btn {
+    padding-inline: 0.6rem;
+    font-size: 0.85rem;
+    white-space: normal;
+    text-align: center;
+  }
+}
+
+/* Tela larga: lista de resultados à esquerda e o mapa fixo à direita. */
+.resultados-dividido {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(380px, 42%);
+  gap: 1.25rem;
+  align-items: start;
+}
+
+.resultados-dividido__lista {
+  min-width: 0;
+  transition: opacity 0.15s;
+}
+
+.resultados-dividido__lista--carregando {
+  opacity: 0.55;
+  pointer-events: none;
+}
+
+.resultados-dividido__mapa {
+  position: sticky;
+  top: calc(var(--header-height) + 1rem);
+}
+
+/* Na coluna estreita, os cartões cabem dois por linha. */
+.resultados-dividido .grid-cards {
+  grid-template-columns: repeat(auto-fill, minmax(min(100%, 240px), 1fr));
+}
+
+/* Cartão e pino se realçam: passar o mouse num mostra o outro. */
+.ponto-card-wrap--destaque .ponto-card {
+  border-color: var(--coral-500);
+  box-shadow: 0 0 0 3px color-mix(in srgb, var(--coral-500) 35%, transparent);
+}
+
+.marcador-pin--destaque svg {
+  transform: scale(1.3);
+  transform-origin: 50% 100%;
+}
+
+.marcador-pin--destaque path {
+  fill: var(--primary);
+}
+
+.marcador-grupo--destaque span {
+  background: var(--primary);
+  transform: scale(1.18);
+}

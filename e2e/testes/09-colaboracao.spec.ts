@@ -92,7 +92,7 @@ test.describe("roteiro colaborativo", () => {
     await expect(p.locator(".parada__card", { hasText: MUSEU })).toBeVisible();
     await expect(p.getByRole("button", { name: "Adicionar ponto" })).toHaveCount(0);
     await expect(p.getByRole("button", { name: "Remover", exact: true })).toHaveCount(0);
-    await expect(p.getByRole("button", { name: "Observação e custo" })).toHaveCount(0);
+    await expect(p.getByRole("button", { name: /observação e custo/i })).toHaveCount(0);
     await expect(p.getByRole("button", { name: "Otimizar todos os dias" })).toHaveCount(0);
     await expect(p.getByRole("button", { name: "Editar", exact: true })).toHaveCount(0);
     await expect(p.getByRole("button", { name: "Salvar notas" })).toHaveCount(0);

@@ -64,6 +64,30 @@ test.describe("roteiro por dia", () => {
     await expect(page.getByText(/3 paradas · 3 dias/)).toBeVisible();
   });
 
+  test("a barra de dias leva ao dia escolhido e os dias podem ser recolhidos", async ({ page }) => {
+    await cadastrar(page);
+    await criarRoteiro(page, "Roteiro com barra de dias", { inicio: "2026-11-04", fim: "2026-11-06" });
+    await adicionar(page, MUSEU, "1");
+    await adicionar(page, PARQUE, "3");
+
+    const barra = page.getByRole("navigation", { name: "Ir para o dia" });
+
+    await expect(barra.getByRole("button")).toHaveCount(4); // Dia 1, 2 e 3 + "Recolher todos"
+    await barra.getByRole("button", { name: "Dia 3" }).click();
+    await expect(barra.getByRole("button", { name: "Dia 3" })).toHaveAttribute("aria-current", "true");
+    await expect(page.locator("#dia-3")).toBeInViewport();
+
+    // Recolher esconde as paradas, mas deixa o título de cada dia.
+    await barra.getByRole("button", { name: "Recolher todos" }).click();
+    await expect(page.locator(".parada__card", { hasText: MUSEU })).toBeHidden();
+    await expect(page.getByRole("heading", { name: /^Dia 1 · qua/i })).toBeVisible();
+
+    // Abrir um dia sozinho pelo botão do próprio dia.
+    await page.getByRole("button", { name: "Mostrar o dia 1" }).click();
+    await expect(page.locator(".parada__card", { hasText: MUSEU })).toBeVisible();
+    await expect(page.locator(".parada__card", { hasText: PARQUE })).toBeHidden();
+  });
+
   test("mostra tempo e distância entre paradas do mesmo dia, sem trecho na primeira parada", async ({ page }) => {
     await cadastrar(page);
     await criarRoteiro(page, "Roteiro com trechos");
@@ -155,7 +179,8 @@ test.describe("roteiro por dia", () => {
     await criarRoteiro(page, "Roteiro sem datas");
     await adicionar(page, MUSEU);
 
-    await expect(page.getByRole("heading", { name: "Dia 1", exact: true })).toBeVisible();
+    // Sem datas, o dia mostra o número e a cidade das paradas.
+    await expect(page.getByRole("heading", { name: "Dia 1 · Joinville", exact: true })).toBeVisible();
 
     await page.getByRole("button", { name: "Editar" }).click();
     await page.getByLabel("Data de início").fill("2026-12-25");

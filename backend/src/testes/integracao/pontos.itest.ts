@@ -46,6 +46,29 @@ describe("pontos turísticos: cadastro, publicação e moderação", () => {
   });
 
   describe("cadastro", () => {
+    it("recusa site com esquema perigoso no cadastro e na edição do ponto", async () => {
+      const negocio = await criarUsuario({ tipoConta: TipoConta.NEGOCIO });
+
+      const criar = await api("POST", "/pontos", {
+        token: negocio.token,
+        json: { ...PONTO_VALIDO, siteOficial: "javascript:alert(1)" },
+      });
+      assert.equal(criar.status, 400);
+
+      const valido = await api("POST", "/pontos", {
+        token: negocio.token,
+        json: { ...PONTO_VALIDO, siteOficial: "museu.com.br" },
+      });
+      assert.equal(valido.status, 201);
+      assert.equal(valido.corpo.siteOficial, "https://museu.com.br");
+
+      const editar = await api("PUT", `/pontos/${valido.corpo.id}`, {
+        token: negocio.token,
+        json: { siteOficial: "data:text/html,x" },
+      });
+      assert.equal(editar.status, 400);
+    });
+
     it("só contas de negócio, gestor, moderador e admin cadastram pontos", async () => {
       const visitante = await criarUsuario();
       const morador = await criarUsuario({ tipoConta: TipoConta.MORADOR });

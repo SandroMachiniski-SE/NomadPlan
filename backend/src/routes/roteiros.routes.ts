@@ -2,18 +2,48 @@ import { Router, Request, Response, NextFunction } from "express";
 import { randomBytes } from "crypto";
 import { z } from "zod";
 import prisma from "../lib/prisma";
-import { StatusPonto } from "@prisma/client";
+import { Prisma, StatusPonto } from "@prisma/client";
 import { autenticar } from "../middleware/auth";
-import { gerarRoteiroSugerido, inicioPadrao } from "../lib/recomendacao";
+import { gerarRoteiroSugerido, inicioPadrao, MAX_DIAS_GERADOS } from "../lib/recomendacao";
 import { registrarAuditoria } from "../lib/auditoria";
 import { registrarEvento } from "../lib/metricasUso";
 import { ehViolacaoDeUnicidade } from "../lib/prismaErros";
 import { registrarVersaoRoteiro, type DadosVersaoRoteiro } from "../lib/versionamentoRoteiro";
-import { comTrechos, otimizarOrdem } from "../lib/trajeto";
+import { cidadesDosItens, comTrechos, otimizarOrdem, viagensComEstrada, viagensEntreDias } from "../lib/trajeto";
 import { resumirOrcamento } from "../lib/orcamento";
 import { MAX_PARTICIPANTES, nivelExigido, papelNoRoteiro, papelPermite, type Papel } from "../lib/colaboracao";
 import { criarNotificacao } from "../lib/notificacoes";
 import { enviarEmailConvite } from "../lib/email";
+import { ErroDaViagem, planejarViagemDeCarro, resolverEntradaDaViagem } from "../lib/viagemDeCarro";
+import { ErroRota, SemEstrada } from "../lib/rotas";
+import {
+  conferirHoteis,
+  conferirNoites,
+  diasComNoiteNaEstrada,
+  ErroAoSalvarViagem,
+  gravarViagemDeCarro,
+  hospedagensParaOCatalogo,
+  selecaoDaViagem,
+  trechosDoRoteiro,
+  viagemDoRoteiro,
+} from "../lib/gravarViagem";
+
+/** Erros do planejamento da viagem de carro viram 400, 409, 422 ou 503; devolve se respondeu. */
+function responderErroDaViagem(res: Response, error: unknown): boolean {
+  if (error instanceof ErroDaViagem) {
+    res.status(400).json({ erro: error.message });
+  } else if (error instanceof ErroAoSalvarViagem) {
+    res.status(error.status).json({ erro: error.message });
+  } else if (error instanceof SemEstrada) {
+    res.status(422).json({ erro: error.message });
+  } else if (error instanceof ErroRota) {
+    res.status(503).json({ erro: "Não consegui calcular a rota agora; tente de novo em alguns minutos." });
+  } else {
+    return false;
+  }
+
+  return true;
+}
 
 const roteirosRouter = Router();
 
@@ -22,7 +52,8 @@ const idSchema = z.coerce.number().int().positive();
 // Quantos dias um roteiro pode ter.
 const MAX_DIAS = 30;
 const diaSchema = z.coerce.number().int().min(1).max(MAX_DIAS);
-const ORDEM_DAS_PARADAS = [{ dia: "asc" }, { ordem: "asc" }] as const;
+// A pernoite fecha o dia, qualquer que seja a ordem gravada.
+const ORDEM_DAS_PARADAS = [{ dia: "asc" }, { pernoite: "asc" }, { ordem: "asc" }] as const;
 
 // Dinheiro sempre em centavos inteiros (até R$ 1.000.000,00).
 const centavosSchema = z.coerce.number().int().min(0).max(100_000_000);
@@ -73,10 +104,14 @@ roteirosRouter.get("/publico/:slug", async (req: Request, res: Response) => {
             id: true,
             dia: true,
             ordem: true,
+            titulo: true,
+            periodo: true,
+            pernoite: true,
             observacao: true,
             ponto: { select: pontoResumoSelecao },
           },
         },
+        ...selecaoDaViagem,
       },
     });
 
@@ -84,7 +119,26 @@ roteirosRouter.get("/publico/:slug", async (req: Request, res: Response) => {
       return res.status(404).json({ erro: "Roteiro não encontrado ou não é público." });
     }
 
-    return res.json({ ...roteiro, itens: comTrechos(roteiro.itens) });
+    const {
+      kmPorDia: _km,
+      horasPorDia: _horas,
+      viagemVolta: _volta,
+      consumoKmPorLitro: _consumo,
+      precoLitroCentavos: _preco,
+      municipioDeOrigem: _origem,
+      trechosEstrada,
+      ...dados
+    } = roteiro;
+    const trechos = trechosDoRoteiro(trechosEstrada, true);
+
+    return res.json({
+      ...dados,
+      itens: comTrechos(roteiro.itens),
+      cidades: cidadesDosItens(roteiro.itens),
+      viagensEntreDias: viagensComEstrada(viagensEntreDias(roteiro.itens), trechos),
+      viagemDeCarro: viagemDoRoteiro(roteiro, true),
+      trechosDeEstrada: trechos,
+    });
   } catch (error) {
     console.error("Erro ao buscar roteiro público:", error);
 
@@ -132,41 +186,91 @@ const camposDoRoteiroSchema = z.object({
   dataFim: z.coerce.date().optional(),
 });
 
-// Na criação o roteiro já pode vir com suas paradas (usado ao salvar um roteiro sugerido):
-// tudo é gravado junto ou nada é.
-const criarRoteiroSchema = camposDoRoteiroSchema.extend({
-  pontos: z
-    .array(
-      z.object({
-        idPonto: z.coerce.number().int().positive(),
-        dia: diaSchema.optional(),
-        observacao: z.string().trim().max(500).optional(),
-        custoCentavos: centavosSchema.optional(),
-      }),
-    )
-    .max(30)
-    .optional(),
-});
+const periodoSchema = z.enum(["MANHA", "TARDE", "NOITE", "DIA_INTEIRO"]);
+const tituloSchema = z.string().trim().min(1).max(160);
 
-const atualizarRoteiroSchema = camposDoRoteiroSchema.partial();
-
-const adicionarItemSchema = z.object({
-  idPonto: z.coerce.number().int().positive(),
-  ordem: z.coerce.number().int().min(0).optional(),
+// Uma parada é um ponto cadastrado ou uma atividade livre ("Rolê pelo centro", "Dia livre").
+const camposDaParadaSchema = z.object({
+  idPonto: z.coerce.number().int().positive().optional(),
+  titulo: tituloSchema.optional(),
   dia: diaSchema.optional(),
+  periodo: periodoSchema.optional(),
+  // Onde se dorme nessa noite (um hotel do banco ou um texto, como "Acampamento na serra").
+  pernoite: z.boolean().optional(),
   observacao: z.string().trim().max(500).optional(),
   custoCentavos: centavosSchema.optional(),
 });
 
-// Detalhes de uma parada: quem não for enviado não muda; null limpa o campo.
+const pontoOuTitulo = (parada: { idPonto?: number; titulo?: string }) => parada.idPonto !== undefined || !!parada.titulo;
+const MENSAGEM_PONTO_OU_TITULO = { message: "Informe o ponto turístico ou o título da atividade." };
+
+const pernaSchema = z.number().int().min(0).max(7);
+
+// Viagem de carro saindo de casa: divide a estrada em dias com pernoites sugeridos.
+const viagemDeCarroSchema = z.object({
+  origem: z.number().int().positive().optional(),
+  kmPorDia: z.number().min(150).max(1000).optional(),
+  horasPorDia: z.number().min(2).max(14).optional(),
+  comVolta: z.boolean().optional(),
+  consumoKmPorLitro: z.number().min(3).max(40).optional(),
+  precoLitroCentavos: z.number().int().min(100).max(2000).optional(),
+  escolhas: z
+    .array(z.object({ perna: pernaSchema, noite: z.number().int().min(1).max(30), codigoIbge: z.number().int().positive() }))
+    .max(60)
+    .optional(),
+  decisoes: z.array(z.object({ perna: pernaSchema, esticar: z.boolean() })).max(8).optional(),
+});
+
+// Ao salvar, a viagem é recalculada no servidor com as mesmas entradas da geração; `noites` diz
+// a cidade e o hotel que a pessoa viu e escolheu em cada noite de estrada.
+const viagemSalvaSchema = viagemDeCarroSchema.extend({
+  origem: z.number().int().positive(),
+  etapas: z
+    .array(z.object({ codigoIbge: z.number().int().positive(), dias: z.number().int().min(1).max(MAX_DIAS_GERADOS) }))
+    .min(1)
+    .max(6),
+  horasDisponiveis: z.number().positive().max(24),
+  kmPorDia: z.number().min(150).max(1000),
+  comVolta: z.boolean(),
+  noites: z
+    .array(
+      z.object({
+        perna: pernaSchema,
+        noite: z.number().int().min(1).max(30),
+        codigoIbge: z.number().int().positive().nullable(),
+        idOsm: z
+          .string()
+          .regex(/^(node|way|relation)\/\d+$/)
+          .optional(),
+      }),
+    )
+    .max(60),
+});
+
+// Na criação o roteiro já pode vir com suas paradas (usado ao salvar um roteiro sugerido):
+// tudo é gravado junto ou nada é.
+const criarRoteiroSchema = camposDoRoteiroSchema.extend({
+  pontos: z.array(camposDaParadaSchema.refine(pontoOuTitulo, MENSAGEM_PONTO_OU_TITULO)).max(120).optional(),
+  viagemDeCarro: viagemSalvaSchema.optional(),
+});
+
+const atualizarRoteiroSchema = camposDoRoteiroSchema.partial();
+
+const adicionarItemSchema = camposDaParadaSchema
+  .extend({ ordem: z.coerce.number().int().min(0).optional() })
+  .refine(pontoOuTitulo, MENSAGEM_PONTO_OU_TITULO);
+
+// Detalhes de uma parada: quem não for enviado não muda; null limpa o campo. O título só vale
+// para atividades livres (um ponto cadastrado já tem nome).
 const detalhesDaParadaSchema = z
   .object({
     observacao: z.string().trim().max(500).nullable().optional(),
     custoCentavos: centavosSchema.nullable().optional(),
+    titulo: tituloSchema.optional(),
+    periodo: periodoSchema.nullable().optional(),
+    pernoite: z.boolean().optional(),
   })
-  .refine((d) => d.observacao !== undefined || d.custoCentavos !== undefined, {
-    message: "Informe a observação ou o custo.",
-  });
+  .refine((d) => Object.values(d).some((v) => v !== undefined), { message: "Nada para atualizar." });
 
 const anotacoesSchema = z
   .object({
@@ -197,14 +301,34 @@ const reordenarSchema = z.object({
   idsItensEmOrdem: z.array(z.coerce.number().int().positive()).min(1),
 });
 
-const gerarRoteiroSchema = z.object({
-  cidade: z.string().trim().min(1).max(120),
-  horasDisponiveis: z.coerce.number().positive().max(24).default(6),
-  interesses: z.array(z.string().trim().min(1)).optional(),
-  dataHoraInicio: z.coerce.date().optional(),
-  latitude: z.coerce.number().min(-90).max(90).optional(),
-  longitude: z.coerce.number().min(-180).max(180).optional(),
-});
+const gerarRoteiroSchema = z
+  .object({
+    cidade: z.string().trim().min(1).max(120).optional(),
+    // Viagem por várias cidades: "Joinville, 2 dias → Blumenau, 1 dia".
+    etapas: z
+      .array(
+        z.object({
+          cidade: z.string().trim().min(1).max(120),
+          // Município escolhido na busca (viagem de carro); sem ele, é procurado pelo nome.
+          codigoIbge: z.number().int().positive().optional(),
+          dias: z.coerce.number().int().min(1).max(MAX_DIAS_GERADOS),
+        }),
+      )
+      .min(1)
+      .max(6)
+      .optional(),
+    // Horas de passeio por dia.
+    horasDisponiveis: z.coerce.number().positive().max(24).default(6),
+    interesses: z.array(z.string().trim().min(1)).optional(),
+    dataHoraInicio: z.coerce.date().optional(),
+    latitude: z.coerce.number().min(-90).max(90).optional(),
+    longitude: z.coerce.number().min(-180).max(180).optional(),
+    viagemDeCarro: viagemDeCarroSchema.optional(),
+  })
+  .refine((d) => d.cidade || (d.etapas && d.etapas.length > 0), { message: "Informe a cidade ou as etapas da viagem." })
+  .refine((d) => !d.etapas || d.etapas.reduce((soma, e) => soma + e.dias, 0) <= MAX_DIAS_GERADOS, {
+    message: `O roteiro gerado tem no máximo ${MAX_DIAS_GERADOS} dias.`,
+  });
 
 // A participação (e o nível de acesso) de quem chama já foi conferida pelo middleware de
 // "/:id" mais abaixo; aqui só se confirma que o roteiro existe.
@@ -245,13 +369,15 @@ roteirosRouter.get("/", async (req: Request, res: Response) => {
         },
         usuario: { select: { id: true, nome: true } },
         colaboradores: { where: { idUsuario }, select: { papel: true } },
+        itens: { orderBy: [...ORDEM_DAS_PARADAS], select: { dia: true, ponto: { select: { id: true, cidade: true, latitude: true, longitude: true } } } },
       },
     });
 
     return res.json({
       total: roteiros.length,
-      dados: roteiros.map(({ colaboradores, notas: _notas, orcamentoCentavos: _orcamento, ...roteiro }) => ({
+      dados: roteiros.map(({ colaboradores, itens, notas: _notas, orcamentoCentavos: _orcamento, ...roteiro }) => ({
         ...roteiro,
+        cidades: cidadesDosItens(itens),
         meuPapel: roteiro.idUsuario === idUsuario ? "DONO" : (colaboradores[0]?.papel ?? "LEITOR"),
       })),
     });
@@ -285,10 +411,40 @@ roteirosRouter.post("/gerar", async (req: Request, res: Response) => {
     const interesses =
       dados.interesses && dados.interesses.length > 0 ? dados.interesses : (usuario?.interesses ?? []);
 
+    let etapas = dados.etapas;
+    let viagemDeCarro = null;
+
+    if (dados.viagemDeCarro) {
+      const entrada = await resolverEntradaDaViagem(
+        dados.viagemDeCarro,
+        dados.etapas ?? [{ cidade: dados.cidade!, dias: 1 }],
+        req.usuario!.id,
+        dados.horasDisponiveis,
+      );
+      const plano = await planejarViagemDeCarro(entrada);
+
+      etapas = plano.etapasDoGerador;
+      viagemDeCarro = {
+        origem: entrada.origem,
+        etapas: entrada.etapas.map(({ codigoIbge, cidade, uf, dias }) => ({ codigoIbge, cidade, uf, dias })),
+        // O salvamento manda de volta as mesmas horas: com outras, os dias da viagem mudam.
+        horasDisponiveis: entrada.horasDisponiveis,
+        kmPorDia: entrada.kmPorDia,
+        horasPorDia: entrada.horasPorDia,
+        comVolta: entrada.comVolta,
+        consumoKmPorLitro: entrada.consumoKmPorLitro,
+        precoLitroCentavos: entrada.precoLitroCentavos,
+        pernas: plano.pernas,
+        combustivel: plano.combustivel,
+        avisos: plano.avisos,
+      };
+    }
+
     // Sem horário de início informado, começa no próximo horário comercial: de madrugada
     // ou à noite quase tudo estaria fechado e o roteiro sairia vazio.
     const recomendacao = await gerarRoteiroSugerido({
-      cidade: dados.cidade,
+      cidade: etapas?.[0].cidade ?? dados.cidade!,
+      etapas,
       horasDisponiveis: dados.horasDisponiveis,
       interesses,
       preferenciasAcessibilidade: usuario?.preferenciasAcessibilidade ?? [],
@@ -299,8 +455,10 @@ roteirosRouter.post("/gerar", async (req: Request, res: Response) => {
 
     registrarEvento("roteiro_gerado");
 
-    return res.json(recomendacao);
+    return res.json({ ...recomendacao, viagemDeCarro });
   } catch (error) {
+    if (responderErroDaViagem(res, error)) return;
+
     console.error("Erro ao gerar roteiro sugerido:", error);
 
     return res.status(500).json({ erro: "Erro interno ao gerar roteiro sugerido." });
@@ -334,6 +492,8 @@ roteirosRouter.get("/:id", async (req: Request, res: Response) => {
           },
         },
         checklist: { orderBy: [{ ordem: "asc" }, { id: "asc" }] },
+        municipioDeOrigem: selecaoDaViagem.municipioDeOrigem,
+        trechosEstrada: selecaoDaViagem.trechosEstrada,
       },
     });
 
@@ -343,12 +503,19 @@ roteirosRouter.get("/:id", async (req: Request, res: Response) => {
       });
     }
 
+    const { horasPorDia: _horas, consumoKmPorLitro: _consumo, municipioDeOrigem: _origem, trechosEstrada, ...dados } = roteiro;
+    const trechos = trechosDoRoteiro(trechosEstrada);
+
     return res.json({
-      ...roteiro,
+      ...dados,
       meuPapel: res.locals.papelNoRoteiro as Papel,
       colaboradores: roteiro.colaboradores.map((c) => ({ idUsuario: c.idUsuario, nome: c.usuario.nome, papel: c.papel })),
       itens: comTrechos(roteiro.itens),
-      orcamento: resumirOrcamento(roteiro.itens, roteiro.orcamentoCentavos),
+      cidades: cidadesDosItens(roteiro.itens),
+      viagensEntreDias: viagensComEstrada(viagensEntreDias(roteiro.itens), trechos),
+      orcamento: resumirOrcamento(roteiro.itens, roteiro.orcamentoCentavos, trechosEstrada),
+      viagemDeCarro: viagemDoRoteiro(roteiro),
+      trechosDeEstrada: trechos,
     });
   } catch (error) {
     console.error("Erro ao buscar roteiro:", error);
@@ -379,10 +546,18 @@ roteirosRouter.post("/", async (req: Request, res: Response) => {
     }
 
     const paradas = dados.pontos ?? [];
-    const idsPontos = [...new Set(paradas.map((p) => p.idPonto))];
+    // O mesmo hotel pode ser a pernoite de várias noites; como visita, cada ponto entra uma vez.
+    const comPonto = paradas.flatMap((p) => (p.idPonto === undefined || p.pernoite ? [] : [p.idPonto]));
+    const idsPontos = [...new Set(comPonto)];
 
-    if (idsPontos.length !== paradas.length) {
+    if (idsPontos.length !== comPonto.length) {
       return res.status(400).json({ erro: "Há pontos repetidos na lista de paradas." });
+    }
+
+    const diasComPernoite = paradas.filter((p) => p.pernoite).map((p) => p.dia ?? 1);
+
+    if (new Set(diasComPernoite).size !== diasComPernoite.length) {
+      return res.status(400).json({ erro: "Cada dia tem uma só pernoite." });
     }
 
     if (idsPontos.length > 0) {
@@ -395,25 +570,78 @@ roteirosRouter.post("/", async (req: Request, res: Response) => {
       }
     }
 
-    const roteiro = await prisma.roteiro.create({
-      data: {
-        nome: dados.nome,
-        descricao: dados.descricao || null,
-        cidade: dados.cidade || null,
-        dataInicio: dados.dataInicio || null,
-        dataFim: dados.dataFim || null,
-        idUsuario: req.usuario!.id,
-        itens: {
-          create: paradas.map((parada, indice) => ({
-            idPonto: parada.idPonto,
-            dia: parada.dia ?? 1,
-            ordem: indice,
-            observacao: parada.observacao || null,
-            custoCentavos: parada.custoCentavos ?? null,
-          })),
+    // Viagem de carro: recalcula a partir do cache (mesmas entradas, mesmo resultado) em vez de
+    // confiar nos km e no traçado vindos do navegador.
+    const pedidoDaViagem = dados.viagemDeCarro;
+    let viagem: {
+      entrada: Awaited<ReturnType<typeof resolverEntradaDaViagem>>;
+      plano: Awaited<ReturnType<typeof planejarViagemDeCarro>>;
+      idsDosHoteis: Map<string, number>;
+    } | null = null;
+
+    if (pedidoDaViagem) {
+      const entrada = await resolverEntradaDaViagem(
+        pedidoDaViagem,
+        pedidoDaViagem.etapas.map((e) => ({ cidade: String(e.codigoIbge), codigoIbge: e.codigoIbge, dias: e.dias })),
+        req.usuario!.id,
+        pedidoDaViagem.horasDisponiveis,
+      );
+      const plano = await planejarViagemDeCarro(entrada);
+
+      // As paradas têm de cair nos dias das cidades do plano recalculado (outras horas de passeio,
+      // por exemplo, podem tirar um dia só de estrada e deslocar tudo).
+      const diasNasCidades = new Set(
+        plano.etapasDoGerador.flatMap((e) => Array.from({ length: e.dias }, (_, i) => (e.primeiroDia ?? 1) + i)),
+      );
+      const paradasForaDosDias = paradas.some((p) => !p.pernoite && !diasNasCidades.has(p.dia ?? 1));
+
+      if (!conferirNoites(plano, pedidoDaViagem.noites) || paradasForaDosDias) {
+        return res.status(409).json({ erro: "A rota mudou desde a geração; gere de novo." });
+      }
+
+      conferirHoteis(plano, pedidoDaViagem.noites);
+
+      const diasDeNoite = diasComNoiteNaEstrada(plano);
+
+      if (paradas.some((p) => p.pernoite && diasDeNoite.has(p.dia ?? 1))) {
+        return res.status(400).json({ erro: "Os pernoites dos dias de estrada vêm da viagem de carro." });
+      }
+
+      viagem = { entrada, plano, idsDosHoteis: await hospedagensParaOCatalogo(plano) };
+    }
+
+    const roteiro = await prisma.$transaction(async (tx) => {
+      const criado = await tx.roteiro.create({
+        data: {
+          nome: dados.nome,
+          descricao: dados.descricao || null,
+          cidade: dados.cidade || null,
+          dataInicio: dados.dataInicio || null,
+          dataFim: dados.dataFim || null,
+          idUsuario: req.usuario!.id,
+          itens: {
+            create: paradas.map((parada, indice) => ({
+              idPonto: parada.idPonto ?? null,
+              titulo: parada.idPonto === undefined ? (parada.titulo ?? null) : null,
+              dia: parada.dia ?? 1,
+              ordem: indice,
+              periodo: parada.periodo ?? null,
+              pernoite: parada.pernoite ?? false,
+              observacao: parada.observacao || null,
+              custoCentavos: parada.custoCentavos ?? null,
+            })),
+          },
         },
-      },
-      include: { itens: { orderBy: [...ORDEM_DAS_PARADAS] } },
+      });
+
+      if (viagem && pedidoDaViagem) {
+        await gravarViagemDeCarro(tx, criado.id, viagem.entrada, viagem.plano, pedidoDaViagem.noites, viagem.idsDosHoteis);
+      }
+
+      return tx.roteiro.findUniqueOrThrow({
+        where: { id: criado.id },
+        include: { itens: { orderBy: [...ORDEM_DAS_PARADAS] } },
+      });
     });
 
     registrarEvento("roteiro_criado");
@@ -427,6 +655,8 @@ roteirosRouter.post("/", async (req: Request, res: Response) => {
 
     return res.status(201).json(roteiro);
   } catch (error) {
+    if (responderErroDaViagem(res, error)) return;
+
     console.error("Erro ao criar roteiro:", error);
 
     return res.status(500).json({
@@ -573,20 +803,19 @@ roteirosRouter.post("/:id/itens", async (req: Request, res: Response) => {
       });
     }
 
-    const ponto = await prisma.pontoTuristico.findFirst({
-      where: {
-        id: resultado.data.idPonto,
-        status: "PUBLICADO",
-      },
-      select: {
-        id: true,
-      },
-    });
+    const { idPonto, titulo, periodo, pernoite } = resultado.data;
 
-    if (!ponto) {
-      return res.status(404).json({
-        erro: "Ponto turístico não encontrado.",
+    if (idPonto !== undefined) {
+      const ponto = await prisma.pontoTuristico.findFirst({
+        where: { id: idPonto, status: "PUBLICADO" },
+        select: { id: true },
       });
+
+      if (!ponto) {
+        return res.status(404).json({
+          erro: "Ponto turístico não encontrado.",
+        });
+      }
     }
 
     const ultimoItem = await prisma.itemRoteiro.findFirst({
@@ -613,14 +842,22 @@ roteirosRouter.post("/:id/itens", async (req: Request, res: Response) => {
 
     try {
       item = await prisma.$transaction(async (tx) => {
-        await registrarVersaoRoteiro(idRoteiro.data, "adicionar_ponto", req.usuario!.id, tx);
+        await registrarVersaoRoteiro(idRoteiro.data, idPonto !== undefined ? "adicionar_ponto" : "adicionar_atividade", req.usuario!.id, tx);
+
+        // A nova pernoite do dia substitui a anterior (há uma só por noite).
+        if (pernoite) {
+          await tx.itemRoteiro.updateMany({ where: { idRoteiro: idRoteiro.data, dia, pernoite: true }, data: { pernoite: false } });
+        }
 
         return tx.itemRoteiro.create({
           data: {
             idRoteiro: idRoteiro.data,
-            idPonto: resultado.data.idPonto,
+            idPonto: idPonto ?? null,
+            titulo: idPonto === undefined ? (titulo ?? null) : null,
             dia,
             ordem,
+            periodo: periodo ?? null,
+            pernoite: pernoite ?? false,
             observacao: resultado.data.observacao || null,
             custoCentavos: resultado.data.custoCentavos ?? null,
           },
@@ -639,10 +876,10 @@ roteirosRouter.post("/:id/itens", async (req: Request, res: Response) => {
 
     await registrarAuditoria({
       idUsuario: req.usuario!.id,
-      acao: "adicionar_ponto",
+      acao: idPonto !== undefined ? "adicionar_ponto" : "adicionar_atividade",
       entidade: "roteiro",
       idEntidade: idRoteiro.data,
-      detalhes: { idPonto: resultado.data.idPonto },
+      detalhes: idPonto !== undefined ? { idPonto } : { titulo },
     });
 
     return res.status(201).json(item);
@@ -797,7 +1034,7 @@ roteirosRouter.post("/:id/otimizar", async (req: Request, res: Response) => {
     const itens = await prisma.itemRoteiro.findMany({
       where: { idRoteiro: idRoteiro.data },
       orderBy: [...ORDEM_DAS_PARADAS],
-      select: { id: true, dia: true, ponto: { select: { id: true, latitude: true, longitude: true } } },
+      select: { id: true, dia: true, pernoite: true, ponto: { select: { id: true, latitude: true, longitude: true } } },
     });
 
     const dias = [...new Set(itens.map((item) => item.dia))].filter(
@@ -812,11 +1049,14 @@ roteirosRouter.post("/:id/otimizar", async (req: Request, res: Response) => {
     const novaOrdemPorDia = new Map<number, number[]>();
 
     for (const dia of dias) {
-      const doDia = itens.filter((item) => item.dia === dia);
+      // A pernoite não entra na otimização: continua fechando o dia.
+      const doDia = itens.filter((item) => item.dia === dia && !item.pernoite);
+      const pernoites = itens.filter((item) => item.dia === dia && item.pernoite).map((item) => item.id);
       const otimizado = otimizarOrdem(
-        doDia.map((item) => ({ id: item.id, latitude: item.ponto.latitude, longitude: item.ponto.longitude })),
+        doDia.map((item) => ({ id: item.id, latitude: item.ponto?.latitude ?? null, longitude: item.ponto?.longitude ?? null })),
       );
-      const alterado = otimizado.ids.some((id, i) => id !== doDia[i].id);
+      otimizado.ids.push(...pernoites);
+      const alterado = otimizado.ids.some((id, i) => id !== [...doDia.map((item) => item.id), ...pernoites][i]);
 
       resumo.push({ dia, alterado, metrosAntes: otimizado.metrosAntes, metrosDepois: otimizado.metrosDepois });
 
@@ -882,21 +1122,40 @@ roteirosRouter.patch("/:id/itens/:idItem", async (req: Request, res: Response) =
 
     const roteiro = await buscarRoteiro(idRoteiro.data);
     const item = roteiro
-      ? await prisma.itemRoteiro.findFirst({ where: { id: idItem.data, idRoteiro: idRoteiro.data }, select: { id: true } })
+      ? await prisma.itemRoteiro.findFirst({
+          where: { id: idItem.data, idRoteiro: idRoteiro.data },
+          select: { id: true, dia: true, idPonto: true },
+        })
       : null;
 
     if (!roteiro || !item) {
       return res.status(404).json({ erro: "Parada não encontrada neste roteiro." });
     }
 
-    const { observacao, custoCentavos } = resultado.data;
+    const { observacao, custoCentavos, titulo, periodo, pernoite } = resultado.data;
 
-    const atualizado = await prisma.itemRoteiro.update({
-      where: { id: item.id },
-      data: {
-        ...(observacao !== undefined ? { observacao: observacao || null } : {}),
-        ...(custoCentavos !== undefined ? { custoCentavos } : {}),
-      },
+    if (titulo !== undefined && item.idPonto !== null) {
+      return res.status(400).json({ erro: "Só atividades livres têm título; um ponto cadastrado usa o próprio nome." });
+    }
+
+    const atualizado = await prisma.$transaction(async (tx) => {
+      if (pernoite) {
+        await tx.itemRoteiro.updateMany({
+          where: { idRoteiro: idRoteiro.data, dia: item.dia, pernoite: true, id: { not: item.id } },
+          data: { pernoite: false },
+        });
+      }
+
+      return tx.itemRoteiro.update({
+        where: { id: item.id },
+        data: {
+          ...(observacao !== undefined ? { observacao: observacao || null } : {}),
+          ...(custoCentavos !== undefined ? { custoCentavos } : {}),
+          ...(titulo !== undefined ? { titulo } : {}),
+          ...(periodo !== undefined ? { periodo } : {}),
+          ...(pernoite !== undefined ? { pernoite } : {}),
+        },
+      });
     });
 
     return res.json(atualizado);
@@ -1264,6 +1523,44 @@ roteirosRouter.delete("/:id/colaboradores/:idUsuario", async (req: Request, res:
   }
 });
 
+// Remove uma parada pelo id dela: vale também para atividades livres e pernoites, que não têm
+// ponto. (A rota abaixo, pelo id do ponto, continua para quem já a usa.)
+roteirosRouter.delete("/:id/paradas/:idItem", async (req: Request, res: Response) => {
+  try {
+    const idRoteiro = idSchema.safeParse(req.params.id);
+    const idItem = idSchema.safeParse(req.params.idItem);
+
+    if (!idRoteiro.success || !idItem.success) {
+      return res.status(400).json({ erro: "Identificador inválido." });
+    }
+
+    const item = await prisma.itemRoteiro.findFirst({ where: { id: idItem.data, idRoteiro: idRoteiro.data } });
+
+    if (!item) {
+      return res.status(404).json({ erro: "Parada não encontrada neste roteiro." });
+    }
+
+    await prisma.$transaction(async (tx) => {
+      await registrarVersaoRoteiro(idRoteiro.data, item.idPonto !== null ? "remover_ponto" : "remover_atividade", req.usuario!.id, tx);
+      await tx.itemRoteiro.delete({ where: { id: item.id } });
+    });
+
+    await registrarAuditoria({
+      idUsuario: req.usuario!.id,
+      acao: item.idPonto !== null ? "remover_ponto" : "remover_atividade",
+      entidade: "roteiro",
+      idEntidade: idRoteiro.data,
+      detalhes: item.idPonto !== null ? { idPonto: item.idPonto } : { titulo: item.titulo },
+    });
+
+    return res.status(204).send();
+  } catch (error) {
+    console.error("Erro ao remover parada do roteiro:", error);
+
+    return res.status(500).json({ erro: "Erro interno ao remover a parada." });
+  }
+});
+
 roteirosRouter.delete("/:id/itens/:idPonto", async (req: Request, res: Response) => {
   try {
     const idRoteiro = idSchema.safeParse(req.params.id);
@@ -1424,13 +1721,17 @@ roteirosRouter.post("/:id/versoes/:versaoId/restaurar", async (req: Request, res
     const disponiveis = new Set(
       (
         await prisma.pontoTuristico.findMany({
-          where: { id: { in: dados.itens.map((i) => i.idPonto) }, status: StatusPonto.PUBLICADO },
+          where: {
+            id: { in: dados.itens.flatMap((i) => (i.idPonto === null ? [] : [i.idPonto])) },
+            status: StatusPonto.PUBLICADO,
+          },
           select: { id: true },
         })
       ).map((p) => p.id),
     );
 
-    const itensRestaurados = dados.itens.filter((item) => disponiveis.has(item.idPonto));
+    // Atividades livres (sem ponto) sempre voltam.
+    const itensRestaurados = dados.itens.filter((item) => item.idPonto === null || disponiveis.has(item.idPonto));
 
     await prisma.$transaction(async (tx) => {
       await registrarVersaoRoteiro(id.data, "antes_de_restaurar", req.usuario!.id, tx);
@@ -1446,6 +1747,17 @@ roteirosRouter.post("/:id/versoes/:versaoId/restaurar", async (req: Request, res
         },
       });
 
+      if (dados.viagemDeCarro !== undefined) {
+        await tx.roteiro.update({ where: { id: id.data }, data: dados.viagemDeCarro });
+      }
+
+      if (dados.trechos !== undefined) {
+        await tx.trechoEstrada.deleteMany({ where: { idRoteiro: id.data } });
+        await tx.trechoEstrada.createMany({
+          data: dados.trechos.map((t) => ({ ...t, idRoteiro: id.data, tracado: t.tracado as Prisma.InputJsonValue })),
+        });
+      }
+
       await tx.itemRoteiro.deleteMany({ where: { idRoteiro: id.data } });
 
       await tx.itemRoteiro.createMany({
@@ -1456,6 +1768,9 @@ roteirosRouter.post("/:id/versoes/:versaoId/restaurar", async (req: Request, res
           ordem: indice,
           observacao: item.observacao,
           custoCentavos: item.custoCentavos ?? null,
+          titulo: item.titulo ?? null,
+          periodo: item.periodo ?? null,
+          pernoite: item.pernoite ?? false,
         })),
       });
     });

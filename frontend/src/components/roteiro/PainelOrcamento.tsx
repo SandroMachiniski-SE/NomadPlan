@@ -85,6 +85,13 @@ function PainelOrcamento({ idRoteiro, resumo, dataInicio, aoSalvar, somenteLeitu
         </>
       )}
 
+      {(resumo.combustivelCentavos ?? 0) > 0 && (
+        <div className="orcamento__total">
+          <span className="muted">Combustível da viagem de carro</span>
+          <strong>{formatarMoeda(resumo.combustivelCentavos ?? 0)}</strong>
+        </div>
+      )}
+
       {dias.length > 0 && (
         <ul className="orcamento__dias">
           {dias.map((dia) => (

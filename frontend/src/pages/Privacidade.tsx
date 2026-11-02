@@ -24,19 +24,20 @@ function Privacidade() {
         <ul>
           <li>
             <strong>Cadastro:</strong> nome, e-mail, senha (guardada apenas como hash irreversível), tipo
-            de conta e cidade base.
+            de conta e o município onde você mora (opcional).
           </li>
           <li>
-            <strong>Preferências:</strong> interesses de viagem, idioma e necessidades de acessibilidade,
-            que você informa no perfil.
+            <strong>Preferências:</strong> interesses de viagem, idioma, necessidades de acessibilidade e o
+            consumo do seu carro (para estimar o combustível da viagem de carro), que você informa no perfil.
           </li>
           <li>
             <strong>Uso:</strong> roteiros, pontos salvos, avaliações, sugestões de edição e fotos que você
             envia, além de registros de segurança (login, falhas de login e endereço IP).
           </li>
           <li>
-            <strong>Localização:</strong> só quando você pede &ldquo;perto de mim&rdquo;; a posição é usada
-            na consulta e não é armazenada.
+            <strong>Localização:</strong> só quando você pede &ldquo;perto de mim&rdquo; ou &ldquo;usar minha
+            localização&rdquo;; a posição é usada na consulta e não é armazenada. Para descobrir onde você mora,
+            ela é arredondada (cerca de 1 km) e guardamos só o município, nunca o ponto exato.
           </li>
         </ul>
 

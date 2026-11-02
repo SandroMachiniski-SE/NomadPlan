@@ -19,7 +19,7 @@ async function roteiroComParadas(page: Page, nome: string, paradas: string[]) {
 
 async function definirCusto(page: Page, parada: string, valor: string, observacao?: string) {
   const cartao = page.locator(".parada__card", { hasText: parada });
-  await cartao.getByRole("button", { name: /Observação e custo|Editar detalhes/ }).click();
+  await cartao.getByRole("button", { name: /observação e custo|Editar detalhes/i }).click();
   await cartao.getByLabel(`Custo previsto de ${parada}`).fill(valor);
   if (observacao !== undefined) await cartao.getByLabel(/^Observação/).fill(observacao);
   await cartao.getByRole("button", { name: "Salvar", exact: true }).click();
@@ -75,7 +75,7 @@ test.describe("planejamento da viagem", () => {
     await expect(page.getByRole("region", { name: "Orçamento" }).getByText(/1 parada ainda está sem custo/)).toBeVisible();
 
     const cartao = page.locator(".parada__card", { hasText: PARQUE });
-    await cartao.getByRole("button", { name: "Observação e custo" }).click();
+    await cartao.getByRole("button", { name: "Período, observação e custo" }).click();
     await cartao.getByLabel(`Custo previsto de ${PARQUE}`).fill("abc");
     await cartao.getByRole("button", { name: "Salvar", exact: true }).click();
 
@@ -111,7 +111,7 @@ test.describe("planejamento da viagem", () => {
   test("notas ficam salvas e não aparecem na página pública", async ({ page, browser }) => {
     await cadastrar(page);
     await roteiroComParadas(page, "Viagem com notas", [MUSEU]);
-    await page.locator(".parada__card", { hasText: MUSEU }).getByRole("button", { name: "Observação e custo" }).click();
+    await page.locator(".parada__card", { hasText: MUSEU }).getByRole("button", { name: "Período, observação e custo" }).click();
     await page.locator(".parada__card", { hasText: MUSEU }).getByLabel(`Custo previsto de ${MUSEU}`).fill("33,33");
     await page.locator(".parada__card", { hasText: MUSEU }).getByRole("button", { name: "Salvar", exact: true }).click();
 

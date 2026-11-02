@@ -23,6 +23,7 @@ export const pontoSelecaoPublica = {
   // RNF19: de onde veio o registro e, se veio do OpenStreetMap, qual elemento.
   origem: true,
   idOsm: true,
+  idOverture: true,
   sincronizadoEm: true,
 } as const;
 
