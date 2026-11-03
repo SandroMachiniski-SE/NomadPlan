@@ -81,13 +81,15 @@ Aguarde `NomadPlan API executando` e saia com Ctrl+C.
    docker network connect nomadplan_default elevare-central-caddy-1
    ```
 
-2. Descubra onde está o Caddyfile dele, faça uma cópia e abra para editar (o caminho depende de como o outro projeto foi montado):
+2. O Caddyfile do outro projeto está em `/opt/elevare/deploy/vps/Caddyfile` (montado em `/etc/caddy/Caddyfile` no contêiner). Antes de editar,
+   veja se ele faz parte de um repositório git e faça uma cópia:
 
    ```bash
-   docker inspect elevare-central-caddy-1 --format '{{range .Mounts}}{{.Source}} -> {{.Destination}}{{"\n"}}{{end}}'
+   git -C /opt/elevare status --short
+   cp /opt/elevare/deploy/vps/Caddyfile /opt/elevare/deploy/vps/Caddyfile.antes-do-nomadplan
    ```
 
-   Copie o arquivo que aparece montado em `/etc/caddy/Caddyfile` para `Caddyfile.antes-do-nomadplan` na mesma pasta e acrescente **no fim** do original:
+   Acrescente **no fim** do arquivo original (e só isso):
 
    ```
    nomadplan.blackyears.com.br {
@@ -100,10 +102,18 @@ Aguarde `NomadPlan API executando` e saia com Ctrl+C.
    }
    ```
 
+   Dois detalhes desse Caddyfile:
+
+   - Ele tem um bloco curinga `*.{$DOMINIO}` com certificado sob demanda. Blocos com nome completo, como os dois acima, têm prioridade sobre
+     o curinga no Caddy, e o `ask` dele só autoriza endereços da própria central, então os dois projetos não se misturam.
+   - Como o arquivo está dentro da pasta do outro projeto, **não atualize o outro projeto (`git pull`, `git reset`, reimplantação) enquanto o
+     NomadPlan estiver no ar**: isso pode apagar os blocos novos. O site do NomadPlan sairia do ar, mas o outro projeto não seria afetado. Se
+     acontecer, é só acrescentar os dois blocos de novo e recarregar.
+
 3. Valide e só então recarregue (se a validação falhar, o Caddy continua com a configuração antiga):
 
    ```bash
-   docker exec elevare-central-caddy-1 caddy validate --config /etc/caddy/Caddyfile
+   docker exec elevare-central-caddy-1 caddy validate --config /etc/caddy/Caddyfile --adapter caddyfile
    docker exec elevare-central-caddy-1 caddy reload --config /etc/caddy/Caddyfile
    ```
 
@@ -134,5 +144,5 @@ docker network disconnect nomadplan_default elevare-central-caddy-1 2>/dev/null 
 cd / && rm -rf /opt/nomadplan /tmp/nomadplan-*.dump
 ```
 
-Depois tire os dois blocos do Caddyfile do outro projeto (ou volte a cópia `Caddyfile.antes-do-nomadplan`), valide, recarregue e apague os dois
+Depois tire os dois blocos de `/opt/elevare/deploy/vps/Caddyfile` (ou volte a cópia `Caddyfile.antes-do-nomadplan`, e apague essa cópia), valide, recarregue e apague os dois
 registros `A` na GoDaddy. Confira que só sobraram os contêineres do outro projeto: `docker ps`.
