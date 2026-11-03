@@ -9,7 +9,7 @@ Regras para não atrapalhar o projeto que já está no ar:
 
 - O NomadPlan roda num projeto Docker separado (`-p nomadplan`): contêineres, rede e volumes próprios.
 - Nenhum comando altera, reinicia ou remove contêineres, redes ou volumes do outro projeto.
-- O único arquivo do outro projeto que muda é o Caddyfile (dois blocos novos, com cópia de segurança antes).
+- **Nenhum arquivo do outro projeto é editado.** Um script junta o Caddyfile dele com os dois endereços do NomadPlan num arquivo temporário e recarrega o Caddy com ele; para desfazer, outro script recarrega o Caddyfile original.
 - Não use `docker system prune`, `docker volume prune` nem `ufw --force enable`/`ufw reset`. As portas 22, 80 e 443 já estão liberadas.
 - Faça fora do horário de movimento e **crie um snapshot do VPS pelo painel da hospedagem antes de começar**.
 
@@ -75,52 +75,27 @@ Aguarde `NomadPlan API executando` e saia com Ctrl+C.
 
 ## Parte 4. Ligar o Caddy que já existe
 
-1. Conecte o Caddy existente à rede do NomadPlan (só adiciona uma rede; não reinicia nada):
+Ainda na pasta `/opt/nomadplan`:
 
-   ```bash
-   docker network connect nomadplan_default elevare-central-caddy-1
-   ```
+```bash
+scripts/ligar-caddy-existente.sh
+```
 
-2. O Caddyfile do outro projeto está em `/opt/elevare/deploy/vps/Caddyfile` (montado em `/etc/caddy/Caddyfile` no contêiner). Antes de editar,
-   veja se ele faz parte de um repositório git e faça uma cópia:
+O script conecta o Caddy do outro projeto à rede do NomadPlan (só adiciona uma rede; não reinicia nada), monta um Caddyfile temporário
+com o original **mais** os dois endereços do `.env.prod`, valida e recarrega o Caddy com ele. Se a validação falhar, o Caddy continua com
+a configuração anterior. O arquivo `/opt/elevare/deploy/vps/Caddyfile` (que faz parte do repositório do outro projeto) **não é alterado**.
 
-   ```bash
-   git -C /opt/elevare status --short
-   cp /opt/elevare/deploy/vps/Caddyfile /opt/elevare/deploy/vps/Caddyfile.antes-do-nomadplan
-   ```
+Teste: `https://api.nomadplan.blackyears.com.br/health` deve mostrar `{"status":"ok",...}` e `https://nomadplan.blackyears.com.br` deve abrir
+o site, com cadeado (o certificado sai na primeira visita; pode levar alguns segundos).
 
-   Acrescente **no fim** do arquivo original (e só isso):
+Pontos de atenção:
 
-   ```
-   nomadplan.blackyears.com.br {
-   	reverse_proxy nomadplan-web:80
-   }
-
-   api.nomadplan.blackyears.com.br {
-   	encode zstd gzip
-   	reverse_proxy nomadplan-api:3333
-   }
-   ```
-
-   Dois detalhes desse Caddyfile:
-
-   - Ele tem um bloco curinga `*.{$DOMINIO}` com certificado sob demanda. Blocos com nome completo, como os dois acima, têm prioridade sobre
-     o curinga no Caddy, e o `ask` dele só autoriza endereços da própria central, então os dois projetos não se misturam.
-   - Como o arquivo está dentro da pasta do outro projeto, **não atualize o outro projeto (`git pull`, `git reset`, reimplantação) enquanto o
-     NomadPlan estiver no ar**: isso pode apagar os blocos novos. O site do NomadPlan sairia do ar, mas o outro projeto não seria afetado. Se
-     acontecer, é só acrescentar os dois blocos de novo e recarregar.
-
-3. Valide e só então recarregue (se a validação falhar, o Caddy continua com a configuração antiga):
-
-   ```bash
-   docker exec elevare-central-caddy-1 caddy validate --config /etc/caddy/Caddyfile --adapter caddyfile
-   docker exec elevare-central-caddy-1 caddy reload --config /etc/caddy/Caddyfile
-   ```
-
-4. Teste: `https://api.nomadplan.blackyears.com.br/health` deve mostrar `{"status":"ok",...}` e `https://nomadplan.blackyears.com.br` deve abrir o site, com cadeado.
-
-> O `docker network connect` não sobrevive se o contêiner do Caddy for **recriado** (por exemplo, ao atualizar o outro projeto). Se o site do
-> NomadPlan passar a dar erro 502, repita o comando do passo 1.
+- O Caddy do outro projeto tem um bloco curinga `*.{$DOMINIO}` com certificado sob demanda, mas para outro domínio (`central.elevaresystem.com`)
+  e com um `ask` que só autoriza endereços da própria central: não há sobreposição com `blackyears.com.br`.
+- A ligação vale até o Caddy do outro projeto ser **recriado ou reiniciado** (por exemplo, ao reimplantar o outro projeto): ele volta a ler só o
+  Caddyfile original, e o site do NomadPlan passa a dar erro. O outro projeto não é afetado. Para religar, rode o script de novo.
+- Os certificados do NomadPlan ficam no volume do Caddy do outro projeto (`elevare-central_caddy_dados`). Depois da banca eles não atrapalham
+  em nada, mas continuam lá.
 
 ## Parte 5. Contas de demonstração e e-mail
 
@@ -139,10 +114,10 @@ envia e-mails.
 
 ```bash
 cd /opt/nomadplan
+scripts/desligar-caddy-existente.sh
 docker compose -p nomadplan --env-file .env.prod -f docker-compose.prod.yml -f docker-compose.compartilhado.yml down -v --rmi local
-docker network disconnect nomadplan_default elevare-central-caddy-1 2>/dev/null || true
 cd / && rm -rf /opt/nomadplan /tmp/nomadplan-*.dump
 ```
 
-Depois tire os dois blocos de `/opt/elevare/deploy/vps/Caddyfile` (ou volte a cópia `Caddyfile.antes-do-nomadplan`, e apague essa cópia), valide, recarregue e apague os dois
-registros `A` na GoDaddy. Confira que só sobraram os contêineres do outro projeto: `docker ps`.
+O primeiro comando devolve ao Caddy do outro projeto a configuração original e o tira da rede do NomadPlan. Depois apague os dois registros
+`A` (`nomadplan` e `api.nomadplan`) na GoDaddy e confira que só sobraram os contêineres do outro projeto: `docker ps`.
