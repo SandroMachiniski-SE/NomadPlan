@@ -35,7 +35,7 @@ Confira com `nslookup nomadplan.blackyears.com.br`. O Caddy só emite o certific
 No **seu computador** (com o Docker Desktop aberto e o banco `nomadplan-postgres` rodando), na pasta do projeto:
 
 ```bash
-scripts/backup.sh backups
+bash scripts/backup.sh backups
 ```
 
 Isso gera `backups/nomadplan-AAAAMMDD-HHMMSS.dump` (e, se houver, um `uploads-*.tar.gz` com fotos enviadas em testes, que não precisa ir: as fotos dos pontos reais vêm do Wikimedia Commons). O `.dump` tem os 3.189 pontos, os
@@ -60,7 +60,7 @@ Guarde uma cópia do `.env.prod` fora do servidor. Depois, **primeiro só o banc
 
 ```bash
 docker compose -p nomadplan --env-file .env.prod -f docker-compose.prod.yml -f docker-compose.compartilhado.yml up -d postgres
-scripts/restaurar.sh /tmp/nomadplan-AAAAMMDD-HHMMSS.dump
+bash scripts/restaurar.sh /tmp/nomadplan-AAAAMMDD-HHMMSS.dump
 ```
 
 Digite `nomadplan` quando pedir a confirmação. Agora a API e o site (a primeira compilação leva alguns minutos e usa memória; os
