@@ -1,10 +1,11 @@
 import { useEffect, useState, type FormEvent } from "react";
-import { Link, useNavigate, useParams } from "react-router-dom";
+import { Link, useNavigate, useParams, useSearchParams } from "react-router-dom";
 import api, { urlDoArquivo } from "../services/api";
 import type { Ponto, VersaoPonto } from "../types/ponto";
 import { extrairMensagemErro } from "../utils/erro";
 import { CATEGORIAS_PONTOS } from "../constants/categorias";
 import Icone from "../components/Icone";
+import { cidadePerto } from "../services/cidades";
 
 interface CamposPonto {
   nome: string;
@@ -62,12 +63,29 @@ interface PossivelDuplicado {
   endereco: string | null;
 }
 
+/** Posição vinda do mapa da busca ("?latitude=&longitude="); inválida ou ausente vira null. */
+function posicaoDaUrl(parametros: URLSearchParams): { latitude: number; longitude: number } | null {
+  const latitude = Number(parametros.get("latitude") ?? NaN);
+  const longitude = Number(parametros.get("longitude") ?? NaN);
+
+  if (!Number.isFinite(latitude) || !Number.isFinite(longitude)) return null;
+  if (Math.abs(latitude) > 90 || Math.abs(longitude) > 180) return null;
+
+  return { latitude, longitude };
+}
+
 function PontoFormulario() {
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
   const emEdicao = Boolean(id);
+  const [parametros] = useSearchParams();
+  const [posicaoDoMapa] = useState(() => (emEdicao ? null : posicaoDaUrl(parametros)));
 
-  const [campos, setCampos] = useState<CamposPonto>(CAMPOS_VAZIOS);
+  const [campos, setCampos] = useState<CamposPonto>(() =>
+    posicaoDoMapa
+      ? { ...CAMPOS_VAZIOS, latitude: String(posicaoDoMapa.latitude), longitude: String(posicaoDoMapa.longitude) }
+      : CAMPOS_VAZIOS,
+  );
   const [ponto, setPonto] = useState<Ponto | null>(null);
   const [carregando, setCarregando] = useState(emEdicao);
   const [salvando, setSalvando] = useState(false);
@@ -83,6 +101,23 @@ function PontoFormulario() {
   const [versoes, setVersoes] = useState<VersaoPonto[]>([]);
   const [restaurandoId, setRestaurandoId] = useState<number | null>(null);
   const [mostrarHistorico, setMostrarHistorico] = useState(false);
+
+  // Lugar marcado no mapa: a cidade vem do município mais próximo (se a pessoa ainda não escreveu).
+  useEffect(() => {
+    if (!posicaoDoMapa) return;
+
+    let ativo = true;
+
+    cidadePerto(posicaoDoMapa.latitude, posicaoDoMapa.longitude)
+      .then(({ cidade }) => {
+        if (ativo) setCampos((atual) => (atual.cidade.trim() ? atual : { ...atual, cidade }));
+      })
+      .catch(() => undefined);
+
+    return () => {
+      ativo = false;
+    };
+  }, [posicaoDoMapa]);
 
   useEffect(() => {
     if (!id) {
@@ -394,6 +429,8 @@ function PontoFormulario() {
         </div>
 
         <h2 className="form-titulo">Localização no mapa</h2>
+
+        {posicaoDoMapa && <p className="field__hint">Posição marcada no mapa; confira antes de salvar.</p>}
 
         <div className="form-grid">
           <label className="field">

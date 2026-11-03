@@ -161,4 +161,21 @@ test.describe("viagem de carro", () => {
     await expect(page).toHaveURL(/\/roteiros\/\d+$/);
     await expect(page.locator("#titulo-orcamento").locator("..").getByText("Combustível")).toBeVisible();
   });
+
+  test("viagem para cidade sem pontos avisa que começou a prepará-la e mostra o andamento", async ({ page }) => {
+    await cadastrarEmJoinville(page);
+    await gerarDeCarro(page, "Itajaí", 1);
+
+    await expect(
+      page.getByText("Ainda não há pontos em Itajaí: começamos a preparar a cidade. Gere de novo em alguns minutos"),
+    ).toBeVisible();
+    // No E2E o Overpass não responde: o preparo termina com a mensagem do servidor de mapas.
+    await expect(page.locator(".preparo-destino", { hasText: "Itajaí" })).toContainText("servidor de mapas está ocupado");
+
+    // Gerar de novo logo depois não baixa a cidade outra vez: o cartão e o aviso dizem que falhou.
+    await page.getByRole("button", { name: "Gerar roteiro" }).click();
+    await expect(page.getByText("Não foi possível preparar Itajaí agora; tente de novo em alguns minutos.")).toBeVisible();
+    await expect(page.locator(".preparo-destino", { hasText: "Itajaí" })).toContainText("Não foi possível preparar Itajaí");
+    await expect(page.locator(".preparo-destino", { hasText: "Preparando" })).toHaveCount(0);
+  });
 });

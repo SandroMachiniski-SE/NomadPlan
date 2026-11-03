@@ -47,6 +47,8 @@ function limparAntigos(): void {
 }
 
 export function consultarPreparo(cidade: string, uf: string): PreparoDeCidade | undefined {
+  limparAntigos();
+
   return preparos.get(chaveDe(cidade, uf));
 }
 

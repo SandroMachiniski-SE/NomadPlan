@@ -11,6 +11,7 @@ import SugestoesDeCidade from "../components/SugestoesDeCidade";
 import CaixaViagemDeCarro from "../components/viagem/CaixaViagemDeCarro";
 import DecisaoDeChegada from "../components/viagem/DecisaoDeChegada";
 import PernoiteNaEstrada from "../components/viagem/PernoiteNaEstrada";
+import PreparoDoDestino from "../components/viagem/PreparoDoDestino";
 import TrechoNaEstrada from "../components/viagem/TrechoNaEstrada";
 import MapaRoteiroCarregavel from "../components/MapaRoteiroCarregavel";
 import type { ParadaNoMapa } from "../components/MapaRoteiro";
@@ -57,6 +58,8 @@ function GerarRoteiro() {
   const [gerando, setGerando] = useState(false);
   const [erro, setErro] = useState<string | null>(null);
   const [resultado, setResultado] = useState<RespostaRecomendacao | null>(null);
+  // Cada geração recria os cartões de preparo: o estado de uma geração anterior não fica na tela.
+  const [geracao, setGeracao] = useState(0);
 
   const [viagem, setViagem] = useState<OpcoesViagemDeCarro>({
     ativa: false,
@@ -217,6 +220,7 @@ function GerarRoteiro() {
       });
 
       setResultado(resposta.data);
+      setGeracao((atual) => atual + 1);
 
       if (resposta.data.pontos.length === 0 && !resposta.data.viagemDeCarro?.pernas.length) {
         setErro(
@@ -511,6 +515,16 @@ function GerarRoteiro() {
               </ul>
             </div>
           )}
+
+          {planejada?.preparos.map((p) => (
+            <PreparoDoDestino
+              key={`${geracao}-${p.cidade}-${p.uf}`}
+              cidade={p.cidade}
+              uf={p.uf}
+              estadoInicial={p.estado}
+              aoGerarDeNovo={() => gerar(escolhas, decisoes)}
+            />
+          ))}
 
           {planejada?.combustivel && (
             <p className="alert alert--info" role="status">
