@@ -10,7 +10,8 @@ export interface ChamadaDeMapa {
   corpo: string | null;
 }
 
-export type RespostaDeMapa = { status?: number; corpo: unknown };
+/** `atrasoMs` segura a resposta (para simular um servidor lento, com tarefas ainda em andamento). */
+export type RespostaDeMapa = { status?: number; corpo: unknown; atrasoMs?: number };
 
 export interface MapasFalsos {
   /** Resposta do Nominatim para cada texto buscado (parâmetro "q"). */
@@ -55,7 +56,11 @@ export function instalarMapasFalsos(respostas: MapasFalsos) {
 
     chamadas.push({ url, servico, corpo });
 
-    const { status = 200, corpo: conteudo } = resposta ?? { status: 500, corpo: { erro: "sem resposta combinada" } };
+    const { status = 200, corpo: conteudo, atrasoMs = 0 } = resposta ?? { status: 500, corpo: { erro: "sem resposta combinada" } };
+
+    if (atrasoMs > 0) {
+      await new Promise((resolver) => setTimeout(resolver, atrasoMs));
+    }
 
     return new Response(JSON.stringify(conteudo), { status, headers: { "Content-Type": "application/json" } });
   }) as typeof fetch;

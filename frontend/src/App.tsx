@@ -26,7 +26,6 @@ const Favoritos = lazy(() => import("./pages/Favoritos"));
 const Convites = lazy(() => import("./pages/Convites"));
 const Privacidade = lazy(() => import("./pages/Privacidade"));
 
-const PAPEIS_CADASTRADORES = ["NEGOCIO", "GESTOR", "MODERADOR", "ADMIN"] as const;
 const PAPEIS_FERRAMENTAS = ["GESTOR", "MODERADOR", "ADMIN"] as const;
 const PAPEIS_MODERADORES = ["MODERADOR", "ADMIN"] as const;
 const PAPEIS_ADMIN = ["ADMIN"] as const;
@@ -54,9 +53,7 @@ function App() {
             <Route path="/perfil" element={<Perfil />} />
             <Route path="/salvos" element={<Favoritos />} />
             <Route path="/convites" element={<Convites />} />
-          </Route>
-
-          <Route element={<RotaProtegida papeis={[...PAPEIS_CADASTRADORES]} />}>
+            {/* Qualquer conta cadastra lugares; eles passam pela moderação antes de publicados. */}
             <Route path="/pontos/meus" element={<MeusPontos />} />
             <Route path="/pontos/novo" element={<PontoFormulario />} />
             <Route path="/pontos/:id/editar" element={<PontoFormulario />} />

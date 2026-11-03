@@ -69,15 +69,81 @@ describe("pontos turísticos: cadastro, publicação e moderação", () => {
       assert.equal(editar.status, 400);
     });
 
-    it("só contas de negócio, gestor, moderador e admin cadastram pontos", async () => {
+    it("qualquer conta logada cadastra pontos, que nascem rascunho", async () => {
       const visitante = await criarUsuario();
       const morador = await criarUsuario({ tipoConta: TipoConta.MORADOR });
-      const negocio = await criarUsuario({ tipoConta: TipoConta.NEGOCIO });
 
       assert.equal((await api("POST", "/pontos", { json: PONTO_VALIDO })).status, 401);
-      assert.equal((await api("POST", "/pontos", { token: visitante.token, json: PONTO_VALIDO })).status, 403);
-      assert.equal((await api("POST", "/pontos", { token: morador.token, json: PONTO_VALIDO })).status, 403);
-      assert.equal((await api("POST", "/pontos", { token: negocio.token, json: PONTO_VALIDO })).status, 201);
+
+      const doVisitante = await api("POST", "/pontos", { token: visitante.token, json: PONTO_VALIDO });
+      assert.equal(doVisitante.status, 201);
+      assert.equal(doVisitante.corpo.status, "RASCUNHO");
+      assert.equal(doVisitante.corpo.idResponsavel, visitante.usuario.id);
+
+      const doMorador = await api("POST", "/pontos", {
+        token: morador.token,
+        json: { ...PONTO_VALIDO, nome: "Mirante do Morador", latitude: -26.4, longitude: -48.9 },
+      });
+      assert.equal(doMorador.status, 201);
+    });
+
+    async function pendentesDe(idResponsavel: number, quantos: number) {
+      for (let i = 0; i < quantos; i += 1) {
+        await criarPonto({
+          nome: `Pendente ${i}`,
+          idResponsavel,
+          status: i % 2 === 0 ? StatusPonto.RASCUNHO : StatusPonto.PENDENTE_VERIFICACAO,
+          latitude: -27 - i * 0.01,
+        });
+      }
+    }
+
+    it("o 21º lugar esperando revisão dá 429", async () => {
+      const { usuario, token } = await criarUsuario();
+      await pendentesDe(usuario.id, 20);
+      // Publicados não contam.
+      await criarPonto({ nome: "Já publicado", idResponsavel: usuario.id, latitude: -28 });
+
+      const r = await api("POST", "/pontos", { token, json: PONTO_VALIDO });
+
+      assert.equal(r.status, 429);
+      assert.equal(r.corpo.erro, "Você já tem 20 lugares esperando revisão. Envie seus rascunhos para revisão ou aguarde a moderação.");
+    });
+
+    it("moderador não tem limite de lugares esperando revisão", async () => {
+      const { usuario, token } = await criarUsuario({ tipoConta: TipoConta.MODERADOR });
+      await pendentesDe(usuario.id, 20);
+
+      assert.equal((await api("POST", "/pontos", { token, json: PONTO_VALIDO })).status, 201);
+    });
+
+    it("lugar do autor ainda em revisão não entra no roteiro dele", async () => {
+      const { usuario, token } = await criarUsuario();
+      const emRevisao = await criarPonto({ nome: "Ainda em revisão", idResponsavel: usuario.id, status: StatusPonto.PENDENTE_VERIFICACAO });
+      const roteiro = await api("POST", "/roteiros", { token, json: { nome: "Meu roteiro" } });
+
+      const r = await api("POST", `/roteiros/${roteiro.corpo.id}/itens`, { token, json: { idPonto: emRevisao.id } });
+
+      assert.equal(r.status, 404);
+      assert.equal(r.corpo.erro, "Ponto turístico não encontrado.");
+    });
+
+    it("nem como pernoite ao salvar o roteiro de uma vez, e id inexistente dá 404, não 500", async () => {
+      const { usuario, token } = await criarUsuario();
+      const emRevisao = await criarPonto({ nome: "Hotel em revisão", idResponsavel: usuario.id, status: StatusPonto.PENDENTE_VERIFICACAO });
+
+      const comPendente = await api("POST", "/roteiros", {
+        token,
+        json: { nome: "Com pernoite", pontos: [{ idPonto: emRevisao.id, dia: 1, pernoite: true }] },
+      });
+      const comInexistente = await api("POST", "/roteiros", {
+        token,
+        json: { nome: "Com pernoite", pontos: [{ idPonto: 999_999, dia: 1, pernoite: true }] },
+      });
+
+      assert.equal(comPendente.status, 404);
+      assert.equal(comInexistente.status, 404);
+      assert.equal(await prisma.roteiro.count({ where: { idUsuario: usuario.id } }), 0);
     });
 
     it("cria como rascunho, com o usuário como responsável, e registra no log", async () => {

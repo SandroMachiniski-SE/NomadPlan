@@ -14,7 +14,13 @@ import { resumirOrcamento } from "../lib/orcamento";
 import { MAX_PARTICIPANTES, nivelExigido, papelNoRoteiro, papelPermite, type Papel } from "../lib/colaboracao";
 import { criarNotificacao } from "../lib/notificacoes";
 import { enviarEmailConvite } from "../lib/email";
-import { ErroDaViagem, planejarViagemDeCarro, resolverEntradaDaViagem } from "../lib/viagemDeCarro";
+import {
+  ErroDaViagem,
+  planejarViagemDeCarro,
+  prepararDestinosSemPontos,
+  resolverEntradaDaViagem,
+  type PreparoDoDestino,
+} from "../lib/viagemDeCarro";
 import { ErroRota, SemEstrada } from "../lib/rotas";
 import {
   conferirHoteis,
@@ -43,6 +49,20 @@ function responderErroDaViagem(res: Response, error: unknown): boolean {
   }
 
   return true;
+}
+
+/** Aviso de uma cidade de destino sem pontos para visitar, conforme o preparo dela. */
+function avisoDoPreparo(preparo: PreparoDoDestino): string {
+  switch (preparo.estado) {
+    case "preparando":
+      return `Ainda não há pontos em ${preparo.cidade}: começamos a preparar a cidade. Gere de novo em alguns minutos para ver os dias de passeio.`;
+    case "poucos":
+      return `O OpenStreetMap tem poucos lugares em ${preparo.cidade}; cadastre os que você conhece pelo mapa da busca.`;
+    case "erro":
+      return `Não foi possível preparar ${preparo.cidade} agora; tente de novo em alguns minutos.`;
+    default:
+      return `Ainda não há pontos em ${preparo.cidade} e outras cidades estão sendo preparadas agora; tente de novo em alguns minutos.`;
+  }
 }
 
 const roteirosRouter = Router();
@@ -413,6 +433,7 @@ roteirosRouter.post("/gerar", async (req: Request, res: Response) => {
 
     let etapas = dados.etapas;
     let viagemDeCarro = null;
+    let preparos: PreparoDoDestino[] = [];
 
     if (dados.viagemDeCarro) {
       const entrada = await resolverEntradaDaViagem(
@@ -423,6 +444,7 @@ roteirosRouter.post("/gerar", async (req: Request, res: Response) => {
       );
       const plano = await planejarViagemDeCarro(entrada);
 
+      preparos = await prepararDestinosSemPontos(entrada.etapas, req.usuario!.id);
       etapas = plano.etapasDoGerador;
       viagemDeCarro = {
         origem: entrada.origem,
@@ -437,6 +459,7 @@ roteirosRouter.post("/gerar", async (req: Request, res: Response) => {
         pernas: plano.pernas,
         combustivel: plano.combustivel,
         avisos: plano.avisos,
+        preparos,
       };
     }
 
@@ -455,7 +478,17 @@ roteirosRouter.post("/gerar", async (req: Request, res: Response) => {
 
     registrarEvento("roteiro_gerado");
 
-    return res.json({ ...recomendacao, viagemDeCarro });
+    // Destino sem pontos em preparo: o aviso do gerador ("ainda não há pontos cadastrados") dá lugar
+    // a um que diz o que está acontecendo e o que fazer.
+    const avisos =
+      preparos.length === 0
+        ? recomendacao.avisos
+        : [
+            ...recomendacao.avisos.filter((aviso) => !aviso.startsWith("Ainda não há pontos cadastrados")),
+            ...preparos.flatMap((p) => (p.estado === "pronta" ? [] : [avisoDoPreparo(p)])),
+          ];
+
+    return res.json({ ...recomendacao, avisos, viagemDeCarro });
   } catch (error) {
     if (responderErroDaViagem(res, error)) return;
 
@@ -548,9 +581,11 @@ roteirosRouter.post("/", async (req: Request, res: Response) => {
     const paradas = dados.pontos ?? [];
     // O mesmo hotel pode ser a pernoite de várias noites; como visita, cada ponto entra uma vez.
     const comPonto = paradas.flatMap((p) => (p.idPonto === undefined || p.pernoite ? [] : [p.idPonto]));
-    const idsPontos = [...new Set(comPonto)];
+    const pernoitesComPonto = paradas.flatMap((p) => (p.idPonto !== undefined && p.pernoite ? [p.idPonto] : []));
+    // Visitas e pernoites: todos precisam ser pontos publicados.
+    const idsPontos = [...new Set([...comPonto, ...pernoitesComPonto])];
 
-    if (idsPontos.length !== comPonto.length) {
+    if (new Set(comPonto).size !== comPonto.length) {
       return res.status(400).json({ erro: "Há pontos repetidos na lista de paradas." });
     }
 

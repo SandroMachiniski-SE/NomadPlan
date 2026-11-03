@@ -46,6 +46,8 @@ export default defineConfig({
         NOMINATIM_URL: "http://127.0.0.1:9/search",
         // Rotas só do cache gravado pelo e2e:preparar: uma rota fora dele falha em vez de ir à internet.
         OSRM_URL: "http://127.0.0.1:9",
+        // O preparo de cidades novas também não vai à internet: no E2E ele falha logo, com a mensagem.
+        OVERPASS_URL: "http://127.0.0.1:9/api/interpreter",
       },
     },
     {
