@@ -53,6 +53,15 @@ export async function anonimizarUsuario(idUsuario: number): Promise<void> {
     where: { idAutor: idUsuario, fotoUrl: { not: null } },
     select: { fotoUrl: true },
   });
+  // As fotos enviadas para os rascunhos e rejeitados, que somem com a conta.
+  const rascunhosComFoto = await prisma.pontoTuristico.findMany({
+    where: {
+      idResponsavel: idUsuario,
+      status: { in: [StatusPonto.RASCUNHO, StatusPonto.REJEITADO] },
+      imagemUrl: { not: null },
+    },
+    select: { imagemUrl: true },
+  });
 
   await prisma.$transaction(async (tx) => {
     await tx.roteiro.deleteMany({ where: { idUsuario } });
@@ -105,7 +114,10 @@ export async function anonimizarUsuario(idUsuario: number): Promise<void> {
     });
   });
 
-  await Promise.all(avaliacoesComFoto.map((a) => removerArquivoPublico(a.fotoUrl)));
+  await Promise.all([
+    ...avaliacoesComFoto.map((a) => removerArquivoPublico(a.fotoUrl)),
+    ...rascunhosComFoto.map((p) => removerArquivoPublico(p.imagemUrl)),
+  ]);
 
   await registrarAuditoria({
     idUsuario,

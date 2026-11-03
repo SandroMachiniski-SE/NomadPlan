@@ -139,10 +139,12 @@ export async function prepararCidade(
   latitude: number,
   longitude: number,
   idUsuario: number,
+  /** Quem acabou de contar os pontos da cidade passa o número, para não contar de novo. */
+  jaContados?: number,
 ): Promise<ResultadoDoPedido> {
   limparAntigos();
 
-  const existentes = await pontosDaCidade(cidade, latitude, longitude);
+  const existentes = jaContados ?? (await pontosDaCidade(cidade, latitude, longitude));
 
   if (existentes >= PONTOS_PARA_CIDADE_PRONTA) {
     return { situacao: "pronta", pontos: existentes };

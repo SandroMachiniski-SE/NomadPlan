@@ -445,7 +445,7 @@ describe("viagem de carro no gerador de roteiro", () => {
       const r = await gerar(token, { etapas: [{ cidade: "Itajaí", dias: 1 }], viagemDeCarro: {} });
 
       assert.equal(r.status, 200, JSON.stringify(r.corpo));
-      assert.deepEqual(r.corpo.viagemDeCarro.preparos, [{ cidade: "Itajaí", uf: "SC", estado: "preparando" }]);
+      assert.deepEqual(r.corpo.viagemDeCarro.preparos, [{ cidade: "Itajaí", uf: "SC", estado: "preparando", pontos: 0 }]);
       assert.ok(r.corpo.avisos.includes(avisoDePreparo("Itajaí")), JSON.stringify(r.corpo.avisos));
       assert.ok(!r.corpo.avisos.some((a: string) => a.startsWith("Ainda não há pontos cadastrados")));
       assert.equal((await esperarPreparo(token, "Itajaí", "SC")).estado, "pronta");
@@ -459,8 +459,14 @@ describe("viagem de carro no gerador de roteiro", () => {
 
       const r = await gerar(token, { etapas: [{ cidade: "Penha", dias: 1 }], viagemDeCarro: {} });
 
-      assert.deepEqual(r.corpo.viagemDeCarro.preparos, [{ cidade: "Penha", uf: "SC", estado: "preparando" }]);
-      assert.ok(r.corpo.avisos.includes(avisoDePreparo("Penha")));
+      assert.deepEqual(r.corpo.viagemDeCarro.preparos, [{ cidade: "Penha", uf: "SC", estado: "preparando", pontos: 2 }]);
+      // Com 2 lugares, o aviso não diz que não há nenhum.
+      assert.ok(
+        r.corpo.avisos.includes(
+          "Penha tem só 2 lugares para visitar: começamos a preparar a cidade. Gere de novo em alguns minutos para ver mais opções.",
+        ),
+        JSON.stringify(r.corpo.avisos),
+      );
       await esperarPreparo(token, "Penha", "SC");
     });
 
@@ -482,7 +488,7 @@ describe("viagem de carro no gerador de roteiro", () => {
       // Nova geração (ou a troca de um pernoite): não baixa a cidade de novo.
       const r = await gerar(token, { etapas: [{ cidade: "Piçarras", dias: 1 }], viagemDeCarro: {} });
 
-      assert.deepEqual(r.corpo.viagemDeCarro.preparos, [{ cidade: "Piçarras", uf: "SC", estado: "poucos" }]);
+      assert.deepEqual(r.corpo.viagemDeCarro.preparos, [{ cidade: "Piçarras", uf: "SC", estado: "poucos", pontos: 1 }]);
       assert.ok(
         r.corpo.avisos.includes("O OpenStreetMap tem poucos lugares em Piçarras; cadastre os que você conhece pelo mapa da busca."),
         JSON.stringify(r.corpo.avisos),
@@ -499,7 +505,7 @@ describe("viagem de carro no gerador de roteiro", () => {
 
       const r = await gerar(token, { etapas: [{ cidade: "Barra Velha", dias: 1 }], viagemDeCarro: {} });
 
-      assert.deepEqual(r.corpo.viagemDeCarro.preparos, [{ cidade: "Barra Velha", uf: "SC", estado: "erro" }]);
+      assert.deepEqual(r.corpo.viagemDeCarro.preparos, [{ cidade: "Barra Velha", uf: "SC", estado: "erro", pontos: 0 }]);
       assert.ok(r.corpo.avisos.includes("Não foi possível preparar Barra Velha agora; tente de novo em alguns minutos."));
       assert.equal(chamadasDePreparo("Barra Velha"), 1);
     });

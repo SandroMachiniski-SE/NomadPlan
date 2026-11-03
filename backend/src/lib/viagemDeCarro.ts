@@ -524,6 +524,8 @@ export interface PreparoDoDestino {
    * poucos e erro: um preparo recente já terminou assim e não é refeito tão cedo.
    */
   estado: "preparando" | "pronta" | "ocupado" | "poucos" | "erro";
+  /** Pontos para visitar que a cidade já tem (menos de 3). */
+  pontos: number;
 }
 
 /**
@@ -534,7 +536,9 @@ export async function prepararDestinosSemPontos(etapas: Municipio[], idUsuario: 
   const preparos: PreparoDoDestino[] = [];
 
   for (const etapa of etapas) {
-    if ((await pontosDaCidade(etapa.cidade, etapa.latitude, etapa.longitude)) >= PONTOS_PARA_CIDADE_PRONTA) continue;
+    const pontos = await pontosDaCidade(etapa.cidade, etapa.latitude, etapa.longitude);
+
+    if (pontos >= PONTOS_PARA_CIDADE_PRONTA) continue;
     if (preparos.some((p) => p.cidade === etapa.cidade && p.uf === etapa.uf)) continue;
 
     // Um preparo que terminou há pouco (guardado por 30 min) não é refeito a cada nova geração:
@@ -542,13 +546,13 @@ export async function prepararDestinosSemPontos(etapas: Municipio[], idUsuario: 
     const anterior = consultarPreparo(etapa.cidade, etapa.uf);
 
     if (anterior && anterior.estado !== "preparando") {
-      preparos.push({ cidade: etapa.cidade, uf: etapa.uf, estado: anterior.estado === "pronta" ? "poucos" : "erro" });
+      preparos.push({ cidade: etapa.cidade, uf: etapa.uf, estado: anterior.estado === "pronta" ? "poucos" : "erro", pontos });
       continue;
     }
 
-    const resultado = await prepararCidade(etapa.cidade, etapa.uf, etapa.latitude, etapa.longitude, idUsuario);
+    const resultado = await prepararCidade(etapa.cidade, etapa.uf, etapa.latitude, etapa.longitude, idUsuario, pontos);
 
-    preparos.push({ cidade: etapa.cidade, uf: etapa.uf, estado: resultado.situacao });
+    preparos.push({ cidade: etapa.cidade, uf: etapa.uf, estado: resultado.situacao, pontos });
   }
 
   return preparos;

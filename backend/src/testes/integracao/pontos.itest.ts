@@ -110,6 +110,17 @@ describe("pontos turísticos: cadastro, publicação e moderação", () => {
       assert.equal(r.corpo.erro, "Você já tem 20 lugares esperando revisão. Envie seus rascunhos para revisão ou aguarde a moderação.");
     });
 
+    it("corrigir um lugar rejeitado com 20 esperando revisão também dá 429", async () => {
+      const { usuario, token } = await criarUsuario();
+      await pendentesDe(usuario.id, 20);
+      const rejeitado = await criarPonto({ nome: "Rejeitado", idResponsavel: usuario.id, status: StatusPonto.REJEITADO, latitude: -29 });
+
+      const r = await api("PUT", `/pontos/${rejeitado.id}`, { token, json: { nome: "Rejeitado corrigido" } });
+
+      assert.equal(r.status, 429);
+      assert.equal((await prisma.pontoTuristico.findUnique({ where: { id: rejeitado.id } }))?.status, StatusPonto.REJEITADO);
+    });
+
     it("moderador não tem limite de lugares esperando revisão", async () => {
       const { usuario, token } = await criarUsuario({ tipoConta: TipoConta.MODERADOR });
       await pendentesDe(usuario.id, 20);

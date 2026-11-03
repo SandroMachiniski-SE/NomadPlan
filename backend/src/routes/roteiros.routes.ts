@@ -4,6 +4,7 @@ import { z } from "zod";
 import prisma from "../lib/prisma";
 import { Prisma, StatusPonto } from "@prisma/client";
 import { autenticar } from "../middleware/auth";
+import { limiteViagemDeCarro } from "../middleware/rateLimit";
 import { gerarRoteiroSugerido, inicioPadrao, MAX_DIAS_GERADOS } from "../lib/recomendacao";
 import { registrarAuditoria } from "../lib/auditoria";
 import { registrarEvento } from "../lib/metricasUso";
@@ -53,15 +54,20 @@ function responderErroDaViagem(res: Response, error: unknown): boolean {
 
 /** Aviso de uma cidade de destino sem pontos para visitar, conforme o preparo dela. */
 function avisoDoPreparo(preparo: PreparoDoDestino): string {
+  const inicio =
+    preparo.pontos === 0
+      ? `Ainda não há pontos em ${preparo.cidade}`
+      : `${preparo.cidade} tem só ${preparo.pontos} ${preparo.pontos === 1 ? "lugar" : "lugares"} para visitar`;
+
   switch (preparo.estado) {
     case "preparando":
-      return `Ainda não há pontos em ${preparo.cidade}: começamos a preparar a cidade. Gere de novo em alguns minutos para ver os dias de passeio.`;
+      return `${inicio}: começamos a preparar a cidade. Gere de novo em alguns minutos para ver ${preparo.pontos === 0 ? "os dias de passeio" : "mais opções"}.`;
     case "poucos":
       return `O OpenStreetMap tem poucos lugares em ${preparo.cidade}; cadastre os que você conhece pelo mapa da busca.`;
     case "erro":
       return `Não foi possível preparar ${preparo.cidade} agora; tente de novo em alguns minutos.`;
     default:
-      return `Ainda não há pontos em ${preparo.cidade} e outras cidades estão sendo preparadas agora; tente de novo em alguns minutos.`;
+      return `${inicio} e outras cidades estão sendo preparadas agora; tente de novo em alguns minutos.`;
   }
 }
 
@@ -410,7 +416,7 @@ roteirosRouter.get("/", async (req: Request, res: Response) => {
   }
 });
 
-roteirosRouter.post("/gerar", async (req: Request, res: Response) => {
+roteirosRouter.post("/gerar", limiteViagemDeCarro, async (req: Request, res: Response) => {
   try {
     const resultado = gerarRoteiroSchema.safeParse(req.body);
 

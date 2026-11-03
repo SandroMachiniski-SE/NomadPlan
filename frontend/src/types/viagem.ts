@@ -97,6 +97,8 @@ export interface PreparoDoDestinoPlanejado {
   uf: string;
   /** poucos e erro: um preparo recente já terminou assim e não é refeito tão cedo. */
   estado: "preparando" | "pronta" | "ocupado" | "poucos" | "erro";
+  /** Pontos para visitar que a cidade já tem (menos de 3). */
+  pontos: number;
 }
 
 /** Viagem gravada no roteiro (o link público não traz consumo nem preço). */

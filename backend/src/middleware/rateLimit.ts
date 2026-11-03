@@ -41,6 +41,27 @@ export const limiteContribuicao = rateLimit({
   },
 });
 
+// Cadastrar e enviar lugares para revisão (cada envio avisa os moderadores): qualquer conta pode.
+export const limiteCadastroPontos = rateLimit({
+  windowMs: 15 * 60 * 1000,
+  limit: 30,
+  standardHeaders: true,
+  skip: semLimite,
+  legacyHeaders: false,
+  message: { erro: "Muitos lugares cadastrados ou enviados em pouco tempo. Aguarde alguns minutos e tente novamente." },
+});
+
+// A viagem de carro consulta servidores públicos de rotas e mapas (OSRM, Overpass) quando a rota
+// ainda não está no banco; só os pedidos com viagem de carro contam.
+export const limiteViagemDeCarro = rateLimit({
+  windowMs: 15 * 60 * 1000,
+  limit: 60,
+  standardHeaders: true,
+  skip: (req) => semLimite() || !req.body?.viagemDeCarro,
+  legacyHeaders: false,
+  message: { erro: "Muitas viagens de carro geradas em pouco tempo. Aguarde alguns minutos e tente novamente." },
+});
+
 // Cada consulta ao Google Places conta na cota mensal da conta do projeto.
 export const limiteGoogle = rateLimit({
   windowMs: 15 * 60 * 1000,

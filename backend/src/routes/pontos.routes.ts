@@ -11,7 +11,7 @@ import { criarNotificacao, notificarModeradores } from "../lib/notificacoes";
 import { registrarVersaoPonto } from "../lib/versionamento";
 import { conteudoSuspeito } from "../lib/moderacaoTexto";
 import { ehUsuarioConfiavel, incrementarReputacao, PONTOS_REPUTACAO } from "../lib/reputacao";
-import { limiteContribuicao, limiteGoogle } from "../middleware/rateLimit";
+import { limiteCadastroPontos, limiteContribuicao, limiteGoogle } from "../middleware/rateLimit";
 import { chaveGoogle, detalhesDoGoogle, idGoogleDoPonto } from "../lib/googlePlaces";
 import { analisarCsv, linhasParaObjetos, objetosParaCsv } from "../lib/csv";
 import { ErroGeoJson, linhasDeGeoJson, type LinhaImportacao } from "../lib/geojson";
@@ -48,6 +48,22 @@ const DISTANCIA_DUPLICIDADE_METROS = 150;
 function ehModerador(tipoConta: TipoConta): boolean {
   return tipoConta === TipoConta.MODERADOR || tipoConta === TipoConta.ADMIN;
 }
+
+/** Quem não é moderador já tem o máximo de lugares em rascunho ou esperando revisão? */
+async function limiteDeRevisaoAtingido(usuario: { id: number; tipoConta: TipoConta }): Promise<boolean> {
+  if ((TIPOS_MODERADORES as readonly TipoConta[]).includes(usuario.tipoConta)) return false;
+
+  const esperando = await prisma.pontoTuristico.count({
+    where: {
+      idResponsavel: usuario.id,
+      status: { in: [StatusPonto.RASCUNHO, StatusPonto.PENDENTE_VERIFICACAO] },
+    },
+  });
+
+  return esperando >= MAX_PONTOS_ESPERANDO_REVISAO;
+}
+
+const MENSAGEM_LIMITE_DE_REVISAO = `Você já tem ${MAX_PONTOS_ESPERANDO_REVISAO} lugares esperando revisão. Envie seus rascunhos para revisão ou aguarde a moderação.`;
 
 const criarPontoSchema = z.object({
   nome: z.string().trim().min(1).max(160),
@@ -295,6 +311,7 @@ pontosRouter.get(
 pontosRouter.post(
   "/",
   autenticar,
+  limiteCadastroPontos,
   async (req: Request, res: Response) => {
     try {
       const resultado = criarPontoSchema.safeParse(req.body);
@@ -308,19 +325,8 @@ pontosRouter.post(
 
       const dados = resultado.data;
 
-      if (!(TIPOS_MODERADORES as readonly TipoConta[]).includes(req.usuario!.tipoConta)) {
-        const esperando = await prisma.pontoTuristico.count({
-          where: {
-            idResponsavel: req.usuario!.id,
-            status: { in: [StatusPonto.RASCUNHO, StatusPonto.PENDENTE_VERIFICACAO] },
-          },
-        });
-
-        if (esperando >= MAX_PONTOS_ESPERANDO_REVISAO) {
-          return res.status(429).json({
-            erro: `Você já tem ${MAX_PONTOS_ESPERANDO_REVISAO} lugares esperando revisão. Envie seus rascunhos para revisão ou aguarde a moderação.`,
-          });
-        }
+      if (await limiteDeRevisaoAtingido(req.usuario!)) {
+        return res.status(429).json({ erro: MENSAGEM_LIMITE_DE_REVISAO });
       }
 
       if (!dados.confirmarDuplicidade) {
@@ -897,6 +903,11 @@ pontosRouter.put("/:id", autenticar, async (req: Request, res: Response) => {
       });
     }
 
+    // Corrigir um rejeitado o devolve ao rascunho: volta a contar entre os que esperam revisão.
+    if (ponto.status === StatusPonto.REJEITADO && (await limiteDeRevisaoAtingido(req.usuario!))) {
+      return res.status(429).json({ erro: MENSAGEM_LIMITE_DE_REVISAO });
+    }
+
     const dados = resultado.data;
 
     const respostaDeConflito = async () =>
@@ -1060,7 +1071,7 @@ pontosRouter.post(
   },
 );
 
-pontosRouter.post("/:id/publicar", autenticar, async (req: Request, res: Response) => {
+pontosRouter.post("/:id/publicar", autenticar, limiteCadastroPontos, async (req: Request, res: Response) => {
   try {
     const id = idSchema.safeParse(req.params.id);
 
