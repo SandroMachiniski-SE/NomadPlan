@@ -483,6 +483,7 @@ function Home() {
                     pontos={pontos}
                     altura={520}
                     aoBuscarNestaArea={buscarNaArea}
+                    autenticado={autenticado}
                     ajustarAosPontos={!buscaPelaArea}
                     carregando={carregando}
                     vistaInicial={
@@ -538,6 +539,7 @@ function Home() {
                     pontos={pontos}
                     altura="calc(100vh - var(--header-height) - 2rem)"
                     aoBuscarNestaArea={buscarNaArea}
+                    autenticado={autenticado}
                     ajustarAosPontos={!buscaPelaArea}
                     carregando={carregando}
                     destacadoId={pontoDoCartao}

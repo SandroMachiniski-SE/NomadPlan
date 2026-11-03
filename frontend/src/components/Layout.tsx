@@ -22,8 +22,6 @@ function Layout() {
   const [menuAberto, setMenuAberto] = useState(false);
 
   const tipoConta = usuario?.tipoConta;
-  const podeCadastrarPontos =
-    tipoConta === "NEGOCIO" || tipoConta === "GESTOR" || tipoConta === "MODERADOR" || tipoConta === "ADMIN";
   const podeModerar = tipoConta === "MODERADOR" || tipoConta === "ADMIN";
   const ehAdmin = tipoConta === "ADMIN";
 
@@ -69,7 +67,7 @@ function Layout() {
                 </NavLink>
               )}
 
-              {autenticado && podeCadastrarPontos && (
+              {autenticado && (
                 <NavLink to="/pontos/meus" className="nav-link">
                   Meus pontos
                 </NavLink>

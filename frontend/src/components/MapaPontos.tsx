@@ -56,6 +56,8 @@ export interface MapaPontosProps {
   /** Onde o mapa começa quando ainda não há pontos para enquadrar. */
   vistaInicial?: { centro: [number, number]; zoom: number };
   carregando?: boolean;
+  /** No modo de exploração, clicar num lugar vazio oferece cadastrar um lugar ali (ou entrar, sem login). */
+  autenticado?: boolean;
 }
 
 const CENTRO_PADRAO: [number, number] = [-26.3045, -48.8487]; // Joinville
@@ -340,6 +342,40 @@ function BalaoDoPonto({ ponto, explorando }: { ponto: PontoNoMapa; explorando: b
   );
 }
 
+// Cliques em pinos, balões, controles e no botão "Buscar nesta área" não contam como lugar vazio.
+const FORA_DO_LUGAR_VAZIO = ".leaflet-marker-icon, .leaflet-popup, .leaflet-control, .mapa-busca-area";
+
+/** Balão "Cadastrar um lugar aqui" no ponto clicado do mapa. */
+function CadastroNoMapa({ autenticado }: { autenticado: boolean }) {
+  const [posicao, setPosicao] = useState<L.LatLng | null>(null);
+
+  useMapEvents({
+    click: (evento) => {
+      const alvo = evento.originalEvent.target as HTMLElement | null;
+
+      if (alvo?.closest(FORA_DO_LUGAR_VAZIO)) return;
+
+      setPosicao(evento.latlng.wrap());
+    },
+  });
+
+  if (!posicao) return null;
+
+  const destino = `/pontos/novo?latitude=${posicao.lat.toFixed(6)}&longitude=${posicao.lng.toFixed(6)}`;
+
+  return (
+    <Popup position={posicao} eventHandlers={{ remove: () => setPosicao(null) }}>
+      {autenticado ? (
+        <Link to={destino}>Cadastrar um lugar aqui</Link>
+      ) : (
+        <>
+          <Link to="/login">Entre</Link> para cadastrar um lugar aqui
+        </>
+      )}
+    </Popup>
+  );
+}
+
 function MapaPontos({
   pontos,
   altura = 420,
@@ -349,6 +385,7 @@ function MapaPontos({
   ajustarAosPontos = true,
   vistaInicial,
   carregando = false,
+  autenticado = false,
 }: MapaPontosProps) {
   const ignorarMovimentoRef = useRef(false);
   const explorando = aoBuscarNestaArea !== undefined;
@@ -383,6 +420,8 @@ function MapaPontos({
           destacadoId={destacadoId}
           aoDestacarPonto={aoDestacarPonto}
         />
+
+        {explorando && <CadastroNoMapa autenticado={autenticado} />}
       </MapContainer>
     </div>
   );
