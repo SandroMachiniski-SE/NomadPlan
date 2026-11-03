@@ -26,7 +26,7 @@ function RotaProtegida({ papeis }: RotaProtegidaProps) {
         to={saiuManualmente ? "/" : "/login"}
         replace
         state={{
-          destino: location.pathname,
+          destino: location.pathname + location.search,
           ...(sessaoExpirada ? { mensagem: "Sua sessão expirou. Entre novamente para continuar." } : {}),
         }}
       />

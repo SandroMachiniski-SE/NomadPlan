@@ -6,6 +6,7 @@ import { resumirCidades, type ResumoOsm } from "./resumoOsm";
 import { dividirEmDias, type CandidatoDePernoite, type DivisaoDaPerna } from "./divisaoEmDias";
 import type { EtapaDoRoteiro } from "./recomendacao";
 import { estimarCombustivel } from "./combustivel";
+import { consultarPreparo, PONTOS_PARA_CIDADE_PRONTA, pontosDaCidade, prepararCidade } from "./cidadesSobDemanda";
 
 // Viagem de carro saindo de casa: cada perna (casa → 1ª cidade, …) é dividida em dias de estrada
 // com pernoite, e o trecho que chega a uma cidade é descontado do 1º dia nela quando sobram ao
@@ -232,6 +233,10 @@ export async function resolverEntradaDaViagem(
     const achados = etapa.codigoIbge ? (porCodigo ? [porCodigo] : []) : await procurarMunicipio(etapa.cidade);
     const nome = separarUf(etapa.cidade).nome;
 
+    // Pelo código (salvamento): o nome não veio, então a mensagem cita o código.
+    if (etapa.codigoIbge && !porCodigo) {
+      throw new ErroDaViagem(`Uma das cidades da viagem não foi encontrada (código IBGE ${etapa.codigoIbge}).`);
+    }
     if (achados.length === 0) throw new ErroDaViagem(`Não encontrei o município ${nome}.`);
     if (achados.length > 1) throw new ErroDaViagem(`Informe a UF de ${nome}.`);
 
@@ -509,4 +514,46 @@ export async function planejarViagemDeCarro(
       : null;
 
   return { pernas, etapasDoGerador, totalDeDias: agenda.totalDeDias, combustivel, avisos, resumos };
+}
+
+export interface PreparoDoDestino {
+  cidade: string;
+  uf: string;
+  /**
+   * ocupado: outras cidades já estão sendo preparadas (o limite de preparos simultâneos);
+   * poucos e erro: um preparo recente já terminou assim e não é refeito tão cedo.
+   */
+  estado: "preparando" | "pronta" | "ocupado" | "poucos" | "erro";
+  /** Pontos para visitar que a cidade já tem (menos de 3). */
+  pontos: number;
+}
+
+/**
+ * Cidades da viagem sem pontos para visitar (ex.: Rio de Janeiro na primeira viagem para lá):
+ * dispara o preparo sob demanda de cada uma, o mesmo de "Buscar outra cidade do Brasil".
+ */
+export async function prepararDestinosSemPontos(etapas: Municipio[], idUsuario: number): Promise<PreparoDoDestino[]> {
+  const preparos: PreparoDoDestino[] = [];
+
+  for (const etapa of etapas) {
+    const pontos = await pontosDaCidade(etapa.cidade, etapa.latitude, etapa.longitude);
+
+    if (pontos >= PONTOS_PARA_CIDADE_PRONTA) continue;
+    if (preparos.some((p) => p.cidade === etapa.cidade && p.uf === etapa.uf)) continue;
+
+    // Um preparo que terminou há pouco (guardado por 30 min) não é refeito a cada nova geração:
+    // pronto com menos de 3 pontos quer dizer que o OpenStreetMap tem poucos lugares ali.
+    const anterior = consultarPreparo(etapa.cidade, etapa.uf);
+
+    if (anterior && anterior.estado !== "preparando") {
+      preparos.push({ cidade: etapa.cidade, uf: etapa.uf, estado: anterior.estado === "pronta" ? "poucos" : "erro", pontos });
+      continue;
+    }
+
+    const resultado = await prepararCidade(etapa.cidade, etapa.uf, etapa.latitude, etapa.longitude, idUsuario, pontos);
+
+    preparos.push({ cidade: etapa.cidade, uf: etapa.uf, estado: resultado.situacao, pontos });
+  }
+
+  return preparos;
 }

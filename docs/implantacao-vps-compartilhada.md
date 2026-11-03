@@ -110,6 +110,13 @@ docker exec nomadplan-postgres psql -U nomadplan -d nomadplan -c "UPDATE usuario
 Para o e-mail de recuperação de senha, siga a Parte 6 do [implantacao-web.md](implantacao-web.md) (Brevo). Sem isso o sistema funciona, só não
 envia e-mails.
 
+A chave do Google (`GOOGLE_MAPS_API_KEY`) e os servidores de mapas (`OSRM_URL`, `OVERPASS_URL`) também ficam no `.env.prod`. Depois de mudar,
+suba de novo só a API, sem compilar:
+
+```bash
+docker compose -p nomadplan --env-file .env.prod -f docker-compose.prod.yml -f docker-compose.compartilhado.yml up -d api
+```
+
 ## Depois da banca: remover tudo
 
 ```bash

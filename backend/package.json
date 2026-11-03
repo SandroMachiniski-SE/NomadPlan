@@ -25,7 +25,8 @@
     "roteiro:exemplo": "tsx src/scripts/criarRoteiroExemplo.ts",
     "municipios:baixar": "tsx src/scripts/baixarMunicipios.ts",
     "municipios:importar": "tsx src/scripts/importarMunicipios.ts",
-    "viagem:preparar": "tsx src/scripts/prepararViagem.ts"
+    "viagem:preparar": "tsx src/scripts/prepararViagem.ts",
+    "dados:carregar": "npm run municipios:importar && npm run osm:importar && npm run overture:importar && npm run curadoria:aplicar"
   },
   "dependencies": {
     "@prisma/client": "^6.19.3",

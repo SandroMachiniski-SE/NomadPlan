@@ -88,6 +88,17 @@ export interface ViagemDeCarroPlanejada {
   pernas: PernaPlanejada[];
   combustivel: { litros: number; custoCentavos: number } | null;
   avisos: string[];
+  /** Cidades de destino sem pontos cujo preparo a geração disparou (ou que terminou há pouco). */
+  preparos: PreparoDoDestinoPlanejado[];
+}
+
+export interface PreparoDoDestinoPlanejado {
+  cidade: string;
+  uf: string;
+  /** poucos e erro: um preparo recente já terminou assim e não é refeito tão cedo. */
+  estado: "preparando" | "pronta" | "ocupado" | "poucos" | "erro";
+  /** Pontos para visitar que a cidade já tem (menos de 3). */
+  pontos: number;
 }
 
 /** Viagem gravada no roteiro (o link público não traz consumo nem preço). */

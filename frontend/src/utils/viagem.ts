@@ -22,9 +22,9 @@ export interface OpcoesViagemDeCarro {
   preco: string;
 }
 
-/** Número digitado com vírgula ou ponto; vazio ou inválido vira null. */
+/** Número digitado com vírgula ou ponto (e "R$" na frente, no preço); vazio ou inválido vira null. */
 export function lerNumero(texto: string): number | null {
-  const limpo = texto.trim().replace(",", ".");
+  const limpo = texto.replace(/^\s*R\$/i, "").trim().replace(",", ".");
 
   if (!limpo) return null;
 
@@ -48,7 +48,7 @@ export function pedidoDaViagem(
 
   return {
     ...(opcoes.origem ? { origem: opcoes.origem.codigoIbge } : {}),
-    ...(kmPorDia !== null ? { kmPorDia } : {}),
+    ...(kmPorDia !== null ? { kmPorDia: Math.round(kmPorDia) } : {}),
     ...(horasPorDia !== null ? { horasPorDia } : {}),
     comVolta: opcoes.comVolta,
     ...(consumo !== null ? { consumoKmPorLitro: consumo } : {}),
@@ -58,7 +58,43 @@ export function pedidoDaViagem(
   };
 }
 
+/** As mesmas faixas que o servidor aceita: devolve o que corrigir, ou null se está tudo certo. */
+export function conferirViagem(opcoes: OpcoesViagemDeCarro): string | null {
+  // Campo opcional: vazio vale; preenchido, precisa ser um número dentro da faixa.
+  const foraDaFaixa = (texto: string, minimo: number, maximo: number) => {
+    if (!texto.trim()) return false;
+
+    const valor = lerNumero(texto);
+
+    return valor === null || valor < minimo || valor > maximo;
+  };
+  const km = lerNumero(opcoes.kmPorDia);
+
+  if (km === null || km < 150 || km > 1000) return "O alvo por dia vai de 150 a 1.000 km.";
+  if (foraDaFaixa(opcoes.horasPorDia, 2, 14)) return "O máximo de horas ao volante vai de 2 a 14.";
+  if (foraDaFaixa(opcoes.consumo, 3, 40)) return "O consumo do carro vai de 3 a 40 km/l.";
+  if (foraDaFaixa(opcoes.preco, 1, 20)) return "O preço do litro vai de R$ 1,00 a R$ 20,00.";
+
+  return null;
+}
+
 export const chaveDaNoite = (perna: number, noite: number) => `${perna}-${noite}`;
+
+/**
+ * Depois de gerar de novo, a cidade de uma noite pode ter mudado: só continua escolhido o hotel que
+ * ainda está entre as hospedagens da mesma noite (o servidor recusaria salvar com os outros).
+ */
+export function hoteisQueContinuam(hoteis: Map<string, string>, resposta: RespostaRecomendacao): Map<string, string> {
+  const opcoes = new Map(
+    (resposta.viagemDeCarro?.pernas ?? []).flatMap((perna) =>
+      perna.trechos.flatMap((t) =>
+        t.noite === null ? [] : [[chaveDaNoite(perna.perna, t.noite), t.pernoite?.hospedagens.map((h) => h.idOsm) ?? []] as const],
+      ),
+    ),
+  );
+
+  return new Map([...hoteis].filter(([chave, idOsm]) => opcoes.get(chave)?.includes(idOsm)));
+}
 
 export interface TrechoDoDia {
   perna: PernaPlanejada;

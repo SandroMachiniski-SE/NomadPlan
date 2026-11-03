@@ -56,6 +56,8 @@ export interface MapaPontosProps {
   /** Onde o mapa começa quando ainda não há pontos para enquadrar. */
   vistaInicial?: { centro: [number, number]; zoom: number };
   carregando?: boolean;
+  /** No modo de exploração, clicar num lugar vazio oferece cadastrar um lugar ali (ou entrar, sem login). */
+  autenticado?: boolean;
 }
 
 const CENTRO_PADRAO: [number, number] = [-26.3045, -48.8487]; // Joinville
@@ -230,14 +232,21 @@ function ControleDeBusca({
   const mapa = useMap();
   const [movido, setMovido] = useState(!jaMostraPontos);
   const [area, setArea] = useState<AreaDoMapa>(() => areaVisivel(mapa));
+  // Um balão que abre perto da borda move o mapa para caber: não é a pessoa mexendo no mapa.
+  const movidoPeloBalao = useRef(false);
 
   useMapEvents({
+    autopanstart: () => {
+      movidoPeloBalao.current = true;
+    },
     moveend: () => {
       setArea(areaVisivel(mapa));
 
-      if (!ignorarMovimentoRef.current) {
+      if (!ignorarMovimentoRef.current && !movidoPeloBalao.current) {
         setMovido(true);
       }
+
+      movidoPeloBalao.current = false;
     },
   });
 
@@ -340,6 +349,79 @@ function BalaoDoPonto({ ponto, explorando }: { ponto: PontoNoMapa; explorando: b
   );
 }
 
+// Cliques em pinos, balões, controles e no botão "Buscar nesta área" não contam como lugar vazio.
+const FORA_DO_LUGAR_VAZIO = ".leaflet-marker-icon, .leaflet-popup, .leaflet-control, .mapa-busca-area";
+
+// Espera para abrir o balão: um duplo clique (aproximar o mapa) chega antes disso e cancela.
+const ESPERA_DO_CLIQUE_MS = 250;
+
+/** Balão "Cadastrar um lugar aqui" no ponto clicado do mapa. */
+function CadastroNoMapa({ autenticado }: { autenticado: boolean }) {
+  const [posicao, setPosicao] = useState<L.LatLng | null>(null);
+  const baloesAbertos = useRef(0);
+  const fechandoBalao = useRef(false);
+  const relogio = useRef<ReturnType<typeof setTimeout> | undefined>(undefined);
+
+  const mapa = useMap();
+
+  // Na captura, o clique chega antes de o Leaflet fechar o balão aberto: o clique que só fecha
+  // um balão não abre outro.
+  useEffect(() => {
+    const conteiner = mapa.getContainer();
+    const anotar = () => {
+      fechandoBalao.current = baloesAbertos.current > 0;
+    };
+
+    conteiner.addEventListener("click", anotar, true);
+
+    return () => {
+      conteiner.removeEventListener("click", anotar, true);
+      clearTimeout(relogio.current);
+    };
+  }, [mapa]);
+
+  useMapEvents({
+    popupopen: () => {
+      baloesAbertos.current += 1;
+    },
+    popupclose: () => {
+      baloesAbertos.current = Math.max(0, baloesAbertos.current - 1);
+    },
+    click: (evento) => {
+      const alvo = evento.originalEvent.target as HTMLElement | null;
+
+      clearTimeout(relogio.current);
+      if (fechandoBalao.current || alvo?.closest(FORA_DO_LUGAR_VAZIO)) return;
+
+      const lugar = evento.latlng.wrap();
+
+      relogio.current = setTimeout(() => setPosicao(lugar), ESPERA_DO_CLIQUE_MS);
+    },
+    dblclick: () => {
+      clearTimeout(relogio.current);
+    },
+  });
+
+  if (!posicao) return null;
+
+  const destino = `/pontos/novo?latitude=${posicao.lat.toFixed(6)}&longitude=${posicao.lng.toFixed(6)}`;
+
+  return (
+    <Popup position={posicao} eventHandlers={{ remove: () => setPosicao(null) }}>
+      {autenticado ? (
+        <Link to={destino}>Cadastrar um lugar aqui</Link>
+      ) : (
+        <>
+          <Link to="/login" state={{ destino }}>
+            Entre
+          </Link>{" "}
+          para cadastrar um lugar aqui
+        </>
+      )}
+    </Popup>
+  );
+}
+
 function MapaPontos({
   pontos,
   altura = 420,
@@ -349,6 +431,7 @@ function MapaPontos({
   ajustarAosPontos = true,
   vistaInicial,
   carregando = false,
+  autenticado = false,
 }: MapaPontosProps) {
   const ignorarMovimentoRef = useRef(false);
   const explorando = aoBuscarNestaArea !== undefined;
@@ -383,6 +466,8 @@ function MapaPontos({
           destacadoId={destacadoId}
           aoDestacarPonto={aoDestacarPonto}
         />
+
+        {explorando && <CadastroNoMapa autenticado={autenticado} />}
       </MapContainer>
     </div>
   );

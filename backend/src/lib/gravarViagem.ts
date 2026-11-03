@@ -1,4 +1,4 @@
-import type { Prisma } from "@prisma/client";
+import { StatusPonto, type Prisma } from "@prisma/client";
 import prisma from "./prisma";
 import { pontoDoElemento, type ElementoOsm } from "./osm";
 import { importarPontosOsm, type PontoParaImportar } from "./importacaoOsm";
@@ -88,8 +88,9 @@ export async function hospedagensParaOCatalogo(plano: PlanoDaViagem): Promise<Ma
 
   await importarPontosOsm([...pontos.values()]);
 
+  // Hotel rejeitado pela moderação (ou ainda em revisão) não vira pernoite: fica só o nome.
   const gravados = await prisma.pontoTuristico.findMany({
-    where: { idOsm: { in: [...pontos.keys()] } },
+    where: { idOsm: { in: [...pontos.keys()] }, status: StatusPonto.PUBLICADO },
     select: { id: true, idOsm: true },
   });
 

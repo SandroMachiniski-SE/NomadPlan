@@ -1,7 +1,10 @@
 import "../ambiente";
 import { after, before, beforeEach, describe, it, mock } from "node:test";
 import assert from "node:assert/strict";
+import fs from "fs";
+import path from "path";
 import { TipoConta } from "@prisma/client";
+import { PASTA_UPLOADS_TESTE } from "../ambiente";
 import prisma from "../../lib/prisma";
 import { gerarTokenRedefinicaoSenha } from "../../lib/auth";
 import { codigoTotp, passoDoTempo } from "../../lib/totp";
@@ -571,6 +574,20 @@ describe("autenticação e contas", () => {
 
       const log = await prisma.logAuditoria.findFirst({ where: { acao: "anonimizar_conta" } });
       assert.ok(log);
+    });
+
+    it("excluir a conta apaga do disco as fotos dos rascunhos que somem com ela", async () => {
+      const { usuario, token } = await criarUsuario();
+      fs.mkdirSync(path.join(PASTA_UPLOADS_TESTE, "pontos"), { recursive: true });
+      const arquivo = path.join(PASTA_UPLOADS_TESTE, "pontos", `rascunho-${usuario.id}.jpg`);
+      fs.writeFileSync(arquivo, "foto");
+      const rascunho = await criarPonto({ status: "RASCUNHO", idResponsavel: usuario.id });
+      await prisma.pontoTuristico.update({ where: { id: rascunho.id }, data: { imagemUrl: `/uploads/pontos/rascunho-${usuario.id}.jpg` } });
+
+      const r = await api("DELETE", "/auth/me", { token, json: { senha: SENHA_DE_TESTE } });
+
+      assert.equal(r.status, 200);
+      assert.equal(fs.existsSync(arquivo), false);
     });
 
     it("não deixa o único administrador excluir a conta", async () => {

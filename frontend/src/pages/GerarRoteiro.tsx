@@ -11,6 +11,7 @@ import SugestoesDeCidade from "../components/SugestoesDeCidade";
 import CaixaViagemDeCarro from "../components/viagem/CaixaViagemDeCarro";
 import DecisaoDeChegada from "../components/viagem/DecisaoDeChegada";
 import PernoiteNaEstrada from "../components/viagem/PernoiteNaEstrada";
+import PreparoDoDestino from "../components/viagem/PreparoDoDestino";
 import TrechoNaEstrada from "../components/viagem/TrechoNaEstrada";
 import MapaRoteiroCarregavel from "../components/MapaRoteiroCarregavel";
 import type { ParadaNoMapa } from "../components/MapaRoteiro";
@@ -18,12 +19,13 @@ import { useCidadesDisponiveis, type CidadeDaBusca } from "../services/cidades";
 import type { DecisaoDaPerna, EscolhaDaNoite } from "../types/viagem";
 import {
   chaveDaNoite,
+  conferirViagem,
   diasDaViagem,
   formatarCombustivel,
   formatarDirecao,
   formatarKm,
+  hoteisQueContinuam,
   lembrarPreco,
-  lerNumero,
   noitesParaSalvar,
   pedidoDaViagem,
   precoLembrado,
@@ -57,6 +59,8 @@ function GerarRoteiro() {
   const [gerando, setGerando] = useState(false);
   const [erro, setErro] = useState<string | null>(null);
   const [resultado, setResultado] = useState<RespostaRecomendacao | null>(null);
+  // Cada geração recria os cartões de preparo: o estado de uma geração anterior não fica na tela.
+  const [geracao, setGeracao] = useState(0);
 
   const [viagem, setViagem] = useState<OpcoesViagemDeCarro>({
     ativa: false,
@@ -191,15 +195,15 @@ function GerarRoteiro() {
     }
 
     if (viagem.ativa) {
-      const km = lerNumero(viagem.kmPorDia);
-
       if (!viagem.origem) {
         setErro("Informe de onde você sai.");
         return;
       }
 
-      if (km === null || km < 150 || km > 1000) {
-        setErro("O alvo por dia vai de 150 a 1.000 km.");
+      const problema = conferirViagem(viagem);
+
+      if (problema) {
+        setErro(problema);
         return;
       }
     }
@@ -217,6 +221,8 @@ function GerarRoteiro() {
       });
 
       setResultado(resposta.data);
+      setGeracao((atual) => atual + 1);
+      setHoteis((atual) => hoteisQueContinuam(atual, resposta.data));
 
       if (resposta.data.pontos.length === 0 && !resposta.data.viagemDeCarro?.pernas.length) {
         setErro(
@@ -511,6 +517,17 @@ function GerarRoteiro() {
               </ul>
             </div>
           )}
+
+          {planejada?.preparos.map((p) => (
+            <PreparoDoDestino
+              key={`${geracao}-${p.cidade}-${p.uf}`}
+              cidade={p.cidade}
+              uf={p.uf}
+              estadoInicial={p.estado}
+              aoGerarDeNovo={() => gerar(escolhas, decisoes)}
+              desativado={gerando}
+            />
+          ))}
 
           {planejada?.combustivel && (
             <p className="alert alert--info" role="status">

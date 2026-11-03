@@ -16,6 +16,8 @@ const PONTOS_NO_TRACADO = 30;
 const JOINVILLE = 4209102;
 const BRASILIA = 5300108;
 const GOIANIA = 5208707;
+// Sem pontos no E2E: a viagem para lá dispara o preparo da cidade.
+const ITAJAI = 4208203;
 
 async function gravarRota(origem: Municipio, destino: Municipio, metros: number): Promise<number> {
   const coordenadas = Array.from({ length: PONTOS_NO_TRACADO + 1 }, (_, i): [number, number] => {
@@ -83,9 +85,11 @@ async function pontosNoDestino(m: Municipio) {
 
 /** Depois de carregar os municípios: rotas, resumos e pontos da viagem de carro do E2E. */
 export async function prepararViagemE2e(): Promise<void> {
-  const [joinville, brasilia, goiania] = await Promise.all([JOINVILLE, BRASILIA, GOIANIA].map((c) => municipioPorCodigo(c)));
+  const [joinville, brasilia, goiania, itajai] = await Promise.all(
+    [JOINVILLE, BRASILIA, GOIANIA, ITAJAI].map((c) => municipioPorCodigo(c)),
+  );
 
-  if (!joinville || !brasilia || !goiania) {
+  if (!joinville || !brasilia || !goiania || !itajai) {
     throw new Error("Municípios do E2E não encontrados: importe prisma/dados/municipios.json antes.");
   }
 
@@ -93,10 +97,12 @@ export async function prepararViagemE2e(): Promise<void> {
   const volta = await gravarRota(brasilia, joinville, 1_501_000);
   // 1.120 km: depois da 1ª noite faltam ~620 km e a chegada pede a decisão "esticar ou dormir".
   const goias = await gravarRota(joinville, goiania, 1_120_000);
+  const litoral = await gravarRota(joinville, itajai, 95_000);
 
   await resumirOCaminho(ida, [JOINVILLE, BRASILIA]);
   await resumirOCaminho(volta, [JOINVILLE, BRASILIA]);
   await resumirOCaminho(goias, [JOINVILLE, GOIANIA]);
+  await resumirOCaminho(litoral, [JOINVILLE, ITAJAI]);
   await pontosNoDestino(brasilia);
   await pontosNoDestino(goiania);
 }

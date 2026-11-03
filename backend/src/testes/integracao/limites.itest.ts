@@ -220,5 +220,41 @@ describe("limites de taxa", () => {
       const outro = await api("POST", "/pontos/1/sugestoes", { token, headers: novoIp(), json: {} });
       assert.notEqual(outro.status, 429);
     });
+
+    it("cadastrar e enviar lugares dividem o limite de 30 por 15 minutos", async () => {
+      const { token } = await criarUsuario();
+      const headers = novoIp();
+
+      for (let i = 0; i < 30; i++) {
+        const r = await api("POST", i % 2 === 0 ? "/pontos" : "/pontos/999999/publicar", { token, headers, json: {} });
+        assert.notEqual(r.status, 429, `requisição ${i + 1}`);
+      }
+
+      const cadastro = await api("POST", "/pontos", { token, headers, json: {} });
+      const envio = await api("POST", "/pontos/999999/publicar", { token, headers, json: {} });
+
+      assert.equal(cadastro.status, 429);
+      assert.equal(envio.status, 429);
+      assert.match(cadastro.corpo.erro, /Muitos lugares cadastrados ou enviados/);
+    });
+  });
+
+  describe("viagem de carro (servidores públicos de rotas e mapas)", () => {
+    it("gerar com viagem de carro tem limite próprio de 60 por 15 minutos; sem viagem não conta", async () => {
+      const { token } = await criarUsuario();
+      const headers = novoIp();
+
+      for (let i = 0; i < 60; i++) {
+        const r = await api("POST", "/roteiros/gerar", { token, headers, json: { viagemDeCarro: {} } });
+        assert.notEqual(r.status, 429, `requisição ${i + 1}`);
+      }
+
+      const comViagem = await api("POST", "/roteiros/gerar", { token, headers, json: { viagemDeCarro: {} } });
+      const semViagem = await api("POST", "/roteiros/gerar", { token, headers, json: {} });
+
+      assert.equal(comViagem.status, 429);
+      assert.match(comViagem.corpo.erro, /Muitas viagens de carro/);
+      assert.notEqual(semViagem.status, 429);
+    });
   });
 });
