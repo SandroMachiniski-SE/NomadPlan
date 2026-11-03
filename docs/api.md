@@ -57,7 +57,7 @@ Erros têm o formato `{ "erro": "mensagem em português" }`; erros de validaçã
 | POST | `/pontos/:id/rejeitar` 🔒 | moderação | Corpo: `motivo`. |
 | GET | `/pontos/:id/sugestoes` 🔒 | dono/moderação | Sugestões de edição do ponto. |
 | POST | `/pontos/:id/sugestoes` 🔒 | qualquer | Sugere uma correção: `camposPropostos` (`nome`, `descricao`, `categoria`, `cidade`, `endereco`, `faixaPreco`, `acessibilidade`, `siteOficial`, `telefoneContato`, `horarioFuncionamento`) e `mensagem?`. Aplicada na hora para o dono verificado ou usuário com reputação ≥ 5, ou quando duas pessoas diferentes propõem a mesma mudança; conteúdo suspeito fica retido. Limite: 20 contribuições/15 min. |
-| POST | `/pontos/:id/solicitar-verificacao` 🔒 | dono | Pede o selo de verificado (`comprovacao?`). |
+| POST | `/pontos/:id/solicitar-verificacao` 🔒 | dono (negócio ou gestor) | Pede o selo de verificado (`comprovacao?`). Quem cadastrou um lugar da comunidade com outro tipo de conta recebe `403`. |
 | GET | `/pontos/:id/versoes` 🔒 | dono/moderação | Histórico de versões. |
 | POST | `/pontos/:id/versoes/:versaoId/restaurar` 🔒 | dono/admin | Volta o ponto a uma versão anterior. |
 | GET | `/pontos/:id/avaliacoes` | público | Avaliações aprovadas: `{ total, media, dados[] }`. |
