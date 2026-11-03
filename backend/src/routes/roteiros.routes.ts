@@ -229,7 +229,7 @@ const pernaSchema = z.number().int().min(0).max(7);
 // Viagem de carro saindo de casa: divide a estrada em dias com pernoites sugeridos.
 const viagemDeCarroSchema = z.object({
   origem: z.number().int().positive().optional(),
-  kmPorDia: z.number().min(150).max(1000).optional(),
+  kmPorDia: z.number().int().min(150).max(1000).optional(),
   horasPorDia: z.number().min(2).max(14).optional(),
   comVolta: z.boolean().optional(),
   consumoKmPorLitro: z.number().min(3).max(40).optional(),
@@ -250,7 +250,7 @@ const viagemSalvaSchema = viagemDeCarroSchema.extend({
     .min(1)
     .max(6),
   horasDisponiveis: z.number().positive().max(24),
-  kmPorDia: z.number().min(150).max(1000),
+  kmPorDia: z.number().int().min(150).max(1000),
   comVolta: z.boolean(),
   noites: z
     .array(

@@ -2,7 +2,8 @@ import "../ambiente";
 import { after, afterEach, before, beforeEach, describe, it } from "node:test";
 import assert from "node:assert/strict";
 import prisma from "../../lib/prisma";
-import { criarCliente, criarUsuario, iniciarServidor, limparBanco, type ServidorDeTeste } from "../suporte";
+import { StatusPonto } from "@prisma/client";
+import { criarCliente, criarPonto, criarUsuario, iniciarServidor, limparBanco, type ServidorDeTeste } from "../suporte";
 import { pontosDaCidade } from "../../lib/cidadesSobDemanda";
 import { cidadesComPontos } from "../../lib/cidades";
 import { gerarRoteiroSugerido } from "../../lib/recomendacao";
@@ -310,5 +311,36 @@ describe("salvar e ler a viagem de carro", () => {
     const restaurado = await prisma.roteiro.findUnique({ where: { id: criado.id } });
     assert.equal(restaurado?.kmPorDia, 500);
     assert.equal(restaurado?.viagemOrigem, JOINVILLE.codigoIbge);
+  });
+
+  it("hotel rejeitado pela moderação não vira o pernoite: fica só o nome", async () => {
+    const { gerado, pedido } = await gerarEMontar();
+    const hotelEscolhido = gerado.viagemDeCarro.pernas[0].trechos[0].pernoite.hospedagens[0];
+    const rejeitado = await criarPonto({ nome: hotelEscolhido.nome, categoria: "Hospedagem", cidade: "Cidade A", status: StatusPonto.REJEITADO });
+    await prisma.pontoTuristico.update({ where: { id: rejeitado.id }, data: { idOsm: hotelEscolhido.idOsm } });
+
+    const r = await salvar(pedido);
+
+    assert.equal(r.status, 201, JSON.stringify(r.corpo));
+    const pernoite = await prisma.itemRoteiro.findFirst({ where: { idRoteiro: r.corpo.id, pernoite: true, dia: 1 } });
+    assert.equal(pernoite?.idPonto, null);
+    assert.equal(pernoite?.titulo, `Pernoite no ${hotelEscolhido.nome} (Cidade A)`);
+  });
+
+  it("km por dia com casas decimais dá 400, não 500", async () => {
+    const { pedido } = await gerarEMontar();
+
+    const r = await salvar({ ...pedido, viagemDeCarro: { ...pedido.viagemDeCarro, kmPorDia: 500.5 } });
+
+    assert.equal(r.status, 400);
+  });
+
+  it("município inexistente no salvamento não mostra o código como se fosse um nome", async () => {
+    const { pedido } = await gerarEMontar();
+
+    const r = await salvar({ ...pedido, viagemDeCarro: { ...pedido.viagemDeCarro, etapas: [{ codigoIbge: 1234567, dias: 4 }] } });
+
+    assert.equal(r.status, 400);
+    assert.equal(r.corpo.erro, "Uma das cidades da viagem não foi encontrada (código IBGE 1234567).");
   });
 });

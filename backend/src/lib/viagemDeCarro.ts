@@ -233,6 +233,10 @@ export async function resolverEntradaDaViagem(
     const achados = etapa.codigoIbge ? (porCodigo ? [porCodigo] : []) : await procurarMunicipio(etapa.cidade);
     const nome = separarUf(etapa.cidade).nome;
 
+    // Pelo código (salvamento): o nome não veio, então a mensagem cita o código.
+    if (etapa.codigoIbge && !porCodigo) {
+      throw new ErroDaViagem(`Uma das cidades da viagem não foi encontrada (código IBGE ${etapa.codigoIbge}).`);
+    }
     if (achados.length === 0) throw new ErroDaViagem(`Não encontrei o município ${nome}.`);
     if (achados.length > 1) throw new ErroDaViagem(`Informe a UF de ${nome}.`);
 
