@@ -19,12 +19,13 @@ import { useCidadesDisponiveis, type CidadeDaBusca } from "../services/cidades";
 import type { DecisaoDaPerna, EscolhaDaNoite } from "../types/viagem";
 import {
   chaveDaNoite,
+  conferirViagem,
   diasDaViagem,
   formatarCombustivel,
   formatarDirecao,
   formatarKm,
+  hoteisQueContinuam,
   lembrarPreco,
-  lerNumero,
   noitesParaSalvar,
   pedidoDaViagem,
   precoLembrado,
@@ -194,15 +195,15 @@ function GerarRoteiro() {
     }
 
     if (viagem.ativa) {
-      const km = lerNumero(viagem.kmPorDia);
-
       if (!viagem.origem) {
         setErro("Informe de onde você sai.");
         return;
       }
 
-      if (km === null || km < 150 || km > 1000) {
-        setErro("O alvo por dia vai de 150 a 1.000 km.");
+      const problema = conferirViagem(viagem);
+
+      if (problema) {
+        setErro(problema);
         return;
       }
     }
@@ -221,6 +222,7 @@ function GerarRoteiro() {
 
       setResultado(resposta.data);
       setGeracao((atual) => atual + 1);
+      setHoteis((atual) => hoteisQueContinuam(atual, resposta.data));
 
       if (resposta.data.pontos.length === 0 && !resposta.data.viagemDeCarro?.pernas.length) {
         setErro(

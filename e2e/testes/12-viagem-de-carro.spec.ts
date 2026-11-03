@@ -162,6 +162,57 @@ test.describe("viagem de carro", () => {
     await expect(page.locator("#titulo-orcamento").locator("..").getByText("Combustível")).toBeVisible();
   });
 
+  test("preço com R$ e km com vírgula são entendidos", async ({ page }) => {
+    await cadastrarEmJoinville(page);
+    await page.goto("/roteiros/gerar");
+    await page.getByLabel("Cidade *").fill("Brasília");
+    await page.getByLabel("Vou de carro saindo de casa").check();
+    await page.getByLabel("Alvo por dia (km)").fill("500,4");
+    await page.getByLabel("Consumo do carro (km/l)").fill("12");
+    await page.getByLabel("Preço do litro (R$)").fill("R$ 6,29");
+    await page.getByRole("button", { name: "Gerar roteiro" }).click();
+
+    await expect(page.getByText(/^Combustível estimado: 1\.501 km · ~[\d.,]+ l · ~R\$/)).toBeVisible();
+    await page.getByRole("button", { name: "Salvar como meu roteiro" }).click();
+    await expect(page).toHaveURL(/\/roteiros\/\d+$/);
+  });
+
+  test("horas, consumo e preço fora da faixa dizem o que corrigir", async ({ page }) => {
+    await cadastrarEmJoinville(page);
+    await page.goto("/roteiros/gerar");
+    await page.getByLabel("Cidade *").fill("Brasília");
+    await page.getByLabel("Vou de carro saindo de casa").check();
+    const gerar = page.getByRole("button", { name: "Gerar roteiro" });
+
+    await page.getByLabel(/^No máximo \(horas ao volante\)/).fill("1");
+    await gerar.click();
+    await expect(page.getByText("O máximo de horas ao volante vai de 2 a 14.")).toBeVisible();
+
+    await page.getByLabel(/^No máximo \(horas ao volante\)/).fill("");
+    await page.getByLabel("Consumo do carro (km/l)").fill("doze");
+    await gerar.click();
+    await expect(page.getByText("O consumo do carro vai de 3 a 40 km/l.")).toBeVisible();
+
+    await page.getByLabel("Consumo do carro (km/l)").fill("12");
+    await page.getByLabel("Preço do litro (R$)").fill("62,90");
+    await gerar.click();
+    await expect(page.getByText("O preço do litro vai de R$ 1,00 a R$ 20,00.")).toBeVisible();
+  });
+
+  test("mudar a decisão de chegada não deixa um hotel que já não vale e o roteiro salva", async ({ page }) => {
+    await cadastrarEmJoinville(page);
+    await gerarDeCarro(page, "Goiânia", 1);
+    const hotel = page.locator(".pernoite-estrada select").first();
+    await hotel.selectOption({ index: 1 });
+
+    await page.getByLabel(/^Dormir no caminho e chegar amanhã/).click();
+    await expect(page.getByLabel(/^Dormir no caminho e chegar amanhã/)).toBeChecked();
+    await expect(page.locator(".pernoite-estrada select").first()).toBeVisible();
+
+    await page.getByRole("button", { name: "Salvar como meu roteiro" }).click();
+    await expect(page).toHaveURL(/\/roteiros\/\d+$/);
+  });
+
   test("viagem para cidade sem pontos avisa que começou a prepará-la e mostra o andamento", async ({ page }) => {
     await cadastrarEmJoinville(page);
     await gerarDeCarro(page, "Itajaí", 1);
