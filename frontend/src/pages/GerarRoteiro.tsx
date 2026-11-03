@@ -11,6 +11,7 @@ import SugestoesDeCidade from "../components/SugestoesDeCidade";
 import CaixaViagemDeCarro from "../components/viagem/CaixaViagemDeCarro";
 import DecisaoDeChegada from "../components/viagem/DecisaoDeChegada";
 import PernoiteNaEstrada from "../components/viagem/PernoiteNaEstrada";
+import PreparoDoDestino from "../components/viagem/PreparoDoDestino";
 import TrechoNaEstrada from "../components/viagem/TrechoNaEstrada";
 import MapaRoteiroCarregavel from "../components/MapaRoteiroCarregavel";
 import type { ParadaNoMapa } from "../components/MapaRoteiro";
@@ -511,6 +512,16 @@ function GerarRoteiro() {
               </ul>
             </div>
           )}
+
+          {planejada?.preparos.map((p) => (
+            <PreparoDoDestino
+              key={`${p.cidade}-${p.uf}-${p.estado}`}
+              cidade={p.cidade}
+              uf={p.uf}
+              estadoInicial={p.estado}
+              aoGerarDeNovo={() => gerar(escolhas, decisoes)}
+            />
+          ))}
 
           {planejada?.combustivel && (
             <p className="alert alert--info" role="status">

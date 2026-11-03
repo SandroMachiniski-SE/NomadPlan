@@ -88,6 +88,8 @@ export interface ViagemDeCarroPlanejada {
   pernas: PernaPlanejada[];
   combustivel: { litros: number; custoCentavos: number } | null;
   avisos: string[];
+  /** Cidades de destino sem pontos cujo preparo a geração disparou. */
+  preparos: { cidade: string; uf: string; estado: "preparando" | "pronta" | "ocupado" }[];
 }
 
 /** Viagem gravada no roteiro (o link público não traz consumo nem preço). */

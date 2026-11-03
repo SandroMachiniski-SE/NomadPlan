@@ -1378,6 +1378,14 @@ fieldset.field {
   border: 1px solid var(--accent, var(--primary));
 }
 
+.preparo-destino {
+  display: grid;
+  gap: 0.5rem;
+  justify-items: start;
+  padding: 0.85rem 1rem;
+  margin-bottom: 1rem;
+}
+
 .viagem-carro__mapa {
   display: grid;
   gap: 0.35rem;
