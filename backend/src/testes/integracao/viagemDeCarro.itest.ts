@@ -404,6 +404,105 @@ describe("viagem de carro no gerador de roteiro", () => {
     assert.ok(consulta.corpo!.startsWith("[out:json][timeout:170];"), consulta.corpo!);
   });
 
+  describe("destino sem pontos", () => {
+    const ITAJAI = { codigoIbge: 4208203, cidade: "Itajaí", uf: "SC", latitude: -26.9101, longitude: -48.6705 };
+    const AVISO_DE_PREPARO = "Ainda não há pontos em Itajaí: começamos a preparar a cidade. Gere de novo em alguns minutos para ver os dias de passeio.";
+
+    async function prepararItajai() {
+      await criarMunicipio(JOINVILLE);
+      await criarMunicipio(ITAJAI);
+      viagem.naEstrada(ITAJAI, () => ({ corpo: estradaReta(90) }));
+      // O preparo da cidade baixa estes museus do Overpass falso.
+      viagem.estado.ofertas.push({ municipio: ITAJAI, hoteis: 0, atracoes: 4 });
+      return comCasa(JOINVILLE);
+    }
+
+    async function esperarPreparo(token: string, cidade: string, uf: string) {
+      for (let tentativa = 0; tentativa < 50; tentativa += 1) {
+        const r = await api("GET", `/cidades/preparar?cidade=${encodeURIComponent(cidade)}&uf=${uf}`, { token });
+
+        if (r.corpo.estado !== "preparando") return r.corpo;
+
+        await new Promise((resolver) => setTimeout(resolver, 100));
+      }
+
+      throw new Error("O preparo da cidade não terminou a tempo.");
+    }
+
+    it("a geração dispara o preparo e troca o aviso do gerador", async () => {
+      const { token } = await prepararItajai();
+
+      const r = await gerar(token, { etapas: [{ cidade: "Itajaí", dias: 1 }], viagemDeCarro: {} });
+
+      assert.equal(r.status, 200, JSON.stringify(r.corpo));
+      assert.deepEqual(r.corpo.viagemDeCarro.preparos, [{ cidade: "Itajaí", uf: "SC", estado: "preparando" }]);
+      assert.ok(r.corpo.avisos.includes(AVISO_DE_PREPARO), JSON.stringify(r.corpo.avisos));
+      assert.ok(!r.corpo.avisos.some((a: string) => a.startsWith("Ainda não há pontos cadastrados")));
+      assert.equal((await esperarPreparo(token, "Itajaí", "SC")).estado, "pronta");
+    });
+
+    it("destino com só 2 pontos também dispara o preparo", async () => {
+      const { token } = await prepararItajai();
+      await criarPonto({ nome: "Praia de Itajaí", cidade: "Itajaí", latitude: -26.91, longitude: -48.66 });
+      await criarPonto({ nome: "Mercado de Itajaí", cidade: "Itajaí", latitude: -26.905, longitude: -48.665 });
+
+      const r = await gerar(token, { etapas: [{ cidade: "Itajaí", dias: 1 }], viagemDeCarro: {} });
+
+      assert.deepEqual(r.corpo.viagemDeCarro.preparos, [{ cidade: "Itajaí", uf: "SC", estado: "preparando" }]);
+      assert.ok(r.corpo.avisos.includes(AVISO_DE_PREPARO));
+      await esperarPreparo(token, "Itajaí", "SC");
+    });
+
+    it("destino com pontos não dispara nada", async () => {
+      await prepararBrasilia(viagem);
+      const { token } = await comCasa(JOINVILLE);
+
+      const r = await gerar(token, { etapas: [{ cidade: "Brasília, DF", dias: 1 }], viagemDeCarro: {} });
+
+      assert.deepEqual(r.corpo.viagemDeCarro.preparos, []);
+    });
+
+    it("com os preparos simultâneos ocupados, a cidade vem como ocupado e com o outro aviso", async () => {
+      const { token } = await prepararItajai();
+      const outras = [
+        { codigoIbge: 4202008, cidade: "Balneário Camboriú", uf: "SC", latitude: -26.9926, longitude: -48.6352 },
+        { codigoIbge: 4211306, cidade: "Navegantes", uf: "SC", latitude: -26.8943, longitude: -48.6546 },
+      ];
+      for (const m of outras) {
+        await criarMunicipio(m);
+        viagem.naEstrada(m, () => ({ corpo: estradaReta(100) }));
+      }
+      // Os dois primeiros preparos ficam esperando o Overpass: o terceiro não cabe.
+      viagem.estado.atrasoDoOverpassMs = 1500;
+
+      const r = await gerar(token, {
+        etapas: [
+          { cidade: "Balneário Camboriú", dias: 1 },
+          { cidade: "Navegantes", dias: 1 },
+          { cidade: "Itajaí", dias: 1 },
+        ],
+        viagemDeCarro: {},
+      });
+
+      assert.equal(r.status, 200, JSON.stringify(r.corpo));
+      assert.deepEqual(
+        r.corpo.viagemDeCarro.preparos.map((p: { cidade: string; estado: string }) => [p.cidade, p.estado]),
+        [
+          ["Balneário Camboriú", "preparando"],
+          ["Navegantes", "preparando"],
+          ["Itajaí", "ocupado"],
+        ],
+      );
+      assert.ok(
+        r.corpo.avisos.includes(
+          "Ainda não há pontos em Itajaí e outras cidades estão sendo preparadas agora; tente de novo em alguns minutos.",
+        ),
+      );
+      await esperarPreparo(token, "Balneário Camboriú", "SC");
+      await esperarPreparo(token, "Navegantes", "SC");
+    });
+  });
+
   it("sem viagemDeCarro a resposta é a de hoje, com viagemDeCarro null", async () => {
     await criarPonto({ nome: "Museu de Joinville", cidade: "Joinville" });
     const { token } = await comCasa(null);

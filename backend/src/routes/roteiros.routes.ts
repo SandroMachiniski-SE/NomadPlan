@@ -14,7 +14,13 @@ import { resumirOrcamento } from "../lib/orcamento";
 import { MAX_PARTICIPANTES, nivelExigido, papelNoRoteiro, papelPermite, type Papel } from "../lib/colaboracao";
 import { criarNotificacao } from "../lib/notificacoes";
 import { enviarEmailConvite } from "../lib/email";
-import { ErroDaViagem, planejarViagemDeCarro, resolverEntradaDaViagem } from "../lib/viagemDeCarro";
+import {
+  ErroDaViagem,
+  planejarViagemDeCarro,
+  prepararDestinosSemPontos,
+  resolverEntradaDaViagem,
+  type PreparoDoDestino,
+} from "../lib/viagemDeCarro";
 import { ErroRota, SemEstrada } from "../lib/rotas";
 import {
   conferirHoteis,
@@ -413,6 +419,7 @@ roteirosRouter.post("/gerar", async (req: Request, res: Response) => {
 
     let etapas = dados.etapas;
     let viagemDeCarro = null;
+    let preparos: PreparoDoDestino[] = [];
 
     if (dados.viagemDeCarro) {
       const entrada = await resolverEntradaDaViagem(
@@ -423,6 +430,7 @@ roteirosRouter.post("/gerar", async (req: Request, res: Response) => {
       );
       const plano = await planejarViagemDeCarro(entrada);
 
+      preparos = await prepararDestinosSemPontos(entrada.etapas, req.usuario!.id);
       etapas = plano.etapasDoGerador;
       viagemDeCarro = {
         origem: entrada.origem,
@@ -437,6 +445,7 @@ roteirosRouter.post("/gerar", async (req: Request, res: Response) => {
         pernas: plano.pernas,
         combustivel: plano.combustivel,
         avisos: plano.avisos,
+        preparos,
       };
     }
 
@@ -455,7 +464,23 @@ roteirosRouter.post("/gerar", async (req: Request, res: Response) => {
 
     registrarEvento("roteiro_gerado");
 
-    return res.json({ ...recomendacao, viagemDeCarro });
+    // Destino sem pontos em preparo: o aviso do gerador ("ainda não há pontos cadastrados") dá lugar
+    // a um que diz o que está acontecendo e o que fazer.
+    const avisos =
+      preparos.length === 0
+        ? recomendacao.avisos
+        : [
+            ...recomendacao.avisos.filter((aviso) => !aviso.startsWith("Ainda não há pontos cadastrados")),
+            ...preparos
+              .filter((p) => p.estado !== "pronta")
+              .map((p) =>
+                p.estado === "preparando"
+                  ? `Ainda não há pontos em ${p.cidade}: começamos a preparar a cidade. Gere de novo em alguns minutos para ver os dias de passeio.`
+                  : `Ainda não há pontos em ${p.cidade} e outras cidades estão sendo preparadas agora; tente de novo em alguns minutos.`,
+              ),
+          ];
+
+    return res.json({ ...recomendacao, avisos, viagemDeCarro });
   } catch (error) {
     if (responderErroDaViagem(res, error)) return;
 

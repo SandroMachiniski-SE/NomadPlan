@@ -37,6 +37,8 @@ export function instalarViagemFalsa() {
     ofertas: [] as Oferta[],
     estradas: [] as { destino: Municipio; responder: () => RespostaDeMapa }[],
     overpassFora: false,
+    // Atraso das respostas do Overpass (preparos de cidade que ficam "preparando" por um tempo).
+    atrasoDoOverpassMs: 0,
   };
 
   const mapas = instalarMapasFalsos({
@@ -51,6 +53,7 @@ export function instalarViagemFalsa() {
     },
     overpass: () => ({
       ...(estado.overpassFora ? { status: 504 } : {}),
+      atrasoMs: estado.atrasoDoOverpassMs,
       corpo: {
         elements: estado.ofertas.flatMap(({ municipio, hoteis, atracoes }, i) => [
           ...Array.from({ length: hoteis }, (_, j) => ({
