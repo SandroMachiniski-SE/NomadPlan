@@ -43,6 +43,13 @@ services:
       SMTP_USER: ${SMTP_USER:-}
       SMTP_PASS: ${SMTP_PASS:-}
       EMAIL_FROM: ${EMAIL_FROM:-}
+      SMTP_SECURE: ${SMTP_SECURE:-}
+      # Opcionais: vazios, valem os padrões. Para mudar, edite o .env.prod e suba a API de novo.
+      GOOGLE_MAPS_API_KEY: ${GOOGLE_MAPS_API_KEY:-}
+      GOOGLE_PONTOS_POR_ROTEIRO: ${GOOGLE_PONTOS_POR_ROTEIRO:-8}
+      OSRM_URL: ${OSRM_URL:-}
+      OVERPASS_URL: ${OVERPASS_URL:-}
+      NOMINATIM_URL: ${NOMINATIM_URL:-}
     volumes:
       - uploads:/app/uploads
 

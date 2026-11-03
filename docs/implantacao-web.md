@@ -100,8 +100,15 @@ cd NomadPlan
 ## Parte 5. Carregar os dados e criar o administrador
 
 ```bash
-# 2.025 pontos reais (OpenStreetMap) de Joinville, Florianópolis e Blumenau
-docker exec nomadplan-api npm run osm:importar
+# Municípios do IBGE (viagem de carro e cidade de casa), pontos reais do OpenStreetMap e do Overture
+# de Joinville, Florianópolis, Blumenau, Pomerode, São Francisco do Sul e Urubici, e a curadoria
+docker exec nomadplan-api npm run dados:carregar
+```
+
+Pode ser repetido: nada é duplicado e o que a comunidade editou não é sobrescrito. Para a banca não depender dos servidores públicos de mapas, deixe a viagem de demonstração pronta no banco (leva alguns minutos):
+
+```bash
+docker exec nomadplan-api npm run viagem:preparar -- "Joinville/SC" "Brasília/DF"
 ```
 
 Depois, **cadastre-se pelo site** com o seu e-mail e promova a conta a administradora:
@@ -133,6 +140,7 @@ Saia e entre de novo no site para o novo papel valer.
 
 - **Backup diário**: ajuste o caminho e agende, como em [operacao.md](operacao.md#backup-rnf07). Copie os backups para fora do servidor.
 - **Atualizar a versão**: `git pull && docker compose --env-file .env.prod -f docker-compose.prod.yml up -d --build`. Faça um backup antes (as migrações não têm reversão automática).
+- **Chave do Google e servidores de mapas**: preencha `GOOGLE_MAPS_API_KEY` (ou troque `OSRM_URL` e `OVERPASS_URL`, se o padrão estiver fora do ar) no `.env.prod` e rode `docker compose --env-file .env.prod -f docker-compose.prod.yml up -d api`. Não é preciso mexer no código nem compilar de novo.
 - **Logs**: `docker compose --env-file .env.prod -f docker-compose.prod.yml logs -f api web`.
 - **Reiniciar tudo**: os contêineres sobem sozinhos quando o servidor reinicia (`restart: unless-stopped`).
 - **Monitoramento**: cadastre `https://api.nomadplan.blackyears.com.br/health` no UptimeRobot (gratuito) para ser avisado se cair.
