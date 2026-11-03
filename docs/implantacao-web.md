@@ -2,6 +2,8 @@
 
 Este guia leva o NomadPlan de um computador para a internet, em um servidor virtual (VPS) com Docker, usando um domínio comprado na GoDaddy e o Brevo para os e-mails. Ele complementa o [operacao.md](operacao.md) (backup, restauração e monitoramento).
 
+> **O servidor já tem outro projeto nas portas 80 e 443?** Use o [implantacao-vps-compartilhada.md](implantacao-vps-compartilhada.md), que reaproveita o proxy existente em vez de subir outro Caddy.
+
 **O que vamos montar**
 
 | Endereço | O que serve |
