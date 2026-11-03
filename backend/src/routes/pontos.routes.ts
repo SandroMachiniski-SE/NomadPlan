@@ -318,7 +318,7 @@ pontosRouter.post(
 
         if (esperando >= MAX_PONTOS_ESPERANDO_REVISAO) {
           return res.status(429).json({
-            erro: `Você já tem ${MAX_PONTOS_ESPERANDO_REVISAO} lugares esperando revisão. Aguarde a moderação ou apague um rascunho.`,
+            erro: `Você já tem ${MAX_PONTOS_ESPERANDO_REVISAO} lugares esperando revisão. Envie seus rascunhos para revisão ou aguarde a moderação.`,
           });
         }
       }

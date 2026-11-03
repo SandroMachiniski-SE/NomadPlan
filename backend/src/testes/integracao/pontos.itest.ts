@@ -107,7 +107,7 @@ describe("pontos turísticos: cadastro, publicação e moderação", () => {
       const r = await api("POST", "/pontos", { token, json: PONTO_VALIDO });
 
       assert.equal(r.status, 429);
-      assert.equal(r.corpo.erro, "Você já tem 20 lugares esperando revisão. Aguarde a moderação ou apague um rascunho.");
+      assert.equal(r.corpo.erro, "Você já tem 20 lugares esperando revisão. Envie seus rascunhos para revisão ou aguarde a moderação.");
     });
 
     it("moderador não tem limite de lugares esperando revisão", async () => {
@@ -126,6 +126,24 @@ describe("pontos turísticos: cadastro, publicação e moderação", () => {
 
       assert.equal(r.status, 404);
       assert.equal(r.corpo.erro, "Ponto turístico não encontrado.");
+    });
+
+    it("nem como pernoite ao salvar o roteiro de uma vez, e id inexistente dá 404, não 500", async () => {
+      const { usuario, token } = await criarUsuario();
+      const emRevisao = await criarPonto({ nome: "Hotel em revisão", idResponsavel: usuario.id, status: StatusPonto.PENDENTE_VERIFICACAO });
+
+      const comPendente = await api("POST", "/roteiros", {
+        token,
+        json: { nome: "Com pernoite", pontos: [{ idPonto: emRevisao.id, dia: 1, pernoite: true }] },
+      });
+      const comInexistente = await api("POST", "/roteiros", {
+        token,
+        json: { nome: "Com pernoite", pontos: [{ idPonto: 999_999, dia: 1, pernoite: true }] },
+      });
+
+      assert.equal(comPendente.status, 404);
+      assert.equal(comInexistente.status, 404);
+      assert.equal(await prisma.roteiro.count({ where: { idUsuario: usuario.id } }), 0);
     });
 
     it("cria como rascunho, com o usuário como responsável, e registra no log", async () => {

@@ -88,4 +88,33 @@ test.describe("lugar novo marcado no mapa da busca", () => {
     await expect(page.getByLabel("Longitude")).toHaveValue("");
     await expect(page.getByText("Posição marcada no mapa; confira antes de salvar.")).toHaveCount(0);
   });
+
+  test("fechar o balão de um lugar clicando no mapa não abre o de cadastro", async ({ page }) => {
+    await cadastrar(page);
+    await page.goto("/");
+    await page.getByLabel("Buscar por nome ou descrição").fill("Museu Nacional da Imigração E2E");
+    await page.getByRole("button", { name: "Buscar", exact: true }).click();
+    await page.locator(".leaflet-marker-icon").first().click();
+    await expect(page.locator(".leaflet-popup")).toBeVisible();
+
+    await clicarLugarVazio(page);
+    await page.waitForTimeout(600);
+    await expect(page.getByRole("link", { name: "Cadastrar um lugar aqui" })).toHaveCount(0);
+
+    // Com nada aberto, o clique seguinte num lugar vazio oferece o cadastro.
+    await clicarLugarVazio(page);
+    await expect(page.getByRole("link", { name: "Cadastrar um lugar aqui" })).toBeVisible();
+  });
+
+  test("duplo clique para aproximar não abre o balão de cadastro", async ({ page }) => {
+    await cadastrar(page);
+    await buscarJoinville(page);
+    const mapa = page.locator(".leaflet-container").first();
+    const caixa = (await mapa.boundingBox())!;
+
+    await mapa.dblclick({ position: { x: caixa.width * 0.15, y: caixa.height * 0.8 } });
+    await page.waitForTimeout(600);
+
+    await expect(page.getByRole("link", { name: "Cadastrar um lugar aqui" })).toHaveCount(0);
+  });
 });

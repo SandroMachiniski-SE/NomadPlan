@@ -58,6 +58,8 @@ function GerarRoteiro() {
   const [gerando, setGerando] = useState(false);
   const [erro, setErro] = useState<string | null>(null);
   const [resultado, setResultado] = useState<RespostaRecomendacao | null>(null);
+  // Cada geração recria os cartões de preparo: o estado de uma geração anterior não fica na tela.
+  const [geracao, setGeracao] = useState(0);
 
   const [viagem, setViagem] = useState<OpcoesViagemDeCarro>({
     ativa: false,
@@ -218,6 +220,7 @@ function GerarRoteiro() {
       });
 
       setResultado(resposta.data);
+      setGeracao((atual) => atual + 1);
 
       if (resposta.data.pontos.length === 0 && !resposta.data.viagemDeCarro?.pernas.length) {
         setErro(
@@ -515,7 +518,7 @@ function GerarRoteiro() {
 
           {planejada?.preparos.map((p) => (
             <PreparoDoDestino
-              key={`${p.cidade}-${p.uf}-${p.estado}`}
+              key={`${geracao}-${p.cidade}-${p.uf}`}
               cidade={p.cidade}
               uf={p.uf}
               estadoInicial={p.estado}

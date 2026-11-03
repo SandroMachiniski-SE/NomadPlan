@@ -1,11 +1,13 @@
 import { useEffect, useState } from "react";
+import { Link } from "react-router-dom";
 import Icone from "../Icone";
 import { consultarPreparoDaCidade, type PreparoDaCidade } from "../../services/cidades";
+import type { PreparoDoDestinoPlanejado } from "../../types/viagem";
 
 interface PreparoDoDestinoProps {
   cidade: string;
   uf: string;
-  estadoInicial: "preparando" | "pronta" | "ocupado";
+  estadoInicial: PreparoDoDestinoPlanejado["estado"];
   /** Gera a viagem de novo (com as mesmas escolhas) quando a cidade fica pronta. */
   aoGerarDeNovo: () => void;
 }
@@ -15,7 +17,7 @@ const INTERVALO_DE_CONSULTA_MS = 3000;
 /** Andamento do preparo de uma cidade de destino que ainda não tinha pontos. */
 function PreparoDoDestino({ cidade, uf, estadoInicial, aoGerarDeNovo }: PreparoDoDestinoProps) {
   const [preparo, setPreparo] = useState<PreparoDaCidade | null>(
-    estadoInicial === "ocupado" ? null : { estado: estadoInicial },
+    estadoInicial === "ocupado" || estadoInicial === "poucos" ? null : { estado: estadoInicial },
   );
 
   useEffect(() => {
@@ -46,7 +48,12 @@ function PreparoDoDestino({ cidade, uf, estadoInicial, aoGerarDeNovo }: PreparoD
 
   return (
     <div className="card preparo-destino" role="status">
-      {preparo === null ? (
+      {estadoInicial === "poucos" ? (
+        <p>
+          O OpenStreetMap tem poucos lugares em {cidade}. <Link to="/">Cadastre os que você conhece</Link> pelo mapa
+          da busca.
+        </p>
+      ) : preparo === null ? (
         <>
           <p>Outras cidades estão sendo preparadas agora; {cidade} fica para daqui a pouco.</p>
           <button type="button" className="btn btn--outline btn--sm" onClick={aoGerarDeNovo}>

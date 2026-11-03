@@ -345,17 +345,53 @@ function BalaoDoPonto({ ponto, explorando }: { ponto: PontoNoMapa; explorando: b
 // Cliques em pinos, balões, controles e no botão "Buscar nesta área" não contam como lugar vazio.
 const FORA_DO_LUGAR_VAZIO = ".leaflet-marker-icon, .leaflet-popup, .leaflet-control, .mapa-busca-area";
 
+// Espera para abrir o balão: um duplo clique (aproximar o mapa) chega antes disso e cancela.
+const ESPERA_DO_CLIQUE_MS = 250;
+
 /** Balão "Cadastrar um lugar aqui" no ponto clicado do mapa. */
 function CadastroNoMapa({ autenticado }: { autenticado: boolean }) {
   const [posicao, setPosicao] = useState<L.LatLng | null>(null);
+  const baloesAbertos = useRef(0);
+  const fechandoBalao = useRef(false);
+  const relogio = useRef<ReturnType<typeof setTimeout> | undefined>(undefined);
+
+  const mapa = useMap();
+
+  // Na captura, o clique chega antes de o Leaflet fechar o balão aberto: o clique que só fecha
+  // um balão não abre outro.
+  useEffect(() => {
+    const conteiner = mapa.getContainer();
+    const anotar = () => {
+      fechandoBalao.current = baloesAbertos.current > 0;
+    };
+
+    conteiner.addEventListener("click", anotar, true);
+
+    return () => {
+      conteiner.removeEventListener("click", anotar, true);
+      clearTimeout(relogio.current);
+    };
+  }, [mapa]);
 
   useMapEvents({
+    popupopen: () => {
+      baloesAbertos.current += 1;
+    },
+    popupclose: () => {
+      baloesAbertos.current = Math.max(0, baloesAbertos.current - 1);
+    },
     click: (evento) => {
       const alvo = evento.originalEvent.target as HTMLElement | null;
 
-      if (alvo?.closest(FORA_DO_LUGAR_VAZIO)) return;
+      clearTimeout(relogio.current);
+      if (fechandoBalao.current || alvo?.closest(FORA_DO_LUGAR_VAZIO)) return;
 
-      setPosicao(evento.latlng.wrap());
+      const lugar = evento.latlng.wrap();
+
+      relogio.current = setTimeout(() => setPosicao(lugar), ESPERA_DO_CLIQUE_MS);
+    },
+    dblclick: () => {
+      clearTimeout(relogio.current);
     },
   });
 
