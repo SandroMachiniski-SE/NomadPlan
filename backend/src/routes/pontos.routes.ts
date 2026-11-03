@@ -1504,6 +1504,10 @@ pontosRouter.post(
         });
       }
 
+      if (req.usuario!.tipoConta !== TipoConta.NEGOCIO && req.usuario!.tipoConta !== TipoConta.GESTOR) {
+        return res.status(403).json({ erro: "Só contas de negócio ou de gestor podem pedir o selo de verificação." });
+      }
+
       if (ponto.status !== StatusPonto.PUBLICADO) {
         return res.status(409).json({ erro: "Apenas pontos publicados podem solicitar verificação." });
       }

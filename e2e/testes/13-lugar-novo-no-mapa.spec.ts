@@ -1,5 +1,5 @@
 import { expect, test, type Page } from "@playwright/test";
-import { cadastrar, entrarComo, sair } from "../suporte/ajudantes";
+import { cadastrar, CONTAS_E2E, entrar, entrarComo, SENHA_E2E, sair } from "../suporte/ajudantes";
 
 async function buscarJoinville(page: Page) {
   await page.goto("/");
@@ -21,7 +21,7 @@ test.describe("lugar novo marcado no mapa da busca", () => {
   test("visitante marca um lugar no mapa, envia para revisão e a moderadora publica", async ({ page }) => {
     const nome = `Mirante Novo ${Date.now()}`;
 
-    await cadastrar(page);
+    const email = await cadastrar(page);
     await buscarJoinville(page);
     await clicarLugarVazio(page);
     await page.getByRole("link", { name: "Cadastrar um lugar aqui" }).click();
@@ -37,6 +37,9 @@ test.describe("lugar novo marcado no mapa da busca", () => {
     await page.getByLabel("Horário de funcionamento *").fill("Todos os dias, 24h");
     await page.getByRole("button", { name: "Cadastrar ponto" }).click();
     await expect(page).toHaveURL(/\/pontos\/\d+\/editar$/);
+    const id = page.url().match(/\/pontos\/(\d+)\/editar$/)![1];
+    // Já salvo, a dica sobre a posição marcada no mapa sai da tela.
+    await expect(page.getByText("Posição marcada no mapa; confira antes de salvar.")).toHaveCount(0);
     await page.getByRole("button", { name: "Enviar para publicação" }).click();
     await expect(page.getByRole("button", { name: "Enviar para publicação" })).toHaveCount(0);
 
@@ -52,6 +55,13 @@ test.describe("lugar novo marcado no mapa da busca", () => {
     await page.getByLabel("Buscar por nome ou descrição").fill(nome);
     await page.getByRole("button", { name: "Buscar", exact: true }).click();
     await expect(page.getByRole("heading", { name: nome })).toBeVisible();
+
+    // Quem cadastrou um lugar da comunidade não vê o pedido de selo (coisa de dono) e pode sugerir correções.
+    await entrar(page, email);
+    await expect(page.getByRole("button", { name: "Sair" })).toBeVisible();
+    await page.goto(`/pontos/${id}`);
+    await expect(page.getByRole("heading", { name: "Dados desatualizados?" })).toBeVisible();
+    await expect(page.getByRole("button", { name: "Solicitar selo de verificação" })).toHaveCount(0);
   });
 
   test("todas as contas veem Meus pontos no menu", async ({ page }) => {
@@ -87,6 +97,43 @@ test.describe("lugar novo marcado no mapa da busca", () => {
     await expect(page.getByLabel("Latitude")).toHaveValue("");
     await expect(page.getByLabel("Longitude")).toHaveValue("");
     await expect(page.getByText("Posição marcada no mapa; confira antes de salvar.")).toHaveCount(0);
+  });
+
+  test("coordenadas vazias na URL deixam os campos vazios", async ({ page }) => {
+    await cadastrar(page);
+
+    await page.goto("/pontos/novo?latitude=&longitude=");
+
+    await expect(page.getByLabel("Latitude")).toHaveValue("");
+    await expect(page.getByLabel("Longitude")).toHaveValue("");
+    await expect(page.getByText("Posição marcada no mapa; confira antes de salvar.")).toHaveCount(0);
+  });
+
+  test("entrar pelo balão volta para o cadastro no ponto marcado", async ({ page }) => {
+    await buscarJoinville(page);
+    await clicarLugarVazio(page);
+    await page.locator(".leaflet-popup").getByRole("link", { name: "Entre" }).click();
+
+    await page.getByLabel("E-mail").fill(CONTAS_E2E.moderador.email);
+    await page.getByLabel("Senha").fill(SENHA_E2E);
+    await page.getByRole("button", { name: "Entrar" }).click();
+
+    await expect(page).toHaveURL(/\/pontos\/novo\?latitude=-?\d+\.\d+&longitude=-?\d+\.\d+$/);
+    await expect(page.getByLabel("Latitude")).not.toHaveValue("");
+  });
+
+  test("o balão que abre perto da borda não conta como mexer no mapa", async ({ page }) => {
+    await buscarJoinville(page);
+    await expect(page.getByRole("button", { name: "Mova o mapa para buscar outra área" })).toBeVisible();
+    const mapa = page.locator(".leaflet-container").first();
+    const caixa = (await mapa.boundingBox())!;
+
+    // Perto do topo, o balão só cabe se o mapa descer um pouco.
+    await mapa.click({ position: { x: caixa.width * 0.9, y: 12 } });
+    await expect(page.locator(".leaflet-popup")).toBeVisible();
+    await page.waitForTimeout(800);
+
+    await expect(page.getByRole("button", { name: "Mova o mapa para buscar outra área" })).toBeVisible();
   });
 
   test("fechar o balão de um lugar clicando no mapa não abre o de cadastro", async ({ page }) => {

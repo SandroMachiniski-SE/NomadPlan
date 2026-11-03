@@ -525,6 +525,7 @@ function GerarRoteiro() {
               uf={p.uf}
               estadoInicial={p.estado}
               aoGerarDeNovo={() => gerar(escolhas, decisoes)}
+              desativado={gerando}
             />
           ))}
 

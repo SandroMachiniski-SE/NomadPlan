@@ -65,8 +65,14 @@ interface PossivelDuplicado {
 
 /** Posição vinda do mapa da busca ("?latitude=&longitude="); inválida ou ausente vira null. */
 function posicaoDaUrl(parametros: URLSearchParams): { latitude: number; longitude: number } | null {
-  const latitude = Number(parametros.get("latitude") ?? NaN);
-  const longitude = Number(parametros.get("longitude") ?? NaN);
+  const textoLatitude = parametros.get("latitude")?.trim();
+  const textoLongitude = parametros.get("longitude")?.trim();
+
+  // Vazio viraria 0 (Number("") === 0), um ponto no meio do oceano.
+  if (!textoLatitude || !textoLongitude) return null;
+
+  const latitude = Number(textoLatitude);
+  const longitude = Number(textoLongitude);
 
   if (!Number.isFinite(latitude) || !Number.isFinite(longitude)) return null;
   if (Math.abs(latitude) > 90 || Math.abs(longitude) > 180) return null;
@@ -430,7 +436,7 @@ function PontoFormulario() {
 
         <h2 className="form-titulo">Localização no mapa</h2>
 
-        {posicaoDoMapa && <p className="field__hint">Posição marcada no mapa; confira antes de salvar.</p>}
+        {posicaoDoMapa && !emEdicao && <p className="field__hint">Posição marcada no mapa; confira antes de salvar.</p>}
 
         <div className="form-grid">
           <label className="field">

@@ -10,15 +10,19 @@ interface PreparoDoDestinoProps {
   estadoInicial: PreparoDoDestinoPlanejado["estado"];
   /** Gera a viagem de novo (com as mesmas escolhas) quando a cidade fica pronta. */
   aoGerarDeNovo: () => void;
+  /** Enquanto uma geração está em andamento, os botões ficam desligados. */
+  desativado?: boolean;
 }
 
 const INTERVALO_DE_CONSULTA_MS = 3000;
 
 /** Andamento do preparo de uma cidade de destino que ainda não tinha pontos. */
-function PreparoDoDestino({ cidade, uf, estadoInicial, aoGerarDeNovo }: PreparoDoDestinoProps) {
+function PreparoDoDestino({ cidade, uf, estadoInicial, aoGerarDeNovo, desativado = false }: PreparoDoDestinoProps) {
   const [preparo, setPreparo] = useState<PreparoDaCidade | null>(
     estadoInicial === "ocupado" || estadoInicial === "poucos" ? null : { estado: estadoInicial },
   );
+  // O servidor reiniciou no meio do preparo (o andamento fica só na memória dele): parar de consultar.
+  const [perdido, setPerdido] = useState(false);
 
   useEffect(() => {
     if (estadoInicial !== "preparando") return;
@@ -33,8 +37,10 @@ function PreparoDoDestino({ cidade, uf, estadoInicial, aoGerarDeNovo }: PreparoD
         if (!ativo) return;
         setPreparo(atual);
         if (atual.estado === "preparando") relogio = setTimeout(consultar, INTERVALO_DE_CONSULTA_MS);
-      } catch {
-        if (ativo) relogio = setTimeout(consultar, INTERVALO_DE_CONSULTA_MS);
+      } catch (err) {
+        if (!ativo) return;
+        if ((err as { response?: { status?: number } }).response?.status === 404) setPerdido(true);
+        else relogio = setTimeout(consultar, INTERVALO_DE_CONSULTA_MS);
       }
     }
 
@@ -48,7 +54,14 @@ function PreparoDoDestino({ cidade, uf, estadoInicial, aoGerarDeNovo }: PreparoD
 
   return (
     <div className="card preparo-destino" role="status">
-      {estadoInicial === "poucos" ? (
+      {perdido ? (
+        <>
+          <p>Perdemos o andamento do preparo de {cidade}. Gere de novo para conferir como a cidade está.</p>
+          <button type="button" className="btn btn--outline btn--sm" onClick={aoGerarDeNovo} disabled={desativado}>
+            Gerar de novo
+          </button>
+        </>
+      ) : estadoInicial === "poucos" ? (
         <p>
           O OpenStreetMap tem poucos lugares em {cidade}. <Link to="/">Cadastre os que você conhece</Link> pelo mapa
           da busca.
@@ -56,7 +69,7 @@ function PreparoDoDestino({ cidade, uf, estadoInicial, aoGerarDeNovo }: PreparoD
       ) : preparo === null ? (
         <>
           <p>Outras cidades estão sendo preparadas agora; {cidade} fica para daqui a pouco.</p>
-          <button type="button" className="btn btn--outline btn--sm" onClick={aoGerarDeNovo}>
+          <button type="button" className="btn btn--outline btn--sm" onClick={aoGerarDeNovo} disabled={desativado}>
             Tentar de novo
           </button>
         </>
@@ -69,7 +82,7 @@ function PreparoDoDestino({ cidade, uf, estadoInicial, aoGerarDeNovo }: PreparoD
           <p>
             <Icone nome="check" /> {cidade} está pronta.
           </p>
-          <button type="button" className="btn btn--primary btn--sm" onClick={aoGerarDeNovo}>
+          <button type="button" className="btn btn--primary btn--sm" onClick={aoGerarDeNovo} disabled={desativado}>
             Gerar de novo
           </button>
         </>

@@ -265,7 +265,10 @@ function PontoDetalhes() {
   }
 
   const ehResponsavel = Boolean(usuario && ponto && usuario.id === ponto.idResponsavel);
-  const podeSugerir = Boolean(autenticado && !ehResponsavel && ponto?.status === "PUBLICADO");
+  // O selo é coisa de dono (negócio ou gestão pública). Quem cadastrou um lugar da comunidade, como
+  // um mirante, não pede selo e sugere correções como qualquer pessoa.
+  const ehDonoDoLugar = ehResponsavel && (usuario?.tipoConta === "NEGOCIO" || usuario?.tipoConta === "GESTOR");
+  const podeSugerir = Boolean(autenticado && !ehDonoDoLugar && ponto?.status === "PUBLICADO");
 
   /** Leva até o cartão "Adicionar a um roteiro" e já deixa a lista de roteiros em foco. */
   function aoIrParaRoteiro() {
@@ -554,7 +557,7 @@ function PontoDetalhes() {
                 </section>
               )}
 
-              {ehResponsavel && ponto.status === "PUBLICADO" && !ponto.seloVerificado && (
+              {ehDonoDoLugar && ponto.status === "PUBLICADO" && !ponto.seloVerificado && (
                 <button
                   type="button"
                   className="btn btn--outline btn--block"

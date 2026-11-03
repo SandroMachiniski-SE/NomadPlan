@@ -229,4 +229,34 @@ test.describe("viagem de carro", () => {
     await expect(page.locator(".preparo-destino", { hasText: "Itajaí" })).toContainText("Não foi possível preparar Itajaí");
     await expect(page.locator(".preparo-destino", { hasText: "Preparando" })).toHaveCount(0);
   });
+
+  test("preparo que o servidor esqueceu (reinício) para de consultar e oferece gerar de novo", async ({ page }) => {
+    await cadastrarEmJoinville(page);
+    // A geração disse "preparando" e depois o servidor reiniciou: o andamento passa a dar 404.
+    await page.route("**/roteiros/gerar", async (rota) => {
+      if (rota.request().method() !== "POST") return rota.continue();
+
+      const resposta = await rota.fetch();
+      const corpo = await resposta.json();
+      corpo.viagemDeCarro.preparos = [{ cidade: "Itajaí", uf: "SC", estado: "preparando", pontos: 0 }];
+      await rota.fulfill({ response: resposta, json: corpo });
+    });
+    await page.route(
+      (url) => url.pathname.endsWith("/cidades/preparar"),
+      (rota) => rota.fulfill({ status: 404, json: { erro: "Esta cidade não está sendo preparada." } }),
+    );
+    await gerarDeCarro(page, "Itajaí", 1);
+
+    const cartao = page.locator(".preparo-destino", { hasText: "Itajaí" });
+    await expect(cartao).toContainText("Perdemos o andamento do preparo de Itajaí");
+
+    // Enquanto gera de novo, o botão do cartão fica desligado.
+    await page.unroute("**/roteiros/gerar");
+    await page.route("**/roteiros/gerar", async (rota) => {
+      if (rota.request().method() === "POST") await new Promise((resolver) => setTimeout(resolver, 1500));
+      await rota.continue();
+    });
+    await cartao.getByRole("button", { name: "Gerar de novo" }).click();
+    await expect(cartao.getByRole("button", { name: "Gerar de novo" })).toBeDisabled();
+  });
 });

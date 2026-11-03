@@ -595,6 +595,16 @@ describe("pontos turísticos: cadastro, publicação e moderação", () => {
       assert.equal((await api("POST", `/pontos/${publicado.id}/solicitar-verificacao`, { token: dono.token, json: {} })).status, 409);
     });
 
+    it("quem cadastrou um lugar da comunidade com conta de visitante não pede o selo", async () => {
+      const autor = await criarUsuario();
+      const lugar = await criarPonto({ idResponsavel: autor.usuario.id });
+
+      const r = await api("POST", `/pontos/${lugar.id}/solicitar-verificacao`, { token: autor.token, json: {} });
+
+      assert.equal(r.status, 403);
+      assert.equal(r.corpo.erro, "Só contas de negócio ou de gestor podem pedir o selo de verificação.");
+    });
+
     it("aprovar concede o selo sem republicar um ponto que voltou a rascunho", async () => {
       const dono = await criarUsuario({ tipoConta: TipoConta.NEGOCIO });
       const moderador = await criarUsuario({ tipoConta: TipoConta.MODERADOR });

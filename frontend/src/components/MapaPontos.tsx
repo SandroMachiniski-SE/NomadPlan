@@ -232,14 +232,21 @@ function ControleDeBusca({
   const mapa = useMap();
   const [movido, setMovido] = useState(!jaMostraPontos);
   const [area, setArea] = useState<AreaDoMapa>(() => areaVisivel(mapa));
+  // Um balão que abre perto da borda move o mapa para caber: não é a pessoa mexendo no mapa.
+  const movidoPeloBalao = useRef(false);
 
   useMapEvents({
+    autopanstart: () => {
+      movidoPeloBalao.current = true;
+    },
     moveend: () => {
       setArea(areaVisivel(mapa));
 
-      if (!ignorarMovimentoRef.current) {
+      if (!ignorarMovimentoRef.current && !movidoPeloBalao.current) {
         setMovido(true);
       }
+
+      movidoPeloBalao.current = false;
     },
   });
 
@@ -405,7 +412,10 @@ function CadastroNoMapa({ autenticado }: { autenticado: boolean }) {
         <Link to={destino}>Cadastrar um lugar aqui</Link>
       ) : (
         <>
-          <Link to="/login">Entre</Link> para cadastrar um lugar aqui
+          <Link to="/login" state={{ destino }}>
+            Entre
+          </Link>{" "}
+          para cadastrar um lugar aqui
         </>
       )}
     </Popup>
