@@ -1,0 +1,23 @@
+# Variante para quando OUTRO Caddy (ou proxy) já ocupa as portas 80 e 443 do servidor.
+# Aqui o site é servido só em HTTP, dentro da rede do Docker, sem publicar porta nenhuma:
+# o HTTPS e os certificados ficam com o proxy existente (veja docs/implantacao-vps-compartilhada.md).
+{
+	auto_https off
+}
+
+:80 {
+	root * /srv
+	encode zstd gzip
+	# Aplicação de página única: qualquer rota desconhecida devolve o index.html.
+	try_files {path} /index.html
+	file_server
+
+	header {
+		X-Content-Type-Options nosniff
+		X-Frame-Options DENY
+		Referrer-Policy strict-origin-when-cross-origin
+		Strict-Transport-Security "max-age=31536000"
+		Permissions-Policy "camera=(), microphone=(), geolocation=(self)"
+		Content-Security-Policy "frame-ancestors 'none'; object-src 'none'; base-uri 'self'"
+	}
+}

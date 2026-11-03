@@ -1,0 +1,27 @@
+# Complemento do docker-compose.prod.yml para um servidor que JÁ tem outro proxy nas portas 80 e 443.
+# Não publica nenhuma porta, serve o site em HTTP interno e limita a memória, para não atrapalhar
+# o que já roda ali. Passo a passo em docs/implantacao-vps-compartilhada.md.
+#
+#   docker compose -p nomadplan --env-file .env.prod \
+#     -f docker-compose.prod.yml -f docker-compose.compartilhado.yml up -d --build
+#
+# Precisa do Docker Compose 2.24 ou mais novo (por causa do "!reset").
+
+services:
+  postgres:
+    mem_limit: 768m
+
+  api:
+    mem_limit: 768m
+
+  web:
+    mem_limit: 128m
+    ports: !reset []
+    volumes: !reset []
+    configs:
+      - source: caddyfile_interno
+        target: /etc/caddy/Caddyfile
+
+configs:
+  caddyfile_interno:
+    file: ./deploy/Caddyfile.interno
