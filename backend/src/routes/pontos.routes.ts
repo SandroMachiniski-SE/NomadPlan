@@ -36,12 +36,9 @@ import { MENSAGEM_URL_HTTP, normalizarUrlHttp } from "../lib/urlHttp";
 
 const pontosRouter = Router();
 
-const TIPOS_CADASTRADORES = [
-  TipoConta.NEGOCIO,
-  TipoConta.GESTOR,
-  TipoConta.MODERADOR,
-  TipoConta.ADMIN,
-] as const;
+// Qualquer conta cadastra lugares (que passam pela moderação), com um limite de lugares ainda não
+// publicados por pessoa contra abuso; moderadores e administradores não têm limite.
+const MAX_PONTOS_ESPERANDO_REVISAO = 20;
 
 const TIPOS_MODERADORES = [TipoConta.MODERADOR, TipoConta.ADMIN] as const;
 const TIPOS_EXPORTADORES = [TipoConta.GESTOR, TipoConta.MODERADOR, TipoConta.ADMIN] as const;
@@ -298,7 +295,6 @@ pontosRouter.get(
 pontosRouter.post(
   "/",
   autenticar,
-  autorizar(...TIPOS_CADASTRADORES),
   async (req: Request, res: Response) => {
     try {
       const resultado = criarPontoSchema.safeParse(req.body);
@@ -311,6 +307,21 @@ pontosRouter.post(
       }
 
       const dados = resultado.data;
+
+      if (!(TIPOS_MODERADORES as readonly TipoConta[]).includes(req.usuario!.tipoConta)) {
+        const esperando = await prisma.pontoTuristico.count({
+          where: {
+            idResponsavel: req.usuario!.id,
+            status: { in: [StatusPonto.RASCUNHO, StatusPonto.PENDENTE_VERIFICACAO] },
+          },
+        });
+
+        if (esperando >= MAX_PONTOS_ESPERANDO_REVISAO) {
+          return res.status(429).json({
+            erro: `Você já tem ${MAX_PONTOS_ESPERANDO_REVISAO} lugares esperando revisão. Aguarde a moderação ou apague um rascunho.`,
+          });
+        }
+      }
 
       if (!dados.confirmarDuplicidade) {
         const duplicados = filtrarDuplicados(
