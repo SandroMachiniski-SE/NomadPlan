@@ -90,3 +90,22 @@ arquivos), pelo mesmo motivo: foi adicionada antes do `.gitignore` existir.
 Não é um problema de segurança, mas infla bastante o repositório. Vale uma
 limpeza (`git rm -r --cached backend/node_modules`) em uma contribuição
 futura.
+
+## Situação atual e o que falta decidir
+
+Já resolvido:
+
+- `backend/.env` saiu do índice no commit `29eba76` e está no `.gitignore` (`git ls-files backend/.env` não lista nada).
+- A API recusa iniciar em produção com `JWT_SECRET` curto ou igual ao valor de exemplo (`validarSegredoJwt`, em `backend/src/lib/auth.ts`).
+- `deploy/env.prod.exemplo` traz `POSTGRES_PASSWORD` e `JWT_SECRET` **vazios**, e os guias de implantação mandam gerar cada um com `openssl rand -hex 32`, então nenhum valor do histórico precisa ir para o servidor.
+
+Antes de publicar, confirme no servidor que nenhum segredo do histórico foi reaproveitado:
+
+```bash
+grep -E 'dev-only-change-me|nomadplan_dev' .env.prod && echo "TROQUE ESTES VALORES" || echo "ok: nenhum valor do histórico em uso"
+```
+
+Falta uma decisão do dono do repositório (Sandro), a registrar aqui com a data:
+
+- [ ] **Aceitar o risco**, já que os valores do histórico são só de desenvolvimento e não serão usados em produção (o GitHub guarda os commits antigos em `refs/pull/*` mesmo depois de uma reescrita, então a limpeza não elimina a exposição), **ou**
+- [ ] **Limpar o histórico** com os passos 3 e 4 acima, avisando todos os colaboradores antes do `push --force`.
