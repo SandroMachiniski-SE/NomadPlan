@@ -19,6 +19,10 @@
 		# Restrições que não afetam o site: sem embutir em outras páginas, sem plugins,
 		# sem trocar o endereço-base dos links.
 		Content-Security-Policy "frame-ancestors 'none'; object-src 'none'; base-uri 'self'"
+		# Política completa em modo só-relatório: o navegador avisa no console sobre o que ela bloquearia,
+		# mas não bloqueia nada. Depois de navegar pelo site sem avisos (mapa, foto, roteiro, perfil), troque
+		# o nome do cabeçalho por Content-Security-Policy (docs/seguranca.md, "Riscos aceitos").
+		Content-Security-Policy-Report-Only "default-src 'self'; script-src 'self'; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src https://fonts.gstatic.com; img-src 'self' data: blob: https://*.tile.openstreetmap.org https://upload.wikimedia.org https://commons.wikimedia.org https://{$DOMINIO_API} https://*.googleusercontent.com https://places.googleapis.com; connect-src 'self' https://{$DOMINIO_API}; frame-ancestors 'none'; object-src 'none'; base-uri 'self'"
 	}
 }
 
