@@ -45,11 +45,15 @@ jobs:
       - run: npm ci
       - run: npm run typecheck
       - run: npm run build
+      # Auditoria das dependências de produção. Hoje restam 3 altas na ferramenta de linha de comando do
+      # Prisma (riscos aceitos em docs/seguranca.md): o passo avisa sem derrubar o build.
+      - run: npm audit --omit=dev --audit-level=high
+        continue-on-error: true
       # Testes unitários e de integração (banco real), com meta de 60% de linhas (RNF).
       - run: npm run test:cobertura
 
   frontend:
-    name: Frontend (lint e build)
+    name: Frontend (lint, testes e build)
     runs-on: ubuntu-latest
     defaults:
       run:
@@ -63,7 +67,10 @@ jobs:
           cache-dependency-path: frontend/package-lock.json
       - run: npm ci
       - run: npm run lint
+      - run: npm test
       - run: npm run build
+      # Só as dependências de produção: os alertas que restam são de ferramentas de desenvolvimento.
+      - run: npm audit --omit=dev --audit-level=moderate
 
   e2e:
     name: Ponta a ponta (Playwright)
