@@ -2,7 +2,17 @@
 
 # NomadPlan
 
-Smart tourism platform that centralizes a city's tourism inventory (attractions, restaurants, lodging and events) and suggests personalized itineraries for each user, respecting opening hours, distances, interests and accessibility needs.
+Academic full-stack travel itinerary project built with TypeScript, React, Node.js and PostgreSQL/PostGIS.
+
+The project combines a travel-planning interface, a REST API and geospatial data. The repository includes automated tests, CI configuration, Docker setup and technical documentation.
+
+## What to inspect first
+
+- API and data model: how places, users and itineraries are represented.
+- Authentication: JWT, rate limiting and single-use password reset links.
+- Quality checks: automated tests, Playwright scenarios and CI configuration.
+
+The sections below explain features, setup, tests and technical decisions.
 
 ## ✨ Features
 
