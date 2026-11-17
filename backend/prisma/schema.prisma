@@ -99,6 +99,7 @@ model Municipio {
   uf              String    @db.Char(2)
   latitude        Float
   longitude       Float
+  populacao       Int?
   resumoOsm       Json?     @map("resumo_osm")
   resumoEm        DateTime? @map("resumo_em")
   geom            Unsupported("geography(Point,4326)")?

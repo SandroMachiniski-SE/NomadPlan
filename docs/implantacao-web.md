@@ -105,7 +105,7 @@ cd NomadPlan
 docker exec nomadplan-api npm run dados:carregar
 ```
 
-Pode ser repetido: nada é duplicado e o que a comunidade editou não é sobrescrito. Para a banca não depender dos servidores públicos de mapas, deixe a viagem de demonstração pronta no banco (leva alguns minutos):
+Pode ser repetido: nada é duplicado e o que a comunidade editou não é sobrescrito. Se a base veio de um backup antigo, rode `docker exec nomadplan-api npm run municipios:importar` para trazer a população dos municípios (IBGE). Opcional, de madrugada (leva horas): `docker exec nomadplan-api npm run viagem:aquecer` busca de antemão os hotéis das cidades do Sul e do Sudeste. Para a banca não depender dos servidores públicos de mapas, deixe a viagem de demonstração pronta no banco (leva alguns minutos):
 
 ```bash
 docker exec nomadplan-api npm run viagem:preparar -- "Joinville/SC" "Brasília/DF"

@@ -66,6 +66,8 @@ export interface CidadeDePernoite {
   distanciaDoAlvoKm: number;
   totalHospedagens: number | null;
   totalAtracoes: number | null;
+  /** Habitantes (IBGE): o porte da cidade enquanto os hotéis não foram contados. */
+  populacao: number | null;
   hospedagens: { idOsm: string; nome: string; tipo: string }[];
   atracoes: string[];
   aDefinir: boolean;
@@ -338,6 +340,7 @@ function cidadeDePernoite(c: CandidatoDePernoite, kmAlvo: number, aDefinir: bool
     distanciaDoAlvoKm: umaCasa(Math.abs(c.km - kmAlvo)),
     totalHospedagens: resumo?.totalHospedagens ?? null,
     totalAtracoes: resumo?.totalAtracoes ?? null,
+    populacao: c.populacao ?? null,
     hospedagens: resumo ? resumo.hospedagens.map(({ idOsm, nome, tipo }) => ({ idOsm, nome, tipo })) : [],
     atracoes: resumo ? resumo.atracoes.slice(0, MAX_ATRACOES_NA_RESPOSTA).map((a) => a.nome) : [],
     aDefinir,
@@ -353,6 +356,7 @@ function pernoiteNoKm(km: number): CidadeDePernoite {
     distanciaDoAlvoKm: 0,
     totalHospedagens: null,
     totalAtracoes: null,
+    populacao: null,
     hospedagens: [],
     atracoes: [],
     aDefinir: true,

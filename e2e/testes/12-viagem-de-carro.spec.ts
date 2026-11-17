@@ -116,12 +116,12 @@ test.describe("viagem de carro", () => {
     await expect(page).toHaveURL(/\/roteiros\/\d+$/);
   });
 
-  test("decisão de chegada vem marcada em esticar", async ({ page }) => {
+  test("decisão de chegada vem marcada em dormir no caminho, sem passar do limite", async ({ page }) => {
     await cadastrarEmJoinville(page);
     await gerarDeCarro(page, "Goiânia", 1);
 
-    await expect(page.getByLabel(/^Esticar e chegar hoje/)).toBeChecked();
-    await expect(page.getByLabel(/^Dormir no caminho e chegar amanhã/)).not.toBeChecked();
+    await expect(page.getByLabel(/^Dormir no caminho e chegar amanhã/)).toBeChecked();
+    await expect(page.getByLabel(/^Esticar e chegar hoje/)).not.toBeChecked();
   });
 
   test("viagem com volta mostra a estrada de volta e chega em casa", async ({ page }) => {
@@ -205,8 +205,8 @@ test.describe("viagem de carro", () => {
     const hotel = page.locator(".pernoite-estrada select").first();
     await hotel.selectOption({ index: 1 });
 
-    await page.getByLabel(/^Dormir no caminho e chegar amanhã/).click();
-    await expect(page.getByLabel(/^Dormir no caminho e chegar amanhã/)).toBeChecked();
+    await page.getByLabel(/^Esticar e chegar hoje/).click();
+    await expect(page.getByLabel(/^Esticar e chegar hoje/)).toBeChecked();
     await expect(page.locator(".pernoite-estrada select").first()).toBeVisible();
 
     await page.getByRole("button", { name: "Salvar como meu roteiro" }).click();

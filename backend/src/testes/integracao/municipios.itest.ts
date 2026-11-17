@@ -1,8 +1,11 @@
 import "../ambiente";
 import { after, afterEach, before, beforeEach, describe, it } from "node:test";
 import assert from "node:assert/strict";
+import fs from "fs";
+import os from "os";
+import path from "path";
 import prisma from "../../lib/prisma";
-import { importarMunicipios, municipioMaisProximo, procurarMunicipio } from "../../lib/municipios";
+import { importarMunicipios, lerMunicipios, municipioMaisProximo, procurarMunicipio } from "../../lib/municipios";
 import { criarCliente, criarMunicipio, iniciarServidor, limparBanco, type ServidorDeTeste } from "../suporte";
 import { instalarMapasFalsos, municipioNominatim } from "../mapasFalsos";
 
@@ -20,6 +23,34 @@ describe("municípios do IBGE", () => {
 
     assert.equal(await prisma.municipio.count(), 2);
     assert.equal((await prisma.municipio.findUnique({ where: { codigoIbge: 4209102 } }))?.nome, "Joinville (nova)");
+  });
+
+  it("grava a população (IBGE) e a atualiza ao importar de novo", async () => {
+    await importarMunicipios([{ ...JOINVILLE, populacao: 600_000 }, BRASILIA]);
+    await importarMunicipios([{ ...JOINVILLE, populacao: 673_980 }, BRASILIA]);
+
+    assert.equal((await prisma.municipio.findUnique({ where: { codigoIbge: 4209102 } }))?.populacao, 673_980);
+    assert.equal((await prisma.municipio.findUnique({ where: { codigoIbge: 5300108 } }))?.populacao, null);
+  });
+
+  it("lerMunicipios junta a população do arquivo do IBGE; sem o arquivo, fica nula", () => {
+    const pasta = fs.mkdtempSync(path.join(os.tmpdir(), "nomadplan-municipios-"));
+    const municipios = path.join(pasta, "municipios.json");
+    const populacao = path.join(pasta, "populacao.json");
+    fs.writeFileSync(municipios, JSON.stringify([JOINVILLE, BRASILIA]));
+    fs.writeFileSync(populacao, JSON.stringify({ fonte: "IBGE", ano: "2026", populacao: { "4209102": 673980 } }));
+
+    const lidos = lerMunicipios(municipios, populacao);
+    const semArquivo = lerMunicipios(municipios, path.join(pasta, "nao-existe.json"));
+
+    assert.deepEqual(
+      lidos.map((m) => [m.codigoIbge, m.populacao]),
+      [
+        [4209102, 673980],
+        [5300108, null],
+      ],
+    );
+    assert.ok(semArquivo.every((m) => m.populacao === null));
   });
 
   it("procura pelo nome sem acento e com UF", async () => {

@@ -71,7 +71,15 @@ docker compose -p nomadplan --env-file .env.prod -f docker-compose.prod.yml -f d
 docker compose -p nomadplan --env-file .env.prod -f docker-compose.prod.yml -f docker-compose.compartilhado.yml logs -f api
 ```
 
-Aguarde `NomadPlan API executando` e saia com Ctrl+C.
+Aguarde `NomadPlan API executando` e saia com Ctrl+C. A população dos municípios (IBGE), que a viagem de carro usa para escolher
+o pernoite enquanto os hotéis não foram contados, entra com um comando (pode repetir):
+
+```bash
+docker exec nomadplan-api npm run municipios:importar
+```
+
+Opcional, de madrugada (leva horas): `docker exec nomadplan-api npm run viagem:aquecer` busca de antemão os hotéis das cidades do Sul e
+do Sudeste, para a viagem de carro já sugerir pernoites com hotéis na primeira vez.
 
 ## Parte 4. Ligar o Caddy que já existe
 

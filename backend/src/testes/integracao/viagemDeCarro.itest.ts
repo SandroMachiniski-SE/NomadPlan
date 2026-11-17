@@ -135,7 +135,7 @@ describe("viagem de carro no gerador de roteiro", () => {
     assert.equal(r.corpo.erro, "Não encontrei o município Cidade Inexistente.");
   });
 
-  it("a escolha da noite 1 troca a cidade e a decisão esticar=false acrescenta uma noite", async () => {
+  it("perto do destino o padrão é dormir antes; a escolha da noite 1 troca a cidade e esticar=true tira uma noite", async () => {
     await criarMunicipio(JOINVILLE);
     const destino = await criarMunicipio(noKm(1000020, "Destino", 1120, 0));
     await criarPonto({ nome: "Atração do Destino", cidade: "Destino", latitude: destino.latitude, longitude: destino.longitude });
@@ -154,22 +154,40 @@ describe("viagem de carro no gerador de roteiro", () => {
     const padrao = (await gerar(token, { etapas, viagemDeCarro: {} })).corpo.viagemDeCarro.pernas[0];
     assert.deepEqual(
       padrao.trechos.map((t: { pernoite: { cidade: string } | null }) => t.pernoite?.cidade ?? null),
-      ["Km 500", null],
+      ["Km 500", "Km 1000", null],
     );
-    assert.equal(padrao.decisao.esticar, true);
+    assert.equal(padrao.decisao.esticar, false);
     assert.ok(Math.abs(padrao.decisao.metrosEsticando - 620_000) < 2000, `${padrao.decisao.metrosEsticando}`);
 
     const trocada = (
       await gerar(token, {
         etapas,
-        viagemDeCarro: { escolhas: [{ perna: 0, noite: 1, codigoIbge: c470.codigoIbge }], decisoes: [{ perna: 0, esticar: false }] },
+        viagemDeCarro: { escolhas: [{ perna: 0, noite: 1, codigoIbge: c470.codigoIbge }], decisoes: [{ perna: 0, esticar: true }] },
       })
     ).corpo.viagemDeCarro.pernas[0];
     assert.deepEqual(
       trocada.trechos.map((t: { pernoite: { cidade: string } | null }) => t.pernoite?.cidade ?? null),
-      ["Km 470", "Km 1000", null],
+      ["Km 470", null],
     );
-    assert.equal(trocada.decisao.esticar, false);
+    assert.equal(trocada.decisao.esticar, true);
+  });
+
+  it("sem a contagem de hotéis, a cidade maior vira o pernoite e a resposta traz a população", async () => {
+    await criarMunicipio(JOINVILLE);
+    const destino = await criarMunicipio(noKm(1000030, "Destino", 1000, 0));
+    await criarPonto({ nome: "Atração do Destino", cidade: "Destino", latitude: destino.latitude, longitude: destino.longitude });
+    await criarMunicipio({ ...noKm(1000031, "Pequena", 501), populacao: 4_000 });
+    await criarMunicipio({ ...noKm(1000032, "Grande", 496), populacao: 120_000 });
+    viagem.naEstrada(destino, () => ({ corpo: estradaReta(1000) }));
+    viagem.estado.overpassFora = true;
+    const { token } = await comCasa(JOINVILLE);
+
+    const r = await gerar(token, { etapas: [{ cidade: "Destino/GO", dias: 1 }], viagemDeCarro: {} });
+
+    const noite = r.corpo.viagemDeCarro.pernas[0].trechos[0].pernoite;
+    assert.equal(noite.cidade, "Grande");
+    assert.equal(noite.populacao, 120_000);
+    assert.equal(noite.totalHospedagens, null);
   });
 
   it("kmPorDia, horasPorDia, consumo e preço fora da faixa dão 400", async () => {
@@ -295,9 +313,10 @@ describe("viagem de carro no gerador de roteiro", () => {
         pernas.map((p: { perna: number }) => p.perna),
         [0, 1, 2],
       );
+      // Volta de 1.100 km: depois da 1ª noite faltam 600, e o padrão é dormir antes (sem passar do limite).
       assert.deepEqual(
         pernas.map((p: { trechos: { dia: number }[] }) => p.trechos.map((t) => t.dia)),
-        [[1, 2, 3], [6], [8, 9]],
+        [[1, 2, 3], [6], [8, 9, 10]],
       );
       assert.equal(pernas[1].trechos[0].ocupaODia, false);
       assert.equal(pernas[2].para.codigoIbge, JOINVILLE.codigoIbge);

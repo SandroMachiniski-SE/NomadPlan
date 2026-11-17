@@ -16,6 +16,10 @@ const ESPERA_PADRAO_MS = 10_000;
 const CONSULTA_EM_SEGUNDO_PLANO_MS = 90_000;
 // Depois de uma falha, a mesma cidade não volta a esperar o Overpass por um tempo.
 const PAUSA_DEPOIS_DE_FALHA_MS = 3 * 60 * 1000;
+// O aquecimento de madrugada espera o Overpass sem pressa e, quando ele recusa, tenta de novo.
+const ESPERA_DO_AQUECIMENTO_MS = 175_000;
+const PAUSA_DO_AQUECIMENTO_MS = 60_000;
+const TENTATIVAS_DO_AQUECIMENTO = 3;
 const INTERVALO_ENTRE_CONSULTAS_MS = 1000;
 const MAX_HOSPEDAGENS = 40;
 const MAX_ATRACOES = 10;
@@ -295,3 +299,59 @@ export async function resumirCidades(
   return resultado;
 }
 
+/**
+ * Busca de antemão os resumos das cidades das UFs pedidas que ainda não têm um válido, as maiores
+ * primeiro (mais chance de virar pernoite), em lotes. Feito para rodar de madrugada, num processo
+ * próprio: um lote que falha (o Overpass público recusa com 429 quando está cheio) é tentado de novo
+ * depois de uma pausa.
+ */
+export async function aquecerResumos(
+  ufs: string[],
+  opcoes: { lote?: number; pausaDepoisDeFalhaMs?: number; aoAvancar?: (mensagem: string) => void } = {},
+): Promise<{ cidades: number; comResumo: number; falhas: number }> {
+  const lote = opcoes.lote ?? 8;
+  const pausa = opcoes.pausaDepoisDeFalhaMs ?? PAUSA_DO_AQUECIMENTO_MS;
+  const validoDesde = new Date(Date.now() - VALIDADE_DO_RESUMO_MS);
+  const pendentes = await prisma.$queryRaw<{ codigoIbge: number; nome: string; uf: string }[]>`
+    SELECT codigo_ibge AS "codigoIbge", nome, uf
+    FROM municipio
+    WHERE uf = ANY(${ufs}::text[])
+      AND (resumo_osm IS NULL OR resumo_em IS NULL OR resumo_em < ${validoDesde})
+    ORDER BY populacao DESC NULLS LAST, codigo_ibge
+  `;
+  const totalDeLotes = Math.ceil(pendentes.length / lote);
+  let comResumo = 0;
+  let falhas = 0;
+
+  for (let i = 0; i < pendentes.length; i += lote) {
+    const grupo = pendentes.slice(i, i + lote);
+    let faltando = grupo.map((c) => c.codigoIbge);
+
+    for (let tentativa = 1; tentativa <= TENTATIVAS_DO_AQUECIMENTO && faltando.length > 0; tentativa += 1) {
+      if (tentativa > 1) {
+        await new Promise((resolver) => setTimeout(resolver, pausa));
+        esquecerConsultasDosResumos();
+      }
+
+      await resumirCidades(faltando, new Date(), ESPERA_DO_AQUECIMENTO_MS);
+
+      // Conta só o que foi gravado agora (um resumo vencido devolvido na falha não vale).
+      const gravados = await prisma.$queryRaw<{ codigoIbge: number }[]>`
+        SELECT codigo_ibge AS "codigoIbge" FROM municipio
+        WHERE codigo_ibge = ANY(${faltando}::int[]) AND resumo_em >= ${validoDesde}
+      `;
+      const prontos = new Set(gravados.map((g) => g.codigoIbge));
+
+      faltando = faltando.filter((codigo) => !prontos.has(codigo));
+    }
+
+    comResumo += grupo.length - faltando.length;
+    falhas += faltando.length;
+    opcoes.aoAvancar?.(
+      `lote ${i / lote + 1} de ${totalDeLotes}: ${grupo.map((c) => `${c.nome}/${c.uf}`).join(", ")}` +
+        (faltando.length > 0 ? ` (${faltando.length} sem resumo)` : ""),
+    );
+  }
+
+  return { cidades: pendentes.length, comResumo, falhas };
+}

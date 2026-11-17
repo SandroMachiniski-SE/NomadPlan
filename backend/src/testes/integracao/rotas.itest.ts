@@ -4,7 +4,7 @@ import assert from "node:assert/strict";
 import prisma from "../../lib/prisma";
 import { buscarRota, ErroRota, gravarRotaEmCache, lerRespostaOsrm } from "../../lib/rotas";
 import { candidatosDaRota, tracadoEntre } from "../../lib/corredor";
-import { resumirCidades, type ResumoOsm } from "../../lib/resumoOsm";
+import { aquecerResumos, resumirCidades, type ResumoOsm } from "../../lib/resumoOsm";
 import { criarMunicipio, limparBanco } from "../suporte";
 import { instalarMapasFalsos, rotaOsrm } from "../mapasFalsos";
 
@@ -117,7 +117,7 @@ describe("corredor", () => {
     await limparBanco();
     await criarMunicipio(ORIGEM);
     await criarMunicipio(DESTINO);
-    await criarMunicipio(noKm(1000010, "A", 500, 5));
+    await criarMunicipio({ ...noKm(1000010, "A", 500, 5), populacao: 20_000 });
     await criarMunicipio(noKm(1000011, "B", 1000, 15));
     await criarMunicipio(noKm(1000012, "C", 700, 30));
     idRota = await gravarRotaEmCache(ORIGEM.codigoIbge, DESTINO.codigoIbge, lerRespostaOsrm(rotaOsrm(MERIDIANO)));
@@ -134,6 +134,9 @@ describe("corredor", () => {
     assert.ok(Math.abs(lista[0].desvioKm - 5) < 0.5, `desvio de A: ${lista[0].desvioKm}`);
     assert.ok(Math.abs(lista[1].km - 1000) < 5, `km de B: ${lista[1].km}`);
     assert.ok(lista[0].fracao > 0.3 && lista[0].fracao < 0.37, `fração de A: ${lista[0].fracao}`);
+    // A população do IBGE vem junto: é o porte da cidade quando os hotéis ainda não foram contados.
+    assert.equal(lista[0].populacao, 20_000);
+    assert.equal(lista[1].populacao, null);
   });
 
   it("deixa de fora as pontas da perna", async () => {
@@ -294,5 +297,65 @@ describe("resumos das cidades", () => {
     const resumos = await resumirCidades([B.codigoIbge]);
 
     assert.equal(resumos.get(B.codigoIbge), null);
+  });
+});
+
+describe("aquecer os resumos de uma região (de madrugada)", () => {
+  let mapas: ReturnType<typeof instalarMapasFalsos> | null = null;
+  const PEQUENA = { codigoIbge: 4200001, cidade: "Pequena", uf: "SC", latitude: -27, longitude: -49, populacao: 4_000 };
+  const GRANDE = { codigoIbge: 4200002, cidade: "Grande", uf: "SC", latitude: -27.5, longitude: -49.5, populacao: 120_000 };
+  const CARIOCA = { codigoIbge: 3300001, cidade: "Carioca", uf: "RJ", latitude: -22.9, longitude: -43.2, populacao: 500_000 };
+  const hotelPerto = (m: { latitude: number; longitude: number }, id: number) => ({
+    type: "node",
+    id,
+    lat: m.latitude + 0.01,
+    lon: m.longitude,
+    tags: { name: `Hotel ${id}`, tourism: "hotel" },
+  });
+
+  beforeEach(async () => {
+    await limparBanco();
+    await criarMunicipio(PEQUENA);
+    await criarMunicipio(GRANDE);
+    await criarMunicipio(CARIOCA);
+  });
+
+  afterEach(() => {
+    mapas?.desinstalar();
+    mapas = null;
+  });
+
+  it("busca só as UFs pedidas, as maiores primeiro, em lotes, e pula quem já tem resumo", async () => {
+    mapas = instalarMapasFalsos({
+      overpass: (consulta) => ({
+        corpo: { elements: consulta.includes("-27.5") ? [hotelPerto(GRANDE, 1)] : [hotelPerto(PEQUENA, 2)] },
+      }),
+    });
+
+    const primeira = await aquecerResumos(["SC"], { lote: 1 });
+    const segunda = await aquecerResumos(["SC"], { lote: 1 });
+
+    const consultas = mapas.chamadas.filter((c) => c.servico === "overpass").map((c) => c.corpo!);
+    assert.equal(consultas.length, 2, "a segunda passada não consulta de novo");
+    assert.ok(consultas[0].includes("-27.5"), "a cidade maior vem primeiro");
+    assert.deepEqual(primeira, { cidades: 2, comResumo: 2, falhas: 0 });
+    assert.deepEqual(segunda, { cidades: 0, comResumo: 0, falhas: 0 });
+    const carioca = await prisma.municipio.findUnique({ where: { codigoIbge: CARIOCA.codigoIbge } });
+    assert.equal(carioca?.resumoEm, null, "RJ não foi pedida");
+  });
+
+  it("lote que falha é tentado de novo depois da pausa", async () => {
+    let tentativas = 0;
+    mapas = instalarMapasFalsos({
+      overpass: () => {
+        tentativas += 1;
+        return tentativas === 1 ? { status: 429, corpo: {} } : { corpo: { elements: [hotelPerto(GRANDE, 3)] } };
+      },
+    });
+
+    const resultado = await aquecerResumos(["SC"], { lote: 2, pausaDepoisDeFalhaMs: 10 });
+
+    assert.deepEqual(resultado, { cidades: 2, comResumo: 2, falhas: 0 });
+    assert.equal(tentativas, 2);
   });
 });

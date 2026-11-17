@@ -41,6 +41,8 @@ export interface CidadeDePernoite {
   distanciaDoAlvoKm: number;
   totalHospedagens: number | null;
   totalAtracoes: number | null;
+  /** Habitantes (IBGE): o porte da cidade enquanto os hotéis não foram contados. */
+  populacao: number | null;
   hospedagens: { idOsm: string; nome: string; tipo: string }[];
   atracoes: string[];
   aDefinir: boolean;
