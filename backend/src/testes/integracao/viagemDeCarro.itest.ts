@@ -259,7 +259,7 @@ describe("viagem de carro no gerador de roteiro", () => {
 
     assert.equal(r.status, 200, JSON.stringify(r.corpo));
     assert.equal(viagem.chamadas("overpass").length, 1);
-    assert.ok(r.corpo.viagemDeCarro.avisos.includes("Não foi possível contar os hotéis agora; as cidades estão só pela distância."));
+    assert.ok(r.corpo.viagemDeCarro.avisos.includes("Os hotéis de algumas cidades do caminho ainda estão sendo buscados; elas aparecem só pela distância. Gere de novo em instantes para ver os hotéis."));
     assert.deepEqual(
       r.corpo.viagemDeCarro.pernas[0].trechos.map((t: { pernoite: { cidade: string } | null }) => t.pernoite?.cidade ?? null),
       ["Cidade A", "Cidade B", null],

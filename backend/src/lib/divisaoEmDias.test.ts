@@ -176,8 +176,8 @@ describe("dividirEmDias", () => {
     const d = dividir([cidade(1, 480, null), cidade(2, 500, null), cidade(3, 1000, null)]);
 
     assert.deepEqual(codigos(d), [2, 3]);
-    assert.ok(d.avisos.includes("Não foi possível contar os hotéis agora; as cidades estão só pela distância."));
-    assert.equal(d.avisos.filter((a) => a.startsWith("Não foi possível contar")).length, 1);
+    assert.ok(d.avisos.includes("Os hotéis de algumas cidades do caminho ainda estão sendo buscados; elas aparecem só pela distância. Gere de novo em instantes para ver os hotéis."));
+    assert.equal(d.avisos.filter((a) => a.startsWith("Os hotéis de algumas cidades")).length, 1);
   });
 
   it("resumo undefined nas faixas avaliadas vai para semResumo", () => {

@@ -10,7 +10,12 @@ import type { ElementoOsm } from "./osm";
 const OVERPASS_URL = process.env.OVERPASS_URL || "https://overpass-api.de/api/interpreter";
 export const RAIO_DA_CIDADE_KM = 8;
 const VALIDADE_DO_RESUMO_MS = 30 * 24 * 60 * 60 * 1000;
-const TEMPO_LIMITE_MS = 30_000;
+// A geração da viagem espera o Overpass por pouco tempo; a consulta continua depois disso e grava o
+// resumo para a próxima geração. O Overpass público às vezes leva quase um minuto.
+const ESPERA_PADRAO_MS = 10_000;
+const CONSULTA_EM_SEGUNDO_PLANO_MS = 90_000;
+// Depois de uma falha, a mesma cidade não volta a esperar o Overpass por um tempo.
+const PAUSA_DEPOIS_DE_FALHA_MS = 3 * 60 * 1000;
 const INTERVALO_ENTRE_CONSULTAS_MS = 1000;
 const MAX_HOSPEDAGENS = 40;
 const MAX_ATRACOES = 10;
@@ -193,26 +198,59 @@ interface MunicipioComResumo extends CidadeParaResumo {
   resumoEm: Date | null;
 }
 
+// Consultas em andamento (uma por cidade, mesmo com gerações simultâneas) e cidades em pausa.
+const emAndamento = new Map<number, Promise<void>>();
+const pausadasAte = new Map<number, number>();
+
+/** Para os testes: esquece as consultas em andamento e as pausas. */
+export function esquecerConsultasDosResumos(): void {
+  emAndamento.clear();
+  pausadasAte.clear();
+}
+
+async function buscarEGravar(cidades: MunicipioComResumo[], tempoLimiteMs: number, agora: Date): Promise<void> {
+  try {
+    const resumos = distribuirElementos(await consultarOverpass(cidades, tempoLimiteMs), cidades);
+
+    for (const [codigo, resumo] of resumos) {
+      await prisma.$executeRaw`
+        UPDATE municipio SET resumo_osm = ${JSON.stringify(resumo)}::jsonb, resumo_em = ${agora}
+        WHERE codigo_ibge = ${codigo}
+      `;
+    }
+  } catch (erro) {
+    console.error("Overpass indisponível para o resumo das cidades:", erro instanceof Error ? erro.message : erro);
+
+    const ate = Date.now() + PAUSA_DEPOIS_DE_FALHA_MS;
+
+    for (const c of cidades) pausadasAte.set(c.codigoIbge, ate);
+  } finally {
+    for (const c of cidades) emAndamento.delete(c.codigoIbge);
+  }
+}
+
 /**
  * Resumo de cada município pedido: do cache (30 dias) ou de uma consulta só ao Overpass para
- * todos os que faltam. Se o Overpass falhar, usa o resumo vencido; sem nenhum, `null`.
+ * todos os que faltam. Espera a consulta por até `esperaMs`; o que não chegou a tempo vem com o
+ * resumo vencido (ou `null`) e a consulta segue em segundo plano, gravando para a próxima vez.
  */
 export async function resumirCidades(
   codigos: number[],
   agora: Date = new Date(),
-  tempoLimiteMs = TEMPO_LIMITE_MS,
+  esperaMs = ESPERA_PADRAO_MS,
 ): Promise<Map<number, ResumoOsm | null>> {
   const resultado = new Map<number, ResumoOsm | null>();
 
   if (codigos.length === 0) return resultado;
 
-  const municipios = await prisma.$queryRaw<MunicipioComResumo[]>`
+  const ler = (lista: number[]) => prisma.$queryRaw<MunicipioComResumo[]>`
     SELECT codigo_ibge AS "codigoIbge", latitude, longitude, resumo_osm AS resumo, resumo_em AS "resumoEm"
     FROM municipio
-    WHERE codigo_ibge = ANY(${codigos}::int[])
+    WHERE codigo_ibge = ANY(${lista}::int[])
   `;
   const valido = (m: MunicipioComResumo) =>
     m.resumo !== null && m.resumoEm !== null && agora.getTime() - m.resumoEm.getTime() < VALIDADE_DO_RESUMO_MS;
+  const municipios = await ler(codigos);
   const faltando = municipios.filter((m) => !valido(m));
 
   for (const m of municipios) {
@@ -221,22 +259,37 @@ export async function resumirCidades(
 
   if (faltando.length === 0) return resultado;
 
-  try {
-    const resumos = distribuirElementos(await consultarOverpass(faltando, tempoLimiteMs), faltando);
+  const novas = faltando.filter(
+    (m) => !emAndamento.has(m.codigoIbge) && (pausadasAte.get(m.codigoIbge) ?? 0) <= Date.now(),
+  );
 
-    for (const [codigo, resumo] of resumos) {
-      await prisma.$executeRaw`
-        UPDATE municipio SET resumo_osm = ${JSON.stringify(resumo)}::jsonb, resumo_em = ${agora}
-        WHERE codigo_ibge = ${codigo}
-      `;
-      resultado.set(codigo, resumo);
-    }
-  } catch (erro) {
-    console.error("Overpass indisponível para o resumo das cidades:", erro instanceof Error ? erro.message : erro);
+  if (novas.length > 0) {
+    const consulta = buscarEGravar(novas, Math.max(esperaMs, CONSULTA_EM_SEGUNDO_PLANO_MS), agora);
 
-    for (const m of faltando) {
-      resultado.set(m.codigoIbge, m.resumo);
-    }
+    for (const m of novas) emAndamento.set(m.codigoIbge, consulta);
+  }
+
+  const aguardando = [...new Set(faltando.flatMap((m) => emAndamento.get(m.codigoIbge) ?? []))];
+
+  if (aguardando.length > 0) {
+    let relogio: ReturnType<typeof setTimeout> | undefined;
+
+    await Promise.race([
+      Promise.all(aguardando),
+      new Promise((resolver) => {
+        relogio = setTimeout(resolver, esperaMs);
+      }),
+    ]);
+    clearTimeout(relogio);
+  }
+
+  // O que chegou a tempo já está no banco; o resto vem com o resumo vencido (ou nenhum).
+  const releitura = new Map((await ler(faltando.map((m) => m.codigoIbge))).map((m) => [m.codigoIbge, m]));
+
+  for (const m of faltando) {
+    const atual = releitura.get(m.codigoIbge) ?? m;
+
+    resultado.set(m.codigoIbge, valido(atual) ? atual.resumo : m.resumo);
   }
 
   return resultado;

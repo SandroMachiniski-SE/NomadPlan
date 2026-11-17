@@ -233,6 +233,61 @@ describe("resumos das cidades", () => {
     assert.equal(b?.resumoEm, null, "nada foi gravado para B");
   });
 
+  it("Overpass lento: responde no tempo de espera e grava o resumo quando a consulta termina", async () => {
+    mapas = instalarMapasFalsos({
+      overpass: () => ({
+        atrasoMs: 1200,
+        corpo: { elements: [{ type: "node", id: 7, lat: -18.01, lon: -48, tags: { name: "Hotel Lento", tourism: "hotel" } }] },
+      }),
+    });
+
+    const inicio = Date.now();
+    const agora = new Date();
+    const primeira = await resumirCidades([B.codigoIbge], agora, 200);
+
+    assert.ok(Date.now() - inicio < 1000, `esperou ${Date.now() - inicio} ms`);
+    assert.equal(primeira.get(B.codigoIbge), null);
+
+    // A consulta seguiu em segundo plano: o resumo chega ao banco e a próxima geração já o usa.
+    let gravado = null;
+    for (let i = 0; i < 40 && !gravado; i += 1) {
+      await new Promise((r) => setTimeout(r, 100));
+      gravado = (await prisma.municipio.findUnique({ where: { codigoIbge: B.codigoIbge } }))?.resumoOsm ?? null;
+    }
+    assert.ok(gravado, "o resumo não foi gravado");
+
+    const segunda = await resumirCidades([B.codigoIbge], agora, 200);
+    assert.equal(segunda.get(B.codigoIbge)!.hospedagens[0].nome, "Hotel Lento");
+    assert.equal(mapas.chamadas.filter((c) => c.servico === "overpass").length, 1);
+  });
+
+  it("depois de uma falha, a mesma cidade não volta a esperar o Overpass por alguns minutos", async () => {
+    mapas = instalarMapasFalsos({ overpass: () => ({ status: 504, corpo: {} }) });
+
+    await resumirCidades([B.codigoIbge]);
+    const inicio = Date.now();
+    const segunda = await resumirCidades([B.codigoIbge]);
+
+    assert.equal(segunda.get(B.codigoIbge), null);
+    assert.ok(Date.now() - inicio < 500, `esperou ${Date.now() - inicio} ms`);
+    assert.equal(mapas.chamadas.filter((c) => c.servico === "overpass").length, 1);
+  });
+
+  it("duas gerações ao mesmo tempo para a mesma cidade fazem uma consulta só", async () => {
+    mapas = instalarMapasFalsos({
+      overpass: () => ({
+        atrasoMs: 300,
+        corpo: { elements: [{ type: "node", id: 8, lat: -18.01, lon: -48, tags: { name: "Hotel Único", tourism: "hotel" } }] },
+      }),
+    });
+
+    const [uma, outra] = await Promise.all([resumirCidades([B.codigoIbge]), resumirCidades([B.codigoIbge])]);
+
+    assert.equal(uma.get(B.codigoIbge)!.totalHospedagens, 1);
+    assert.equal(outra.get(B.codigoIbge)!.totalHospedagens, 1);
+    assert.equal(mapas.chamadas.filter((c) => c.servico === "overpass").length, 1);
+  });
+
   it("sem resumo e Overpass fora do ar: devolve null", async () => {
     mapas = instalarMapasFalsos({ overpass: () => ({ status: 504, corpo: {} }) });
 

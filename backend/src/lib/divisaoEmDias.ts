@@ -105,7 +105,9 @@ export function dividirEmDias(entrada: EntradaDaDivisao): DivisaoDaPerna {
       .forEach((c) => semResumo.add(c.codigoIbge));
 
     if (lista.some((c) => !temResumo(c))) {
-      avisar("Não foi possível contar os hotéis agora; as cidades estão só pela distância.");
+      avisar(
+        "Os hotéis de algumas cidades do caminho ainda estão sendo buscados; elas aparecem só pela distância. Gere de novo em instantes para ver os hotéis.",
+      );
     }
 
     return lista.filter((c) => !temResumo(c) || c.resumo.totalHospedagens >= 1);
