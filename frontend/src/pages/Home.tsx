@@ -47,6 +47,11 @@ function Home() {
   const [buscandoLocalizacao, setBuscandoLocalizacao] = useState(false);
 
   const [pontos, setPontos] = useState<Ponto[]>([]);
+  // A busca vem em páginas: o total de resultados e o pedido da última busca, para "Mostrar mais".
+  const [total, setTotal] = useState(0);
+  const [temMais, setTemMais] = useState(false);
+  const [pedidoDaBusca, setPedidoDaBusca] = useState<Record<string, string> | null>(null);
+  const [carregandoMais, setCarregandoMais] = useState(false);
   const [carregando, setCarregando] = useState(false);
   const [erro, setErro] = useState<string | null>(null);
   const [buscou, setBuscou] = useState(false);
@@ -96,12 +101,11 @@ function Home() {
       }
 
       const resposta = await api.get<RespostaPontos>("/pontos", { params });
-      setPontos(resposta.data.dados);
-      setDesatualizado(Boolean(resposta.data.desatualizado));
+      mostrarPrimeiraPagina(resposta.data, params);
     } catch (error) {
       console.error("Erro ao buscar pontos turísticos:", error);
       setErro(extrairMensagemErro(error, "Não foi possível carregar os pontos turísticos. Tente novamente."));
-      setPontos([]);
+      limparResultados();
     } finally {
       setCarregando(false);
     }
@@ -131,14 +135,51 @@ function Home() {
       if (abertoAgora) params.abertoAgora = "true";
 
       const resposta = await api.get<RespostaPontos>("/pontos", { params });
-      setPontos(resposta.data.dados);
-      setDesatualizado(Boolean(resposta.data.desatualizado));
+      mostrarPrimeiraPagina(resposta.data, params);
     } catch (error) {
       console.error("Erro ao buscar pontos na área do mapa:", error);
       setErro(extrairMensagemErro(error, "Não foi possível carregar os pontos desta área. Tente novamente."));
-      setPontos([]);
+      limparResultados();
     } finally {
       setCarregando(false);
+    }
+  }
+
+  function mostrarPrimeiraPagina(resposta: RespostaPontos, pedido: Record<string, string>) {
+    setPontos(resposta.dados);
+    setTotal(resposta.total);
+    setTemMais(Boolean(resposta.temMais));
+    setPedidoDaBusca(pedido);
+    setDesatualizado(Boolean(resposta.desatualizado));
+  }
+
+  function limparResultados() {
+    setPontos([]);
+    setTotal(0);
+    setTemMais(false);
+    setPedidoDaBusca(null);
+  }
+
+  /** Traz a página seguinte da mesma busca e junta aos resultados que já estão na tela. */
+  async function mostrarMais() {
+    if (!pedidoDaBusca) return;
+
+    setCarregandoMais(true);
+
+    try {
+      const resposta = await api.get<RespostaPontos>("/pontos", {
+        params: { ...pedidoDaBusca, deslocamento: String(pontos.length) },
+      });
+      const vistos = new Set(pontos.map((p) => p.id));
+
+      setPontos([...pontos, ...resposta.data.dados.filter((p) => !vistos.has(p.id))]);
+      setTotal(resposta.data.total);
+      setTemMais(Boolean(resposta.data.temMais));
+    } catch (error) {
+      console.error("Erro ao carregar mais resultados:", error);
+      setErro(extrairMensagemErro(error, "Não foi possível carregar mais resultados. Tente novamente."));
+    } finally {
+      setCarregandoMais(false);
     }
   }
 
@@ -152,7 +193,7 @@ function Home() {
       setVisualizacao("mapa");
       setBuscaPelaArea(true);
       setErro(null);
-      setPontos([]);
+      limparResultados();
       setUltimaAreaBuscada(null);
     }
 
@@ -418,7 +459,9 @@ function Home() {
                     ? "Resultados"
                     : buscaPelaArea && !ultimaAreaBuscada
                       ? "Escolha onde você quer ir"
-                      : `${pontos.length} ${pontos.length === 1 ? "resultado" : "resultados"}`}
+                      : total > pontos.length
+                        ? `Mostrando ${pontos.length} de ${total} resultados`
+                        : `${pontos.length} ${pontos.length === 1 ? "resultado" : "resultados"}`}
               </h2>
 
               {!erro && (
@@ -559,6 +602,14 @@ function Home() {
                 {pontos.map((ponto) => (
                   <PontoCard key={ponto.id} ponto={ponto} />
                 ))}
+              </div>
+            )}
+
+            {temMais && !erro && !carregando && (
+              <div className="resultados__mais">
+                <button type="button" className="btn btn--outline" onClick={mostrarMais} disabled={carregandoMais}>
+                  {carregandoMais ? "Carregando..." : `Mostrar mais (faltam ${total - pontos.length})`}
+                </button>
               </div>
             )}
           </section>

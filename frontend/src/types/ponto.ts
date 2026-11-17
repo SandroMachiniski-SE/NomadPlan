@@ -58,8 +58,11 @@ export interface InformacoesGoogle {
 }
 
 export interface RespostaPontos {
+  /** Todos os resultados da busca, não só os desta página. */
   total: number;
   dados: Ponto[];
+  /** Há mais resultados depois desta página (pedidos com `deslocamento`). */
+  temMais?: boolean;
   /** A busca veio do cache porque o banco demorou a responder (AF02). */
   desatualizado?: boolean;
 }

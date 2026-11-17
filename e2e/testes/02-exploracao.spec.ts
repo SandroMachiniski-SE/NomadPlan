@@ -236,4 +236,41 @@ test.describe("explorar pelo mapa e escolher qualquer cidade", () => {
 
     await expect(page.getByRole("button", { name: /em todo o Brasil/ })).toBeVisible();
   });
+
+  test("mostra quantos lugares a cidade tem e traz os seguintes com Mostrar mais", async ({ page }) => {
+    // Os dados do E2E têm 3 lugares em Joinville: a resposta da busca é ampliada para 25.
+    const paginas: string[] = [];
+    let modelo: Record<string, unknown> | undefined;
+    await page.route(
+      (url) => url.pathname === "/pontos" && url.searchParams.get("cidade") === "Joinville",
+      async (rota) => {
+        const resposta = await rota.fetch();
+        const corpo = await resposta.json();
+        // A página seguinte vem vazia de verdade: o modelo é o primeiro lugar da primeira página.
+        modelo ??= corpo.dados[0];
+        const deslocamento = Number(new URL(rota.request().url()).searchParams.get("deslocamento") ?? 0);
+        const quantos = deslocamento === 0 ? 20 : 5;
+        paginas.push(String(deslocamento));
+        const dados = Array.from({ length: quantos }, (_, i) => ({
+          ...modelo,
+          id: 900_000 + deslocamento + i,
+          nome: `Lugar ${String(deslocamento + i + 1).padStart(2, "0")} E2E`,
+        }));
+        await rota.fulfill({ response: resposta, json: { total: 25, dados, temMais: deslocamento + quantos < 25 } });
+      },
+    );
+
+    await buscarCidade(page, "Joinville");
+
+    await expect(page.getByRole("heading", { name: "Mostrando 20 de 25 resultados" })).toBeVisible();
+    await expect(page.getByRole("heading", { name: "Lugar 20 E2E" })).toBeVisible();
+    await expect(page.getByRole("heading", { name: "Lugar 21 E2E" })).toHaveCount(0);
+
+    await page.getByRole("button", { name: /Mostrar mais/ }).click();
+
+    await expect(page.getByRole("heading", { name: "Lugar 25 E2E" })).toBeVisible();
+    await expect(page.getByRole("heading", { name: "25 resultados" })).toBeVisible();
+    await expect(page.getByRole("button", { name: /Mostrar mais/ })).toHaveCount(0);
+    expect(paginas).toEqual(["0", "20"]);
+  });
 });

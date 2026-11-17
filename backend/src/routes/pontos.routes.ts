@@ -230,6 +230,7 @@ const buscaSchema = z
     lng: z.coerce.number().min(-180).max(180).optional(),
     raioKm: z.coerce.number().positive().max(RAIO_BUSCA_KM_MAXIMO).default(RAIO_BUSCA_KM_PADRAO),
     limite: z.coerce.number().int().min(1).max(100).default(20),
+    deslocamento: z.coerce.number().int().min(0).max(10_000).default(0),
     notaMinima: z.coerce.number().min(1).max(5).optional(),
     abertoAgora: booleanoDeQuery.optional(),
     ordenar: z.enum(ORDENACOES).optional(),

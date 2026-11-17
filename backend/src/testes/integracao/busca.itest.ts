@@ -121,10 +121,39 @@ describe("busca de pontos turísticos", () => {
       assert.equal((await api("GET", "/pontos?cidade=_")).corpo.total, 0);
     });
 
-    it("respeita o limite de resultados", async () => {
+    it("respeita o limite de resultados, mas o total conta todos", async () => {
       for (let i = 0; i < 5; i += 1) await criarPonto({ nome: `Ponto ${i}` });
 
-      assert.equal((await api("GET", "/pontos?limite=3")).corpo.total, 3);
+      const r = await api("GET", "/pontos?limite=3");
+
+      assert.equal(r.corpo.dados.length, 3);
+      assert.equal(r.corpo.total, 5);
+      assert.equal(r.corpo.temMais, true);
+    });
+
+    it("deslocamento traz a página seguinte, na mesma ordem e sem repetir", async () => {
+      for (let i = 0; i < 5; i += 1) await criarPonto({ nome: `Ponto ${i}` });
+
+      const primeira = await api("GET", "/pontos?limite=3&ordenar=nome");
+      const segunda = await api("GET", "/pontos?limite=3&ordenar=nome&deslocamento=3");
+
+      assert.deepEqual(
+        [...primeira.corpo.dados, ...segunda.corpo.dados].map((p: { nome: string }) => p.nome),
+        ["Ponto 0", "Ponto 1", "Ponto 2", "Ponto 3", "Ponto 4"],
+      );
+      assert.equal(segunda.corpo.total, 5);
+      assert.equal(segunda.corpo.temMais, false);
+      assert.equal((await api("GET", "/pontos?deslocamento=-1")).status, 400);
+    });
+
+    it("página depois do fim vem vazia, com o total certo", async () => {
+      for (let i = 0; i < 2; i += 1) await criarPonto({ nome: `Ponto ${i}` });
+
+      const r = await api("GET", "/pontos?limite=3&deslocamento=3");
+
+      assert.deepEqual(r.corpo.dados, []);
+      assert.equal(r.corpo.total, 2);
+      assert.equal(r.corpo.temMais, false);
     });
 
     it("rejeita parâmetros inválidos com 400", async () => {
