@@ -17,12 +17,13 @@ export const MAX_ALTERNATIVAS = 3;
 // faixa tem dezenas de municípios e a consulta ao Overpass ficaria pesada demais.
 export const MAX_RESUMOS_POR_FAIXA = 10;
 const PESOS = { proximidade: 0.4, hospedagens: 0.35, atracoes: 0.25 };
-// Sem a contagem de hotéis (o Overpass ainda não respondeu), o porte da cidade ocupa o lugar de
-// hospedagens e atrações: cidade maior tem onde dormir; um vilarejo, quase nunca.
-const PESOS_SEM_CONTAGEM = { proximidade: 0.4, porte: 0.6 };
+// Sem a contagem de hotéis (o Overpass ainda não respondeu), o porte da cidade ocupa só o lugar das
+// hospedagens: cidade maior tem onde dormir; um vilarejo, quase nunca. Atrações, sem contagem, não
+// somam, para uma cidade com hotéis confirmados não perder para uma maior ainda sem contagem.
 const HOSPEDAGENS_PARA_NOTA_CHEIA = 20;
 const ATRACOES_PARA_NOTA_CHEIA = 10;
-const MIL_HABITANTES_PARA_NOTA_CHEIA = 100;
+const HABITANTES_SEM_PORTE = 5_000;
+const HABITANTES_PARA_PORTE_CHEIO = 100_000;
 // Trava contra laço infinito: nenhuma viagem válida chega perto disso (o limite é 21 dias).
 const MAX_NOITES = 100;
 
@@ -70,16 +71,18 @@ const temResumo = (c: CandidatoDePernoite): c is CandidatoDePernoite & { resumo:
 
 const escalaLog = (quantidade: number, cheia: number) => Math.min(1, Math.log(1 + quantidade) / Math.log(1 + cheia));
 
+/** De 0 (até 5 mil habitantes, ou sem população conhecida) a 1 (100 mil ou mais), em escala logarítmica. */
+function porteDaCidade(populacao: number | null | undefined): number {
+  if (!populacao || populacao <= HABITANTES_SEM_PORTE) return 0;
+
+  return Math.min(1, Math.log(populacao / HABITANTES_SEM_PORTE) / Math.log(HABITANTES_PARA_PORTE_CHEIO / HABITANTES_SEM_PORTE));
+}
+
 export function notaDoCandidato(c: CandidatoDePernoite, kmAlvo: number, largura: number): number {
   const proximidade = Math.max(0, 1 - Math.abs(c.km - kmAlvo) / largura);
 
   if (!temResumo(c)) {
-    if (c.populacao === null || c.populacao === undefined) return PESOS_SEM_CONTAGEM.proximidade * proximidade;
-
-    return (
-      PESOS_SEM_CONTAGEM.proximidade * proximidade +
-      PESOS_SEM_CONTAGEM.porte * escalaLog(c.populacao / 1000, MIL_HABITANTES_PARA_NOTA_CHEIA)
-    );
+    return PESOS.proximidade * proximidade + PESOS.hospedagens * porteDaCidade(c.populacao);
   }
 
   return (

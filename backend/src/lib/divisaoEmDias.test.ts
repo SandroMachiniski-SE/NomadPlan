@@ -197,13 +197,18 @@ describe("dividirEmDias", () => {
     assert.ok(d.avisos.includes("Os hotéis de algumas cidades do caminho ainda estão sendo buscados; elas aparecem só pela distância. Gere de novo em instantes para ver os hotéis."));
   });
 
-  it("nota sem contagem: proximidade 0,40 e porte 0,60 (população em milhares, escala logarítmica até 100 mil)", () => {
-    assert.ok(Math.abs(notaDoCandidato(cidade(1, 500, null, 0, 2, TOTAL, 100_000), 500, 50) - 1) < 1e-9);
-    assert.ok(
-      Math.abs(notaDoCandidato(cidade(1, 500, null, 0, 2, TOTAL, 4_000), 500, 50) - (0.4 + (0.6 * Math.log(5)) / Math.log(101))) < 1e-9,
-    );
-    // Sem população conhecida, continua só a proximidade.
+  it("nota sem contagem: proximidade 0,40 e porte 0,35 no lugar das hospedagens (de 5 mil a 100 mil habitantes, escala logarítmica)", () => {
+    assert.ok(Math.abs(notaDoCandidato(cidade(1, 500, null, 0, 2, TOTAL, 100_000), 500, 50) - 0.75) < 1e-9);
+    assert.ok(Math.abs(notaDoCandidato(cidade(1, 500, null, 0, 2, TOTAL, 20_000), 500, 50) - (0.4 + (0.35 * Math.log(4)) / Math.log(20))) < 1e-9);
+    // Vilarejo (menos de 5 mil) e população desconhecida: só a proximidade.
+    assert.ok(Math.abs(notaDoCandidato(cidade(1, 500, null, 0, 2, TOTAL, 4_000), 500, 50) - 0.4) < 1e-9);
     assert.ok(Math.abs(notaDoCandidato(cidade(1, 500, null), 500, 50) - 0.4) < 1e-9);
+  });
+
+  it("cidade com hotéis contados não perde para uma maior sem contagem um pouco mais perto do alvo", () => {
+    const d = dividir([cidade(1, 510, 20, 3), cidade(2, 500, null, 0, 2, TOTAL, 120_000), cidade(3, 1000, 4)]);
+
+    assert.equal(d.noites[0].cidade?.codigoIbge, 1);
   });
 
   it("resumo undefined nas faixas avaliadas vai para semResumo", () => {
