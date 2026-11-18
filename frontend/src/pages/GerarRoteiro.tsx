@@ -224,7 +224,8 @@ function GerarRoteiro() {
       setGeracao((atual) => atual + 1);
       setHoteis((atual) => hoteisQueContinuam(atual, resposta.data));
 
-      if (resposta.data.pontos.length === 0 && !resposta.data.viagemDeCarro?.pernas.length) {
+      // Cidade sem pontos em preparo: o cartão de andamento explica; não é erro.
+      if (resposta.data.pontos.length === 0 && !resposta.data.viagemDeCarro?.pernas.length && !resposta.data.preparos?.length) {
         setErro(
           resposta.data.avisos[0] ??
             "Nenhum ponto publicado e aberto foi encontrado para essa cidade nesse horário.",
@@ -299,7 +300,9 @@ function GerarRoteiro() {
   const planejada = resultado?.viagemDeCarro ?? null;
   const diasDoResultado = resultado ? diasDaViagem(resultado) : [];
   const avisos = [...(resultado?.avisos ?? []), ...(planejada?.avisos ?? [])];
-  const temResultado = !!resultado && (pontos.length > 0 || (planejada?.pernas.length ?? 0) > 0);
+  const preparos = resultado?.preparos ?? planejada?.preparos ?? [];
+  const podeSalvar = pontos.length > 0 || (planejada?.pernas.length ?? 0) > 0;
+  const temResultado = !!resultado && (podeSalvar || preparos.length > 0);
   const nomeDoPernoite = (c: { cidade: string; uf: string | null }) => (c.uf ? `${c.cidade}/${c.uf}` : c.cidade);
   const estradas = (planejada?.pernas ?? []).flatMap((perna) =>
     perna.trechos.map((t) => ({ dia: t.dia, tracado: t.tracado, pernoite: t.pernoite ? nomeDoPernoite(t.pernoite) : null })),
@@ -518,7 +521,7 @@ function GerarRoteiro() {
             </div>
           )}
 
-          {planejada?.preparos.map((p) => (
+          {preparos.map((p) => (
             <PreparoDoDestino
               key={`${geracao}-${p.cidade}-${p.uf}`}
               cidade={p.cidade}
@@ -694,15 +697,17 @@ function GerarRoteiro() {
             </button>
           )}
 
-          <button
-            type="button"
-            onClick={aoSalvarComoRoteiro}
-            disabled={salvando}
-            className="btn btn--accent btn--lg btn--block"
-            style={{ marginTop: "1.5rem" }}
-          >
-            {salvando ? "Salvando..." : "Salvar como meu roteiro"}
-          </button>
+          {podeSalvar && (
+            <button
+              type="button"
+              onClick={aoSalvarComoRoteiro}
+              disabled={salvando}
+              className="btn btn--accent btn--lg btn--block"
+              style={{ marginTop: "1.5rem" }}
+            >
+              {salvando ? "Salvando..." : "Salvar como meu roteiro"}
+            </button>
+          )}
         </section>
       )}
     </div>

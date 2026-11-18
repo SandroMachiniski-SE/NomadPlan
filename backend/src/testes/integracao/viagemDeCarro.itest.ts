@@ -489,6 +489,35 @@ describe("viagem de carro no gerador de roteiro", () => {
       await esperarPreparo(token, "Penha", "SC");
     });
 
+    it("sem viagem de carro, a cidade sem pontos também começa a ser preparada", async () => {
+      const { token } = await comCasaEmJoinville();
+      await destinoSemPontos("Penha Sem Carro");
+
+      const r = await gerar(token, { etapas: [{ cidade: "Penha Sem Carro", dias: 1 }] });
+
+      assert.equal(r.status, 200, JSON.stringify(r.corpo));
+      assert.deepEqual(r.corpo.preparos, [{ cidade: "Penha Sem Carro", uf: "SC", estado: "preparando", pontos: 0 }]);
+      assert.ok(r.corpo.avisos.includes(avisoDePreparo("Penha Sem Carro")), JSON.stringify(r.corpo.avisos));
+      assert.ok(!r.corpo.avisos.some((aviso: string) => aviso.startsWith("Ainda não há pontos cadastrados")));
+      assert.equal((await esperarPreparo(token, "Penha Sem Carro", "SC")).estado, "pronta");
+
+      const depois = await gerar(token, { etapas: [{ cidade: "Penha Sem Carro", dias: 1 }] });
+      assert.ok(depois.corpo.pontos.length > 0, "gerar de novo já traz o roteiro");
+      assert.deepEqual(depois.corpo.preparos, []);
+    });
+
+    it("sem viagem de carro, nome repetido em várias UFs não é preparado: continua o aviso", async () => {
+      const { token } = await comCasaEmJoinville();
+      await criarMunicipio({ codigoIbge: 1000290, cidade: "Bom Jesus Teste", uf: "SC", latitude: -27.1, longitude: -48.9 });
+      await criarMunicipio({ codigoIbge: 1000291, cidade: "Bom Jesus Teste", uf: "RS", latitude: -28.6, longitude: -50.4 });
+      await criarPonto({ nome: "Museu de Joinville", cidade: "Joinville" });
+
+      const r = await gerar(token, { etapas: [{ cidade: "Bom Jesus Teste", dias: 1 }] });
+
+      assert.deepEqual(r.corpo.preparos, []);
+      assert.ok(r.corpo.avisos.some((aviso: string) => aviso.startsWith("Ainda não há pontos cadastrados")));
+    });
+
     it("destino com pontos não dispara nada", async () => {
       await prepararBrasilia(viagem);
       const { token } = await comCasa(JOINVILLE);

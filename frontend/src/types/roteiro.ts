@@ -1,4 +1,4 @@
-import type { TrechoDeEstrada, ViagemDeCarroPlanejada, ViagemDoRoteiro } from "./viagem";
+import type { PreparoDoDestinoPlanejado, TrechoDeEstrada, ViagemDeCarroPlanejada, ViagemDoRoteiro } from "./viagem";
 
 export interface PontoResumo {
   id: number;
@@ -190,6 +190,8 @@ export interface RespostaRecomendacao {
   inicio: string;
   fallbackUsado: boolean;
   viagemDeCarro?: ViagemDeCarroPlanejada | null;
+  /** Cidades sem pontos cujo preparo a geração disparou (com ou sem viagem de carro). */
+  preparos?: PreparoDoDestinoPlanejado[];
 }
 
 export interface VersaoRoteiro {

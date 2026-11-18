@@ -23,6 +23,7 @@ import {
   type PreparoDoDestino,
 } from "../lib/viagemDeCarro";
 import { ErroRota, SemEstrada } from "../lib/rotas";
+import { procurarMunicipio, type Municipio } from "../lib/municipios";
 import {
   conferirHoteis,
   conferirNoites,
@@ -467,6 +468,18 @@ roteirosRouter.post("/gerar", limiteViagemDeCarro, async (req: Request, res: Res
         avisos: plano.avisos,
         preparos,
       };
+    } else {
+      // Sem viagem de carro, a cidade digitada que é um município do IBGE (sem dúvida de UF) e ainda
+      // não tem pontos também começa a ser preparada; com nome repetido, fica o aviso de sempre.
+      const municipios: Municipio[] = [];
+
+      for (const etapa of dados.etapas ?? (dados.cidade ? [{ cidade: dados.cidade }] : [])) {
+        const achados = await procurarMunicipio(etapa.cidade);
+
+        if (achados.length === 1) municipios.push(achados[0]);
+      }
+
+      preparos = await prepararDestinosSemPontos(municipios, req.usuario!.id);
     }
 
     // Sem horário de início informado, começa no próximo horário comercial: de madrugada
@@ -494,7 +507,7 @@ roteirosRouter.post("/gerar", limiteViagemDeCarro, async (req: Request, res: Res
             ...preparos.flatMap((p) => (p.estado === "pronta" ? [] : [avisoDoPreparo(p)])),
           ];
 
-    return res.json({ ...recomendacao, avisos, viagemDeCarro });
+    return res.json({ ...recomendacao, avisos, viagemDeCarro, preparos });
   } catch (error) {
     if (responderErroDaViagem(res, error)) return;
 

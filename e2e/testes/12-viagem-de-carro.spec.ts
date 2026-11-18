@@ -231,6 +231,18 @@ test.describe("viagem de carro", () => {
     await expect(page.locator(".preparo-destino", { hasText: "Preparando" })).toHaveCount(0);
   });
 
+  test("sem viagem de carro, a cidade sem pontos também é preparada e o cartão mostra o andamento", async ({ page }) => {
+    await cadastrarEmJoinville(page);
+    await page.goto("/roteiros/gerar");
+    await page.getByLabel("Cidade *").fill("Itajaí");
+    await page.getByLabel("Dias", { exact: true }).fill("1");
+    await page.getByRole("button", { name: "Gerar roteiro" }).click();
+
+    // No E2E o servidor de mapas não responde: o cartão termina dizendo que não deu, sem a lista de cidades.
+    await expect(page.locator(".preparo-destino", { hasText: "Itajaí" })).toBeVisible();
+    await expect(page.getByText(/Ainda não há pontos cadastrados/)).toHaveCount(0);
+  });
+
   test("preparo que o servidor esqueceu (reinício) para de consultar e oferece gerar de novo", async ({ page }) => {
     await cadastrarEmJoinville(page);
     // A geração disse "preparando" e depois o servidor reiniciou: o andamento passa a dar 404.
@@ -239,7 +251,8 @@ test.describe("viagem de carro", () => {
 
       const resposta = await rota.fetch();
       const corpo = await resposta.json();
-      corpo.viagemDeCarro.preparos = [{ cidade: "Itajaí", uf: "SC", estado: "preparando", pontos: 0 }];
+      corpo.preparos = [{ cidade: "Itajaí", uf: "SC", estado: "preparando", pontos: 0 }];
+      corpo.viagemDeCarro.preparos = corpo.preparos;
       await rota.fulfill({ response: resposta, json: corpo });
     });
     await page.route(
