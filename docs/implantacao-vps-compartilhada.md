@@ -7,7 +7,8 @@ servidor passa a atender também os dois endereços novos e repassa o tráfego p
 
 > **Situação atual (17/11/2026).** Este guia foi seguido de ponta a ponta: o NomadPlan está publicado em
 > `https://nomadplan.blackyears.com.br` (API em `https://api.nomadplan.blackyears.com.br`), com os dados restaurados de um backup, certificados
-> emitidos pelo Caddy já existente no servidor e as senhas das contas de demonstração trocadas. Os três contêineres do NomadPlan
+> emitidos pelo Caddy já existente no servidor, as senhas das contas de demonstração trocadas e o e-mail de recuperação de senha funcionando pelo
+> Brevo (domínio `blackyears.com.br` autenticado com DKIM; o SPF e o DMARC que já existiam no domínio foram mantidos). Os três contêineres do NomadPlan
 > rodam com limite de memória e sem afetar o outro projeto.
 
 Regras para não atrapalhar o projeto que já está no ar:
