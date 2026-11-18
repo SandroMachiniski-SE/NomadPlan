@@ -439,10 +439,16 @@ export function consultaOverpass(cidade: string, uf: string): string {
     return `nwr["${chave}"~"^(${valores.join("|")})$"]["name"](area.cidade);`;
   }).join("\n  ");
 
-  return `[out:json][timeout:180];
-area["ISO3166-2"="BR-${uf.toUpperCase()}"]->.uf;
+  // O Distrito Federal não tem município dentro dele no OpenStreetMap: o próprio DF é Brasília.
+  const areaDaCidade =
+    uf.toUpperCase() === "DF"
+      ? `area["ISO3166-2"="BR-DF"]->.cidade;`
+      : `area["ISO3166-2"="BR-${uf.toUpperCase()}"]->.uf;
 rel(area.uf)["boundary"="administrative"]["admin_level"="8"]["name"="${nome}"];
-map_to_area->.cidade;
+map_to_area->.cidade;`;
+
+  return `[out:json][timeout:180];
+${areaDaCidade}
 (
   ${filtros}
 );
