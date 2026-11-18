@@ -219,6 +219,27 @@ describe("dividirEmDias", () => {
     assert.equal(dividir(candidatos, { kmPorHora: 70 }).noites[0].cidade?.codigoIbge, 2);
   });
 
+  it("limite de horas baixo: a faixa encolhe junto com o alvo do dia e não sobra um dia quase vazio", () => {
+    // 2 h a 40 km/h dão 80 km por dia. Com a faixa fixa de ±50 km, a cidade do km 32 (muito bem avaliada)
+    // ganhava da do km 80 e o primeiro dia teria só 32 km. Com a faixa de 30% do alvo (±24 km) ela sai.
+    const candidatos = [cidade(1, 32, 20, 10, 2, 400), cidade(2, 80, 1, 0, 2, 400), cidade(3, 160, 5, 1, 2, 400), cidade(4, 240, 5, 1, 2, 400)];
+
+    const d = dividir(candidatos, { totalKm: 400, alvoKm: 500, horasPorDia: 2, kmPorHora: 40 });
+
+    assert.equal(d.noites[0].cidade?.codigoIbge, 2);
+    assert.equal(d.noites[0].kmAlvo, 80);
+
+    const kmDosDias = d.noites.map((n, i) => n.km - (i === 0 ? 0 : d.noites[i - 1].km));
+
+    assert.ok(kmDosDias.every((km) => km >= 50), `dias de estrada: ${kmDosDias.join(", ")} km`);
+  });
+
+  it("alvo de 500 km continua com a faixa de ±50 km", () => {
+    const d = dividir([cidade(1, 449, 20, 10), cidade(2, 500, 1, 0)]);
+
+    assert.equal(d.noites[0].cidade?.codigoIbge, 2, "o km 449 está fora da faixa 450–550");
+  });
+
   it("até 3 alternativas, sem repetir a escolhida", () => {
     const d = dividir([480, 490, 500, 510, 520, 530].map((km, i) => cidade(i + 1, km, 5, 1)));
     const escolhida = d.noites[0].cidade!.codigoIbge;
