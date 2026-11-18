@@ -521,12 +521,15 @@ describe("viagem de carro no gerador de roteiro", () => {
       viagem.estado.overpassFora = true;
       await gerar(token, { etapas: [{ cidade: "Barra Velha", dias: 1 }], viagemDeCarro: {} });
       assert.equal((await esperarPreparo(token, "Barra Velha", "SC")).estado, "erro");
+      // O preparo já tentou de novo sozinho (servidor fora do ar): a nova geração não tenta mais.
+      const chamadasAntes = chamadasDePreparo("Barra Velha");
 
       const r = await gerar(token, { etapas: [{ cidade: "Barra Velha", dias: 1 }], viagemDeCarro: {} });
 
       assert.deepEqual(r.corpo.viagemDeCarro.preparos, [{ cidade: "Barra Velha", uf: "SC", estado: "erro", pontos: 0 }]);
       assert.ok(r.corpo.avisos.includes("Não foi possível preparar Barra Velha agora; tente de novo em alguns minutos."));
-      assert.equal(chamadasDePreparo("Barra Velha"), 1);
+      assert.equal(chamadasAntes, 3);
+      assert.equal(chamadasDePreparo("Barra Velha"), chamadasAntes);
     });
 
     it("com os preparos simultâneos ocupados, a cidade vem como ocupado e com o outro aviso", async () => {

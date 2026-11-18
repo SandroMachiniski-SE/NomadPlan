@@ -15,6 +15,7 @@ process.env.JWT_SECRET = "segredo-de-teste-apenas-para-a-suite-de-integracao";
 process.env.DATABASE_URL = urlDoBancoDeTeste();
 process.env.FRONTEND_URL = "http://localhost:5173";
 process.env.SMTP_HOST = "";
+process.env.PREPARO_NOVA_TENTATIVA_MS = "20";
 
 if (!process.env.TESTE_COM_RATE_LIMIT) {
   process.env.RATE_LIMIT_OFF = "1";

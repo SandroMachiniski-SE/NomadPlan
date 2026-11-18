@@ -15,9 +15,11 @@ const PADRAO = ["SC", "PR", "RS", "SP", "RJ", "MG", "ES"];
 async function main() {
   const argumentos = process.argv.slice(2);
   const posicaoDoLote = argumentos.indexOf("--lote");
-  const lote = posicaoDoLote >= 0 ? Number(argumentos[posicaoDoLote + 1]) : undefined;
+  // O valor do --lote não é UF (sem --lote, nenhum argumento é pulado).
+  const posicaoDoValor = posicaoDoLote >= 0 ? posicaoDoLote + 1 : -1;
+  const lote = posicaoDoLote >= 0 ? Number(argumentos[posicaoDoValor]) : undefined;
   const ufs = argumentos
-    .filter((a, i) => !a.startsWith("--") && i !== posicaoDoLote + 1)
+    .filter((a, i) => !a.startsWith("--") && i !== posicaoDoValor)
     .map((a) => a.toUpperCase());
   const escolhidas = ufs.length > 0 ? ufs : PADRAO;
   const invalidas = escolhidas.filter((uf) => !(UFS as readonly string[]).includes(uf));

@@ -69,7 +69,7 @@ Erros têm o formato `{ "erro": "mensagem em português" }`; erros de validaçã
 | --- | --- | --- | --- |
 | GET | `/cidades/buscar?q=` | público | Municípios do Brasil pelo nome (Nominatim), cada um com `codigoIbge` (ou `null`), `pontos`, `disponivel` e o andamento do preparo. Sem o Nominatim (`semServidorDeMapas: true`), procura nos municípios do IBGE gravados no banco. Limite: 20/min por IP. |
 | POST | `/cidades/perto` | público | Município cuja sede é a mais próxima das coordenadas. Corpo: `latitude`, `longitude` (o front arredonda para 2 casas). É `POST` para as coordenadas não irem na URL nem no log; nada é gravado. Resposta: `{ codigoIbge, cidade, uf, latitude, longitude }`; sede a mais de 50 km → `404` "Não encontramos um município do Brasil perto de você." |
-| POST / GET | `/cidades/preparar` | 🔒 / público | Prepara uma cidade nova sob demanda (lugares do OpenStreetMap) e consulta o andamento. |
+| POST / GET | `/cidades/preparar` | 🔒 / público | Prepara uma cidade nova sob demanda (lugares do OpenStreetMap) e consulta o andamento. Se o servidor de mapas estiver ocupado (429, 502, 503, 504 ou tempo esgotado), tenta de novo sozinho até 3 vezes, 2 minutos entre elas (`PREPARO_NOVA_TENTATIVA_MS`), e a `etapa` diz que está esperando. |
 
 ## Roteiros — `/roteiros` 🔒
 

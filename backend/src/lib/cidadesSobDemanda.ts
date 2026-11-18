@@ -77,41 +77,82 @@ export async function pontosDaCidade(cidade: string, latitude: number, longitude
   return Number(total);
 }
 
-function mensagemDoErro(erro: unknown): string {
-  const texto = erro instanceof Error ? erro.message : String(erro);
+// O Overpass público recusa (429) ou cai (502/503/504) quando está cheio: são falhas passageiras.
+const ehFalhaPassageira = (erro: unknown) =>
+  /\b(429|504|502|503)\b|timeout|aborted|fetch failed/i.test(erro instanceof Error ? erro.message : String(erro));
 
-  if (/\b(429|504|502|503)\b|timeout|aborted|fetch failed/i.test(texto)) {
+function mensagemDoErro(erro: unknown): string {
+  if (ehFalhaPassageira(erro)) {
     return "O servidor de mapas está ocupado ou demorou a responder. Tente novamente em alguns minutos.";
   }
 
   return "Não foi possível preparar esta cidade agora. Tente novamente mais tarde.";
 }
 
+const TENTATIVAS_DO_PREPARO = 3;
+// Pausa antes de tentar de novo depois de uma falha passageira (os testes usam uma curta).
+const pausaDaNovaTentativaMs = () => Number(process.env.PREPARO_NOVA_TENTATIVA_MS) || 2 * 60 * 1000;
+
+/**
+ * Baixa os lugares da cidade (Overpass, com fotos e descrições do Wikidata e do Commons) e grava no
+ * banco. null quando o OpenStreetMap não tem nenhum lugar ali; erro quando o servidor falha.
+ */
+export async function baixarEImportarCidade(
+  cidade: string,
+  uf: string,
+  aoGravar?: () => void,
+): Promise<{ pontosNoArquivo: number; resumo: Awaited<ReturnType<typeof importarPontosOsm>> } | null> {
+  const baixada = await baixarDadosDaCidade(cidade, uf);
+
+  if (!baixada) return null;
+
+  aoGravar?.();
+
+  return { pontosNoArquivo: baixada.dados.pontos.length, resumo: await importarPontosOsm(baixada.dados.pontos) };
+}
+
+/** Baixa e grava; com o servidor de mapas ocupado, tenta de novo sozinho depois de uma pausa. */
+async function baixarComNovasTentativas(preparo: PreparoDeCidade) {
+  for (let tentativa = 1; ; tentativa += 1) {
+    try {
+      preparo.etapa = "Baixando os lugares do OpenStreetMap (pode levar até 1 minuto)...";
+
+      return await baixarEImportarCidade(preparo.cidade, preparo.uf, () => {
+        preparo.etapa = "Gravando os lugares no banco...";
+      });
+    } catch (erro) {
+      if (!ehFalhaPassageira(erro) || tentativa >= TENTATIVAS_DO_PREPARO) throw erro;
+
+      const pausa = pausaDaNovaTentativaMs();
+
+      console.error(`Preparo de ${preparo.cidade}/${preparo.uf}, tentativa ${tentativa}:`, erro instanceof Error ? erro.message : erro);
+      preparo.etapa =
+        `O servidor de mapas está ocupado; tentando de novo em ${Math.max(1, Math.round(pausa / 60_000))} min ` +
+        `(tentativa ${tentativa + 1} de ${TENTATIVAS_DO_PREPARO})...`;
+      await new Promise((resolver) => setTimeout(resolver, pausa));
+    }
+  }
+}
+
 async function executar(preparo: PreparoDeCidade, idUsuario: number): Promise<void> {
   try {
-    preparo.etapa = "Baixando os lugares do OpenStreetMap (pode levar até 1 minuto)...";
+    const importada = await baixarComNovasTentativas(preparo);
 
-    const baixada = await baixarDadosDaCidade(preparo.cidade, preparo.uf);
-
-    if (!baixada) {
+    if (!importada) {
       preparo.estado = "erro";
       preparo.erro = `O OpenStreetMap não tem lugares cadastrados para ${preparo.cidade}/${preparo.uf}.`;
 
       return;
     }
 
-    preparo.etapa = "Gravando os lugares no banco...";
-
-    const resumo = await importarPontosOsm(baixada.dados.pontos);
-
     await registrarAuditoria({
       idUsuario,
       acao: "preparar_cidade",
       entidade: "ponto_turistico",
-      detalhes: { cidade: preparo.cidade, uf: preparo.uf, pontosNoArquivo: baixada.dados.pontos.length, ...resumo },
+      detalhes: { cidade: preparo.cidade, uf: preparo.uf, pontosNoArquivo: importada.pontosNoArquivo, ...importada.resumo },
     });
 
-    preparo.pontos = baixada.dados.pontos.length;
+    preparo.pontos = importada.pontosNoArquivo;
     preparo.estado = "pronta";
     preparo.etapa = "Pronta.";
   } catch (erro) {

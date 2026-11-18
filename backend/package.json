@@ -28,6 +28,7 @@
     "municipios:populacao": "tsx src/scripts/baixarPopulacao.ts",
     "viagem:preparar": "tsx src/scripts/prepararViagem.ts",
     "viagem:aquecer": "tsx src/scripts/aquecerResumos.ts",
+    "destinos:preparar": "tsx src/scripts/prepararDestinos.ts",
     "dados:carregar": "npm run municipios:importar && npm run osm:importar && npm run overture:importar && npm run curadoria:aplicar"
   },
   "dependencies": {

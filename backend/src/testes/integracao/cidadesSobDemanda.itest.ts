@@ -165,7 +165,7 @@ describe("qualquer cidade do Brasil: busca e preparação sob demanda", () => {
       assert.match(fim.erro, /não tem lugares/);
     });
 
-    it("explica de forma amigável quando o servidor de mapas está ocupado", async () => {
+    it("servidor ocupado nas 3 tentativas: explica de forma amigável", async () => {
       const { token } = await criarUsuario();
       mapas = instalarMapasFalsos({ overpass: () => ({ status: 429, corpo: {} }) });
 
@@ -174,6 +174,34 @@ describe("qualquer cidade do Brasil: busca e preparação sob demanda", () => {
 
       assert.equal(fim.estado, "erro");
       assert.match(fim.erro, /ocupado/);
+      assert.equal(mapas.chamadas.filter((c) => c.servico === "overpass").length, 3);
+    });
+
+    it("servidor ocupado uma vez: tenta de novo sozinho e a cidade fica pronta", async () => {
+      const { token } = await criarUsuario();
+      let chamadas = 0;
+      mapas = instalarMapasFalsos({
+        overpass: () => {
+          chamadas += 1;
+          return chamadas === 1 ? { status: 502, corpo: {} } : { corpo: { elements: elementosOverpass(PEDIDO.latitude, PEDIDO.longitude) } };
+        },
+      });
+
+      await api("POST", "/cidades/preparar", { token, json: PEDIDO });
+      const fim = await esperarPreparo(token, PEDIDO.cidade, PEDIDO.uf);
+
+      assert.equal(fim.estado, "pronta", JSON.stringify(fim));
+      assert.equal(chamadas, 2);
+    });
+
+    it("OpenStreetMap sem lugares não é tentado de novo", async () => {
+      const { token } = await criarUsuario();
+      mapas = instalarMapasFalsos({ overpass: () => ({ corpo: { elements: [] } }) });
+
+      await api("POST", "/cidades/preparar", { token, json: { cidade: "Vila Sem Nada", uf: "AC", latitude: -9.9, longitude: -67.8 } });
+      await esperarPreparo(token, "Vila Sem Nada", "AC");
+
+      assert.equal(mapas.chamadas.filter((c) => c.servico === "overpass").length, 1);
     });
 
     it("a consulta de acompanhamento responde 404 para cidade que não está sendo preparada", async () => {
