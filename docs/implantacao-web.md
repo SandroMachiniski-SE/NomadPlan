@@ -126,7 +126,7 @@ Saia e entre de novo no site para o novo papel valer.
 1. Crie a conta em https://www.brevo.com (o plano gratuito envia cerca de 300 e-mails por dia).
 2. **Domínios e remetentes → Domínios → Adicionar** `blackyears.com.br`. O Brevo mostra registros DNS (verificação do domínio, DKIM, e sugere SPF e DMARC).
 3. Cadastre esses registros no DNS da GoDaddy (**Adicionar novo registro**, tipo e valores exatamente como o Brevo mostrar; atenção para não duplicar um SPF `TXT` que já exista: junte as inclusões em um só) e clique em **Verificar** no Brevo.
-4. No Brevo, em **SMTP e API → SMTP**, copie o servidor, o login e gere uma **chave SMTP**.
+4. No Brevo, em **SMTP e API → SMTP**, copie o servidor, o login e gere uma **chave SMTP**. O login é o que o Brevo mostra (algo como `codigo@smtp-brevo.com`), não o e-mail da conta, e a chave SMTP não é a chave de API. O remetente do `EMAIL_FROM` precisa pertencer ao domínio verificado (por exemplo `nao-responda@blackyears.com.br`).
 5. No servidor, edite o `.env.prod` (`SMTP_USER` com o login e `SMTP_PASS` com a chave; a chave só vai neste arquivo, nunca no git nem em conversas) e reinicie a API:
 
    ```bash
