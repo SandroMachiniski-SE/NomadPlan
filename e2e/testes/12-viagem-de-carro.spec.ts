@@ -129,9 +129,10 @@ test.describe("viagem de carro", () => {
     await gerarDeCarro(page, "Brasília", 2, { comVolta: true });
 
     await expect(cabecalhoDoDia1(page)).toBeVisible();
-    // Ida nos dias 1 a 3, Brasília nos dias 4 e 5, volta do 6 ao 8 terminando em casa.
+    // Ida nos dias 1 a 3, Brasília nos dias 4 e 5, volta do 6 ao 9 terminando em casa: no fim da volta
+    // sobra pouco mais que a faixa do alvo, e o padrão é dormir antes em vez de passar do limite.
     await expect(page.getByRole("heading", { name: /^Dia 6 · Estrada · Brasília\/DF →/ })).toBeVisible();
-    await expect(page.getByRole("heading", { name: /^Dia 8 · Estrada · .+ → Joinville\/SC/ })).toBeVisible();
+    await expect(page.getByRole("heading", { name: /^Dia 9 · Estrada · .+ → Joinville\/SC/ })).toBeVisible();
 
     await page.getByRole("button", { name: "Salvar como meu roteiro" }).click();
     await expect(page).toHaveURL(/\/roteiros\/\d+$/);
