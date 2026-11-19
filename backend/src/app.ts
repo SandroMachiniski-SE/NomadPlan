@@ -15,6 +15,7 @@ import salvosRouter from "./routes/salvos.routes";
 import convitesRouter from "./routes/convites.routes";
 import cidadesRouter from "./routes/cidades.routes";
 import { limiteGeral } from "./middleware/rateLimit";
+import { medirRequisicoes } from "./lib/prometheus";
 
 interface ErroComStatus {
   type?: string;
@@ -36,6 +37,9 @@ export function criarApp(): express.Express {
   if (trustProxy) {
     app.set("trust proxy", /^\d+$/.test(trustProxy) ? Number(trustProxy) : trustProxy);
   }
+
+  // Primeiro de todos: mede também as requisições recusadas pelos demais.
+  app.use(medirRequisicoes);
 
   app.use(helmet());
 

@@ -1,0 +1,46 @@
+# Regras de alerta (RNF25). Aparecem no Prometheus (aba Alerts) e no Grafana (Alerting). Para receber aviso por
+# e-mail ou Telegram, acrescente um Alertmanager; veja docs/monitoramento.md.
+groups:
+  - name: nomadplan-api
+    rules:
+      - alert: ApiForaDoAr
+        expr: up{job="nomadplan-api"} == 0
+        for: 2m
+        labels:
+          severidade: critica
+        annotations:
+          resumo: "A API não responde às coletas há mais de 2 minutos."
+
+      - alert: ErrosNoServidor
+        expr: >
+          sum(rate(nomadplan_http_requisicoes_total{status=~"5.."}[5m]))
+          / clamp_min(sum(rate(nomadplan_http_requisicoes_total[5m])), 1e-9) > 0.01
+        for: 5m
+        labels:
+          severidade: alta
+        annotations:
+          resumo: "Mais de 1% das respostas foram erro 5xx nos últimos 5 minutos."
+
+      - alert: RespostaLenta
+        expr: histogram_quantile(0.95, sum by (le) (rate(nomadplan_http_duracao_segundos_bucket[5m]))) > 2
+        for: 10m
+        labels:
+          severidade: media
+        annotations:
+          resumo: "O tempo de resposta p95 passou de 2 segundos por 10 minutos."
+
+      - alert: MemoriaAlta
+        expr: nomadplan_process_resident_memory_bytes > 600 * 1024 * 1024
+        for: 10m
+        labels:
+          severidade: media
+        annotations:
+          resumo: "A API usa mais de 600 MB de memória (o limite do contêiner é 768 MB)."
+
+      - alert: LacoDeEventosAtrasado
+        expr: nomadplan_nodejs_eventloop_lag_p99_seconds > 0.5
+        for: 5m
+        labels:
+          severidade: media
+        annotations:
+          resumo: "O laço de eventos da API atrasa mais de 0,5 s: a API está sobrecarregada."
