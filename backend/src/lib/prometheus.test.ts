@@ -15,6 +15,11 @@ describe("rotaDaRequisicao", () => {
     assert.equal(rotaDaRequisicao({ baseUrl: "", route: { path: "/health" } } as never), "/health");
   });
 
+  it("a raiz da aplicação sem prefixo é /, e sem baseUrl só vale o caminho da rota", () => {
+    assert.equal(rotaDaRequisicao({ baseUrl: "", route: { path: "/" } } as never), "/");
+    assert.equal(rotaDaRequisicao({ route: { path: "/saude" } } as never), "/saude");
+  });
+
   it("endereço sem rota (404) vira um único rótulo, para as métricas não crescerem sem limite", () => {
     assert.equal(rotaDaRequisicao({ baseUrl: "", route: undefined } as never), "(sem rota)");
   });
