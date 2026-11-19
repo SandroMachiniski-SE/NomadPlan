@@ -37,6 +37,9 @@ export function formatarMoeda(centavos: number): string {
  * Vazio devolve null (sem valor); texto que não é um valor devolve NaN.
  */
 export function lerValorEmCentavos(texto: string): number | null {
+  // Custo e teto não são negativos: o sinal de menos não pode sumir na limpeza e virar positivo.
+  if (/[-−–]/.test(texto)) return Number.NaN;
+
   const limpo = texto.replace(/[^\d.,]/g, "");
 
   if (limpo === "") return texto.trim() === "" ? null : Number.NaN;
