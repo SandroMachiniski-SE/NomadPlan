@@ -274,3 +274,81 @@ test.describe("viagem de carro", () => {
     await expect(cartao.getByRole("button", { name: "Gerar de novo" })).toBeDisabled();
   });
 });
+
+test.describe("no caminho: sugestões do gosto e o pernoite que a pessoa decide", () => {
+  test("as sugestões no caminho seguem o gosto marcado e não entram na agenda", async ({ page }) => {
+    await cadastrarEmJoinville(page);
+    await page.goto("/roteiros/gerar");
+    await page.getByLabel("Cidade *").fill("Brasília");
+    await page.getByLabel("Dias", { exact: true }).fill("1");
+    await page.getByRole("button", { name: "Natureza", exact: true }).click();
+    await page.getByLabel("Vou de carro saindo de casa").check();
+    await page.getByRole("button", { name: "Gerar roteiro" }).click();
+
+    const sugestoes = page.getByRole("complementary", { name: "Sugestões no caminho do dia 1" });
+    await expect(sugestoes.getByRole("link", { name: "Parque no caminho E2E" })).toBeVisible();
+    await expect(sugestoes.getByRole("link", { name: "Museu no caminho E2E" })).toHaveCount(0);
+    await expect(page.locator(".paradas").getByText("Parque no caminho E2E")).toHaveCount(0);
+
+    // Em tela de celular nada passa da largura.
+    await page.setViewportSize({ width: 390, height: 844 });
+    await sugestoes.scrollIntoViewIfNeeded();
+    await expect.poll(() => page.evaluate(() => document.documentElement.scrollWidth <= window.innerWidth)).toBe(true);
+  });
+
+  test("descartar a sugestão de pernoite mantém a viagem e o roteiro salvo marca o pernoite no caminho", async ({ page }) => {
+    await cadastrarEmJoinville(page);
+    await gerarDeCarro(page, "Brasília", 1);
+
+    await page.getByRole("button", { name: "Descartar sugestão de pernoite" }).first().click();
+    await expect(page.getByText(/Sugestão de pernoite descartada/)).toBeVisible();
+    await expect(cabecalhoDoDia1(page)).toBeVisible();
+
+    await page.getByRole("button", { name: "Salvar como meu roteiro" }).click();
+    await expect(page).toHaveURL(/\/roteiros\/\d+$/);
+    await expect(page.getByText("Pernoite a escolher no caminho (sugestão descartada)")).toBeVisible();
+    await page.reload();
+    await expect(page.getByText("Pernoite a escolher no caminho (sugestão descartada)")).toBeVisible();
+  });
+
+  test("seguir até a próxima hospedagem só com aceite: recusar mantém a viagem e aceitar pede a nova divisão", async ({ page }) => {
+    // Nos dados do E2E sempre há hotel perto do alvo: a primeira resposta ganha a proposta de seguir até o destino.
+    const pedidos: { escolhas?: { perna: number; noite: number; codigoIbge: number }[] }[] = [];
+    await page.route("**/roteiros/gerar", async (rota) => {
+      // A página /roteiros/gerar do site também casa com o padrão: só o POST da API é alterado.
+      if (rota.request().method() !== "POST") return rota.continue();
+
+      const viagem = (rota.request().postDataJSON() as { viagemDeCarro?: (typeof pedidos)[number] }).viagemDeCarro ?? {};
+      pedidos.push(viagem);
+      const resposta = await rota.fetch();
+      const corpo = await resposta.json();
+
+      if (!viagem.escolhas?.length) {
+        const pernoite = corpo.viagemDeCarro.pernas[0].trechos[0].pernoite;
+        pernoite.aDefinir = true;
+        pernoite.proximaOpcao = { codigoIbge: 5300108, cidade: "Brasília", uf: "DF", kmDoDia: 1501, excedenteKm: 1001, destino: true };
+      }
+
+      await rota.fulfill({ response: resposta, json: corpo });
+    });
+    await cadastrarEmJoinville(page);
+    await gerarDeCarro(page, "Brasília", 1);
+
+    const aceitar = page.getByRole("button", { name: "Aceitar seguir até Brasília" });
+    await expect(aceitar).toBeVisible();
+    await expect(page.getByText(/seriam 1\.501 km neste dia, 1\.001 km além do alvo/)).toBeVisible();
+
+    await page.getByRole("button", { name: "Recusar e escolher no caminho" }).click();
+    await expect(aceitar).toHaveCount(0);
+    await expect(page.getByText(/Sugestão de pernoite descartada/)).toBeVisible();
+    await expect(page.getByRole("button", { name: "Salvar como meu roteiro" })).toBeVisible();
+
+    await page.getByRole("button", { name: "Rever a sugestão" }).click();
+    const regerada = page.waitForResponse((r) => r.url().endsWith("/roteiros/gerar") && r.request().method() === "POST");
+    await aceitar.click();
+    await regerada;
+
+    expect(pedidos.length).toBe(2);
+    expect(pedidos[1].escolhas).toEqual([{ perna: 0, noite: 1, codigoIbge: 5300108 }]);
+  });
+});

@@ -195,6 +195,55 @@ describe("salvar e ler a viagem de carro", () => {
     assert.deepEqual(roteiro.pontos, []);
   });
 
+  it("descartar a sugestão de pernoite mantém a viagem e grava o pernoite a escolher no caminho", async () => {
+    const { pedido } = await gerarEMontar();
+    pedido.viagemDeCarro.noites = pedido.viagemDeCarro.noites.map((n) => (n.noite === 1 ? { ...n, semSugestao: true } : n));
+
+    const r = await salvar(pedido);
+    assert.equal(r.status, 201, JSON.stringify(r.corpo));
+
+    const pernoites = await prisma.itemRoteiro.findMany({ where: { idRoteiro: r.corpo.id, pernoite: true }, orderBy: { dia: "asc" } });
+    assert.deepEqual(
+      pernoites.map((i) => [i.dia, i.idPonto, i.titulo]),
+      [
+        [1, null, "Pernoite a escolher no caminho (sugestão descartada)"],
+        [2, null, "Pernoite em Cidade B (hotel a definir)"],
+      ],
+      "o hotel da noite 1 fica de fora mesmo tendo vindo no pedido",
+    );
+    assert.equal(await prisma.trechoEstrada.count({ where: { idRoteiro: r.corpo.id } }), 3, "a estrada continua a mesma");
+  });
+
+  it("aceitar seguir direto até o destino salva a viagem sem a noite na estrada", async () => {
+    viagem.estado.ofertas = [];
+    const escolhas = [{ perna: 0, noite: 1, codigoIbge: 5300108 }];
+    const gerado = await api("POST", "/roteiros/gerar", {
+      token,
+      json: { etapas: [{ cidade: "Brasília, DF", dias: 1 }], horasDisponiveis: 6, dataHoraInicio: INICIO, viagemDeCarro: { escolhas } },
+    });
+    assert.equal(gerado.status, 200, JSON.stringify(gerado.corpo));
+    assert.equal(gerado.corpo.viagemDeCarro.pernas[0].trechos.length, 1);
+
+    const r = await salvar({
+      nome: "Direto para Brasília",
+      pontos: gerado.corpo.pontos.map((p: { id: number; dia: number }) => ({ idPonto: p.id, dia: p.dia })),
+      viagemDeCarro: {
+        origem: JOINVILLE.codigoIbge,
+        etapas: [{ codigoIbge: 5300108, dias: 1 }],
+        horasDisponiveis: 6,
+        kmPorDia: 500,
+        comVolta: false,
+        escolhas,
+        decisoes: [],
+        noites: [],
+      },
+    });
+
+    assert.equal(r.status, 201, JSON.stringify(r.corpo));
+    assert.equal(await prisma.trechoEstrada.count({ where: { idRoteiro: r.corpo.id } }), 1);
+    assert.equal(await prisma.itemRoteiro.count({ where: { idRoteiro: r.corpo.id, pernoite: true } }), 0);
+  });
+
   it("idOsm que não está no resumo da cidade dá 400", async () => {
     const { pedido } = await gerarEMontar();
     pedido.viagemDeCarro.noites[0] = { ...pedido.viagemDeCarro.noites[0], idOsm: "node/999999" };

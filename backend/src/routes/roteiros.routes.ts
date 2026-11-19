@@ -265,6 +265,7 @@ const viagemSalvaSchema = viagemDeCarroSchema.extend({
         perna: pernaSchema,
         noite: z.number().int().min(1).max(30),
         codigoIbge: z.number().int().positive().nullable(),
+        semSugestao: z.boolean().optional(),
         idOsm: z
           .string()
           .regex(/^(node|way|relation)\/\d+$/)
@@ -452,7 +453,7 @@ roteirosRouter.post("/gerar", limiteViagemDeCarro, async (req: Request, res: Res
         req.usuario!.id,
         dados.horasDisponiveis,
       );
-      const plano = await planejarViagemDeCarro(entrada);
+      const plano = await planejarViagemDeCarro(entrada, { interesses });
 
       preparos = await prepararDestinosSemPontos(entrada.etapas, req.usuario!.id);
       etapas = plano.etapasDoGerador;

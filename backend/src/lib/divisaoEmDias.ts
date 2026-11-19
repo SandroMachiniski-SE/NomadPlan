@@ -8,6 +8,8 @@ import { kmApos, type PerfilDaRota } from "./rotas";
 // hospedagens e de atrações (sem a contagem de hotéis, o porte da cidade pela população do IBGE).
 // Quando o fim da perna está "perto" (até um dia curto além da faixa), a pessoa decide entre esticar
 // e chegar ou dormir antes; o padrão é dormir antes, para nenhum dia passar do limite.
+// Sem hospedagem nem na maior faixa ampliada, o pernoite fica a definir e a divisão propõe seguir até
+// a próxima cidade com hospedagem conhecida adiante (ou até o destino): só vale se a pessoa aceitar.
 
 export const FAIXA_KM = 50;
 export const FRACAO_DIA_CURTO = 0.3;
@@ -41,6 +43,17 @@ export interface CandidatoDePernoite extends CidadeNaRota {
   resumo: ResumoOsm | null | undefined;
 }
 
+/** Seguir além do alvo até onde há hospedagem conhecida: proposta que só vale com o aceite da pessoa. */
+export interface ProximaOpcao {
+  /** null: o destino da perna (lá a viagem já chega; não depende da contagem de hotéis). */
+  cidade: CandidatoDePernoite | null;
+  codigoIbge: number;
+  km: number;
+  kmDoDia: number;
+  excedenteKm: number;
+  destino: boolean;
+}
+
 export interface PernoiteEscolhido {
   cidade: CandidatoDePernoite | null;
   km: number;
@@ -49,6 +62,8 @@ export interface PernoiteEscolhido {
   kmAlvo: number;
   aDefinir: boolean;
   alternativas: CandidatoDePernoite[];
+  /** Só no pernoite a definir: até onde seguir para dormir numa cidade com hospedagem. */
+  proximaOpcao?: ProximaOpcao;
 }
 
 export interface DecisaoDeChegada {
@@ -74,6 +89,8 @@ export interface EntradaDaDivisao {
   /** noite → código IBGE da cidade que a pessoa escolheu. */
   escolhas: Map<number, number>;
   esticar?: boolean;
+  /** Código IBGE do destino da perna: aceitar "seguir até o destino" encerra a perna sem mais noites. */
+  codigoDoDestino?: number;
 }
 
 const temResumo = (c: CandidatoDePernoite): c is CandidatoDePernoite & { resumo: ResumoOsm } => !!c.resumo;
@@ -136,6 +153,32 @@ export function dividirEmDias(entrada: EntradaDaDivisao): DivisaoDaPerna {
     return lista.filter((c) => !temResumo(c) || c.resumo.totalHospedagens >= 1);
   };
 
+  // A primeira cidade adiante com hospedagem confirmada; sem nenhuma antes do fim da perna, o destino.
+  // Cidades antes dela ainda sem contagem podem ter hotel: primeiro são contadas (próxima rodada).
+  const proximaAdiante = (depoisDoKm: number, kmAlvo: number): ProximaOpcao | undefined => {
+    const adiante = candidatos.filter((c) => c.km > depoisDoKm && c.km < totalKm).sort((a, b) => a.km - b.km);
+    const conhecida = adiante.find((c) => temResumo(c) && c.resumo.totalHospedagens >= 1);
+    const antes = adiante.filter((c) => !conhecida || c.km < conhecida.km);
+    const semContagem = antes.filter((c) => c.resumo === undefined).slice(0, MAX_RESUMOS_POR_FAIXA);
+
+    if (semContagem.length > 0) {
+      semContagem.forEach((c) => semResumo.add(c.codigoIbge));
+      return undefined;
+    }
+
+    if (antes.some((c) => c.resumo === null)) {
+      avisar("Algumas cidades do caminho ficaram sem a contagem de hotéis; a próxima opção proposta pode não ser a primeira com hospedagem.");
+    }
+
+    const fim = conhecida
+      ? { cidade: conhecida, codigoIbge: conhecida.codigoIbge, km: conhecida.km, destino: false }
+      : entrada.codigoDoDestino !== undefined
+        ? { cidade: null, codigoIbge: entrada.codigoDoDestino, km: totalKm, destino: true }
+        : null;
+
+    return fim ? { ...fim, kmDoDia: fim.km - pos, excedenteKm: fim.km - kmAlvo } : undefined;
+  };
+
   for (let noite = 1; noite <= MAX_NOITES; noite += 1) {
     const restante = totalKm - pos;
     const alvoDoDia = horasPorDia ? Math.min(alvoKm, kmApos(perfil, pos, horasPorDia * 3600) - pos) : alvoKm;
@@ -170,16 +213,33 @@ export function dividirEmDias(entrada: EntradaDaDivisao): DivisaoDaPerna {
     );
 
     if (ordenadas.length === 0) {
+      const proxima = proximaAdiante(kmAlvo + faixaMaxima, kmAlvo);
+
+      if (proxima && escolhas.get(noite) === proxima.codigoIbge) {
+        const nome = proxima.cidade?.cidade ?? "o destino";
+
+        avisar(`Você aceitou seguir até ${nome}: ${km(proxima.kmDoDia)} km neste dia, ${km(proxima.excedenteKm)} km além do alvo.`);
+
+        // Chegar ao destino encerra a perna: a chegada é o fim deste dia, sem uma noite a mais.
+        if (proxima.destino || !proxima.cidade) break;
+
+        noites.push({ cidade: proxima.cidade, km: proxima.km, fracao: proxima.cidade.fracao, kmAlvo, aDefinir: false, alternativas: [] });
+        pos = proxima.km;
+        continue;
+      }
+
       // Nenhuma hospedagem nem na maior faixa ampliada: dorme "a definir" na cidade mais perto do alvo.
       const maisPerto = naFaixa(kmAlvo - faixaMaxima, kmAlvo + faixaMaxima).sort(
         (a, b) => Math.abs(a.km - kmAlvo) - Math.abs(b.km - kmAlvo) || a.km - b.km,
       )[0];
 
       avisar(`Não há cidade com hospedagem perto do km ${km(kmAlvo)}; o pernoite ficou a definir.`);
+      const proposta = proxima ? { proximaOpcao: proxima } : {};
+
       noites.push(
         maisPerto
-          ? { cidade: maisPerto, km: maisPerto.km, fracao: maisPerto.fracao, kmAlvo, aDefinir: true, alternativas: [] }
-          : { cidade: null, km: kmAlvo, fracao: kmAlvo / totalKm, kmAlvo, aDefinir: true, alternativas: [] },
+          ? { cidade: maisPerto, km: maisPerto.km, fracao: maisPerto.fracao, kmAlvo, aDefinir: true, alternativas: [], ...proposta }
+          : { cidade: null, km: kmAlvo, fracao: kmAlvo / totalKm, kmAlvo, aDefinir: true, alternativas: [], ...proposta },
       );
       pos = noites[noites.length - 1].km;
       continue;

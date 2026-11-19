@@ -1370,6 +1370,37 @@ fieldset.field {
   list-style: none;
 }
 
+/* Proposta de seguir além do alvo: o texto quebra e os botões descem em tela estreita. */
+.proposta-pernoite {
+  margin: 0;
+  overflow-wrap: anywhere;
+}
+
+.pernoite-estrada .btn {
+  white-space: normal;
+}
+
+/* Sugestões do gosto da pessoa perto da estrada: separadas da agenda e do pernoite. */
+.sugestoes-estrada {
+  padding: 0.85rem 1rem;
+  margin-top: 0.75rem;
+  overflow-wrap: anywhere;
+}
+
+.sugestoes-estrada__titulo {
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+  font-size: 1rem;
+}
+
+.sugestoes-estrada__lista {
+  display: grid;
+  gap: 0.35rem;
+  margin: 0;
+  padding-left: 1.1rem;
+}
+
 .decisao-chegada {
   display: grid;
   gap: 0.35rem;
