@@ -313,6 +313,41 @@ describe("administração, notificações, pontos salvos e recomendações", () 
       assert.equal(r.corpo.dados[0].motivoRecomendacao, "usuarios_semelhantes");
     });
 
+    it("com interesses, gostos diferentes recebem listas diferentes: as indicações ficam nas categorias de cada um", async () => {
+      // Uma pessoa que gosta de tudo e salvou um parque e um museu é "parecida" com as duas.
+      const eclética = await criarUsuario({ interesses: ["Natureza", "Cultura"] });
+      const natureza = await criarUsuario({ interesses: ["Natureza"] });
+      const cultura = await criarUsuario({ interesses: ["Cultura"] });
+      const parque = await criarPonto({ nome: "Parque", categoria: "Natureza" });
+      const museu = await criarPonto({ nome: "Museu", categoria: "Cultura" });
+      await api("POST", `/salvos/${parque.id}`, { token: eclética.token });
+      await api("POST", `/salvos/${museu.id}`, { token: eclética.token });
+
+      const paraNatureza = (await api("GET", "/pontos/recomendados", { token: natureza.token })).corpo.dados;
+      const paraCultura = (await api("GET", "/pontos/recomendados", { token: cultura.token })).corpo.dados;
+
+      assert.deepEqual(paraNatureza.map((p: { nome: string }) => p.nome), ["Parque"]);
+      assert.deepEqual(paraCultura.map((p: { nome: string }) => p.nome), ["Museu"]);
+    });
+
+    it("hotel de pernoite das viagens de outras pessoas não vira recomendação", async () => {
+      const eu = await criarUsuario({ interesses: ["Natureza"] });
+      const parecida = await criarUsuario({ interesses: ["Natureza"] });
+      const parque = await criarPonto({ nome: "Parque", categoria: "Natureza" });
+      const hotel = await criarPonto({ nome: "Hotel do caminho", categoria: "Hospedagem" });
+      const roteiro = await prisma.roteiro.create({ data: { nome: "Viagem", idUsuario: parecida.usuario.id } });
+      await prisma.itemRoteiro.createMany({
+        data: [
+          { idRoteiro: roteiro.id, idPonto: parque.id, ordem: 0 },
+          { idRoteiro: roteiro.id, idPonto: hotel.id, ordem: 0, dia: 1, pernoite: true },
+        ],
+      });
+
+      const nomes = (await api("GET", "/pontos/recomendados", { token: eu.token })).corpo.dados.map((p: { nome: string }) => p.nome);
+
+      assert.deepEqual(nomes, ["Parque"]);
+    });
+
     it("exige login", async () => {
       assert.equal((await api("GET", "/pontos/recomendados")).status, 401);
     });

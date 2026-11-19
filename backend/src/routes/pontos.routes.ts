@@ -771,7 +771,15 @@ pontosRouter.get("/recomendados", autenticar, async (req: Request, res: Response
 
     const ordemSemelhantes = new Map(idsSemelhantes.map((id, indice) => [id, indice]));
 
+    // Quem marcou interesses recebe, das indicações de pessoas parecidas, só as das categorias do
+    // seu gosto (senão quem gosta de natureza e quem gosta de cultura recebiam a mesma lista).
+    // Sem interesses, hospedagem não entra: a recomendação é de lugares para visitar.
+    const meusInteresses = new Set(usuario.interesses.map((interesse) => interesse.trim().toLowerCase()));
+    const combinaComOGosto = (categoria: string) =>
+      meusInteresses.size > 0 ? meusInteresses.has(categoria.toLowerCase()) : categoria.toLowerCase() !== "hospedagem";
+
     const porSimilaridade = pontosSemelhantes
+      .filter((ponto) => combinaComOGosto(ponto.categoria))
       .sort((a, b) => (ordemSemelhantes.get(a.id) ?? 0) - (ordemSemelhantes.get(b.id) ?? 0))
       .map((ponto) => ({ ...ponto, motivoRecomendacao: "usuarios_semelhantes" as const }));
 
