@@ -136,4 +136,43 @@ test.describe("planejamento da viagem", () => {
     await expect(publica.getByText("Orçamento")).toHaveCount(0);
     await anonimo.close();
   });
+
+  test("teto de gastos negativo é recusado em vez de virar positivo", async ({ page }) => {
+    await cadastrar(page);
+    await roteiroComParadas(page, "Viagem com teto", [MUSEU]);
+    const orcamento = page.getByRole("region", { name: "Orçamento" });
+
+    await orcamento.getByLabel(/Teto de gastos/).fill("-25,90");
+    await orcamento.getByRole("button", { name: "Salvar teto" }).click();
+
+    await expect(orcamento.getByRole("alert")).toContainText("Informe um valor válido");
+    await page.reload();
+    await expect(page.getByRole("region", { name: "Orçamento" }).getByText("R$ 25,90")).toHaveCount(0);
+  });
+
+  test("notas abertas em duas abas: a segunda gravação não apaga a primeira", async ({ page }) => {
+    await cadastrar(page);
+    await roteiroComParadas(page, "Viagem em duas abas", [MUSEU]);
+    const outraAba = await page.context().newPage();
+    await outraAba.goto(page.url());
+    // As duas abas abriram as notas (vazias) antes de qualquer uma salvar.
+    await expect(outraAba.getByRole("region", { name: "Notas" }).getByLabel("Notas do roteiro")).toHaveValue("");
+
+    const notas = page.getByRole("region", { name: "Notas" });
+    await notas.getByLabel("Notas do roteiro").fill("Escrito na primeira aba");
+    await notas.getByRole("button", { name: "Salvar notas" }).click();
+    await expect(notas.getByText("Notas salvas.")).toBeVisible();
+
+    const notasDaOutra = outraAba.getByRole("region", { name: "Notas" });
+    await notasDaOutra.getByLabel("Notas do roteiro").fill("Escrito na segunda aba");
+    await notasDaOutra.getByRole("button", { name: "Salvar notas" }).click();
+
+    await expect(notasDaOutra.getByRole("alert")).toContainText("As notas mudaram em outra aba");
+    await expect(notasDaOutra.getByText("Escrito na primeira aba")).toBeVisible();
+    await notasDaOutra.getByRole("button", { name: "Usar as notas atuais" }).click();
+    await expect(notasDaOutra.getByLabel("Notas do roteiro")).toHaveValue("Escrito na primeira aba");
+
+    await page.reload();
+    await expect(page.getByRole("region", { name: "Notas" }).getByLabel("Notas do roteiro")).toHaveValue("Escrito na primeira aba");
+  });
 });

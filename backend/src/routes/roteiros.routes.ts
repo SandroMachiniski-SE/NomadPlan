@@ -302,6 +302,9 @@ const detalhesDaParadaSchema = z
 const anotacoesSchema = z
   .object({
     notas: z.string().trim().max(5000).nullable().optional(),
+    // As notas que a tela tinha quando a pessoa começou a editar: se mudaram desde então (outra aba,
+    // outra pessoa), a gravação é recusada em vez de apagar o que a outra salvou.
+    notasAnteriores: z.string().trim().max(5000).nullable().optional(),
     orcamentoCentavos: centavosSchema.nullable().optional(),
   })
   .refine((d) => d.notas !== undefined || d.orcamentoCentavos !== undefined, {
@@ -1241,18 +1244,31 @@ roteirosRouter.patch("/:id/anotacoes", async (req: Request, res: Response) => {
       return res.status(404).json({ erro: "Roteiro não encontrado." });
     }
 
-    const { notas, orcamentoCentavos } = resultado.data;
+    const { notas, notasAnteriores, orcamentoCentavos } = resultado.data;
+    const conferirNotas = notas !== undefined && notasAnteriores !== undefined;
 
-    const atualizado = await prisma.roteiro.update({
-      where: { id: id.data },
+    // O "where" com as notas anteriores torna a conferência atômica: de duas gravações sobre a
+    // mesma versão das notas, só a primeira encontra a linha.
+    const alteradas = await prisma.roteiro.updateMany({
+      where: { id: id.data, ...(conferirNotas ? { notas: notasAnteriores || null } : {}) },
       data: {
         ...(notas !== undefined ? { notas: notas || null } : {}),
         ...(orcamentoCentavos !== undefined ? { orcamentoCentavos } : {}),
       },
+    });
+    const atual = await prisma.roteiro.findUnique({
+      where: { id: id.data },
       select: { id: true, notas: true, orcamentoCentavos: true },
     });
 
-    return res.json(atualizado);
+    if (alteradas.count === 0) {
+      return res.status(409).json({
+        erro: "As notas mudaram em outra aba ou por outra pessoa enquanto você editava.",
+        notasAtuais: atual?.notas ?? null,
+      });
+    }
+
+    return res.json(atual);
   } catch (error) {
     console.error("Erro ao salvar anotações do roteiro:", error);
 

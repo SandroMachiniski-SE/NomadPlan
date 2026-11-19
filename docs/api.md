@@ -89,7 +89,7 @@ Erros têm o formato `{ "erro": "mensagem em português" }`; erros de validaçã
 | POST | `/roteiros/:id/itens/reordenar` | Corpo: `idsItensEmOrdem`. |
 | PUT | `/roteiros/:id/itens/organizar` | Organiza o roteiro de uma vez. Corpo: `itens: [{ id, dia }]` com **todas** as paradas atuais, na ordem desejada; serve para mover uma parada de dia e reordenar. `204`. |
 | PATCH | `/roteiros/:id/itens/:idItem` | Detalhes de uma parada: `observacao`, `custoCentavos`, `periodo`, `pernoite` e, só para atividades livres, `titulo` (`null` limpa; o que não vier não muda). `:idItem` é o `id` do item no roteiro. Não gera versão no histórico. |
-| PATCH | `/roteiros/:id/anotacoes` | Notas livres (`notas`, até 5.000 caracteres) e teto de gastos (`orcamentoCentavos`) do roteiro; `null` limpa. Só o dono vê; não aparecem no link público. Não gera versão. |
+| PATCH | `/roteiros/:id/anotacoes` | Notas livres (`notas`, até 5.000 caracteres) e teto de gastos (`orcamentoCentavos`) do roteiro; `null` limpa. Com `notasAnteriores` (as notas que a tela tinha ao começar a editar), a gravação só acontece se elas não mudaram desde então; senão, `409` com `notasAtuais`, para a pessoa escolher sem perder o que outra aba ou outra pessoa salvou. Quem participa do roteiro vê; não aparecem no link público. Não gera versão. |
 | POST | `/roteiros/:id/checklist` | Novo item da checklist (`texto`, até 200 caracteres; máx. 100 itens, `409` além disso). |
 | PATCH | `/roteiros/:id/checklist/:idItem` | Altera `texto` e/ou `feito`. |
 | DELETE | `/roteiros/:id/checklist/:idItem` | Remove o item. |
