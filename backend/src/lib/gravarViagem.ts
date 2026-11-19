@@ -13,6 +13,8 @@ export interface NoiteSalva {
   noite: number;
   codigoIbge: number | null;
   idOsm?: string;
+  /** A pessoa descartou a sugestão de pernoite: a estrada fica, e o hotel é escolhido no caminho. */
+  semSugestao?: boolean;
 }
 
 /** Problema no pedido de salvamento (vira o status informado com a mensagem). */
@@ -54,7 +56,7 @@ export function conferirHoteis(plano: PlanoDaViagem, noites: NoiteSalva[]): void
     const escolhida = noites.find((n) => n.perna === perna && n.noite === trecho.noite);
     const codigo = trecho.pernoite?.codigoIbge;
 
-    if (!escolhida?.idOsm) continue;
+    if (escolhida?.semSugestao || !escolhida?.idOsm) continue;
 
     const resumo = codigo ? plano.resumos.get(codigo) : undefined;
 
@@ -140,16 +142,19 @@ export async function gravarViagemDeCarro(
   for (const { perna, trecho } of noitesDoPlano(plano)) {
     const escolhida = noites.find((n) => n.perna === perna && n.noite === trecho.noite);
     const pernoite = trecho.pernoite!;
-    const idPonto = escolhida?.idOsm ? idsDosHoteis.get(escolhida.idOsm) : undefined;
-    const hotel = escolhida?.idOsm ? plano.resumos.get(pernoite.codigoIbge!)?.hospedagens.find((h) => h.idOsm === escolhida.idOsm) : undefined;
+    const idOsm = escolhida?.semSugestao ? undefined : escolhida?.idOsm;
+    const idPonto = idOsm ? idsDosHoteis.get(idOsm) : undefined;
+    const hotel = idOsm ? plano.resumos.get(pernoite.codigoIbge!)?.hospedagens.find((h) => h.idOsm === idOsm) : undefined;
     // Hotel que o classificador do OSM não aceitou como ponto continua escolhido, pelo nome.
-    const titulo = idPonto
-      ? null
-      : hotel
-        ? `Pernoite no ${hotel.nome} (${pernoite.cidade})`
-        : pernoite.codigoIbge
-          ? `Pernoite em ${pernoite.cidade} (hotel a definir)`
-          : `Pernoite no km ${Math.round(pernoite.km)} (a definir)`;
+    const titulo = escolhida?.semSugestao
+      ? "Pernoite a escolher no caminho (sugestão descartada)"
+      : idPonto
+        ? null
+        : hotel
+          ? `Pernoite no ${hotel.nome} (${pernoite.cidade})`
+          : pernoite.codigoIbge
+            ? `Pernoite em ${pernoite.cidade} (hotel a definir)`
+            : `Pernoite no km ${Math.round(pernoite.km)} (a definir)`;
 
     await tx.itemRoteiro.create({
       data: { idRoteiro, idPonto: idPonto ?? null, titulo, dia: trecho.dia, ordem: 0, pernoite: true },

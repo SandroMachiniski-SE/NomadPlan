@@ -128,14 +128,38 @@ export function diasDaViagem(resposta: RespostaRecomendacao): DiaDaViagem[] {
 }
 
 /** As noites de estrada como a pessoa as vê agora, com o hotel escolhido em cada uma. */
-export function noitesParaSalvar(resposta: RespostaRecomendacao, hoteis: Map<string, string>): NoiteSalva[] {
+/** Das noites marcadas ("perna-noite"), as que ainda existem na viagem gerada de novo. */
+export function noitesQueContinuam(chaves: Set<string>, resposta: RespostaRecomendacao): Set<string> {
+  const existentes = new Set(
+    (resposta.viagemDeCarro?.pernas ?? []).flatMap((p) => p.trechos.flatMap((t) => (t.noite === null ? [] : [chaveDaNoite(p.perna, t.noite)]))),
+  );
+
+  return new Set([...chaves].filter((chave) => existentes.has(chave)));
+}
+
+/** As noites como a pessoa deixou: o hotel escolhido, ou a sugestão de pernoite descartada (sem hotel). */
+export function noitesParaSalvar(
+  resposta: RespostaRecomendacao,
+  hoteis: Map<string, string>,
+  descartadas: Set<string> = new Set(),
+): NoiteSalva[] {
   return (resposta.viagemDeCarro?.pernas ?? []).flatMap((perna) =>
     perna.trechos.flatMap((t) => {
       if (t.noite === null) return [];
 
-      const idOsm = hoteis.get(chaveDaNoite(perna.perna, t.noite));
+      const chave = chaveDaNoite(perna.perna, t.noite);
+      const semSugestao = descartadas.has(chave);
+      const idOsm = semSugestao ? undefined : hoteis.get(chave);
 
-      return [{ perna: perna.perna, noite: t.noite, codigoIbge: t.pernoite?.codigoIbge ?? null, ...(idOsm ? { idOsm } : {}) }];
+      return [
+        {
+          perna: perna.perna,
+          noite: t.noite,
+          codigoIbge: t.pernoite?.codigoIbge ?? null,
+          ...(idOsm ? { idOsm } : {}),
+          ...(semSugestao ? { semSugestao: true } : {}),
+        },
+      ];
     }),
   );
 }

@@ -27,6 +27,7 @@ import {
   hoteisQueContinuam,
   lembrarPreco,
   noitesParaSalvar,
+  noitesQueContinuam,
   pedidoDaViagem,
   precoLembrado,
   type OpcoesViagemDeCarro,
@@ -76,6 +77,8 @@ function GerarRoteiro() {
   const [decisoes, setDecisoes] = useState<DecisaoDaPerna[]>([]);
   // Hotel escolhido em cada noite de estrada ("perna-noite" → idOsm).
   const [hoteis, setHoteis] = useState<Map<string, string>>(new Map());
+  // Noites cuja sugestão de pernoite a pessoa descartou ("perna-noite"): dorme onde decidir na estrada.
+  const [descartadas, setDescartadas] = useState<Set<string>>(new Set());
   // O servidor recalculou a viagem ao salvar e ela mudou (409): oferece gerar de novo.
   const [rotaMudou, setRotaMudou] = useState(false);
 
@@ -140,6 +143,7 @@ function GerarRoteiro() {
     setEscolhas([]);
     setDecisoes([]);
     setHoteis(new Map());
+    setDescartadas(new Set());
     await gerar([], []);
   }
 
@@ -147,16 +151,14 @@ function GerarRoteiro() {
   async function trocarCidade(perna: number, noite: number, codigoIbge: number) {
     const novas = [...escolhas.filter((e) => e.perna !== perna || e.noite < noite), { perna, noite, codigoIbge }];
 
+    const anterior = (chave: string) => {
+      const [p, n] = chave.split("-").map(Number);
+      return p !== perna || n < noite;
+    };
+
     setEscolhas(novas);
-    setHoteis(
-      (atual) =>
-        new Map(
-          [...atual].filter(([chave]) => {
-            const [p, n] = chave.split("-").map(Number);
-            return p !== perna || n < noite;
-          }),
-        ),
-    );
+    setHoteis((atual) => new Map([...atual].filter(([chave]) => anterior(chave))));
+    setDescartadas((atual) => new Set([...atual].filter(anterior)));
     await gerar(novas, decisoes);
   }
 
@@ -165,6 +167,17 @@ function GerarRoteiro() {
 
     setDecisoes(novas);
     await gerar(escolhas, novas);
+  }
+
+  function descartarPernoite(perna: number, noite: number, descartar: boolean) {
+    setDescartadas((atual) => {
+      const novas = new Set(atual);
+
+      if (descartar) novas.add(chaveDaNoite(perna, noite));
+      else novas.delete(chaveDaNoite(perna, noite));
+
+      return novas;
+    });
   }
 
   function escolherHotel(perna: number, noite: number, idOsm: string) {
@@ -223,6 +236,7 @@ function GerarRoteiro() {
       setResultado(resposta.data);
       setGeracao((atual) => atual + 1);
       setHoteis((atual) => hoteisQueContinuam(atual, resposta.data));
+      setDescartadas((atual) => noitesQueContinuam(atual, resposta.data));
 
       // Cidade sem pontos em preparo: o cartão de andamento explica; não é erro.
       if (resposta.data.pontos.length === 0 && !resposta.data.viagemDeCarro?.pernas.length && !resposta.data.preparos?.length) {
@@ -280,7 +294,7 @@ function GerarRoteiro() {
                 ...(planejada.precoLitroCentavos !== null ? { precoLitroCentavos: planejada.precoLitroCentavos } : {}),
                 escolhas,
                 decisoes,
-                noites: noitesParaSalvar(resultado, hoteis),
+                noites: noitesParaSalvar(resultado, hoteis, descartadas),
               },
             }
           : {}),
@@ -555,6 +569,7 @@ function GerarRoteiro() {
               const chegada = trechos.find((t) => !t.trecho.ocupaODia && !t.trecho.noFimDoDia);
               const volta = trechos.find((t) => t.trecho.noFimDoDia);
               const decisoesDoDia = trechos.filter((t) => t.trecho.noite === null && t.perna.decisao);
+              const sugestoesDoDia = trechos.flatMap((t) => t.trecho.sugestoes ?? []);
 
               return (
                 <div
@@ -664,6 +679,45 @@ function GerarRoteiro() {
                     </ol>
                   )}
 
+                  {(sugestoesDoDia.length > 0 || (tipo === "ESTRADA" && daEstrada)) && (
+                    <aside className="card sugestoes-estrada stack stack--sm" aria-label={`Sugestões no caminho do dia ${numero}`}>
+                      <h4 className="sugestoes-estrada__titulo">
+                        <Icone nome="bussola" />
+                        No caminho, do seu gosto
+                      </h4>
+                      {sugestoesDoDia.length > 0 ? (
+                        <>
+                          <p className="muted small">
+                            Lugares perto da estrada, fora da agenda: parar aumenta o tempo do dia. Confira o acesso e o
+                            horário antes.
+                          </p>
+                          <ul className="sugestoes-estrada__lista">
+                            {sugestoesDoDia.map((s) => (
+                              <li key={s.id}>
+                                <Link to={`/pontos/${s.id}`} target="_blank" rel="noopener noreferrer">
+                                  {s.nome}
+                                </Link>
+                                <span className="muted small">
+                                  {" "}
+                                  · {s.categoria} · {s.cidade} · km {Math.round(s.kmNaPerna).toLocaleString("pt-BR")} ·{" "}
+                                  {s.desvioKm < 1
+                                    ? "na beira da estrada"
+                                    : `a ${s.desvioKm.toLocaleString("pt-BR")} km da estrada em linha reta`}
+                                </span>
+                              </li>
+                            ))}
+                          </ul>
+                        </>
+                      ) : (
+                        <p className="muted small">
+                          {interesses.length > 0
+                            ? "Nenhum lugar publicado do seu gosto perto da estrada neste dia."
+                            : "Marque seus interesses acima para ver lugares do seu gosto perto da estrada."}
+                        </p>
+                      )}
+                    </aside>
+                  )}
+
                   {daEstrada?.trecho.pernoite && daEstrada.trecho.noite !== null && (
                     <PernoiteNaEstrada
                       pernoite={daEstrada.trecho.pernoite}
@@ -672,6 +726,8 @@ function GerarRoteiro() {
                       aoEscolherHotel={(idOsm) => escolherHotel(daEstrada.perna.perna, daEstrada.trecho.noite!, idOsm)}
                       aoTrocarCidade={(codigoIbge) => trocarCidade(daEstrada.perna.perna, daEstrada.trecho.noite!, codigoIbge)}
                       trocando={gerando}
+                      descartada={descartadas.has(chaveDaNoite(daEstrada.perna.perna, daEstrada.trecho.noite))}
+                      aoDescartar={(descartar) => descartarPernoite(daEstrada.perna.perna, daEstrada.trecho.noite!, descartar)}
                     />
                   )}
 

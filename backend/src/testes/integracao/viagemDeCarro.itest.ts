@@ -2,6 +2,7 @@ import "../ambiente";
 import { after, afterEach, before, beforeEach, describe, it } from "node:test";
 import assert from "node:assert/strict";
 import prisma from "../../lib/prisma";
+import { StatusPonto } from "@prisma/client";
 import type { Municipio } from "../../lib/municipios";
 import { planejarViagemDeCarro, resolverEntradaDaViagem } from "../../lib/viagemDeCarro";
 import { criarCliente, criarMunicipio, criarPonto, criarUsuario, iniciarServidor, limparBanco, type ServidorDeTeste } from "../suporte";
@@ -596,6 +597,117 @@ describe("viagem de carro no gerador de roteiro", () => {
       await esperarPreparo(token, "Balneário Camboriú", "SC");
       await esperarPreparo(token, "Navegantes", "SC");
     });
+  });
+
+  describe("sem hotel nem na busca ampliada: seguir adiante só com aceite", () => {
+    interface TrechoComProposta {
+      noite: number | null;
+      pernoite: {
+        codigoIbge: number | null;
+        cidade: string;
+        aDefinir: boolean;
+        proximaOpcao?: { codigoIbge: number; cidade: string; uf: string; kmDoDia: number; excedenteKm: number; destino: boolean };
+      } | null;
+    }
+
+    it("propõe a próxima cidade com hospedagem adiante e o aceite faz dela o pernoite", async () => {
+      const { b } = await prepararBrasilia(viagem);
+      // A (km 498) e A2 (km 520) ficam sem hotel: a primeira hospedagem adiante é a de B (km 1.001).
+      viagem.estado.ofertas = viagem.estado.ofertas.filter((o) => o.municipio.codigoIbge === b.codigoIbge);
+      const { token } = await comCasa(JOINVILLE);
+
+      const r = await gerar(token, { etapas: [{ cidade: "Brasília, DF", dias: 1 }], viagemDeCarro: {} });
+
+      assert.equal(r.status, 200, JSON.stringify(r.corpo));
+      const [noite1] = r.corpo.viagemDeCarro.pernas[0].trechos as TrechoComProposta[];
+      assert.equal(noite1.pernoite?.aDefinir, true);
+      assert.deepEqual(noite1.pernoite?.proximaOpcao, {
+        codigoIbge: b.codigoIbge,
+        cidade: "Cidade B",
+        uf: "GO",
+        kmDoDia: noite1.pernoite!.proximaOpcao!.kmDoDia,
+        excedenteKm: noite1.pernoite!.proximaOpcao!.excedenteKm,
+        destino: false,
+      });
+      assert.ok(Math.abs(noite1.pernoite!.proximaOpcao!.kmDoDia - 1001) < 5, `km do dia ${noite1.pernoite!.proximaOpcao!.kmDoDia}`);
+
+      const aceita = await gerar(token, {
+        etapas: [{ cidade: "Brasília, DF", dias: 1 }],
+        viagemDeCarro: { escolhas: [{ perna: 0, noite: 1, codigoIbge: b.codigoIbge }] },
+      });
+
+      assert.equal(aceita.status, 200, JSON.stringify(aceita.corpo));
+      const trechos = aceita.corpo.viagemDeCarro.pernas[0].trechos as TrechoComProposta[];
+      assert.deepEqual(
+        trechos.map((t) => [t.noite, t.pernoite?.cidade ?? null, t.pernoite?.aDefinir ?? null]),
+        [
+          [1, "Cidade B", false],
+          [null, null, null],
+        ],
+      );
+      assert.ok(aceita.corpo.viagemDeCarro.avisos.some((a: string) => a.startsWith("Você aceitou seguir até Cidade B")));
+    });
+
+    it("sem nenhuma hospedagem adiante, propõe ir direto ao destino e o aceite tira a noite", async () => {
+      await prepararBrasilia(viagem);
+      viagem.estado.ofertas = [];
+      const { token } = await comCasa(JOINVILLE);
+
+      const r = await gerar(token, { etapas: [{ cidade: "Brasília, DF", dias: 1 }], viagemDeCarro: {} });
+
+      assert.equal(r.status, 200, JSON.stringify(r.corpo));
+      const proposta = (r.corpo.viagemDeCarro.pernas[0].trechos as TrechoComProposta[])[0].pernoite?.proximaOpcao;
+      assert.equal(proposta?.codigoIbge, BRASILIA.codigoIbge);
+      assert.equal(proposta?.destino, true);
+
+      const aceita = await gerar(token, {
+        etapas: [{ cidade: "Brasília, DF", dias: 1 }],
+        viagemDeCarro: { escolhas: [{ perna: 0, noite: 1, codigoIbge: BRASILIA.codigoIbge }] },
+      });
+
+      assert.equal(aceita.status, 200, JSON.stringify(aceita.corpo));
+      const trechos = aceita.corpo.viagemDeCarro.pernas[0].trechos as TrechoComProposta[];
+      assert.deepEqual(
+        trechos.map((t) => t.noite),
+        [null],
+        "um dia só de estrada, sem noite no caminho nem no destino",
+      );
+    });
+  });
+
+  it("sugestões no caminho seguem os interesses: só lugares publicados, perto da estrada e fora da agenda", async () => {
+    await prepararBrasilia(viagem);
+    const meio = noKm(1000030, "Meio do caminho", 250, 0);
+    const adiante = noKm(1000031, "Segundo trecho", 750, 0);
+    const naEstrada = (m: Municipio, nome: string, categoria: string, extra: Partial<Parameters<typeof criarPonto>[0]> = {}) =>
+      criarPonto({ nome, categoria, cidade: m.cidade, latitude: m.latitude, longitude: m.longitude, ...extra });
+    const parque = await naEstrada(meio, "Parque do caminho", "Natureza");
+    const museu = await naEstrada(meio, "Museu do caminho", "Cultura");
+    const segundo = await naEstrada(adiante, "Parque do segundo dia", "Natureza");
+    await naEstrada(meio, "Rascunho escondido", "Natureza", { status: StatusPonto.RASCUNHO });
+    await naEstrada(meio, "Hotel do caminho", "Hospedagem");
+    await criarPonto({ nome: "Longe da estrada", categoria: "Natureza", cidade: meio.cidade, latitude: meio.latitude, longitude: meio.longitude + 2 });
+    // A cidade de saída é a casa da pessoa, e a de chegada já está na agenda: não viram sugestão.
+    const saida = noKm(1000032, "Joinville", 5, 0);
+    await criarPonto({ nome: "Parque de Joinville", categoria: "Natureza", cidade: "Joinville", latitude: saida.latitude, longitude: saida.longitude });
+    const { token } = await comCasa(JOINVILLE);
+    const comInteresses = (interesses: string[]) =>
+      gerar(token, { etapas: [{ cidade: "Brasília, DF", dias: 1 }], interesses, viagemDeCarro: {} });
+    const ids = (r: Awaited<ReturnType<typeof gerar>>, i: number) =>
+      (r.corpo.viagemDeCarro.pernas[0].trechos[i].sugestoes as { id: number }[]).map((s) => s.id);
+
+    const natureza = await comInteresses(["Natureza", "Hospedagem"]);
+    const cultura = await comInteresses(["Cultura"]);
+
+    assert.equal(natureza.status, 200, JSON.stringify(natureza.corpo));
+    assert.deepEqual(ids(natureza, 0), [parque.id], "o hotel, o rascunho e o lugar longe da estrada ficam de fora");
+    assert.deepEqual(ids(natureza, 1), [segundo.id]);
+    assert.deepEqual(ids(cultura, 0), [museu.id]);
+    assert.deepEqual(ids(cultura, 1), []);
+    assert.ok(natureza.corpo.pontos.every((p: { cidade: string }) => p.cidade === "Brasília"), "nada entra na agenda");
+    const [primeira] = natureza.corpo.viagemDeCarro.pernas[0].trechos[0].sugestoes;
+    assert.ok(Math.abs(primeira.kmNaPerna - 250) < 5, `km ${primeira.kmNaPerna}`);
+    assert.ok(primeira.desvioKm < 1, `desvio ${primeira.desvioKm}`);
   });
 
   it("sem viagemDeCarro a resposta é a de hoje, com viagemDeCarro null", async () => {

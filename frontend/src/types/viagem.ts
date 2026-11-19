@@ -31,6 +31,28 @@ export interface NoiteSalva {
   noite: number;
   codigoIbge: number | null;
   idOsm?: string;
+  /** A pessoa descartou a sugestão de pernoite: o hotel fica para escolher no caminho. */
+  semSugestao?: boolean;
+}
+
+/** Seguir além do alvo até a próxima hospedagem conhecida (ou o destino): só vale com o aceite. */
+export interface ProximaOpcao {
+  codigoIbge: number;
+  cidade: string;
+  uf: string;
+  kmDoDia: number;
+  excedenteKm: number;
+  destino: boolean;
+}
+
+/** Lugar do gosto da pessoa perto da estrada; não entra na agenda. */
+export interface SugestaoNaEstrada {
+  id: number;
+  nome: string;
+  cidade: string;
+  categoria: string;
+  kmNaPerna: number;
+  desvioKm: number;
 }
 
 export interface CidadeDePernoite {
@@ -46,6 +68,7 @@ export interface CidadeDePernoite {
   hospedagens: { idOsm: string; nome: string; tipo: string }[];
   atracoes: string[];
   aDefinir: boolean;
+  proximaOpcao?: ProximaOpcao;
 }
 
 export interface TrechoPlanejado {
@@ -64,6 +87,7 @@ export interface TrechoPlanejado {
   tracado: [number, number][];
   pernoite: CidadeDePernoite | null;
   alternativas: CidadeDePernoite[];
+  sugestoes?: SugestaoNaEstrada[];
 }
 
 export interface PernaPlanejada {

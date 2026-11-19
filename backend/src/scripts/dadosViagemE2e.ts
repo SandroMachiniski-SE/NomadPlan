@@ -84,6 +84,23 @@ async function pontosNoDestino(m: Municipio) {
   }
 }
 
+/** Dois lugares em cima da estrada Joinville → Brasília, no 1º dia: as sugestões no caminho pelo gosto. */
+async function pontosNaEstrada(origem: Municipio, destino: Municipio) {
+  const noCaminho = (fracao: number) => ({
+    latitude: origem.latitude + (destino.latitude - origem.latitude) * fracao,
+    longitude: origem.longitude + (destino.longitude - origem.longitude) * fracao,
+  });
+
+  for (const [nome, categoria] of [
+    ["Parque no caminho E2E", "Natureza"],
+    ["Museu no caminho E2E", "Cultura"],
+  ]) {
+    await prisma.pontoTuristico.create({
+      data: { nome, categoria, cidade: "Caminho E2E", ...noCaminho(1 / 6), horarioFuncionamento: "Todos os dias, 24h", status: StatusPonto.PUBLICADO },
+    });
+  }
+}
+
 /** Depois de carregar os municípios: rotas, resumos e pontos da viagem de carro do E2E. */
 export async function prepararViagemE2e(): Promise<void> {
   const [joinville, brasilia, goiania, itajai] = await Promise.all(
@@ -106,4 +123,5 @@ export async function prepararViagemE2e(): Promise<void> {
   await resumirOCaminho(litoral, [JOINVILLE, ITAJAI]);
   await pontosNoDestino(brasilia);
   await pontosNoDestino(goiania);
+  await pontosNaEstrada(joinville, brasilia);
 }

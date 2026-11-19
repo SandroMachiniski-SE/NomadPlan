@@ -1,5 +1,14 @@
 import { describe, expect, it } from "vitest";
-import { conferirViagem, formatarCombustivel, lerNumero, pedidoDaViagem, type OpcoesViagemDeCarro } from "./viagem";
+import type { RespostaRecomendacao } from "../types/roteiro";
+import {
+  conferirViagem,
+  formatarCombustivel,
+  lerNumero,
+  noitesParaSalvar,
+  noitesQueContinuam,
+  pedidoDaViagem,
+  type OpcoesViagemDeCarro,
+} from "./viagem";
 
 const simples = (texto: string) => texto.replace(/\s/g, " ");
 
@@ -92,5 +101,30 @@ describe("formatarCombustivel", () => {
 
   it("mostra litros e custo quando há estimativa", () => {
     expect(simples(formatarCombustivel(41.8, 26292))).toBe(" · ~41,8 l · ~R$ 262,92");
+  });
+});
+
+describe("noitesParaSalvar", () => {
+  const trecho = (noite: number | null, codigoIbge: number | null) => ({ noite, pernoite: noite === null ? null : { codigoIbge } });
+  const resposta = {
+    viagemDeCarro: { pernas: [{ perna: 0, trechos: [trecho(1, 10), trecho(2, 20), trecho(null, null)] }] },
+  } as unknown as RespostaRecomendacao;
+
+  it("manda a cidade e o hotel escolhido de cada noite", () => {
+    expect(noitesParaSalvar(resposta, new Map([["0-1", "node/1"]]))).toEqual([
+      { perna: 0, noite: 1, codigoIbge: 10, idOsm: "node/1" },
+      { perna: 0, noite: 2, codigoIbge: 20 },
+    ]);
+  });
+
+  it("ao gerar de novo, só as noites que ainda existem continuam marcadas", () => {
+    expect([...noitesQueContinuam(new Set(["0-1", "0-3", "1-1"]), resposta)]).toEqual(["0-1"]);
+  });
+
+  it("noite com a sugestão descartada vai sem o hotel, marcada para escolher no caminho", () => {
+    expect(noitesParaSalvar(resposta, new Map([["0-1", "node/1"]]), new Set(["0-1"]))).toEqual([
+      { perna: 0, noite: 1, codigoIbge: 10, semSugestao: true },
+      { perna: 0, noite: 2, codigoIbge: 20 },
+    ]);
   });
 });

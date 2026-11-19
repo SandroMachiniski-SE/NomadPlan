@@ -2,6 +2,7 @@ import prisma from "./prisma";
 import { municipioPorCodigo, procurarMunicipio, separarUf, type Municipio } from "./municipios";
 import { buscarRota, SemEstrada, segundosAte, type Rota } from "./rotas";
 import { candidatosDaRota, tracadoEntre } from "./corredor";
+import { sugerirNaEstrada, type SugestaoNaEstrada } from "./sugestoesNaEstrada";
 import { resumirCidades, type ResumoOsm } from "./resumoOsm";
 import { dividirEmDias, type CandidatoDePernoite, type DivisaoDaPerna } from "./divisaoEmDias";
 import type { EtapaDoRoteiro } from "./recomendacao";
@@ -71,6 +72,11 @@ export interface CidadeDePernoite {
   hospedagens: { idOsm: string; nome: string; tipo: string }[];
   atracoes: string[];
   aDefinir: boolean;
+  /**
+   * Só no pernoite a definir: seguir além do alvo até a próxima cidade com hospedagem conhecida (ou
+   * até o destino). Vale só se a pessoa aceitar, escolhendo essa cidade para a noite.
+   */
+  proximaOpcao?: { codigoIbge: number; cidade: string; uf: string; kmDoDia: number; excedenteKm: number; destino: boolean };
 }
 
 export interface TrechoPlanejado {
@@ -87,6 +93,8 @@ export interface TrechoPlanejado {
   tracado: [number, number][];
   pernoite: CidadeDePernoite | null;
   alternativas: CidadeDePernoite[];
+  /** Lugares do gosto da pessoa perto da estrada neste dia; não entram na agenda. */
+  sugestoes: SugestaoNaEstrada[];
 }
 
 export interface PernaPlanejada {
@@ -300,7 +308,16 @@ async function dividirPerna(
   const escolhas = new Map(entrada.escolhas.filter((e) => e.perna === numero).map((e) => [e.noite, e.codigoIbge]));
   const esticar = entrada.decisoes.find((d) => d.perna === numero)?.esticar;
   const dividir = () =>
-    dividirEmDias({ totalKm, alvoKm: entrada.kmPorDia, horasPorDia: entrada.horasPorDia, perfil: rota.perfil, candidatos, escolhas, esticar });
+    dividirEmDias({
+      totalKm,
+      alvoKm: entrada.kmPorDia,
+      horasPorDia: entrada.horasPorDia,
+      perfil: rota.perfil,
+      candidatos,
+      escolhas,
+      esticar,
+      codigoDoDestino: para.codigoIbge,
+    });
 
   // A faixa da noite 2 depende do pernoite da noite 1: divide, busca os resumos que faltam e divide de novo.
   let divisao = dividir();
@@ -316,6 +333,14 @@ async function dividirPerna(
     }
 
     divisao = dividir();
+  }
+
+  // As rodadas acabaram com cidades ainda por contar: um pernoite a definir pode ter, adiante, uma
+  // hospedagem que ainda não apareceu como proposta.
+  if (divisao.semResumo.length > 0 && divisao.noites.some((n) => n.aDefinir && !n.proximaOpcao)) {
+    divisao.avisos.push(
+      "Os hotéis de algumas cidades do caminho ainda estão sendo buscados; gere de novo em instantes para ver até onde seguir para dormir com hotel.",
+    );
   }
 
   const marcos = [{ km: 0, fracao: 0 }, ...divisao.noites.map((n) => ({ km: n.km, fracao: n.fracao })), { km: totalKm, fracao: 1 }];
@@ -367,6 +392,7 @@ async function planejarTrechos(
   naAgenda: TrechoNaAgenda[],
   resumos: Map<number, ResumoOsm>,
   entrada: EntradaDaViagem,
+  interesses: string[],
 ) {
   const nomeDoMarco = (j: number) => {
     if (j === 0) return rotulo(d.de);
@@ -385,6 +411,21 @@ async function planejarTrechos(
 
     const metros = Math.round(t.km * 1000);
     const combustivel = estimarCombustivel(metros / 1000, entrada.consumoKmPorLitro, entrada.precoLitroCentavos);
+    const pernoite = !noite ? null : noite.cidade ? cidadeDePernoite(noite.cidade, noite.kmAlvo, noite.aDefinir) : pernoiteNoKm(noite.km);
+    const proxima = noite?.proximaOpcao;
+
+    if (pernoite && proxima) {
+      const fim = proxima.cidade ?? d.para;
+
+      pernoite.proximaOpcao = {
+        codigoIbge: proxima.codigoIbge,
+        cidade: fim.cidade,
+        uf: fim.uf,
+        kmDoDia: umaCasa(proxima.kmDoDia),
+        excedenteKm: umaCasa(proxima.excedenteKm),
+        destino: proxima.destino,
+      };
+    }
 
     trechos.push({
       dia: t.dia,
@@ -398,8 +439,9 @@ async function planejarTrechos(
       litros: combustivel?.litros ?? null,
       custoCentavos: combustivel?.custoCentavos ?? null,
       tracado: await tracadoEntre(d.rota.id, d.marcos[j].fracao, d.marcos[j + 1].fracao),
-      pernoite: !noite ? null : noite.cidade ? cidadeDePernoite(noite.cidade, noite.kmAlvo, noite.aDefinir) : pernoiteNoKm(noite.km),
+      pernoite,
       alternativas: noite ? noite.alternativas.map((c) => cidadeDePernoite(c, noite.kmAlvo, false)) : [],
+      sugestoes: await sugerirNaEstrada(d.rota.id, d.marcos[j].fracao, d.marcos[j + 1].fracao, interesses, [d.de.cidade, d.para.cidade]),
     });
   }
 
@@ -409,7 +451,7 @@ async function planejarTrechos(
 /** Planeja as pernas de carro e devolve, além delas, as etapas no formato do gerador de roteiro. */
 export async function planejarViagemDeCarro(
   entrada: EntradaDaViagem,
-  opcoes: { tempoLimiteDosResumosMs?: number } = {},
+  opcoes: { tempoLimiteDosResumosMs?: number; interesses?: string[] } = {},
 ): Promise<PlanoDaViagem> {
   const { etapas, origem } = entrada;
   // Perna i chega à etapa i (a 0 sai de casa); com volta, a perna depois da última volta para casa.
@@ -451,7 +493,7 @@ export async function planejarViagemDeCarro(
   const pernas: PernaPlanejada[] = [];
 
   for (const d of divididas) {
-    const trechos = await planejarTrechos(d, agenda.trechos[d.numero], resumos, entrada);
+    const trechos = await planejarTrechos(d, agenda.trechos[d.numero], resumos, entrada, opcoes.interesses ?? []);
     const decisao = d.divisao.decisao;
 
     pernas.push({

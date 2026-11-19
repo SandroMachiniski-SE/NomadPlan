@@ -53,7 +53,15 @@ function cidade(
 
 function dividir(
   candidatos: CandidatoDePernoite[],
-  opcoes: { totalKm?: number; alvoKm?: number; horasPorDia?: number | null; escolhas?: [number, number][]; esticar?: boolean; kmPorHora?: number } = {},
+  opcoes: {
+    totalKm?: number;
+    alvoKm?: number;
+    horasPorDia?: number | null;
+    escolhas?: [number, number][];
+    esticar?: boolean;
+    kmPorHora?: number;
+    codigoDoDestino?: number;
+  } = {},
 ) {
   const totalKm = opcoes.totalKm ?? TOTAL;
 
@@ -65,6 +73,7 @@ function dividir(
     candidatos,
     escolhas: new Map(opcoes.escolhas ?? []),
     esticar: opcoes.esticar,
+    codigoDoDestino: opcoes.codigoDoDestino,
   });
 }
 
@@ -325,5 +334,62 @@ describe("dividirEmDias", () => {
       d.noites.map((n) => n.kmAlvo),
       [500, 998],
     );
+  });
+});
+
+describe("sem hospedagem nem na maior faixa ampliada: propõe seguir adiante, só com aceite", () => {
+  it("propõe a próxima cidade com hospedagem adiante e não muda a noite sem o aceite", () => {
+    // Alvo no km 500; a busca ampliada vai até ±200 km (300 a 700) e não acha nada.
+    const candidatos = [cidade(1, 760, 2), cidade(2, 900, 4), cidade(3, 1120, 2)];
+
+    const d = dividir(candidatos, { totalKm: 1500 });
+
+    assert.equal(d.noites[0].km, 500);
+    assert.equal(d.noites[0].aDefinir, true);
+    assert.equal(d.noites[0].proximaOpcao?.codigoIbge, 1);
+    assert.equal(d.noites[0].proximaOpcao?.kmDoDia, 760);
+    assert.equal(d.noites[0].proximaOpcao?.excedenteKm, 260);
+    assert.equal(d.noites[0].proximaOpcao?.destino, false);
+
+    const aceita = dividir(candidatos, { totalKm: 1500, escolhas: [[1, 1]] });
+
+    assert.equal(aceita.noites[0].km, 760);
+    assert.equal(aceita.noites[0].aDefinir, false);
+    assert.equal(aceita.noites[0].proximaOpcao, undefined);
+    assert.ok(
+      aceita.avisos.includes("Você aceitou seguir até C1: 760 km neste dia, 260 km além do alvo."),
+      aceita.avisos.join(" | "),
+    );
+  });
+
+  it("sem nenhuma cidade com hospedagem adiante, propõe ir direto ao destino; aceitar encerra a perna", () => {
+    const d = dividir([], { totalKm: 1500, codigoDoDestino: 99 });
+
+    assert.deepEqual(d.noites[0].proximaOpcao, { cidade: null, codigoIbge: 99, km: 1500, kmDoDia: 1500, excedenteKm: 1000, destino: true });
+
+    const aceita = dividir([], { totalKm: 1500, codigoDoDestino: 99, escolhas: [[1, 99]] });
+
+    assert.equal(aceita.noites.length, 0, "nenhuma noite no destino: a chegada é o fim do dia");
+    assert.equal(aceita.kmFinal, 1500);
+  });
+
+  it("cidades adiante ainda sem a contagem de hotéis: conta antes de dizer qual é a próxima", () => {
+    const d = dividir([cidade(1, 760, undefined), cidade(2, 900, 3)], { totalKm: 1500 });
+
+    assert.equal(d.noites[0].proximaOpcao, undefined);
+    assert.ok(d.semResumo.includes(1));
+  });
+
+  it("cidade com hotel antes da faixa não é proposta: a proposta é sempre para avançar", () => {
+    const d = dividir([cidade(1, 280, 2), cidade(2, 760, 3)], { totalKm: 1500 });
+
+    assert.equal(d.noites[0].proximaOpcao?.codigoIbge, 2);
+  });
+
+  it("com hotel dentro da busca ampliada não há proposta: a cidade é escolhida com o aviso", () => {
+    const d = dividir([cidade(1, 640, 2)], { totalKm: 1500, codigoDoDestino: 99 });
+
+    assert.equal(d.noites[0].cidade?.codigoIbge, 1);
+    assert.equal(d.noites[0].proximaOpcao, undefined);
   });
 });
