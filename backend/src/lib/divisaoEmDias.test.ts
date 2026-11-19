@@ -1,6 +1,6 @@
 import { describe, it } from "node:test";
 import assert from "node:assert/strict";
-import { dividirEmDias, notaDoCandidato, type CandidatoDePernoite } from "./divisaoEmDias";
+import { dividirEmDias, faixasAmpliadas, notaDoCandidato, type CandidatoDePernoite } from "./divisaoEmDias";
 import type { PerfilDaRota } from "./rotas";
 import type { ResumoOsm } from "./resumoOsm";
 
@@ -269,6 +269,45 @@ describe("dividirEmDias", () => {
     // A 70 km/h, 7 h dão 490 km: a faixa vira 440–540.
     assert.equal(dividir(candidatos, { horasPorDia: 7, kmPorHora: 70 }).noites[0].cidade?.codigoIbge, 1);
     assert.equal(dividir(candidatos, { kmPorHora: 70 }).noites[0].cidade?.codigoIbge, 2);
+  });
+
+  it("limite de horas baixo: a faixa encolhe junto com o alvo do dia e não sobra um dia quase vazio", () => {
+    // 2 h a 40 km/h dão 80 km por dia. Com a faixa fixa de ±50 km, a cidade do km 32 (muito bem avaliada)
+    // ganhava da do km 80 e o primeiro dia teria só 32 km. Com a faixa de 30% do alvo (±24 km) ela sai.
+    const candidatos = [cidade(1, 32, 20, 10, 2, 400), cidade(2, 80, 1, 0, 2, 400), cidade(3, 160, 5, 1, 2, 400), cidade(4, 240, 5, 1, 2, 400)];
+
+    const d = dividir(candidatos, { totalKm: 400, alvoKm: 500, horasPorDia: 2, kmPorHora: 40 });
+
+    assert.equal(d.noites[0].cidade?.codigoIbge, 2);
+    assert.equal(d.noites[0].kmAlvo, 80);
+
+    const kmDosDias = d.noites.map((n, i) => n.km - (i === 0 ? 0 : d.noites[i - 1].km));
+
+    assert.ok(kmDosDias.every((km) => km >= 50), `dias de estrada: ${kmDosDias.join(", ")} km`);
+  });
+
+  it("a busca ampliada acompanha a faixa e nunca deixa o dia com menos de 40% do alvo", () => {
+    assert.deepEqual(faixasAmpliadas(50, 500), [100, 150, 200]);
+    assert.deepEqual(faixasAmpliadas(50, 300), [100, 150, 180]);
+    assert.deepEqual(faixasAmpliadas(24, 80), [48]);
+  });
+
+  it("dia curto sem hospedagem adiante: a busca ampliada não volta para a cidade onde se dormiu", () => {
+    // 80 km por dia: a cidade do km 240 é o pernoite da noite 3; a noite 4 (alvo no km 320) não tem
+    // nada perto e não pode cair de novo no km 240, o que daria um dia de 0 km.
+    const candidatos = [cidade(1, 80, 3, 0, 2, 400), cidade(2, 160, 3, 0, 2, 400), cidade(3, 240, 3, 0, 2, 400)];
+
+    const d = dividir(candidatos, { totalKm: 400, alvoKm: 500, horasPorDia: 2, kmPorHora: 40 });
+    const kmDosDias = d.noites.map((n, i) => n.km - (i === 0 ? 0 : d.noites[i - 1].km));
+
+    assert.deepEqual(codigos(d), [1, 2, 3, null]);
+    assert.ok(kmDosDias.every((km) => km >= 32), `dias de estrada: ${kmDosDias.join(", ")} km`);
+  });
+
+  it("alvo de 500 km continua com a faixa de ±50 km", () => {
+    const d = dividir([cidade(1, 449, 20, 10), cidade(2, 500, 1, 0)]);
+
+    assert.equal(d.noites[0].cidade?.codigoIbge, 2, "o km 449 está fora da faixa 450–550");
   });
 
   it("até 3 alternativas, sem repetir a escolhida", () => {

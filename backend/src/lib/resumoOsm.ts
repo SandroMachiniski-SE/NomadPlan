@@ -233,15 +233,25 @@ async function buscarEGravar(cidades: MunicipioComResumo[], tempoLimiteMs: numbe
   }
 }
 
+/** Trava compartilhada por várias chamadas (as pernas de uma viagem): depois de uma falha, não se consulta de novo. */
+export interface TravaDoOverpass {
+  falhou: boolean;
+}
+
 /**
  * Resumo de cada município pedido: do cache (30 dias) ou de uma consulta só ao Overpass para
  * todos os que faltam. Espera a consulta por até `esperaMs`; o que não chegou a tempo vem com o
  * resumo vencido (ou `null`) e a consulta segue em segundo plano, gravando para a próxima vez.
+ *
+ * Com `trava`, o Overpass que falha ou não responde a tempo arma a trava (mesmo que haja resumo
+ * vencido para usar no lugar) e, com a trava armada, não há nova consulta nem nova espera: valem o
+ * cache válido e, na falta dele, o vencido.
  */
 export async function resumirCidades(
   codigos: number[],
   agora: Date = new Date(),
   esperaMs = ESPERA_PADRAO_MS,
+  trava?: TravaDoOverpass,
 ): Promise<Map<number, ResumoOsm | null>> {
   const resultado = new Map<number, ResumoOsm | null>();
 
@@ -262,6 +272,12 @@ export async function resumirCidades(
   }
 
   if (faltando.length === 0) return resultado;
+
+  if (trava?.falhou) {
+    for (const m of faltando) resultado.set(m.codigoIbge, m.resumo);
+
+    return resultado;
+  }
 
   const novas = faltando.filter(
     (m) => !emAndamento.has(m.codigoIbge) && (pausadasAte.get(m.codigoIbge) ?? 0) <= Date.now(),
@@ -292,8 +308,10 @@ export async function resumirCidades(
 
   for (const m of faltando) {
     const atual = releitura.get(m.codigoIbge) ?? m;
+    const novo = valido(atual);
 
-    resultado.set(m.codigoIbge, valido(atual) ? atual.resumo : m.resumo);
+    resultado.set(m.codigoIbge, novo ? atual.resumo : m.resumo);
+    if (!novo && trava) trava.falhou = true;
   }
 
   return resultado;

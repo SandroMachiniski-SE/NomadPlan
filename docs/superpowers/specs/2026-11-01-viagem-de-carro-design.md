@@ -155,8 +155,8 @@ virar ponto do catálogo.
 |---|---|
 | `KM_POR_DIA_PADRAO` | 500 (aceito: 150 a 1.000) |
 | Horas ao volante por dia | opcional, 2 a 14 |
-| `FAIXA_KM` | 50 (busca em alvo ± 50) |
-| `FAIXA_ALARGADA_KM` | 100 (alvo ± 100, quando a faixa não tem hospedagem) |
+| `FAIXA_KM` | 50 (busca em alvo ± 50); nunca passa de `FRACAO_FAIXA` (30%) do alvo do dia, então com 2 h ao volante a 40 km/h (80 km por dia) a faixa é ± 24 |
+| `FAIXA_ALARGADA_KM` | 100 (alvo ± 100, quando a faixa não tem hospedagem); vale o dobro da faixa do dia, no máximo 100 |
 | `DIA_CURTO` | 30% do alvo do dia (150 km com alvo de 500) |
 | `CORREDOR_KM` | 20 (distância máxima da sede à estrada) |
 | `RAIO_DA_CIDADE_KM` | 8 (raio da contagem de hospedagens e atrações) |

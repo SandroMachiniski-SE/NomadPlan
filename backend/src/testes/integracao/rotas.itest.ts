@@ -316,6 +316,51 @@ describe("resumos das cidades", () => {
 
     assert.equal(resumos.get(B.codigoIbge), null);
   });
+
+  it("falha do Overpass arma a trava mesmo quando há resumo vencido para usar no lugar", async () => {
+    await guardarResumoDeA(40);
+    mapas = instalarMapasFalsos({ overpass: () => ({ status: 504, corpo: {} }) });
+    const trava = { falhou: false };
+
+    const resumos = await resumirCidades([A.codigoIbge], new Date(), undefined, trava);
+
+    assert.equal(resumos.get(A.codigoIbge)!.totalHospedagens, 3, "o vencido ainda serve como reserva");
+    assert.equal(trava.falhou, true);
+  });
+
+  it("com a trava armada não consulta o Overpass de novo: usa o cache válido e o vencido", async () => {
+    await guardarResumoDeA(40);
+    mapas = instalarMapasFalsos({ overpass: () => ({ corpo: { elements: [] } }) });
+
+    const resumos = await resumirCidades([A.codigoIbge, B.codigoIbge], new Date(), undefined, { falhou: true });
+
+    assert.equal(mapas.chamadas.filter((c) => c.servico === "overpass").length, 0);
+    assert.equal(resumos.get(A.codigoIbge)!.totalHospedagens, 3);
+    assert.equal(resumos.get(B.codigoIbge), null);
+  });
+
+  it("com a trava armada, o resumo ainda válido do cache continua valendo", async () => {
+    await guardarResumoDeA(10);
+    mapas = instalarMapasFalsos({ overpass: () => ({ status: 504, corpo: {} }) });
+
+    const resumos = await resumirCidades([A.codigoIbge], new Date(), undefined, { falhou: true });
+
+    assert.equal(mapas.chamadas.filter((c) => c.servico === "overpass").length, 0);
+    assert.equal(resumos.get(A.codigoIbge)!.totalHospedagens, 3);
+  });
+
+  it("consulta que dá certo não arma a trava", async () => {
+    mapas = instalarMapasFalsos({
+      overpass: () => ({
+        corpo: { elements: [{ type: "node", id: 5, lat: -18.01, lon: -48, tags: { name: "Hotel de B", tourism: "hotel" } }] },
+      }),
+    });
+    const trava = { falhou: false };
+
+    await resumirCidades([B.codigoIbge], new Date(), undefined, trava);
+
+    assert.equal(trava.falhou, false);
+  });
 });
 
 describe("aquecer os resumos de uma região (de madrugada)", () => {

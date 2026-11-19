@@ -5,6 +5,12 @@ contêiner `elevare-central-caddy-1`). O kit normal ([implantacao-web.md](implan
 nessas portas e brigaria com o que já existe. Aqui o NomadPlan **não publica nenhuma porta**: o Caddy que já está no
 servidor passa a atender também os dois endereços novos e repassa o tráfego para os contêineres do NomadPlan.
 
+> **Situação atual (17/11/2026).** Este guia foi seguido de ponta a ponta: o NomadPlan está publicado em
+> `https://nomadplan.blackyears.com.br` (API em `https://api.nomadplan.blackyears.com.br`), com os dados restaurados de um backup, certificados
+> emitidos pelo Caddy já existente no servidor, as senhas das contas de demonstração trocadas e o e-mail de recuperação de senha funcionando pelo
+> Brevo (domínio `blackyears.com.br` autenticado com DKIM; o SPF e o DMARC que já existiam no domínio foram mantidos). Os três contêineres do NomadPlan
+> rodam com limite de memória e sem afetar o outro projeto.
+
 Regras para não atrapalhar o projeto que já está no ar:
 
 - O NomadPlan roda num projeto Docker separado (`-p nomadplan`): contêineres, rede e volumes próprios.
@@ -117,16 +123,37 @@ Pontos de atenção:
 
 ## Parte 5. Contas de demonstração e e-mail
 
-O backup traz as contas de demonstração (`admin@`, `moderador@`, `negocio@`, `morador@nomadplan.local`) com **senhas conhecidas**. Como o
-servidor fica na internet, troque-as antes de divulgar o endereço:
+O backup traz as contas de demonstração (`admin@nomadplan.local`, `moderador@nomadplan.local`, `negocio@nomadplan.local`,
+`morador@nomadplan.local`) com **senhas conhecidas**. Como o servidor fica na internet, troque-as antes de divulgar o endereço. Use uma senha
+forte e guarde-a fora do servidor (ela não aparece em nenhum arquivo do projeto):
 
 ```bash
 HASH=$(docker exec nomadplan-api node -e "console.log(require('bcryptjs').hashSync(process.argv[1], 10))" 'UmaSenhaForteSua')
-docker exec nomadplan-postgres psql -U nomadplan -d nomadplan -c "UPDATE usuario SET senha_hash = '$HASH' WHERE email LIKE '%@nomadplan.local';"
+docker exec nomadplan-postgres psql -U nomadplan -d nomadplan -c "UPDATE usuario SET senha_hash = '$HASH' WHERE email LIKE '%nomadplan.local';"
 ```
 
-Para o e-mail de recuperação de senha, siga a Parte 6 do [implantacao-web.md](implantacao-web.md) (Brevo). Sem isso o sistema funciona, só não
-envia e-mails.
+O filtro é `'%nomadplan.local'` (sem o `@`), para pegar também endereços que não tenham nada antes do domínio. Para conferir quais contas
+serão alteradas antes de rodar o `UPDATE`:
+
+```bash
+docker exec nomadplan-postgres psql -U nomadplan -d nomadplan -c "SELECT email FROM usuario WHERE email LIKE '%nomadplan.local';"
+```
+
+### E-mail de recuperação de senha (Brevo)
+
+Sem SMTP o sistema funciona, mas o "Esqueci minha senha" não entrega nada (a API só avisa no log, sem registrar o link). Crie a conta, autentique o
+domínio e gere a chave SMTP conforme a [Parte 6 do implantacao-web.md](implantacao-web.md#parte-6-e-mail-pelo-brevo). Neste servidor, os
+comandos usam o projeto `nomadplan` e os dois arquivos do Compose:
+
+```bash
+cd /opt/nomadplan
+nano .env.prod     # SMTP_USER = login SMTP do Brevo; SMTP_PASS = chave SMTP; EMAIL_FROM com um remetente do domínio verificado
+docker compose -p nomadplan --env-file .env.prod -f docker-compose.prod.yml -f docker-compose.compartilhado.yml up -d api
+docker logs --tail 5 nomadplan-api                          # deve dizer "E-mail: enviando por smtp-relay.brevo.com:587 ..."
+docker exec nomadplan-api npm run email:testar -- seu@email.com
+```
+
+Depois do teste, peça a recuperação de senha pelo site com uma conta real sua e confira se o e-mail chega (e se não foi para o spam).
 
 A chave do Google (`GOOGLE_MAPS_API_KEY`) e os servidores de mapas (`OSRM_URL`, `OVERPASS_URL`) também ficam no `.env.prod`. Depois de mudar,
 suba de novo só a API, sem compilar:

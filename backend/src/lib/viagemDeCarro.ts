@@ -307,10 +307,9 @@ async function dividirPerna(
 
   for (let rodada = 0; rodada < RODADAS_DE_RESUMO && divisao.semResumo.length > 0; rodada += 1) {
     const pedidos = divisao.semResumo;
-    // Com o Overpass fora do ar, as cidades ficam sem contagem (só pela distância) sem nova espera.
-    const resumos = overpass.falhou ? new Map<number, null>() : await resumirCidades(pedidos, new Date(), overpass.tempoLimiteMs);
-
-    if (pedidos.some((codigo) => !resumos.get(codigo))) overpass.falhou = true;
+    // Depois da primeira falha do Overpass (mesmo com resumo vencido no lugar) a trava impede nova
+    // espera; o cache válido continua valendo e o que não tem resumo fica só pela distância.
+    const resumos = await resumirCidades(pedidos, new Date(), overpass.tempoLimiteMs, overpass);
 
     for (const c of candidatos) {
       if (pedidos.includes(c.codigoIbge)) c.resumo = resumos.get(c.codigoIbge) ?? null;
