@@ -240,7 +240,7 @@ const buscaSchema = z
     path: ["lat"],
   });
 
-pontosRouter.get("/", async (req: Request, res: Response) => {
+pontosRouter.get("/", autenticarOpcional, async (req: Request, res: Response) => {
   try {
     const resultado = buscaSchema.safeParse(req.query);
 
@@ -253,7 +253,11 @@ pontosRouter.get("/", async (req: Request, res: Response) => {
 
     registrarEvento("busca");
 
-    const busca = await buscarComFallback(resultado.data);
+    // Quem está logado vê primeiro os lugares do seu gosto (os interesses do perfil).
+    const interesses = req.usuario
+      ? ((await prisma.usuario.findUnique({ where: { id: req.usuario.id }, select: { interesses: true } }))?.interesses ?? [])
+      : [];
+    const busca = await buscarComFallback({ ...resultado.data, ...(interesses.length > 0 ? { preferir: interesses } : {}) });
 
     return res.json(busca);
   } catch (error) {

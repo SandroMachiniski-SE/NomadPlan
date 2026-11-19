@@ -273,4 +273,17 @@ test.describe("explorar pelo mapa e escolher qualquer cidade", () => {
     await expect(page.getByRole("button", { name: /Mostrar mais/ })).toHaveCount(0);
     expect(paginas).toEqual(["0", "20"]);
   });
+
+  test("logado, a busca traz primeiro os lugares do gosto marcado no perfil", async ({ page }) => {
+    await cadastrar(page);
+    await page.goto("/perfil");
+    await page.getByRole("button", { name: "Natureza", exact: true }).click();
+    await page.getByRole("button", { name: "Salvar alterações" }).click();
+    await expect(page.getByText("Perfil atualizado com sucesso.")).toBeVisible();
+
+    await buscarCidade(page, "Joinville");
+
+    await expect(page.getByText("Primeiro os lugares do seu gosto: Natureza.")).toBeVisible();
+    await expect(page.locator(".grid-cards h3").first()).toHaveText(PARQUE);
+  });
 });

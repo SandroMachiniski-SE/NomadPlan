@@ -24,6 +24,8 @@ export interface FiltrosBusca {
   limite: number;
   /** Quantos resultados pular (a página seguinte começa em `deslocamento + limite`). */
   deslocamento?: number;
+  /** Categorias do gosto de quem busca (os interesses do perfil): vêm primeiro na relevância. */
+  preferir?: string[];
   notaMinima?: number;
   abertoAgora?: boolean;
   ordenar?: Ordenacao;
@@ -99,7 +101,13 @@ function montarOrdenacao(filtros: FiltrosBusca, comCoordenadas: boolean): Prisma
         + CASE WHEN p.acessibilidade IS NOT NULL THEN 1 ELSE 0 END
       )`;
 
-      return Prisma.sql`${peso} p.selo_verificado DESC, a.media DESC NULLS LAST, ${completude} DESC, p.nome ASC`;
+      // Logado, os lugares das categorias do seu gosto vêm primeiro (sem tirar os outros).
+      const gosto =
+        filtros.preferir && filtros.preferir.length > 0
+          ? Prisma.sql`CASE WHEN lower(p.categoria) IN (${Prisma.join(filtros.preferir.map((c) => c.toLowerCase()))}) THEN 0 ELSE 1 END,`
+          : Prisma.empty;
+
+      return Prisma.sql`${peso} ${gosto} p.selo_verificado DESC, a.media DESC NULLS LAST, ${completude} DESC, p.nome ASC`;
     }
     default:
       return Prisma.sql`p.nome ASC`;

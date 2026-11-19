@@ -275,6 +275,36 @@ describe("busca de pontos turísticos", () => {
     });
   });
 
+  describe("pelo gosto de quem busca", () => {
+    async function cidadeComDoisGostos() {
+      await criarPonto({ nome: "A Museu", categoria: "Cultura", cidade: "Joinville" });
+      await criarPonto({ nome: "B Parque", categoria: "Natureza", cidade: "Joinville" });
+      await criarPonto({ nome: "C Trilha", categoria: "Natureza", cidade: "Joinville" });
+    }
+
+    it("logado, a relevância traz primeiro as categorias dos seus interesses", async () => {
+      await cidadeComDoisGostos();
+      const natureza = await criarUsuario({ interesses: ["Natureza"] });
+      const cultura = await criarUsuario({ interesses: ["Cultura"] });
+
+      assert.deepEqual(nomes(await api("GET", "/pontos?cidade=Joinville", { token: natureza.token })), ["B Parque", "C Trilha", "A Museu"]);
+      assert.deepEqual(nomes(await api("GET", "/pontos?cidade=Joinville", { token: cultura.token })), ["A Museu", "B Parque", "C Trilha"]);
+    });
+
+    it("sem login, sem interesses ou com outra ordem escolhida, a busca é a de sempre", async () => {
+      await cidadeComDoisGostos();
+      const natureza = await criarUsuario({ interesses: ["Natureza"] });
+      const semGosto = await criarUsuario();
+
+      assert.deepEqual(nomes(await api("GET", "/pontos?cidade=Joinville")), ["A Museu", "B Parque", "C Trilha"]);
+      assert.deepEqual(nomes(await api("GET", "/pontos?cidade=Joinville", { token: semGosto.token })), ["A Museu", "B Parque", "C Trilha"]);
+      assert.deepEqual(
+        nomes(await api("GET", "/pontos?cidade=Joinville&ordenar=nome", { token: natureza.token })),
+        ["A Museu", "B Parque", "C Trilha"],
+      );
+    });
+  });
+
   describe("métricas de uso", () => {
     it("cada busca entra na contagem diária", async () => {
       const { descarregarMetricas } = require("../../lib/metricasUso") as typeof import("../../lib/metricasUso.js");

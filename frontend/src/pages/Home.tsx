@@ -14,7 +14,7 @@ import { extrairMensagemErro } from "../utils/erro";
 import { useTelaLarga } from "../utils/useTelaLarga";
 
 function Home() {
-  const { autenticado } = useAuth();
+  const { autenticado, usuario } = useAuth();
   const [recomendados, setRecomendados] = useState<Ponto[]>([]);
 
   useEffect(() => {
@@ -485,6 +485,11 @@ function Home() {
                 </div>
               )}
             </div>
+
+            {/* A relevância (ordem padrão da busca por texto) traz primeiro os lugares do gosto de quem está logado. */}
+            {!carregando && !erro && !buscaPelaArea && !ordenar && !localizacao && pontos.length > 0 && (usuario?.interesses.length ?? 0) > 0 && (
+              <p className="muted small">Primeiro os lugares do seu gosto: {usuario!.interesses.join(", ")}.</p>
+            )}
 
             {carregando && <p className="loading">Buscando pontos turísticos...</p>}
 
