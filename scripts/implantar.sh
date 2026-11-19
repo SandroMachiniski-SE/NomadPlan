@@ -22,7 +22,7 @@ cd "$PASTA"
 
 COMPOSE=(docker compose -p nomadplan --env-file .env.prod -f docker-compose.prod.yml -f docker-compose.compartilhado.yml)
 # O painel de monitoramento entra junto, quando o endereço dele foi configurado no .env.prod.
-if [ -f docker-compose.monitoramento.yml ] && grep -qE '^DOMINIO_GRAFANA=.+' .env.prod; then
+if [[ -f docker-compose.monitoramento.yml ]] && grep -qE '^DOMINIO_GRAFANA=.+' .env.prod; then
   COMPOSE+=(-f docker-compose.monitoramento.yml)
 fi
 
@@ -33,7 +33,7 @@ saudavel() {
 esperar_saude() {
   local limite=$((SECONDS + ESPERA))
   until saudavel; do
-    [ "$SECONDS" -lt "$limite" ] || return 1
+    [[ "$SECONDS" -lt "$limite" ]] || return 1
     sleep 3
   done
 }
@@ -44,7 +44,7 @@ NOVO="$(git rev-parse "${ALVO}^{commit}")"
 
 echo "No ar: ${ANTERIOR:0:7}. Implantando: ${NOVO:0:7}."
 
-if [ "${SEM_BACKUP:-0}" != "1" ]; then
+if [[ "${SEM_BACKUP:-0}" != "1" ]]; then
   bash scripts/backup.sh
 fi
 

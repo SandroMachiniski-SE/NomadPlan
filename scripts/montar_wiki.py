@@ -50,7 +50,11 @@ def reescrever(texto: str, origem: str) -> str:
 
 
 def main() -> None:
-    saida = sys.argv[1]
+    # A pasta de saída tem de ficar dentro do diretório atual: o argumento vem da linha de comando.
+    raiz = os.path.realpath(os.getcwd())
+    saida = os.path.realpath(os.path.join(raiz, sys.argv[1]))
+    if os.path.commonpath([raiz, saida]) != raiz:
+        sys.exit("A pasta de saída deve ficar dentro do diretório atual.")
     os.makedirs(saida, exist_ok=True)
 
     for origem, pagina in PAGINAS.items():
