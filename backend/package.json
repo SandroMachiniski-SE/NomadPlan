@@ -9,7 +9,7 @@
     "test:unit": "tsx --test \"src/**/*.test.ts\"",
     "test:preparar": "tsx src/scripts/prepararBancoTeste.ts",
     "test:integracao": "npm run test:preparar && tsx --test --test-concurrency=1 \"src/**/*.itest.ts\"",
-    "test:cobertura": "npm run test:preparar && tsx --test --test-concurrency=1 --experimental-test-coverage --test-coverage-include=\"src/**/*.ts\" --test-coverage-exclude=\"src/**/*.test.ts\" --test-coverage-exclude=\"src/**/*.itest.ts\" --test-coverage-exclude=\"src/testes/**\" --test-coverage-exclude=\"src/scripts/**\" --test-coverage-lines=60 \"src/**/*.test.ts\" \"src/**/*.itest.ts\"",
+    "test:cobertura": "node -e \"require('fs').mkdirSync('coverage',{recursive:true})\" && npm run test:preparar && tsx --test --test-concurrency=1 --experimental-test-coverage --test-reporter=spec --test-reporter-destination=stdout --test-reporter=lcov --test-reporter-destination=coverage/lcov.info --test-coverage-include=\"src/**/*.ts\" --test-coverage-exclude=\"src/**/*.test.ts\" --test-coverage-exclude=\"src/**/*.itest.ts\" --test-coverage-exclude=\"src/testes/**\" --test-coverage-exclude=\"src/scripts/**\" --test-coverage-lines=75 \"src/**/*.test.ts\" \"src/**/*.itest.ts\"",
     "typecheck": "tsc --noEmit -p tsconfig.test.json",
     "build": "tsc",
     "start": "node dist/src/server.js",
@@ -43,6 +43,7 @@
     "morgan": "^1.11.0",
     "multer": "^2.3.0",
     "nodemailer": "^10.0.10",
+    "prom-client": "^15.1.3",
     "zod": "^4.6.7"
   },
   "devDependencies": {

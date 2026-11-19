@@ -11,7 +11,7 @@ Plataforma de turismo inteligente que centraliza o inventário turístico das ci
 - **Pontos salvos (favoritos)** e **recomendações** baseadas nos interesses do perfil e no gosto de usuários parecidos.
 - **Roteiros:** viagens de vários **dias** (com as datas e o dia da semana), mapa com paradas numeradas e trajeto de cada dia, **tempo e distância estimados entre as paradas**, botão para **otimizar a ordem** pelo caminho mais curto, **orçamento** (custo por parada, total por dia e teto de gastos), **checklist** e **notas** da viagem, **colaboração** (convites por e-mail com papéis de editor e leitor, atualização automática entre os participantes), compartilhamento por link público, histórico de versões com restauração e **geração automática** com horários estimados de chegada e saída, deslocamento e espera.
 - **Caderno de viagem:** roteiros por **várias cidades** (o tempo de estrada entre elas aparece sozinho), **atividades livres** ("Rolê pelo centro", "Dia livre"), **período do dia** (manhã, tarde, noite) e **onde dormir** em cada noite (hotel do banco ou texto, como "Acampamento na serra"). O gerador monta a viagem por etapas ("Joinville, 2 dias → Blumenau, 1 dia"). O seed traz um roteiro de exemplo de 10 dias pela região na conta `morador@nomadplan.local` (`npm run roteiro:exemplo` cria em bancos que já existiam).
-- **Viagem de carro:** saindo da cidade de casa (escolhida no cadastro pela busca ou pelo GPS), a estrada é dividida em dias pelo alvo de km por dia (e, se quiser, pelo máximo de horas ao volante), com o pernoite sugerido numa cidade a até 50 km do alvo (sem precisar ter baixado as cidades do caminho; o destino sem pontos começa a ser preparado sozinho), escolhida por proximidade, hospedagens e atrações, e alternativas para trocar. Vale para a ida, entre as cidades e a volta; quando o destino está perto, a pessoa decide entre esticar e chegar ou dormir antes. Com o consumo do carro e o preço do litro, estima o combustível e soma ao orçamento. Rotas do [OSRM](https://project-osrm.org) e municípios do IBGE; antes de uma apresentação, `npm run viagem:preparar -- "Joinville/SC" "Brasília/DF"` deixa a viagem pronta no banco (veja [docs/operacao.md](docs/operacao.md)).
+- **Viagem de carro:** saindo da cidade de casa (escolhida no cadastro pela busca ou pelo GPS), a estrada é dividida em dias pelo alvo de km por dia (e, se quiser, pelo máximo de horas ao volante), com o pernoite sugerido numa cidade a até 50 km do alvo (ampliando até 100 km; mais longe que isso, a próxima cidade com hospedagem é proposta e só entra se a pessoa aceitar; sem precisar ter baixado as cidades do caminho; o destino sem pontos começa a ser preparado sozinho), escolhida por proximidade, hospedagens e atrações, e alternativas para trocar. Vale para a ida, entre as cidades e a volta; quando o destino está perto, a pessoa decide entre esticar e chegar ou dormir antes. Com o consumo do carro e o preço do litro, estima o combustível e soma ao orçamento. Rotas do [OSRM](https://project-osrm.org) e municípios do IBGE; antes de uma apresentação, `npm run viagem:preparar -- "Joinville/SC" "Brasília/DF"` deixa a viagem pronta no banco (veja [docs/operacao.md](docs/operacao.md)).
 - **Contribuição da comunidade:** qualquer conta cadastra um lugar que falta (até marcando no mapa da busca: "Cadastrar um lugar aqui"), que é publicado depois da moderação; avaliações (com foto), sugestões de edição que se confirmam entre usuários ou são aplicadas direto por quem tem reputação, selo de ponto verificado.
 - **Cadastro e moderação:** pontos entram como rascunho, passam por revisão com motivo de rejeição, detecção de duplicados e bloqueio contra edições simultâneas; importação e exportação em CSV e GeoJSON.
 - **Administração:** papéis (visitante, morador, negócio, gestor, moderador, administrador), desativação de contas, log de auditoria, métricas de uso diário com exportação em CSV.
@@ -79,7 +79,7 @@ Dados © colaboradores do OpenStreetMap, sob a licença [ODbL](https://www.opens
 # Backend: unitários + integração (usa um banco "nomadplan_teste", criado sozinho)
 cd backend
 npm test
-npm run test:cobertura   # com relatório de cobertura; falha se ficar abaixo de 60% das linhas
+npm run test:cobertura   # com relatório de cobertura (lcov); falha se ficar abaixo da meta de linhas
 npm run typecheck
 
 # Frontend
@@ -107,6 +107,12 @@ npx playwright test
 | [docs/operacao.md](docs/operacao.md) | Implantação, rollback, backup, restauração, monitoramento |
 | [docs/seguranca.md](docs/seguranca.md) | Controles por categoria do OWASP Top 10 e riscos aceitos |
 | [docs/relatorio-de-carga.md](docs/relatorio-de-carga.md) | Resultados do teste com 100 usuários simultâneos |
+| [docs/requisitos.md](docs/requisitos.md) | Requisitos, histórias de usuário e os fluxos de negócio com os testes que os verificam |
+| [docs/arquitetura.md](docs/arquitetura.md) | Diagramas C4 (contexto, containers e componentes), decisões e ambientes |
+| [docs/implantacao-automatica.md](docs/implantacao-automatica.md) | CI/CD: deploy automático na VPS, volta de versão e instalação do runner |
+| [docs/monitoramento.md](docs/monitoramento.md) | Observabilidade com Prometheus e Grafana: métricas, painel e alertas |
+| [docs/analise-estatica.md](docs/analise-estatica.md) | Análise estática e de segurança com SonarCloud |
+| [CONTRIBUTING.md](CONTRIBUTING.md) | Como contribuir: ambiente, testes, padrões e pull requests |
 | [RFC.pdf](RFC.pdf) | Especificação completa do projeto (requisitos, regras de negócio, fluxos) |
 
 ## 🗂️ Estrutura

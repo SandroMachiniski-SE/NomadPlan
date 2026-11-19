@@ -23,6 +23,8 @@ ENV_FILE="${ENV_FILE:-.env.prod}"
 DOMINIO_WEB="$(grep -E '^DOMINIO_WEB=' "$ENV_FILE" | head -1 | cut -d= -f2-)"
 DOMINIO_API="$(grep -E '^DOMINIO_API=' "$ENV_FILE" | head -1 | cut -d= -f2-)"
 [ -n "$DOMINIO_WEB" ] && [ -n "$DOMINIO_API" ] || { echo "Defina DOMINIO_WEB e DOMINIO_API em $ENV_FILE." >&2; exit 1; }
+# Opcional: o painel do Grafana (docs/monitoramento.md). Sem a variável, nada muda.
+DOMINIO_GRAFANA="$(grep -E '^DOMINIO_GRAFANA=' "$ENV_FILE" | head -1 | cut -d= -f2- || true)"
 
 if [ "${SEM_REDE:-0}" != "1" ]; then
   docker network connect "$REDE" "$CADDY" 2>/dev/null || true   # já conectado também é sucesso
@@ -40,4 +42,4 @@ trap 'rm -f "$TEMP"' EXIT
 docker cp "$TEMP" "$CADDY":/tmp/Caddyfile.nomadplan
 docker exec "$CADDY" caddy validate --config /tmp/Caddyfile.nomadplan --adapter caddyfile > /dev/null
 docker exec "$CADDY" caddy reload --config /tmp/Caddyfile.nomadplan --adapter caddyfile
-echo "Pronto: $DOMINIO_WEB e $DOMINIO_API passam a ser atendidos por $CADDY."
+echo "Pronto: $DOMINIO_WEB e $DOMINIO_API${DOMINIO_GRAFANA:+ e $DOMINIO_GRAFANA} passam a ser atendidos por $CADDY."

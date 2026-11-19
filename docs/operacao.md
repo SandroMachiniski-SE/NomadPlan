@@ -188,12 +188,12 @@ Faça essa conferência periodicamente: backup que nunca foi restaurado não é 
 - **Banco:** acompanhe espaço em disco do volume do PostgreSQL e das imagens; `docker stats nomadplan-postgres` para CPU/memória.
 - **Busca lenta:** quando a consulta passa de `BUSCA_TIMEOUT_MS` (5 s), a API responde o último resultado igual em cache (`desatualizado: true`) ou `504`, e registra a ocorrência no log.
 
-Para métricas contínuas de latência e uso de CPU/memória (Prometheus + Grafana, citados na RFC), exponha um *exporter* de Node.js ou use o painel do provedor de nuvem; o sistema não embute essa pilha.
+Métricas contínuas de latência, erros 5xx, CPU e memória, com painel e alertas, vêm do **Prometheus + Grafana** que sobem junto com a aplicação: ver [monitoramento.md](monitoramento.md). A implantação em si é automática a cada merge na `main`, com backup prévio e volta automática: ver [implantacao-automatica.md](implantacao-automatica.md).
 
 ## Testes antes de liberar
 
 ```bash
-cd backend && npm run test:cobertura   # unitários + integração, falha se a cobertura de linhas < 60%
+cd backend && npm run test:cobertura   # unitários + integração, falha se a cobertura de linhas < 75%
 cd frontend && npm run lint && npm run build
 cd e2e && npx playwright test          # fluxos principais no navegador
 ```

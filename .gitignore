@@ -4,3 +4,4 @@ dist/
 *.log
 backups/
 .env.prod
+coverage/
