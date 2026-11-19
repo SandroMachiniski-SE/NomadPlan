@@ -1,3 +1,5 @@
+import { horaLocal } from "./fuso";
+
 // Interpreta o texto livre de "horário de funcionamento" (RB07). O formato não é
 // estruturado, então reconhecemos os padrões mais comuns em português e, quando não
 // entendemos o texto, assumimos que o ponto está aberto: preferimos incluir um ponto
@@ -158,9 +160,11 @@ export function estaAbertoNoHorario(
     return true;
   }
 
-  const dia = dataHora.getDay();
+  // No relógio de Brasília, não no do servidor (que na VPS está em UTC).
+  const local = horaLocal(dataHora);
+  const dia = local.diaDaSemana;
   const diaAnterior = (dia + 6) % 7;
-  const hora = dataHora.getHours() + dataHora.getMinutes() / 60;
+  const hora = local.hora + local.minuto / 60;
 
   return entendidas.some((clausula) => {
     if (clausula.fechado) {

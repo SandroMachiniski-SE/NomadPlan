@@ -2,6 +2,7 @@ import { StatusPonto } from "@prisma/client";
 import prisma from "./prisma";
 import { distanciaMetros } from "./geo";
 import { estaAbertoNoHorario } from "./horarios";
+import { horaLocal, instanteLocal } from "./fuso";
 import { preferenciasAtendidas } from "./preferencias";
 import { cidadesComPontos, normalizarCidade, variantesDaCidade } from "./cidades";
 import { chaveGoogle, detalhesDoGoogle, idGoogleDoPonto } from "./googlePlaces";
@@ -113,24 +114,21 @@ export function calcularMaxPontos(horasDisponiveis: number): number {
  * das 17h (senão quase tudo estaria "fechado" e o roteiro sairia vazio).
  */
 export function inicioPadrao(agora: Date): Date {
-  const hora = agora.getHours() + agora.getMinutes() / 60;
+  // O horário comercial é o de Brasília, não o do relógio do servidor.
+  const local = horaLocal(agora);
+  const hora = local.hora + local.minuto / 60;
 
   if (hora >= 9 && hora < 17) {
     return new Date(agora);
   }
 
-  const inicio = new Date(agora);
-  inicio.setHours(9, 0, 0, 0);
-
-  if (hora >= 17) {
-    inicio.setDate(inicio.getDate() + 1);
-  }
-
-  return inicio;
+  return instanteLocal(local.ano, local.mes, local.dia + (hora >= 17 ? 1 : 0), 9);
 }
 
 function formatarHora(data: Date): string {
-  return `${String(data.getHours()).padStart(2, "0")}:${String(data.getMinutes()).padStart(2, "0")}`;
+  const { hora, minuto } = horaLocal(data);
+
+  return `${String(hora).padStart(2, "0")}:${String(minuto).padStart(2, "0")}`;
 }
 
 /** Aberto na chegada e ainda aberto 1 h depois (a visita precisa caber no horário). */

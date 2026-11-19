@@ -33,6 +33,7 @@ services:
         condition: service_healthy
     environment:
       NODE_ENV: production
+      TZ: America/Sao_Paulo
       DATABASE_URL: postgresql://nomadplan:${POSTGRES_PASSWORD}@postgres:5432/nomadplan?schema=public
       JWT_SECRET: ${JWT_SECRET:?defina JWT_SECRET no .env.prod}
       CHAVE_CRIPTOGRAFIA: ${CHAVE_CRIPTOGRAFIA:?defina CHAVE_CRIPTOGRAFIA no .env.prod}
