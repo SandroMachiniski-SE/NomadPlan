@@ -40,6 +40,13 @@ export interface AuthContextValor {
   sessaoExpirada: boolean;
   /** Verdadeiro logo após a pessoa escolher sair (ou excluir a conta): rotas protegidas voltam ao início, não ao login. */
   saiuManualmente: boolean;
+  /**
+   * Há uma sessão guardada, mas o servidor não respondeu para confirmá-la (queda prolongada). A pessoa
+   * não foi deslogada: as rotas protegidas mostram a recuperação em vez de mandá-la ao login.
+   */
+  sessaoIndisponivel: boolean;
+  /** Confere de novo a sessão guardada (botão "Tentar novamente"). */
+  tentarSessaoDeNovo: () => Promise<void>;
 }
 
 export const AuthContext = createContext<AuthContextValor | undefined>(

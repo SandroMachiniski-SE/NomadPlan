@@ -76,7 +76,17 @@ test.describe("planejamento da viagem", () => {
 
     const cartao = page.locator(".parada__card", { hasText: PARQUE });
     await cartao.getByRole("button", { name: "Período, observação e custo" }).click();
-    await cartao.getByLabel(`Custo previsto de ${PARQUE}`).fill("abc");
+    const campo = cartao.getByLabel(`Custo previsto de ${PARQUE}`);
+
+    // O campo só deixa digitar número: letras nem entram, e nada é corrigido em silêncio.
+    await campo.pressSequentially("abc25,90");
+    await expect(campo).toHaveValue("25,90");
+    await campo.fill("");
+    await campo.fill("abc");
+    await expect(campo).toHaveValue("");
+
+    // Número bem digitado, mas absurdo, ainda é recusado ao salvar.
+    await campo.fill("9999999999,00");
     await cartao.getByRole("button", { name: "Salvar", exact: true }).click();
 
     await expect(cartao.getByRole("alert")).toContainText("Informe um valor válido");
@@ -142,10 +152,16 @@ test.describe("planejamento da viagem", () => {
     await roteiroComParadas(page, "Viagem com teto", [MUSEU]);
     const orcamento = page.getByRole("region", { name: "Orçamento" });
 
-    await orcamento.getByLabel(/Teto de gastos/).fill("-25,90");
+    const campo = orcamento.getByLabel(/Teto de gastos/);
+
+    // O sinal de menos não entra no campo, então nenhum "-25,90" vira positivo ao ser salvo.
+    await campo.fill("-25,90");
+    await expect(campo).toHaveValue("");
+    await campo.pressSequentially("-25,90");
+    await expect(campo).toHaveValue("25,90");
+    await campo.fill("");
     await orcamento.getByRole("button", { name: "Salvar teto" }).click();
 
-    await expect(orcamento.getByRole("alert")).toContainText("Informe um valor válido");
     await page.reload();
     await expect(page.getByRole("region", { name: "Orçamento" }).getByText("R$ 25,90")).toHaveCount(0);
   });

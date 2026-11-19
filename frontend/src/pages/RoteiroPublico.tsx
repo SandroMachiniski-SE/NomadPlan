@@ -1,6 +1,7 @@
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import { Link, useParams } from "react-router-dom";
 import api from "../services/api";
+import { comNovasTentativas, ehFalhaTemporaria } from "../utils/falhaTemporaria";
 import type { RoteiroPublico as RoteiroPublicoTipo } from "../types/roteiro";
 import MapaRoteiroCarregavel from "../components/MapaRoteiroCarregavel";
 import { agruparPorDia, cidadesDoDia, contarDias, corDoDia, descreverTrecho, nomeDoItem, ROTULO_PERIODO, rotuloDoDia } from "../utils/roteiro";
@@ -13,23 +14,44 @@ function RoteiroPublico() {
 
   const [roteiro, setRoteiro] = useState<RoteiroPublicoTipo | null>(null);
   const [carregando, setCarregando] = useState(true);
-  const [erro, setErro] = useState<string | null>(null);
+  // "naoExiste": o servidor respondeu que não há esse roteiro. "indisponivel": o servidor falhou de
+  // forma temporária (rede, 5xx, ocupado) e mesmo depois de novas tentativas não deu para saber.
+  const [erro, setErro] = useState<"naoExiste" | "indisponivel" | null>(null);
+  const ativa = useRef(true);
+
+  // O estado inicial já é "carregando"; só o botão de tentar de novo precisa recolocá-lo.
+  const buscar = useCallback(async () => {
+    try {
+      const resposta = await comNovasTentativas(
+        () => api.get<RoteiroPublicoTipo>(`/roteiros/publico/${slug}`),
+        [1000, 3000],
+        () => ativa.current,
+      );
+
+      if (ativa.current) setRoteiro(resposta.data);
+    } catch (err) {
+      console.error(err);
+
+      if (ativa.current) setErro(ehFalhaTemporaria(err) ? "indisponivel" : "naoExiste");
+    } finally {
+      if (ativa.current) setCarregando(false);
+    }
+  }, [slug]);
+
+  function tentarDeNovo() {
+    setCarregando(true);
+    setErro(null);
+    buscar();
+  }
 
   useEffect(() => {
-    async function buscar() {
-      try {
-        const resposta = await api.get<RoteiroPublicoTipo>(`/roteiros/publico/${slug}`);
-        setRoteiro(resposta.data);
-      } catch (err) {
-        console.error(err);
-        setErro("Este roteiro não existe ou não está mais público.");
-      } finally {
-        setCarregando(false);
-      }
-    }
-
+    ativa.current = true;
     buscar();
-  }, [slug]);
+
+    return () => {
+      ativa.current = false;
+    };
+  }, [buscar]);
 
   const totalDias = roteiro
     ? contarDias(roteiro.itens, roteiro.dataInicio, roteiro.dataFim, ultimoDiaDeEstrada(roteiro.trechosDeEstrada))
@@ -47,8 +69,19 @@ function RoteiroPublico() {
         <div className="stack">
           <div className="alert alert--error" role="alert">
             <Icone nome="alerta" />
-            <p>{erro}</p>
+            <p>
+              {erro === "indisponivel"
+                ? "Não foi possível carregar este roteiro agora: o servidor não respondeu. O roteiro pode existir; tente de novo em instantes."
+                : "Este roteiro não existe ou não está mais público."}
+            </p>
           </div>
+          {erro === "indisponivel" && (
+            <div>
+              <button type="button" className="btn btn--outline" onClick={tentarDeNovo}>
+                Tentar novamente
+              </button>
+            </div>
+          )}
           <Link to="/" className="back-link">
             <Icone nome="voltar" />
             Ir para a página inicial

@@ -2,7 +2,7 @@ import { useState, type FormEvent } from "react";
 import api from "../../services/api";
 import type { ResumoOrcamentoRoteiro } from "../../types/roteiro";
 import { extrairMensagemErro } from "../../utils/erro";
-import { formatarMoeda, lerValorEmCentavos } from "../../utils/formatar";
+import { aceitarDigitacaoDeValor, formatarMoeda, lerValorEmCentavos } from "../../utils/formatar";
 import { rotuloDoDia } from "../../utils/roteiro";
 
 interface PainelOrcamentoProps {
@@ -120,9 +120,10 @@ function PainelOrcamento({ idRoteiro, resumo, dataInicio, aoSalvar, somenteLeitu
             type="text"
             inputMode="decimal"
             value={teto}
-            onChange={(e) => setTeto(e.target.value)}
+            onChange={(e) => { const digitado = e.target.value; setTeto((anterior) => aceitarDigitacaoDeValor(anterior, digitado)); }}
             placeholder="Ex.: 1500,00"
           />
+          <span className="field__hint">Só números, com vírgula para os centavos.</span>
         </label>
 
         {erro && (

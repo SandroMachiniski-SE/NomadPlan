@@ -2,7 +2,7 @@ import { useState, type FormEvent } from "react";
 import api from "../../services/api";
 import type { ItemRoteiro, PeriodoDoDia } from "../../types/roteiro";
 import { extrairMensagemErro } from "../../utils/erro";
-import { formatarMoeda, lerValorEmCentavos } from "../../utils/formatar";
+import { aceitarDigitacaoDeValor, formatarMoeda, lerValorEmCentavos } from "../../utils/formatar";
 import { nomeDoItem, ROTULO_PERIODO } from "../../utils/roteiro";
 import Icone from "../Icone";
 
@@ -124,10 +124,11 @@ function DetalhesDaParada({ idRoteiro, item, aoSalvar, somenteLeitura = false }:
               type="text"
               inputMode="decimal"
               value={custo}
-              onChange={(e) => setCusto(e.target.value)}
+              onChange={(e) => { const digitado = e.target.value; setCusto((anterior) => aceitarDigitacaoDeValor(anterior, digitado)); }}
               placeholder="0,00"
               aria-label={`Custo previsto de ${nomeDoItem(item)}`}
             />
+            <span className="field__hint">Só números, com vírgula para os centavos.</span>
           </label>
         </div>
 
