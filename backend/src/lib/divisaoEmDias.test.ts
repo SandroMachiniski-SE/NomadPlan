@@ -125,6 +125,27 @@ describe("dividirEmDias", () => {
     );
   });
 
+  it("sem hospedagem até ±100, a busca se amplia para ±150 e depois ±200 antes de deixar a definir", () => {
+    const a150 = dividir([cidade(1, 500, 0), cidade(2, 640, 3), cidade(3, 1000, 4)]);
+    const a200 = dividir([cidade(1, 500, 0), cidade(2, 310, 2), cidade(3, 1000, 4)]);
+
+    assert.equal(a150.noites[0].cidade?.codigoIbge, 2);
+    assert.equal(a150.noites[0].aDefinir, false);
+    assert.ok(
+      a150.avisos.includes("Nenhuma cidade com hospedagem entre 450 e 550 km; a mais próxima é C2, no km 640."),
+      a150.avisos.join(" | "),
+    );
+    assert.equal(a200.noites[0].cidade?.codigoIbge, 2);
+    assert.ok(a200.avisos.includes("Nenhuma cidade com hospedagem entre 450 e 550 km; a mais próxima é C2, no km 310."));
+  });
+
+  it("além de ±200 sem hospedagem, o pernoite fica a definir na cidade mais perto do alvo", () => {
+    const d = dividir([cidade(1, 505, 0), cidade(2, 760, 3)]);
+
+    assert.equal(d.noites[0].cidade?.codigoIbge, 1);
+    assert.equal(d.noites[0].aDefinir, true);
+  });
+
   it("nada na faixa alargada: pernoite a definir na cidade mais perto do alvo", () => {
     const d = dividir([cidade(1, 505, 0), cidade(2, 420, 0)]);
 

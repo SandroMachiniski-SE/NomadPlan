@@ -24,7 +24,7 @@ const INTERVALO_ENTRE_CONSULTAS_MS = 1000;
 const MAX_HOSPEDAGENS = 40;
 const MAX_ATRACOES = 10;
 
-const TIPOS_DE_HOSPEDAGEM = new Set(["hotel", "motel", "guest_house", "hostel", "chalet", "apartment"]);
+const TIPOS_DE_HOSPEDAGEM = new Set(["hotel", "motel", "guest_house", "hostel", "chalet", "apartment", "camp_site"]);
 const TURISMO_ATRACAO = new Set(["attraction", "museum", "viewpoint", "gallery", "zoo", "theme_park"]);
 
 export interface HospedagemDoResumo {

@@ -291,6 +291,24 @@ describe("resumos das cidades", () => {
     assert.equal(mapas.chamadas.filter((c) => c.servico === "overpass").length, 1);
   });
 
+  it("camping conta como hospedagem no resumo da cidade de pernoite", async () => {
+    mapas = instalarMapasFalsos({
+      overpass: () => ({
+        corpo: { elements: [{ type: "node", id: 11, lat: -18.01, lon: -48, tags: { name: "Camping do Rio", tourism: "camp_site" } }] },
+      }),
+    });
+
+    const resumos = await resumirCidades([B.codigoIbge]);
+
+    const consulta = mapas.chamadas.find((c) => c.servico === "overpass")!.corpo!;
+    assert.match(consulta, /camp_site/);
+    assert.equal(resumos.get(B.codigoIbge)!.totalHospedagens, 1);
+    assert.deepEqual(
+      resumos.get(B.codigoIbge)!.hospedagens.map((h) => [h.nome, h.tipo]),
+      [["Camping do Rio", "camp_site"]],
+    );
+  });
+
   it("sem resumo e Overpass fora do ar: devolve null", async () => {
     mapas = instalarMapasFalsos({ overpass: () => ({ status: 504, corpo: {} }) });
 

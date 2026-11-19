@@ -11,6 +11,10 @@ import { kmApos, type PerfilDaRota } from "./rotas";
 
 export const FAIXA_KM = 50;
 export const FAIXA_ALARGADA_KM = 100;
+// Sem hospedagem na faixa do alvo, a busca vai se ampliando antes de deixar o pernoite a definir
+// (numa estrada com poucas cidades, como a de Manaus a Boa Vista, ±100 km não bastava).
+const FAIXAS_AMPLIADAS_KM = [FAIXA_ALARGADA_KM, 150, 200];
+const FAIXA_MAXIMA_KM = FAIXAS_AMPLIADAS_KM[FAIXAS_AMPLIADAS_KM.length - 1];
 export const FRACAO_DIA_CURTO = 0.3;
 export const MAX_ALTERNATIVAS = 3;
 // Cidades de cada faixa cujo resumo é buscado (as mais perto do alvo): numa região metropolitana a
@@ -137,9 +141,11 @@ export function dividirEmDias(entrada: EntradaDaDivisao): DivisaoDaPerna {
     let largura = FAIXA_KM;
     let opcoes = elegiveis(naFaixa(kmAlvo - FAIXA_KM, kmAlvo + FAIXA_KM), kmAlvo);
 
-    if (opcoes.length === 0) {
-      largura = FAIXA_ALARGADA_KM;
-      opcoes = elegiveis(naFaixa(kmAlvo - FAIXA_ALARGADA_KM, kmAlvo + FAIXA_ALARGADA_KM), kmAlvo);
+    for (const ampliada of FAIXAS_AMPLIADAS_KM) {
+      if (opcoes.length > 0) break;
+
+      largura = ampliada;
+      opcoes = elegiveis(naFaixa(kmAlvo - ampliada, kmAlvo + ampliada), kmAlvo);
     }
 
     const ordenadas = [...opcoes].sort(
@@ -149,7 +155,7 @@ export function dividirEmDias(entrada: EntradaDaDivisao): DivisaoDaPerna {
 
     if (ordenadas.length === 0) {
       // Nenhuma hospedagem nem na faixa alargada: dorme "a definir" na cidade mais perto do alvo.
-      const maisPerto = naFaixa(kmAlvo - FAIXA_ALARGADA_KM, kmAlvo + FAIXA_ALARGADA_KM).sort(
+      const maisPerto = naFaixa(kmAlvo - FAIXA_MAXIMA_KM, kmAlvo + FAIXA_MAXIMA_KM).sort(
         (a, b) => Math.abs(a.km - kmAlvo) - Math.abs(b.km - kmAlvo) || a.km - b.km,
       )[0];
 
@@ -180,7 +186,7 @@ export function dividirEmDias(entrada: EntradaDaDivisao): DivisaoDaPerna {
       );
     }
 
-    if (largura === FAIXA_ALARGADA_KM) {
+    if (largura > FAIXA_KM) {
       avisar(
         `Nenhuma cidade com hospedagem entre ${km(kmAlvo - FAIXA_KM)} e ${km(kmAlvo + FAIXA_KM)} km; ` +
           `a mais próxima é ${escolhida.cidade}, no km ${km(escolhida.km)}.`,
