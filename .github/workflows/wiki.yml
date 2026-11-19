@@ -1,0 +1,48 @@
+name: Wiki
+
+# A Wiki do repositório é gerada a partir de docs/ (scripts/montar_wiki.py) a cada alteração na main.
+# Antes da primeira execução, crie qualquer página em Wiki > "Create the first page": é o que inicializa o
+# repositório da Wiki; a partir daí este workflow a mantém atualizada.
+on:
+  push:
+    branches: [main]
+    paths:
+      - "docs/**"
+      - "CONTRIBUTING.md"
+      - "scripts/montar_wiki.py"
+      - ".github/workflows/wiki.yml"
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+concurrency:
+  group: wiki
+  cancel-in-progress: true
+
+jobs:
+  publicar:
+    name: Publicar a Wiki
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Montar as páginas
+        run: python3 scripts/montar_wiki.py wiki-saida
+      - name: Publicar
+        run: |
+          git clone "https://x-access-token:${{ github.token }}@github.com/${{ github.repository }}.wiki.git" wiki || {
+            echo "::error::A Wiki ainda não foi iniciada. Crie a primeira página em Wiki > Create the first page e rode de novo."
+            exit 1
+          }
+          find wiki -mindepth 1 -maxdepth 1 ! -name .git -exec rm -rf {} +
+          cp -r wiki-saida/. wiki/
+          cd wiki
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add -A
+          if git diff --cached --quiet; then
+            echo "Wiki já está atualizada."
+          else
+            git commit -m "Wiki: atualizada a partir de docs/ (${{ github.sha }})"
+            git push
+          fi

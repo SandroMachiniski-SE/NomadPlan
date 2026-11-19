@@ -21,7 +21,7 @@ The sections below explain features, setup, tests and technical decisions.
 - **Saved places (favorites)** and **recommendations** based on profile interests and the taste of similar users.
 - **Itineraries:** multi-**day** trips (with dates and weekday), map with numbered stops and each day's route, **estimated time and distance between stops**, a button to **optimize the order** for the shortest path, **budget** (cost per stop, daily total and spending cap), trip **checklist** and **notes**, **collaboration** (e-mail invitations with editor and reader roles, automatic updates between participants), public link sharing, version history with restore, and **automatic generation** with estimated arrival/departure, travel and waiting times.
 - **Travel notebook:** trips across **several cities** (the road time between them shows up on its own), **free activities** ("Stroll downtown", "Free day"), **period of the day** (morning, afternoon, evening) and **where to sleep** each night (a hotel from the database or free text, such as "Camping in the mountains"). The generator builds the trip in stages ("Joinville, 2 days → Blumenau, 1 day"). The seed brings a 10-day sample itinerary for the region under the `morador@nomadplan.local` account (`npm run roteiro:exemplo` creates it in databases that already existed).
-- **Road trip:** starting from the home city (chosen at sign-up by search or GPS), the road is split into days by a daily distance target (and, optionally, by a maximum number of driving hours), with an overnight stay suggested in a city within 50 km of the target (the cities along the way do not need to be downloaded first; a destination without places starts being prepared automatically), chosen by proximity, lodging and attractions, plus alternatives to swap. It applies to the outbound leg, between cities and the way back; when the destination is close, the user chooses between stretching the day to arrive or sleeping before. With the car's consumption and the fuel price, it estimates fuel and adds it to the budget. Routes from [OSRM](https://project-osrm.org) and municipalities from IBGE; before a presentation, `npm run viagem:preparar -- "Joinville/SC" "Brasília/DF"` leaves the trip ready in the database (see [docs/operacao.md](docs/operacao.md)).
+- **Road trip:** starting from the home city (chosen at sign-up by search or GPS), the road is split into days by a daily distance target (and, optionally, by a maximum number of driving hours), with an overnight stay suggested in a city within 50 km of the target (widening to 100 km; farther than that, the next city with lodging is offered and only used if the user accepts; the cities along the way do not need to be downloaded first; a destination without places starts being prepared automatically), chosen by proximity, lodging and attractions, plus alternatives to swap. It applies to the outbound leg, between cities and the way back; when the destination is close, the user chooses between stretching the day to arrive or sleeping before. With the car's consumption and the fuel price, it estimates fuel and adds it to the budget. Routes from [OSRM](https://project-osrm.org) and municipalities from IBGE; before a presentation, `npm run viagem:preparar -- "Joinville/SC" "Brasília/DF"` leaves the trip ready in the database (see [docs/operacao.md](docs/operacao.md)).
 - **Community contributions:** any account can add a missing place (even by clicking the search map: "Cadastrar um lugar aqui"), published after moderation; reviews (with photos), edit suggestions confirmed across users or applied directly by users with reputation, verified-place badge.
 - **Submission and moderation:** new places enter as drafts, go through review with a rejection reason, duplicate detection and protection against simultaneous edits; CSV and GeoJSON import/export.
 - **Administration:** roles (visitor, resident, business, city manager, moderator, administrator), account deactivation, audit log, daily usage metrics with CSV export.
@@ -89,7 +89,7 @@ Data © OpenStreetMap contributors, under the [ODbL](https://www.openstreetmap.o
 # Backend: unit + integration (uses a "nomadplan_teste" database, created automatically)
 cd backend
 npm test
-npm run test:cobertura   # with coverage report; fails below 60% of lines
+npm run test:cobertura   # with coverage report; fails below 75% of lines
 npm run typecheck
 
 # Frontend
@@ -117,6 +117,12 @@ npx playwright test
 | [docs/operacao.md](docs/operacao.md) | Deployment, rollback, backup, restore, monitoring |
 | [docs/seguranca.md](docs/seguranca.md) | Controls by OWASP Top 10 category and accepted risks |
 | [docs/relatorio-de-carga.md](docs/relatorio-de-carga.md) | Results of the 100-concurrent-user test |
+| [docs/requisitos.md](docs/requisitos.md) | Requirements, user stories and the business flows with the tests that verify them (Portuguese) |
+| [docs/arquitetura.md](docs/arquitetura.md) | C4 diagrams (context, containers, components), decisions and environments (Portuguese) |
+| [docs/implantacao-automatica.md](docs/implantacao-automatica.md) | CI/CD: automatic deployment to the VPS, rollback and runner setup (Portuguese) |
+| [docs/monitoramento.md](docs/monitoramento.md) | Observability with Prometheus and Grafana: metrics, dashboard and alerts (Portuguese) |
+| [docs/analise-estatica.md](docs/analise-estatica.md) | Static and security analysis with SonarCloud (Portuguese) |
+| [CONTRIBUTING.md](CONTRIBUTING.md) | How to contribute: environment, tests, standards and pull requests (Portuguese) |
 | [RFC.pdf](RFC.pdf) | Full project specification (requirements, business rules, flows) |
 
 ## 🗂️ Structure
