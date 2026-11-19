@@ -14,6 +14,9 @@ const INTERVALO_RENOVACAO_MS = 30 * 60 * 1000;
 // Ao abrir o site com o servidor indisponível (503 durante um deploy, falha de rede), a sessão
 // é conferida de novo depois destas esperas, em vez de a pessoa ser deslogada.
 const ESPERAS_DA_RENOVACAO_MS = [1000, 3000];
+// Se mesmo assim o servidor não respondeu, a sessão continua guardada e é conferida de novo sozinha
+// de tempos em tempos, até o servidor voltar.
+const INTERVALO_DA_RECUPERACAO_MS = 15_000;
 
 /** Só um "não" do servidor (token recusado) encerra a sessão; indisponibilidade não. */
 function sessaoRecusada(erro: unknown): boolean {
@@ -27,13 +30,32 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const [carregando, setCarregando] = useState(true);
   const [sessaoExpirada, setSessaoExpirada] = useState(false);
   const [saiuManualmente, setSaiuManualmente] = useState(false);
+  const [sessaoIndisponivel, setSessaoIndisponivel] = useState(false);
 
   const renovarSessao = useCallback(async () => {
     const resposta = await api.post<RespostaAutenticacao>("/auth/renovar");
 
     salvarToken(resposta.data.token);
     setUsuario(resposta.data.usuario);
+    setSessaoIndisponivel(false);
   }, []);
+
+  /** Uma conferência da sessão guardada: confirma, encerra (token recusado) ou marca como indisponível. */
+  const conferirSessaoUmaVez = useCallback(async () => {
+    try {
+      await renovarSessao();
+    } catch (erro) {
+      if (sessaoRecusada(erro)) {
+        limparToken();
+        setUsuario(null);
+        setSessaoIndisponivel(false);
+        return;
+      }
+
+      // O servidor não respondeu: a sessão fica guardada e a pessoa não é deslogada.
+      setSessaoIndisponivel(true);
+    }
+  }, [renovarSessao]);
 
   useEffect(() => {
     let ativo = true;
@@ -56,9 +78,12 @@ export function AuthProvider({ children }: { children: ReactNode }) {
               return;
             }
 
-            // Servidor fora do ar em todas as tentativas: segue como visitante, mas guarda o token
-            // para a próxima visita.
-            if (tentativa >= ESPERAS_DA_RENOVACAO_MS.length) return;
+            // Servidor fora do ar em todas as tentativas: guarda o token e marca a sessão como
+            // indisponível; as rotas protegidas mostram a recuperação em vez do login.
+            if (tentativa >= ESPERAS_DA_RENOVACAO_MS.length) {
+              if (ativo) setSessaoIndisponivel(true);
+              return;
+            }
 
             await new Promise((resolver) => setTimeout(resolver, ESPERAS_DA_RENOVACAO_MS[tentativa]));
           }
@@ -75,10 +100,22 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     };
   }, [renovarSessao]);
 
+  // Enquanto a sessão não pôde ser confirmada, tenta de novo sozinha até o servidor voltar.
+  useEffect(() => {
+    if (!sessaoIndisponivel) return;
+
+    const temporizador = window.setInterval(() => {
+      conferirSessaoUmaVez();
+    }, INTERVALO_DA_RECUPERACAO_MS);
+
+    return () => window.clearInterval(temporizador);
+  }, [sessaoIndisponivel, conferirSessaoUmaVez]);
+
   useEffect(() => {
     function aoExpirar() {
       setUsuario(null);
       setSessaoExpirada(true);
+      setSessaoIndisponivel(false);
     }
 
     window.addEventListener(EVENTO_SESSAO_EXPIRADA, aoExpirar);
@@ -117,6 +154,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     setUsuario(resposta.data.usuario);
     setSessaoExpirada(false);
     setSaiuManualmente(false);
+    setSessaoIndisponivel(false);
 
     return { mfaNecessario: false };
   }
@@ -131,6 +169,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     setUsuario(resposta.data.usuario);
     setSessaoExpirada(false);
     setSaiuManualmente(false);
+    setSessaoIndisponivel(false);
   }
 
   function logout() {
@@ -138,6 +177,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     setUsuario(null);
     setSessaoExpirada(false);
     setSaiuManualmente(true);
+    setSessaoIndisponivel(false);
   }
 
   async function atualizarPerfil(dados: DadosPerfil) {
@@ -158,6 +198,8 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         definirUsuario: setUsuario,
         sessaoExpirada,
         saiuManualmente,
+        sessaoIndisponivel,
+        tentarSessaoDeNovo: conferirSessaoUmaVez,
       }}
     >
       {children}

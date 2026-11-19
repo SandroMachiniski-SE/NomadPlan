@@ -203,7 +203,7 @@ describe("roteiro colaborativo: convites, papéis e acesso", () => {
       assert.equal((await api("POST", `/roteiros/${roteiro.id}/itens`, { token: t, json: { idPonto: novo.id, dia: 2 } })).status, 201);
       assert.equal((await api("PUT", `/roteiros/${roteiro.id}/itens/organizar`, { token: t, json: { itens: [{ id: b.id, dia: 1 }, { id: a.id, dia: 1 }, { id: (await detalhe(t)).corpo.itens[2].id, dia: 2 }] } })).status, 204);
       assert.equal((await api("PATCH", `/roteiros/${roteiro.id}/itens/${a.id}`, { token: t, json: { custoCentavos: 500 } })).status, 200);
-      assert.equal((await api("PATCH", `/roteiros/${roteiro.id}/anotacoes`, { token: t, json: { notas: "do editor" } })).status, 200);
+      assert.equal((await api("PATCH", `/roteiros/${roteiro.id}/anotacoes`, { token: t, json: { notas: "do editor", notasAnteriores: null } })).status, 200);
       assert.equal((await api("POST", `/roteiros/${roteiro.id}/checklist`, { token: t, json: { texto: "Algo" } })).status, 201);
       assert.equal((await api("POST", `/roteiros/${roteiro.id}/otimizar`, { token: t, json: {} })).status, 200);
       assert.equal((await api("PUT", `/roteiros/${roteiro.id}`, { token: t, json: { nome: "Novo nome" } })).status, 200);
@@ -250,7 +250,7 @@ describe("roteiro colaborativo: convites, papéis e acesso", () => {
         ["PATCH", `/roteiros/${roteiro.id}/itens/${a.id}`, { custoCentavos: 1 }],
         ["DELETE", `/roteiros/${roteiro.id}/itens/${a.idPonto}`],
         ["POST", `/roteiros/${roteiro.id}/otimizar`, {}],
-        ["PATCH", `/roteiros/${roteiro.id}/anotacoes`, { notas: "x" }],
+        ["PATCH", `/roteiros/${roteiro.id}/anotacoes`, { notas: "x", notasAnteriores: null }],
         ["POST", `/roteiros/${roteiro.id}/checklist`, { texto: "x" }],
         ["POST", `/roteiros/${roteiro.id}/versoes/1/restaurar`],
         ["DELETE", `/roteiros/${roteiro.id}`],

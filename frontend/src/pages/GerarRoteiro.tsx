@@ -32,6 +32,7 @@ import {
   precoLembrado,
   type OpcoesViagemDeCarro,
 } from "../utils/viagem";
+import { instanteEmBrasilia } from "../utils/fuso";
 import { formatarDistancia, formatarDuracao, formatarHora, formatarMoeda } from "../utils/formatar";
 import { corDoDia } from "../utils/roteiro";
 
@@ -221,6 +222,9 @@ function GerarRoteiro() {
       }
     }
 
+    // O que se digita é o relógio de Brasília, o mesmo em que o servidor calcula as chegadas.
+    const inicioEmBrasilia = inicio ? instanteEmBrasilia(inicio) : null;
+
     try {
       setGerando(true);
 
@@ -229,7 +233,7 @@ function GerarRoteiro() {
         viagemDeCarro: pedidoDaViagem(viagem, escolhasAtuais, decisoesAtuais),
         horasDisponiveis: Number(horasDisponiveis),
         interesses,
-        ...(inicio ? { dataHoraInicio: new Date(inicio).toISOString() } : {}),
+        ...(inicioEmBrasilia ? { dataHoraInicio: inicioEmBrasilia } : {}),
         ...(localizacao ?? {}),
       });
 
@@ -456,7 +460,7 @@ function GerarRoteiro() {
               Início do passeio <span className="field__optional">(opcional)</span>
             </span>
             <input type="datetime-local" value={inicio} onChange={(e) => setInicio(e.target.value)} />
-            <span className="field__hint">Sem data, começamos no próximo horário comercial.</span>
+            <span className="field__hint">Horário de Brasília. Sem data, começamos no próximo horário comercial.</span>
           </label>
 
           <div className="field">

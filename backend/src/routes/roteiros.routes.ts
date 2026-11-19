@@ -303,8 +303,8 @@ const detalhesDaParadaSchema = z
 const anotacoesSchema = z
   .object({
     notas: z.string().trim().max(5000).nullable().optional(),
-    // As notas que a tela tinha quando a pessoa começou a editar: se mudaram desde então (outra aba,
-    // outra pessoa), a gravação é recusada em vez de apagar o que a outra salvou.
+    // As notas que a tela tinha quando a pessoa começou a editar (obrigatório ao gravar notas; null = vazias):
+    // se mudaram desde então (outra aba, outra pessoa), a gravação é recusada em vez de apagar o que a outra salvou.
     notasAnteriores: z.string().trim().max(5000).nullable().optional(),
     orcamentoCentavos: centavosSchema.nullable().optional(),
   })
@@ -1246,12 +1246,19 @@ roteirosRouter.patch("/:id/anotacoes", async (req: Request, res: Response) => {
     }
 
     const { notas, notasAnteriores, orcamentoCentavos } = resultado.data;
-    const conferirNotas = notas !== undefined && notasAnteriores !== undefined;
+
+    // Gravar notas sem dizer de qual versão partiu é o que apagava, em silêncio, o que outra aba ou outra
+    // pessoa tinha salvo. Um cliente antigo (página aberta antes da proteção) cai aqui e precisa recarregar.
+    if (notas !== undefined && notasAnteriores === undefined) {
+      return res.status(428).json({
+        erro: "Esta página está desatualizada e não consegue salvar as notas com segurança. Recarregue a página e tente de novo.",
+      });
+    }
 
     // O "where" com as notas anteriores torna a conferência atômica: de duas gravações sobre a
     // mesma versão das notas, só a primeira encontra a linha.
     const alteradas = await prisma.roteiro.updateMany({
-      where: { id: id.data, ...(conferirNotas ? { notas: notasAnteriores || null } : {}) },
+      where: { id: id.data, ...(notas !== undefined ? { notas: notasAnteriores || null } : {}) },
       data: {
         ...(notas !== undefined ? { notas: notas || null } : {}),
         ...(orcamentoCentavos !== undefined ? { orcamentoCentavos } : {}),

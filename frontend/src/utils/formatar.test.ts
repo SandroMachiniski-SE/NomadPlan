@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { formatarDistancia, formatarDuracao, formatarMoeda, lerValorEmCentavos } from "./formatar";
+import { aceitarDigitacaoDeValor, formatarDistancia, formatarDuracao, formatarMoeda, lerValorEmCentavos } from "./formatar";
 
 // O Intl usa espaço sem quebra entre "R$" e o valor: normalizamos para comparar com texto simples.
 const simples = (texto: string) => texto.replace(/\s/g, " ");
@@ -63,10 +63,45 @@ describe("lerValorEmCentavos", () => {
     expect(lerValorEmCentavos("abc")).toBeNaN();
   });
 
+  it.each(["abc25,90", "25abc", "25,90abc", "R$ abc25", "2 5", "1$0", "R$", "2..5", "1,,5", "25,9,0", "12e3"])(
+    "texto com letras ou símbolos (%s) é inválido, não é limpo em silêncio",
+    (texto) => {
+      expect(lerValorEmCentavos(texto)).toBeNaN();
+    },
+  );
+
+  it.each([
+    ["R$20", 2000],
+    ["r$ 20,5", 2050],
+    ["  12,50  ", 1250],
+    ["0,99", 99],
+  ])("ainda aceita %s", (texto, centavos) => {
+    expect(lerValorEmCentavos(texto)).toBe(centavos);
+  });
+
   it.each(["-25,90", "−25,90", "R$ -25,90", "- 25", "25,90-"])(
     "valor negativo (%s) é inválido, não vira positivo",
     (texto) => {
       expect(lerValorEmCentavos(texto)).toBeNaN();
     },
   );
+});
+
+describe("aceitarDigitacaoDeValor", () => {
+  it.each(["", "2", "25", "25,", "25,9", "25,90", "1.234,56", "1.", "12.5", ",5"])("aceita %j", (novo) => {
+    expect(aceitarDigitacaoDeValor("anterior", novo)).toBe(novo);
+  });
+
+  it.each(["abc", "25abc", "abc25,90", "-25", "-25,90", "R$ 20", "25,901", "25,9,0", "1,,5", "1..2", "1.,5", "2 5", "12e3"])(
+    "recusa %j e o campo fica como estava",
+    (novo) => {
+      expect(aceitarDigitacaoDeValor("12,5", novo)).toBe("12,5");
+    },
+  );
+
+  it("tudo o que o campo aceita é um valor que dá para ler (ou ainda incompleto)", () => {
+    for (const digitado of ["25,90", "1.234,56", "12", "0,5", ",5", "25,"]) {
+      expect(lerValorEmCentavos(aceitarDigitacaoDeValor("", digitado))).not.toBeNaN();
+    }
+  });
 });

@@ -134,21 +134,31 @@ describe("dividirEmDias", () => {
     );
   });
 
-  it("sem hospedagem até ±100, a busca se amplia para ±150 e depois ±200 antes de deixar a definir", () => {
-    const a150 = dividir([cidade(1, 500, 0), cidade(2, 640, 3), cidade(3, 1000, 4)]);
-    const a200 = dividir([cidade(1, 500, 0), cidade(2, 310, 2), cidade(3, 1000, 4)]);
+  it("com hotel só além de ±100 (km 640, alvo 500): oferece a cidade, não decide sozinho", () => {
+    const candidatos = [cidade(1, 500, 0), cidade(2, 640, 3), cidade(3, 1000, 4)];
 
-    assert.equal(a150.noites[0].cidade?.codigoIbge, 2);
-    assert.equal(a150.noites[0].aDefinir, false);
-    assert.ok(
-      a150.avisos.includes("Nenhuma cidade com hospedagem entre 450 e 550 km; a mais próxima é C2, no km 640."),
-      a150.avisos.join(" | "),
-    );
-    assert.equal(a200.noites[0].cidade?.codigoIbge, 2);
-    assert.ok(a200.avisos.includes("Nenhuma cidade com hospedagem entre 450 e 550 km; a mais próxima é C2, no km 310."));
+    const d = dividir(candidatos, { totalKm: 1500 });
+
+    assert.equal(d.noites[0].aDefinir, true, "o km 640 não é escolhido sem o aceite");
+    assert.equal(d.noites[0].km, 500);
+    assert.equal(d.noites[0].proximaOpcao?.codigoIbge, 2);
+    assert.equal(d.noites[0].proximaOpcao?.kmDoDia, 640);
+    assert.equal(d.noites[0].proximaOpcao?.excedenteKm, 140);
+
+    const aceita = dividir(candidatos, { totalKm: 1500, escolhas: [[1, 2]] });
+
+    assert.equal(aceita.noites[0].km, 640);
+    assert.equal(aceita.noites[0].aDefinir, false);
   });
 
-  it("além de ±200 sem hospedagem, o pernoite fica a definir na cidade mais perto do alvo", () => {
+  it("hotel atrás do alvo e além de ±100 também não é escolhido: a proposta é só para avançar", () => {
+    const d = dividir([cidade(1, 500, 0), cidade(2, 310, 2), cidade(3, 1000, 4)], { totalKm: 1500 });
+
+    assert.equal(d.noites[0].aDefinir, true);
+    assert.equal(d.noites[0].proximaOpcao?.codigoIbge, 3);
+  });
+
+  it("além de ±100 sem hospedagem, o pernoite fica a definir na cidade mais perto do alvo", () => {
     const d = dividir([cidade(1, 505, 0), cidade(2, 760, 3)]);
 
     assert.equal(d.noites[0].cidade?.codigoIbge, 1);
@@ -295,9 +305,10 @@ describe("dividirEmDias", () => {
     assert.ok(kmDosDias.every((km) => km >= 50), `dias de estrada: ${kmDosDias.join(", ")} km`);
   });
 
-  it("a busca ampliada acompanha a faixa e nunca deixa o dia com menos de 40% do alvo", () => {
-    assert.deepEqual(faixasAmpliadas(50, 500), [100, 150, 200]);
-    assert.deepEqual(faixasAmpliadas(50, 300), [100, 150, 180]);
+  it("a busca ampliada é uma só, o dobro da faixa, e nunca deixa o dia com menos de 40% do alvo", () => {
+    assert.deepEqual(faixasAmpliadas(50, 500), [100]);
+    assert.deepEqual(faixasAmpliadas(50, 300), [100]);
+    assert.deepEqual(faixasAmpliadas(50, 150), [90]);
     assert.deepEqual(faixasAmpliadas(24, 80), [48]);
   });
 
@@ -339,7 +350,7 @@ describe("dividirEmDias", () => {
 
 describe("sem hospedagem nem na maior faixa ampliada: propõe seguir adiante, só com aceite", () => {
   it("propõe a próxima cidade com hospedagem adiante e não muda a noite sem o aceite", () => {
-    // Alvo no km 500; a busca ampliada vai até ±200 km (300 a 700) e não acha nada.
+    // Alvo no km 500; a busca automática vai até ±100 km (400 a 600) e não acha nada.
     const candidatos = [cidade(1, 760, 2), cidade(2, 900, 4), cidade(3, 1120, 2)];
 
     const d = dividir(candidatos, { totalKm: 1500 });
@@ -386,8 +397,8 @@ describe("sem hospedagem nem na maior faixa ampliada: propõe seguir adiante, s�
     assert.equal(d.noites[0].proximaOpcao?.codigoIbge, 2);
   });
 
-  it("com hotel dentro da busca ampliada não há proposta: a cidade é escolhida com o aviso", () => {
-    const d = dividir([cidade(1, 640, 2)], { totalKm: 1500, codigoDoDestino: 99 });
+  it("com hotel dentro da busca ampliada (±100) não há proposta: a cidade é escolhida com o aviso", () => {
+    const d = dividir([cidade(1, 590, 2)], { totalKm: 1500, codigoDoDestino: 99 });
 
     assert.equal(d.noites[0].cidade?.codigoIbge, 1);
     assert.equal(d.noites[0].proximaOpcao, undefined);

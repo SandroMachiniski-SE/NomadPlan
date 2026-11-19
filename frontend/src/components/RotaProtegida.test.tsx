@@ -1,4 +1,4 @@
-import { render, screen } from "@testing-library/react";
+import { fireEvent, render, screen } from "@testing-library/react";
 import { MemoryRouter, Route, Routes } from "react-router-dom";
 import { beforeEach, describe, expect, it, vi } from "vitest";
 import RotaProtegida from "./RotaProtegida";
@@ -24,7 +24,15 @@ function abrir(papeis?: TipoConta[]) {
 
 describe("RotaProtegida", () => {
   beforeEach(() => {
-    sessao.valor = { usuario: null, autenticado: false, carregando: false, sessaoExpirada: false, saiuManualmente: false };
+    sessao.valor = {
+      usuario: null,
+      autenticado: false,
+      carregando: false,
+      sessaoExpirada: false,
+      saiuManualmente: false,
+      sessaoIndisponivel: false,
+      tentarSessaoDeNovo: vi.fn(() => Promise.resolve()),
+    };
   });
 
   it("mostra o carregamento enquanto confere a sessão", () => {
@@ -59,5 +67,24 @@ describe("RotaProtegida", () => {
     abrir(["ADMIN"]);
 
     expect(screen.getByRole("alert").textContent).toContain("Você não tem permissão");
+  });
+
+  it("servidor sem resposta para confirmar a sessão: mostra a recuperação, não o login", () => {
+    sessao.valor = { ...sessao.valor, sessaoIndisponivel: true };
+    abrir();
+
+    expect(screen.queryByText("Tela de login")).toBeNull();
+    expect(screen.getByRole("alert").textContent).toContain("Você continua conectado");
+    expect(screen.getByRole("link", { name: "Ir para a página inicial" })).toBeTruthy();
+  });
+
+  it("o botão da recuperação confere a sessão de novo", () => {
+    const tentarSessaoDeNovo = vi.fn(() => Promise.resolve());
+    sessao.valor = { ...sessao.valor, sessaoIndisponivel: true, tentarSessaoDeNovo };
+    abrir();
+
+    fireEvent.click(screen.getByRole("button", { name: "Tentar novamente" }));
+
+    expect(tentarSessaoDeNovo).toHaveBeenCalledTimes(1);
   });
 });

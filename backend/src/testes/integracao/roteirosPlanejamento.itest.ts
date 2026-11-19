@@ -136,13 +136,16 @@ describe("planejamento da viagem: notas, orçamento e checklist", () => {
 
       const r = await api("PATCH", `/roteiros/${id}/anotacoes`, {
         token: dono.token,
-        json: { notas: "Levar protetor solar.\nReservar o jantar.", orcamentoCentavos: 150000 },
+        json: { notas: "Levar protetor solar.\nReservar o jantar.", notasAnteriores: null, orcamentoCentavos: 150000 },
       });
 
       assert.equal(r.status, 200);
       assert.equal((await detalhe(id)).notas, "Levar protetor solar.\nReservar o jantar.");
 
-      await api("PATCH", `/roteiros/${id}/anotacoes`, { token: dono.token, json: { notas: "   " } });
+      await api("PATCH", `/roteiros/${id}/anotacoes`, {
+        token: dono.token,
+        json: { notas: "   ", notasAnteriores: "Levar protetor solar.\nReservar o jantar." },
+      });
       assert.equal((await detalhe(id)).notas, null, "texto em branco limpa");
 
       await api("PATCH", `/roteiros/${id}/anotacoes`, { token: dono.token, json: { orcamentoCentavos: null } });
@@ -154,7 +157,7 @@ describe("planejamento da viagem: notas, orçamento e checklist", () => {
     it("notas abertas em duas abas: a segunda gravação não apaga a primeira (409 com as notas atuais)", async () => {
       const { id } = await roteiroComParadas(1);
       const patch = (json: unknown) => api("PATCH", `/roteiros/${id}/anotacoes`, { token: dono.token, json });
-      await patch({ notas: "Base" });
+      await patch({ notas: "Base", notasAnteriores: null });
 
       // As duas abas abriram com "Base"; cada uma manda o que tinha ao começar a editar.
       const aba1 = await patch({ notas: "Da aba 1", notasAnteriores: "Base" });
@@ -172,6 +175,22 @@ describe("planejamento da viagem: notas, orçamento e checklist", () => {
       assert.equal((await v({ notas: "Segunda", notasAnteriores: "" })).status, 409);
     });
 
+    it("cliente antigo, sem notasAnteriores, não grava notas por cima (428); o orçamento sozinho segue valendo", async () => {
+      const { id } = await roteiroComParadas(1);
+      const patch = (json: unknown) => api("PATCH", `/roteiros/${id}/anotacoes`, { token: dono.token, json });
+
+      await patch({ notas: "Original", notasAnteriores: null });
+
+      const antigo = await patch({ notas: "Sobrescrita de uma página antiga" });
+
+      assert.equal(antigo.status, 428);
+      assert.match(String(antigo.corpo.erro), /Recarregue a página/);
+      assert.equal((await detalhe(id)).notas, "Original", "nada foi gravado");
+
+      assert.equal((await patch({ orcamentoCentavos: 5000 })).status, 200, "orçamento não depende das notas");
+      assert.equal((await detalhe(id)).notas, "Original");
+    });
+
     it("valida tamanho e acesso", async () => {
       const { id } = await roteiroComParadas(1);
       const patch = (json: unknown, token = dono.token) => api("PATCH", `/roteiros/${id}/anotacoes`, { token, json });
@@ -184,7 +203,7 @@ describe("planejamento da viagem: notas, orçamento e checklist", () => {
 
     it("notas, orçamento e custos não aparecem no roteiro público", async () => {
       const { id, itens } = await roteiroComParadas(1);
-      await api("PATCH", `/roteiros/${id}/anotacoes`, { token: dono.token, json: { notas: "segredo", orcamentoCentavos: 999 } });
+      await api("PATCH", `/roteiros/${id}/anotacoes`, { token: dono.token, json: { notas: "segredo", notasAnteriores: null, orcamentoCentavos: 999 } });
       await api("PATCH", `/roteiros/${id}/itens/${itens[0].id}`, { token: dono.token, json: { custoCentavos: 123 } });
       await api("POST", `/roteiros/${id}/checklist`, { token: dono.token, json: { texto: "privado" } });
       const { corpo } = await api("PATCH", `/roteiros/${id}/compartilhar`, { token: dono.token, json: { publico: true } });
@@ -247,7 +266,7 @@ describe("planejamento da viagem: notas, orçamento e checklist", () => {
     it("a checklist some junto com o roteiro e vai no download de dados da conta", async () => {
       const { id } = await roteiroComParadas(1);
       await api("POST", `/roteiros/${id}/checklist`, { token: dono.token, json: { texto: "Guarda-chuva" } });
-      await api("PATCH", `/roteiros/${id}/anotacoes`, { token: dono.token, json: { notas: "minha anotação" } });
+      await api("PATCH", `/roteiros/${id}/anotacoes`, { token: dono.token, json: { notas: "minha anotação", notasAnteriores: null } });
 
       const exportado = (await api("GET", "/auth/me/dados", { token: dono.token })).texto;
 

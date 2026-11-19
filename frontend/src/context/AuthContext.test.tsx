@@ -23,9 +23,9 @@ const renovada = () =>
   Promise.resolve({ data: { token: "token-novo", usuario: { id: 1, nome: "Ana", email: "ana@exemplo.test", tipoConta: "VISITANTE", interesses: [] } } });
 
 function Sessao() {
-  const { autenticado, carregando } = useAuth();
+  const { autenticado, carregando, sessaoIndisponivel } = useAuth();
 
-  return <p>{carregando ? "carregando" : autenticado ? "logada" : "visitante"}</p>;
+  return <p>{carregando ? "carregando" : autenticado ? "logada" : sessaoIndisponivel ? "indisponivel" : "visitante"}</p>;
 }
 
 async function abrirComToken() {
@@ -71,12 +71,40 @@ describe("sessão ao abrir o site", () => {
     expect(respostas.fila.length).toBe(1);
   });
 
-  it("servidor fora do ar em todas as tentativas: o token fica guardado para a próxima visita", async () => {
+  it("servidor fora do ar em todas as tentativas: o token fica guardado e a sessão é marcada como indisponível", async () => {
     respostas.fila = [falha(503), falha(503), falha(503)];
 
     await abrirComToken();
 
-    expect(screen.getByText("visitante")).toBeTruthy();
+    expect(screen.getByText("indisponivel")).toBeTruthy();
     expect(localStorage.getItem("nomadplan.token")).toBe("token-antigo");
+  });
+
+  it("queda prolongada: a sessão é conferida de novo sozinha e volta quando o servidor responde", async () => {
+    // Três falhas na abertura e uma quarta na primeira conferência automática; a quinta resposta chega.
+    respostas.fila = [falha(503), falha(503), falha(503), falha(), renovada];
+
+    await abrirComToken();
+    expect(screen.getByText("indisponivel")).toBeTruthy();
+
+    // Dentro do act os efeitos só rodam ao final: a conferência automática começa a contar daqui.
+    await act(async () => {
+      await vi.advanceTimersByTimeAsync(40_000);
+    });
+
+    expect(screen.getByText("logada")).toBeTruthy();
+    expect(localStorage.getItem("nomadplan.token")).toBe("token-novo");
+  });
+
+  it("na conferência automática, um 401 encerra a sessão guardada", async () => {
+    respostas.fila = [falha(503), falha(503), falha(503), falha(), falha(401)];
+
+    await abrirComToken();
+    await act(async () => {
+      await vi.advanceTimersByTimeAsync(40_000);
+    });
+
+    expect(screen.getByText("visitante")).toBeTruthy();
+    expect(localStorage.getItem("nomadplan.token")).toBeNull();
   });
 });
