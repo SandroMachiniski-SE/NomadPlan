@@ -193,14 +193,23 @@ interface MunicipioComResumo extends CidadeParaResumo {
   resumoEm: Date | null;
 }
 
+/** Trava compartilhada por várias chamadas (as pernas de uma viagem): depois de uma falha, não se consulta de novo. */
+export interface TravaDoOverpass {
+  falhou: boolean;
+}
+
 /**
  * Resumo de cada município pedido: do cache (30 dias) ou de uma consulta só ao Overpass para
  * todos os que faltam. Se o Overpass falhar, usa o resumo vencido; sem nenhum, `null`.
+ *
+ * Com `trava`, a falha do Overpass arma a trava (mesmo que haja resumo vencido para usar no lugar) e,
+ * com a trava armada, não há nova consulta: valem o cache válido e, na falta dele, o vencido.
  */
 export async function resumirCidades(
   codigos: number[],
   agora: Date = new Date(),
   tempoLimiteMs = TEMPO_LIMITE_MS,
+  trava?: TravaDoOverpass,
 ): Promise<Map<number, ResumoOsm | null>> {
   const resultado = new Map<number, ResumoOsm | null>();
 
@@ -221,6 +230,18 @@ export async function resumirCidades(
 
   if (faltando.length === 0) return resultado;
 
+  const usarVencidos = () => {
+    for (const m of faltando) {
+      resultado.set(m.codigoIbge, m.resumo);
+    }
+  };
+
+  if (trava?.falhou) {
+    usarVencidos();
+
+    return resultado;
+  }
+
   try {
     const resumos = distribuirElementos(await consultarOverpass(faltando, tempoLimiteMs), faltando);
 
@@ -234,9 +255,9 @@ export async function resumirCidades(
   } catch (erro) {
     console.error("Overpass indisponível para o resumo das cidades:", erro instanceof Error ? erro.message : erro);
 
-    for (const m of faltando) {
-      resultado.set(m.codigoIbge, m.resumo);
-    }
+    if (trava) trava.falhou = true;
+
+    usarVencidos();
   }
 
   return resultado;
