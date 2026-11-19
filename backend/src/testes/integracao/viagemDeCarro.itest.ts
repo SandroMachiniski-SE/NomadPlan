@@ -135,7 +135,7 @@ describe("viagem de carro no gerador de roteiro", () => {
     assert.equal(r.corpo.erro, "Não encontrei o município Cidade Inexistente.");
   });
 
-  it("a escolha da noite 1 troca a cidade e a decisão esticar=false acrescenta uma noite", async () => {
+  it("perto do destino o padrão é dormir antes; a escolha da noite 1 troca a cidade e esticar=true tira uma noite", async () => {
     await criarMunicipio(JOINVILLE);
     const destino = await criarMunicipio(noKm(1000020, "Destino", 1120, 0));
     await criarPonto({ nome: "Atração do Destino", cidade: "Destino", latitude: destino.latitude, longitude: destino.longitude });
@@ -154,22 +154,40 @@ describe("viagem de carro no gerador de roteiro", () => {
     const padrao = (await gerar(token, { etapas, viagemDeCarro: {} })).corpo.viagemDeCarro.pernas[0];
     assert.deepEqual(
       padrao.trechos.map((t: { pernoite: { cidade: string } | null }) => t.pernoite?.cidade ?? null),
-      ["Km 500", null],
+      ["Km 500", "Km 1000", null],
     );
-    assert.equal(padrao.decisao.esticar, true);
+    assert.equal(padrao.decisao.esticar, false);
     assert.ok(Math.abs(padrao.decisao.metrosEsticando - 620_000) < 2000, `${padrao.decisao.metrosEsticando}`);
 
     const trocada = (
       await gerar(token, {
         etapas,
-        viagemDeCarro: { escolhas: [{ perna: 0, noite: 1, codigoIbge: c470.codigoIbge }], decisoes: [{ perna: 0, esticar: false }] },
+        viagemDeCarro: { escolhas: [{ perna: 0, noite: 1, codigoIbge: c470.codigoIbge }], decisoes: [{ perna: 0, esticar: true }] },
       })
     ).corpo.viagemDeCarro.pernas[0];
     assert.deepEqual(
       trocada.trechos.map((t: { pernoite: { cidade: string } | null }) => t.pernoite?.cidade ?? null),
-      ["Km 470", "Km 1000", null],
+      ["Km 470", null],
     );
-    assert.equal(trocada.decisao.esticar, false);
+    assert.equal(trocada.decisao.esticar, true);
+  });
+
+  it("sem a contagem de hotéis, a cidade maior vira o pernoite e a resposta traz a população", async () => {
+    await criarMunicipio(JOINVILLE);
+    const destino = await criarMunicipio(noKm(1000030, "Destino", 1000, 0));
+    await criarPonto({ nome: "Atração do Destino", cidade: "Destino", latitude: destino.latitude, longitude: destino.longitude });
+    await criarMunicipio({ ...noKm(1000031, "Pequena", 501), populacao: 4_000 });
+    await criarMunicipio({ ...noKm(1000032, "Grande", 496), populacao: 120_000 });
+    viagem.naEstrada(destino, () => ({ corpo: estradaReta(1000) }));
+    viagem.estado.overpassFora = true;
+    const { token } = await comCasa(JOINVILLE);
+
+    const r = await gerar(token, { etapas: [{ cidade: "Destino/GO", dias: 1 }], viagemDeCarro: {} });
+
+    const noite = r.corpo.viagemDeCarro.pernas[0].trechos[0].pernoite;
+    assert.equal(noite.cidade, "Grande");
+    assert.equal(noite.populacao, 120_000);
+    assert.equal(noite.totalHospedagens, null);
   });
 
   it("kmPorDia, horasPorDia, consumo e preço fora da faixa dão 400", async () => {
@@ -259,7 +277,7 @@ describe("viagem de carro no gerador de roteiro", () => {
 
     assert.equal(r.status, 200, JSON.stringify(r.corpo));
     assert.equal(viagem.chamadas("overpass").length, 1);
-    assert.ok(r.corpo.viagemDeCarro.avisos.includes("Não foi possível contar os hotéis agora; as cidades estão só pela distância."));
+    assert.ok(r.corpo.viagemDeCarro.avisos.includes("Os hotéis de algumas cidades do caminho ainda estão sendo buscados; elas aparecem só pela distância. Gere de novo em instantes para ver os hotéis."));
     assert.deepEqual(
       r.corpo.viagemDeCarro.pernas[0].trechos.map((t: { pernoite: { cidade: string } | null }) => t.pernoite?.cidade ?? null),
       ["Cidade A", "Cidade B", null],
@@ -295,9 +313,10 @@ describe("viagem de carro no gerador de roteiro", () => {
         pernas.map((p: { perna: number }) => p.perna),
         [0, 1, 2],
       );
+      // Volta de 1.100 km: depois da 1ª noite faltam 600, e o padrão é dormir antes (sem passar do limite).
       assert.deepEqual(
         pernas.map((p: { trechos: { dia: number }[] }) => p.trechos.map((t) => t.dia)),
-        [[1, 2, 3], [6], [8, 9]],
+        [[1, 2, 3], [6], [8, 9, 10]],
       );
       assert.equal(pernas[1].trechos[0].ocupaODia, false);
       assert.equal(pernas[2].para.codigoIbge, JOINVILLE.codigoIbge);
@@ -317,9 +336,10 @@ describe("viagem de carro no gerador de roteiro", () => {
       await prepararBrasilia(viagem);
       viagem.naEstrada(JOINVILLE, () => ({ corpo: estradaReta(1501) }));
       const { token } = await comCasa(JOINVILLE);
-      const etapas = [{ cidade: "Brasília, DF", dias: 12 }];
+      const etapas = [{ cidade: "Brasília, DF", dias: 14 }];
 
-      // 300 km por dia: 5 dias de estrada em cada sentido. Só a ida: 5 + 12 = 17; com a volta, 22.
+      // 300 km por dia, com a busca do pernoite ampliada até ±200 km (as cidades da estrada estão nos
+      // km 500 e 1.000): 4 dias de estrada em cada sentido. Só a ida: 4 + 14 = 18; com a volta, 22.
       const soIda = await gerar(token, { etapas, viagemDeCarro: { kmPorDia: 300 } });
       assert.equal(soIda.status, 200, JSON.stringify(soIda.corpo));
 
@@ -470,6 +490,35 @@ describe("viagem de carro no gerador de roteiro", () => {
       await esperarPreparo(token, "Penha", "SC");
     });
 
+    it("sem viagem de carro, a cidade sem pontos também começa a ser preparada", async () => {
+      const { token } = await comCasaEmJoinville();
+      await destinoSemPontos("Penha Sem Carro");
+
+      const r = await gerar(token, { etapas: [{ cidade: "Penha Sem Carro", dias: 1 }] });
+
+      assert.equal(r.status, 200, JSON.stringify(r.corpo));
+      assert.deepEqual(r.corpo.preparos, [{ cidade: "Penha Sem Carro", uf: "SC", estado: "preparando", pontos: 0 }]);
+      assert.ok(r.corpo.avisos.includes(avisoDePreparo("Penha Sem Carro")), JSON.stringify(r.corpo.avisos));
+      assert.ok(!r.corpo.avisos.some((aviso: string) => aviso.startsWith("Ainda não há pontos cadastrados")));
+      assert.equal((await esperarPreparo(token, "Penha Sem Carro", "SC")).estado, "pronta");
+
+      const depois = await gerar(token, { etapas: [{ cidade: "Penha Sem Carro", dias: 1 }] });
+      assert.ok(depois.corpo.pontos.length > 0, "gerar de novo já traz o roteiro");
+      assert.deepEqual(depois.corpo.preparos, []);
+    });
+
+    it("sem viagem de carro, nome repetido em várias UFs não é preparado: continua o aviso", async () => {
+      const { token } = await comCasaEmJoinville();
+      await criarMunicipio({ codigoIbge: 1000290, cidade: "Bom Jesus Teste", uf: "SC", latitude: -27.1, longitude: -48.9 });
+      await criarMunicipio({ codigoIbge: 1000291, cidade: "Bom Jesus Teste", uf: "RS", latitude: -28.6, longitude: -50.4 });
+      await criarPonto({ nome: "Museu de Joinville", cidade: "Joinville" });
+
+      const r = await gerar(token, { etapas: [{ cidade: "Bom Jesus Teste", dias: 1 }] });
+
+      assert.deepEqual(r.corpo.preparos, []);
+      assert.ok(r.corpo.avisos.some((aviso: string) => aviso.startsWith("Ainda não há pontos cadastrados")));
+    });
+
     it("destino com pontos não dispara nada", async () => {
       await prepararBrasilia(viagem);
       const { token } = await comCasa(JOINVILLE);
@@ -502,12 +551,15 @@ describe("viagem de carro no gerador de roteiro", () => {
       viagem.estado.overpassFora = true;
       await gerar(token, { etapas: [{ cidade: "Barra Velha", dias: 1 }], viagemDeCarro: {} });
       assert.equal((await esperarPreparo(token, "Barra Velha", "SC")).estado, "erro");
+      // O preparo já tentou de novo sozinho (servidor fora do ar): a nova geração não tenta mais.
+      const chamadasAntes = chamadasDePreparo("Barra Velha");
 
       const r = await gerar(token, { etapas: [{ cidade: "Barra Velha", dias: 1 }], viagemDeCarro: {} });
 
       assert.deepEqual(r.corpo.viagemDeCarro.preparos, [{ cidade: "Barra Velha", uf: "SC", estado: "erro", pontos: 0 }]);
       assert.ok(r.corpo.avisos.includes("Não foi possível preparar Barra Velha agora; tente de novo em alguns minutos."));
-      assert.equal(chamadasDePreparo("Barra Velha"), 1);
+      assert.equal(chamadasAntes, 3);
+      assert.equal(chamadasDePreparo("Barra Velha"), chamadasAntes);
     });
 
     it("com os preparos simultâneos ocupados, a cidade vem como ocupado e com o outro aviso", async () => {

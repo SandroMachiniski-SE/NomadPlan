@@ -242,4 +242,12 @@ describe("consultaOverpass", () => {
     assert.match(consulta, /nwr\["tourism"~"\^\(museum\|.*attraction\)\$"\]\["name"\]\(area\.cidade\);/);
     assert.match(consulta, /out center tags;/);
   });
+
+  it("Brasília: no OpenStreetMap o próprio Distrito Federal é a área do município", () => {
+    const consulta = consultaOverpass("Brasília", "DF");
+
+    assert.match(consulta, /area\["ISO3166-2"="BR-DF"\]->\.cidade;/);
+    assert.doesNotMatch(consulta, /admin_level/);
+    assert.match(consulta, /\(area\.cidade\);/);
+  });
 });

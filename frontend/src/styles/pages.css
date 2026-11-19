@@ -1591,3 +1591,21 @@ fieldset.field {
   color: var(--accent-text);
   font-weight: 500;
 }
+
+/* "Mostrar mais" no fim dos resultados da busca */
+.resultados__mais {
+  display: flex;
+  justify-content: center;
+  margin-top: 1.25rem;
+}
+
+/* Notas salvas por outra aba ou pessoa, mostradas no aviso de conflito */
+.notas-conflito {
+  margin: 0;
+  padding: 0.5rem 0.75rem;
+  border-left: 3px solid currentColor;
+  white-space: pre-wrap;
+  max-height: 10rem;
+  overflow: auto;
+}
+

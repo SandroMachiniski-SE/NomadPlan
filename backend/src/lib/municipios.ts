@@ -9,6 +9,8 @@ import { UFS } from "./geocodificacao";
 // Nominatim. O arquivo versionado é gerado por "npm run municipios:baixar".
 
 export const ARQUIVO_MUNICIPIOS = path.resolve(process.cwd(), "prisma", "dados", "municipios.json");
+// População estimada pelo IBGE (código IBGE → habitantes), gerada por "npm run municipios:populacao".
+export const ARQUIVO_POPULACAO = path.resolve(process.cwd(), "prisma", "dados", "populacao.json");
 
 const LOTE_DE_IMPORTACAO = 500;
 
@@ -18,6 +20,8 @@ export interface Municipio {
   uf: string;
   latitude: number;
   longitude: number;
+  /** Habitantes (estimativa do IBGE); null quando não se sabe. */
+  populacao?: number | null;
 }
 
 interface MunicipioDoIbge {
@@ -69,8 +73,15 @@ export function separarUf(texto: string): { nome: string; uf: string | null } {
   return { nome: limpo, uf: null };
 }
 
-export function lerMunicipios(arquivo = ARQUIVO_MUNICIPIOS): Municipio[] {
-  return JSON.parse(fs.readFileSync(arquivo, "utf8")) as Municipio[];
+export function lerMunicipios(arquivo = ARQUIVO_MUNICIPIOS, arquivoPopulacao = ARQUIVO_POPULACAO): Municipio[] {
+  const populacao: Record<string, number> = fs.existsSync(arquivoPopulacao)
+    ? (JSON.parse(fs.readFileSync(arquivoPopulacao, "utf8")) as { populacao: Record<string, number> }).populacao
+    : {};
+
+  return (JSON.parse(fs.readFileSync(arquivo, "utf8")) as Municipio[]).map((m) => ({
+    ...m,
+    populacao: populacao[String(m.codigoIbge)] ?? null,
+  }));
 }
 
 /** Grava ou atualiza (pelo código IBGE) e devolve quantos municípios foram enviados. */
@@ -80,18 +91,19 @@ export async function importarMunicipios(lista: Municipio[]): Promise<number> {
       .slice(i, i + LOTE_DE_IMPORTACAO)
       .map(
         (m) =>
-          Prisma.sql`(${m.codigoIbge}, ${m.cidade}, ${normalizarNome(m.cidade)}, ${m.uf}, ${m.latitude}, ${m.longitude})`,
+          Prisma.sql`(${m.codigoIbge}, ${m.cidade}, ${normalizarNome(m.cidade)}, ${m.uf}, ${m.latitude}, ${m.longitude}, ${m.populacao ?? null}::int)`,
       );
 
     await prisma.$executeRaw`
-      INSERT INTO municipio (codigo_ibge, nome, nome_normalizado, uf, latitude, longitude)
+      INSERT INTO municipio (codigo_ibge, nome, nome_normalizado, uf, latitude, longitude, populacao)
       VALUES ${Prisma.join(linhas)}
       ON CONFLICT (codigo_ibge) DO UPDATE SET
         nome = EXCLUDED.nome,
         nome_normalizado = EXCLUDED.nome_normalizado,
         uf = EXCLUDED.uf,
         latitude = EXCLUDED.latitude,
-        longitude = EXCLUDED.longitude
+        longitude = EXCLUDED.longitude,
+        populacao = EXCLUDED.populacao
     `;
   }
 

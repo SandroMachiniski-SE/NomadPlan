@@ -22,6 +22,10 @@ export interface FiltrosBusca {
   lng?: number;
   raioKm: number;
   limite: number;
+  /** Quantos resultados pular (a página seguinte começa em `deslocamento + limite`). */
+  deslocamento?: number;
+  /** Categorias do gosto de quem busca (os interesses do perfil): vêm primeiro na relevância. */
+  preferir?: string[];
   notaMinima?: number;
   abertoAgora?: boolean;
   ordenar?: Ordenacao;
@@ -51,8 +55,11 @@ export interface PontoBusca {
 }
 
 export interface ResultadoBusca {
+  /** Todos os resultados da busca, não só os desta página. */
   total: number;
   dados: PontoBusca[];
+  /** Há mais resultados depois desta página. */
+  temMais: boolean;
   /** true quando a resposta veio do cache porque o banco não respondeu a tempo. */
   desatualizado?: boolean;
 }
@@ -94,7 +101,13 @@ function montarOrdenacao(filtros: FiltrosBusca, comCoordenadas: boolean): Prisma
         + CASE WHEN p.acessibilidade IS NOT NULL THEN 1 ELSE 0 END
       )`;
 
-      return Prisma.sql`${peso} p.selo_verificado DESC, a.media DESC NULLS LAST, ${completude} DESC, p.nome ASC`;
+      // Logado, os lugares das categorias do seu gosto vêm primeiro (sem tirar os outros).
+      const gosto =
+        filtros.preferir && filtros.preferir.length > 0
+          ? Prisma.sql`CASE WHEN lower(p.categoria) IN (${Prisma.join(filtros.preferir.map((c) => c.toLowerCase()))}) THEN 0 ELSE 1 END,`
+          : Prisma.empty;
+
+      return Prisma.sql`${peso} ${gosto} p.selo_verificado DESC, a.media DESC NULLS LAST, ${completude} DESC, p.nome ASC`;
     }
     default:
       return Prisma.sql`p.nome ASC`;
@@ -141,19 +154,14 @@ export async function buscarPontos(filtros: FiltrosBusca): Promise<ResultadoBusc
   // "Aberto agora" depende do texto livre de horário, que só o código sabe interpretar:
   // busca mais linhas do que o pedido e filtra depois.
   const limiteConsulta = filtros.abertoAgora ? Math.min(filtros.limite * 5, 500) : filtros.limite;
+  // Com "aberto agora" o filtro final é feito aqui, então não há como saber o total nem paginar.
+  const deslocamento = filtros.abertoAgora ? 0 : (filtros.deslocamento ?? 0);
 
   const distancia = comCoordenadas
     ? Prisma.sql`, ST_Distance(p.geom, ST_SetSRID(ST_MakePoint(${filtros.lng}, ${filtros.lat}), 4326)::geography) AS "distanciaMetros"`
     : Prisma.empty;
 
-  const linhas = await prisma.$queryRaw<PontoBusca[]>`
-    SELECT
-      p.id, p.nome, p.descricao, p.categoria, p.cidade, p.endereco, p.latitude, p.longitude,
-      p.faixa_preco AS "faixaPreco", p.acessibilidade, p.site_oficial AS "siteOficial",
-      p.telefone_contato AS "telefoneContato", p.horario_funcionamento AS "horarioFuncionamento",
-      p.imagem_url AS "imagemUrl", p.imagem_credito AS "imagemCredito", p.status::text AS status, p.selo_verificado AS "seloVerificado",
-      a.media AS "mediaAvaliacao", COALESCE(a.total, 0) AS "totalAvaliacoes"
-      ${distancia}
+  const deOndeBuscar = Prisma.sql`
     FROM ponto_turistico p
     LEFT JOIN (
       SELECT id_ponto, AVG(nota)::float8 AS media, COUNT(*)::int AS total
@@ -162,8 +170,21 @@ export async function buscarPontos(filtros: FiltrosBusca): Promise<ResultadoBusc
       GROUP BY id_ponto
     ) a ON a.id_ponto = p.id
     WHERE ${Prisma.join(condicoes, " AND ")}
-    ORDER BY ${montarOrdenacao(filtros, comCoordenadas)}
+  `;
+
+  const linhas = await prisma.$queryRaw<(PontoBusca & { totalGeral: number })[]>`
+    SELECT
+      p.id, p.nome, p.descricao, p.categoria, p.cidade, p.endereco, p.latitude, p.longitude,
+      p.faixa_preco AS "faixaPreco", p.acessibilidade, p.site_oficial AS "siteOficial",
+      p.telefone_contato AS "telefoneContato", p.horario_funcionamento AS "horarioFuncionamento",
+      p.imagem_url AS "imagemUrl", p.imagem_credito AS "imagemCredito", p.status::text AS status, p.selo_verificado AS "seloVerificado",
+      a.media AS "mediaAvaliacao", COALESCE(a.total, 0) AS "totalAvaliacoes",
+      COUNT(*) OVER()::int AS "totalGeral"
+      ${distancia}
+    ${deOndeBuscar}
+    ORDER BY ${montarOrdenacao(filtros, comCoordenadas)}, p.id ASC
     LIMIT ${limiteConsulta}
+    OFFSET ${deslocamento}
   `;
 
   const agora = new Date();
@@ -174,13 +195,25 @@ export async function buscarPontos(filtros: FiltrosBusca): Promise<ResultadoBusc
       : linhas
   )
     .slice(0, filtros.limite)
-    .map((linha) => ({
+    .map(({ totalGeral: _total, ...linha }) => ({
       ...linha,
       totalAvaliacoes: Number(linha.totalAvaliacoes),
       ...(linha.distanciaMetros !== undefined ? { distanciaMetros: Number(linha.distanciaMetros) } : {}),
     }));
 
-  return { total: dados.length, dados };
+  if (filtros.abertoAgora) {
+    return { total: dados.length, dados, temMais: false };
+  }
+
+  // Página depois do fim não traz linhas (nem o total junto): conta à parte.
+  const total =
+    linhas.length > 0
+      ? Number(linhas[0].totalGeral)
+      : deslocamento === 0
+        ? 0
+        : (await prisma.$queryRaw<{ total: number }[]>`SELECT COUNT(*)::int AS total ${deOndeBuscar}`)[0].total;
+
+  return { total, dados, temMais: deslocamento + dados.length < total };
 }
 
 // AF02: se a busca demorar demais ou o banco falhar, devolve o último resultado igual

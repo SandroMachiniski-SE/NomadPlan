@@ -23,6 +23,7 @@ import {
   type PreparoDoDestino,
 } from "../lib/viagemDeCarro";
 import { ErroRota, SemEstrada } from "../lib/rotas";
+import { procurarMunicipio, type Municipio } from "../lib/municipios";
 import {
   conferirHoteis,
   conferirNoites,
@@ -301,6 +302,9 @@ const detalhesDaParadaSchema = z
 const anotacoesSchema = z
   .object({
     notas: z.string().trim().max(5000).nullable().optional(),
+    // As notas que a tela tinha quando a pessoa começou a editar: se mudaram desde então (outra aba,
+    // outra pessoa), a gravação é recusada em vez de apagar o que a outra salvou.
+    notasAnteriores: z.string().trim().max(5000).nullable().optional(),
     orcamentoCentavos: centavosSchema.nullable().optional(),
   })
   .refine((d) => d.notas !== undefined || d.orcamentoCentavos !== undefined, {
@@ -467,6 +471,18 @@ roteirosRouter.post("/gerar", limiteViagemDeCarro, async (req: Request, res: Res
         avisos: plano.avisos,
         preparos,
       };
+    } else {
+      // Sem viagem de carro, a cidade digitada que é um município do IBGE (sem dúvida de UF) e ainda
+      // não tem pontos também começa a ser preparada; com nome repetido, fica o aviso de sempre.
+      const municipios: Municipio[] = [];
+
+      for (const etapa of dados.etapas ?? (dados.cidade ? [{ cidade: dados.cidade }] : [])) {
+        const achados = await procurarMunicipio(etapa.cidade);
+
+        if (achados.length === 1) municipios.push(achados[0]);
+      }
+
+      preparos = await prepararDestinosSemPontos(municipios, req.usuario!.id);
     }
 
     // Sem horário de início informado, começa no próximo horário comercial: de madrugada
@@ -494,7 +510,7 @@ roteirosRouter.post("/gerar", limiteViagemDeCarro, async (req: Request, res: Res
             ...preparos.flatMap((p) => (p.estado === "pronta" ? [] : [avisoDoPreparo(p)])),
           ];
 
-    return res.json({ ...recomendacao, avisos, viagemDeCarro });
+    return res.json({ ...recomendacao, avisos, viagemDeCarro, preparos });
   } catch (error) {
     if (responderErroDaViagem(res, error)) return;
 
@@ -1228,18 +1244,31 @@ roteirosRouter.patch("/:id/anotacoes", async (req: Request, res: Response) => {
       return res.status(404).json({ erro: "Roteiro não encontrado." });
     }
 
-    const { notas, orcamentoCentavos } = resultado.data;
+    const { notas, notasAnteriores, orcamentoCentavos } = resultado.data;
+    const conferirNotas = notas !== undefined && notasAnteriores !== undefined;
 
-    const atualizado = await prisma.roteiro.update({
-      where: { id: id.data },
+    // O "where" com as notas anteriores torna a conferência atômica: de duas gravações sobre a
+    // mesma versão das notas, só a primeira encontra a linha.
+    const alteradas = await prisma.roteiro.updateMany({
+      where: { id: id.data, ...(conferirNotas ? { notas: notasAnteriores || null } : {}) },
       data: {
         ...(notas !== undefined ? { notas: notas || null } : {}),
         ...(orcamentoCentavos !== undefined ? { orcamentoCentavos } : {}),
       },
+    });
+    const atual = await prisma.roteiro.findUnique({
+      where: { id: id.data },
       select: { id: true, notas: true, orcamentoCentavos: true },
     });
 
-    return res.json(atualizado);
+    if (alteradas.count === 0) {
+      return res.status(409).json({
+        erro: "As notas mudaram em outra aba ou por outra pessoa enquanto você editava.",
+        notasAtuais: atual?.notas ?? null,
+      });
+    }
+
+    return res.json(atual);
   } catch (error) {
     console.error("Erro ao salvar anotações do roteiro:", error);
 

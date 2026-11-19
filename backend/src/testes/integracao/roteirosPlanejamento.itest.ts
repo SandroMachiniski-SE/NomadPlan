@@ -151,6 +151,27 @@ describe("planejamento da viagem: notas, orçamento e checklist", () => {
       assert.equal(await prisma.versaoRoteiro.count({ where: { idRoteiro: id } }), 0);
     });
 
+    it("notas abertas em duas abas: a segunda gravação não apaga a primeira (409 com as notas atuais)", async () => {
+      const { id } = await roteiroComParadas(1);
+      const patch = (json: unknown) => api("PATCH", `/roteiros/${id}/anotacoes`, { token: dono.token, json });
+      await patch({ notas: "Base" });
+
+      // As duas abas abriram com "Base"; cada uma manda o que tinha ao começar a editar.
+      const aba1 = await patch({ notas: "Da aba 1", notasAnteriores: "Base" });
+      const aba2 = await patch({ notas: "Da aba 2", notasAnteriores: "Base" });
+
+      assert.equal(aba1.status, 200);
+      assert.equal(aba2.status, 409);
+      assert.equal(aba2.corpo.notasAtuais, "Da aba 1");
+      assert.equal((await detalhe(id)).notas, "Da aba 1");
+
+      // Partindo de notas vazias, o conflito também vale.
+      const { id: vazio } = await roteiroComParadas(1);
+      const v = (json: unknown) => api("PATCH", `/roteiros/${vazio}/anotacoes`, { token: dono.token, json });
+      assert.equal((await v({ notas: "Primeira", notasAnteriores: null })).status, 200);
+      assert.equal((await v({ notas: "Segunda", notasAnteriores: "" })).status, 409);
+    });
+
     it("valida tamanho e acesso", async () => {
       const { id } = await roteiroComParadas(1);
       const patch = (json: unknown, token = dono.token) => api("PATCH", `/roteiros/${id}/anotacoes`, { token, json });

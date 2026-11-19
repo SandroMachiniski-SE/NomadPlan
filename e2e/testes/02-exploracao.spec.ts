@@ -236,4 +236,109 @@ test.describe("explorar pelo mapa e escolher qualquer cidade", () => {
 
     await expect(page.getByRole("button", { name: /em todo o Brasil/ })).toBeVisible();
   });
+
+  test("mostra quantos lugares a cidade tem e traz os seguintes com Mostrar mais", async ({ page }) => {
+    // Os dados do E2E têm 3 lugares em Joinville: a resposta da busca é ampliada para 25.
+    const paginas: string[] = [];
+    let modelo: Record<string, unknown> | undefined;
+    await page.route(
+      (url) => url.pathname === "/pontos" && url.searchParams.get("cidade") === "Joinville",
+      async (rota) => {
+        const resposta = await rota.fetch();
+        const corpo = await resposta.json();
+        // A página seguinte vem vazia de verdade: o modelo é o primeiro lugar da primeira página.
+        modelo ??= corpo.dados[0];
+        const deslocamento = Number(new URL(rota.request().url()).searchParams.get("deslocamento") ?? 0);
+        const quantos = deslocamento === 0 ? 20 : 5;
+        paginas.push(String(deslocamento));
+        const dados = Array.from({ length: quantos }, (_, i) => ({
+          ...modelo,
+          id: 900_000 + deslocamento + i,
+          nome: `Lugar ${String(deslocamento + i + 1).padStart(2, "0")} E2E`,
+        }));
+        await rota.fulfill({ response: resposta, json: { total: 25, dados, temMais: deslocamento + quantos < 25 } });
+      },
+    );
+
+    await buscarCidade(page, "Joinville");
+
+    await expect(page.getByRole("heading", { name: "Mostrando 20 de 25 resultados" })).toBeVisible();
+    await expect(page.getByRole("heading", { name: "Lugar 20 E2E" })).toBeVisible();
+    await expect(page.getByRole("heading", { name: "Lugar 21 E2E" })).toHaveCount(0);
+
+    await page.getByRole("button", { name: /Mostrar mais/ }).click();
+
+    await expect(page.getByRole("heading", { name: "Lugar 25 E2E" })).toBeVisible();
+    await expect(page.getByRole("heading", { name: "25 resultados" })).toBeVisible();
+    await expect(page.getByRole("button", { name: /Mostrar mais/ })).toHaveCount(0);
+    expect(paginas).toEqual(["0", "20"]);
+  });
+
+  test("a resposta atrasada de uma busca anterior não toma o lugar da busca mais nova", async ({ page }) => {
+    // A primeira busca (Joinville, sem categoria) fica presa até a segunda (Gastronomia) já estar na tela.
+    let soltarPrimeira = () => {};
+    const primeiraPresa = new Promise<void>((resolver) => {
+      soltarPrimeira = resolver;
+    });
+    const ehAPrimeira = (url: URL) =>
+      url.pathname === "/pontos" && url.searchParams.get("cidade") === "Joinville" && !url.searchParams.has("categoria");
+    await page.route(ehAPrimeira, async (rota) => {
+      const resposta = await rota.fetch();
+      await primeiraPresa;
+      await rota.fulfill({ response: resposta });
+    });
+
+    await page.goto("/");
+    await page.getByLabel("Cidade", { exact: true }).fill("Joinville");
+    await page.getByRole("button", { name: "Buscar", exact: true }).click();
+    await page.getByRole("button", { name: "Gastronomia" }).click();
+    await expect(page.getByRole("heading", { name: RESTAURANTE })).toBeVisible();
+
+    const chegouAAntiga = page.waitForResponse((resposta) => ehAPrimeira(new URL(resposta.url())));
+    soltarPrimeira();
+    await chegouAAntiga;
+    // Dá tempo de a tela reagir à resposta antiga, se fosse reagir.
+    await page.waitForTimeout(300);
+
+    await expect(page.getByRole("heading", { name: "1 resultado", exact: true })).toBeVisible();
+    await expect(page.getByRole("heading", { name: RESTAURANTE })).toBeVisible();
+    await expect(page.getByRole("heading", { name: MUSEU })).toHaveCount(0);
+  });
+
+  test("ao voltar dos detalhes de um lugar, a busca e os filtros continuam na tela", async ({ page }) => {
+    await page.goto("/");
+    await page.getByLabel("Cidade", { exact: true }).fill("Joinville");
+    await page.getByRole("button", { name: "Cultura" }).click();
+    await expect(page.getByRole("heading", { name: "1 resultado", exact: true })).toBeVisible();
+
+    await page.getByRole("link", { name: new RegExp(MUSEU) }).click();
+    await expect(page.getByRole("heading", { name: MUSEU, level: 1 })).toBeVisible();
+    await page.goBack();
+
+    await expect(page.getByLabel("Cidade", { exact: true })).toHaveValue("Joinville");
+    await expect(page.getByRole("button", { name: "Cultura" })).toHaveAttribute("aria-pressed", "true");
+    await expect(page.getByRole("heading", { name: MUSEU })).toBeVisible();
+    await expect(page.getByRole("heading", { name: PARQUE })).toHaveCount(0);
+
+    // O link "Voltar para a busca" dos detalhes também volta para a mesma busca.
+    await page.getByRole("link", { name: new RegExp(MUSEU) }).click();
+    await page.getByRole("link", { name: "Voltar para a busca" }).click();
+
+    await expect(page.getByLabel("Cidade", { exact: true })).toHaveValue("Joinville");
+    await expect(page.getByRole("heading", { name: MUSEU })).toBeVisible();
+    await expect(page.getByRole("heading", { name: PARQUE })).toHaveCount(0);
+  });
+
+  test("logado, a busca traz primeiro os lugares do gosto marcado no perfil", async ({ page }) => {
+    await cadastrar(page);
+    await page.goto("/perfil");
+    await page.getByRole("button", { name: "Natureza", exact: true }).click();
+    await page.getByRole("button", { name: "Salvar alterações" }).click();
+    await expect(page.getByText("Perfil atualizado com sucesso.")).toBeVisible();
+
+    await buscarCidade(page, "Joinville");
+
+    await expect(page.getByText("Primeiro os lugares do seu gosto: Natureza.")).toBeVisible();
+    await expect(page.locator(".grid-cards h3").first()).toHaveText(PARQUE);
+  });
 });

@@ -1,6 +1,6 @@
 import { describe, it } from "node:test";
 import assert from "node:assert/strict";
-import { dividirEmDias, notaDoCandidato, type CandidatoDePernoite } from "./divisaoEmDias";
+import { dividirEmDias, faixasAmpliadas, notaDoCandidato, type CandidatoDePernoite } from "./divisaoEmDias";
 import type { PerfilDaRota } from "./rotas";
 import type { ResumoOsm } from "./resumoOsm";
 
@@ -35,6 +35,7 @@ function cidade(
   atracoes = 0,
   desvioKm = 2,
   totalKm = TOTAL,
+  populacao: number | null = null,
 ): CandidatoDePernoite {
   return {
     codigoIbge,
@@ -45,6 +46,7 @@ function cidade(
     km,
     fracao: km / totalKm,
     desvioKm,
+    populacao,
     resumo: hospedagens === null ? null : hospedagens === undefined ? undefined : resumo(hospedagens, atracoes),
   };
 }
@@ -78,20 +80,20 @@ describe("dividirEmDias", () => {
     assert.deepEqual(d.avisos, []);
   });
 
-  it("1.120 km: decisão com esticar marcado e chegada de ~620 km", () => {
+  it("1.120 km: o padrão é dormir antes, sem passar do limite; chegada de ~120 km", () => {
     const d = dividir([cidade(1, 500, 10, 3, 2, 1120), cidade(2, 1000, 5, 1, 2, 1120)], { totalKm: 1120 });
-
-    assert.deepEqual(codigos(d), [1]);
-    assert.equal(Math.round(d.kmFinal), 620);
-    assert.deepEqual(d.decisao, { esticar: true, kmEsticando: 620, kmNoDiaSeguinte: 120 });
-  });
-
-  it("1.120 km com esticar=false: 2 noites e chegada de ~120 km", () => {
-    const d = dividir([cidade(1, 500, 10, 3, 2, 1120), cidade(2, 1000, 5, 1, 2, 1120)], { totalKm: 1120, esticar: false });
 
     assert.deepEqual(codigos(d), [1, 2]);
     assert.equal(Math.round(d.kmFinal), 120);
-    assert.equal(d.decisao?.esticar, false);
+    assert.deepEqual(d.decisao, { esticar: false, kmEsticando: 620, kmNoDiaSeguinte: 120 });
+  });
+
+  it("1.120 km com esticar=true: chega no dia 2 com ~620 km", () => {
+    const d = dividir([cidade(1, 500, 10, 3, 2, 1120), cidade(2, 1000, 5, 1, 2, 1120)], { totalKm: 1120, esticar: true });
+
+    assert.deepEqual(codigos(d), [1]);
+    assert.equal(Math.round(d.kmFinal), 620);
+    assert.equal(d.decisao?.esticar, true);
   });
 
   it("540 km: nenhuma noite", () => {
@@ -121,6 +123,27 @@ describe("dividirEmDias", () => {
       d.avisos.includes("Nenhuma cidade com hospedagem entre 450 e 550 km; a mais próxima é C2, no km 590."),
       d.avisos.join(" | "),
     );
+  });
+
+  it("sem hospedagem até ±100, a busca se amplia para ±150 e depois ±200 antes de deixar a definir", () => {
+    const a150 = dividir([cidade(1, 500, 0), cidade(2, 640, 3), cidade(3, 1000, 4)]);
+    const a200 = dividir([cidade(1, 500, 0), cidade(2, 310, 2), cidade(3, 1000, 4)]);
+
+    assert.equal(a150.noites[0].cidade?.codigoIbge, 2);
+    assert.equal(a150.noites[0].aDefinir, false);
+    assert.ok(
+      a150.avisos.includes("Nenhuma cidade com hospedagem entre 450 e 550 km; a mais próxima é C2, no km 640."),
+      a150.avisos.join(" | "),
+    );
+    assert.equal(a200.noites[0].cidade?.codigoIbge, 2);
+    assert.ok(a200.avisos.includes("Nenhuma cidade com hospedagem entre 450 e 550 km; a mais próxima é C2, no km 310."));
+  });
+
+  it("além de ±200 sem hospedagem, o pernoite fica a definir na cidade mais perto do alvo", () => {
+    const d = dividir([cidade(1, 505, 0), cidade(2, 760, 3)]);
+
+    assert.equal(d.noites[0].cidade?.codigoIbge, 1);
+    assert.equal(d.noites[0].aDefinir, true);
   });
 
   it("nada na faixa alargada: pernoite a definir na cidade mais perto do alvo", () => {
@@ -176,8 +199,37 @@ describe("dividirEmDias", () => {
     const d = dividir([cidade(1, 480, null), cidade(2, 500, null), cidade(3, 1000, null)]);
 
     assert.deepEqual(codigos(d), [2, 3]);
-    assert.ok(d.avisos.includes("Não foi possível contar os hotéis agora; as cidades estão só pela distância."));
-    assert.equal(d.avisos.filter((a) => a.startsWith("Não foi possível contar")).length, 1);
+    assert.ok(d.avisos.includes("Os hotéis de algumas cidades do caminho ainda estão sendo buscados; elas aparecem só pela distância. Gere de novo em instantes para ver os hotéis."));
+    assert.equal(d.avisos.filter((a) => a.startsWith("Os hotéis de algumas cidades")).length, 1);
+  });
+
+  it("noite com hotéis contados não avisa, mesmo com outra cidade da faixa sem contagem", () => {
+    const d = dividir([cidade(1, 500, 10, 3), cidade(2, 510, null), cidade(3, 1000, 4)]);
+
+    assert.deepEqual(codigos(d), [1, 3]);
+    assert.ok(!d.avisos.includes("Os hotéis de algumas cidades do caminho ainda estão sendo buscados; elas aparecem só pela distância. Gere de novo em instantes para ver os hotéis."), JSON.stringify(d.avisos));
+  });
+
+  it("sem contagem de hotéis, a cidade maior ganha de uma minúscula um pouco mais perto do alvo", () => {
+    // Como Tubarão (110 mil habitantes, a 4 km do alvo) e Pedras Grandes (4 mil, a 1 km).
+    const d = dividir([cidade(1, 501, null, 0, 2, TOTAL, 4_000), cidade(2, 496, null, 0, 2, TOTAL, 110_000), cidade(3, 1000, 4)]);
+
+    assert.equal(d.noites[0].cidade?.codigoIbge, 2);
+    assert.ok(d.avisos.includes("Os hotéis de algumas cidades do caminho ainda estão sendo buscados; elas aparecem só pela distância. Gere de novo em instantes para ver os hotéis."));
+  });
+
+  it("nota sem contagem: proximidade 0,40 e porte 0,35 no lugar das hospedagens (de 5 mil a 100 mil habitantes, escala logarítmica)", () => {
+    assert.ok(Math.abs(notaDoCandidato(cidade(1, 500, null, 0, 2, TOTAL, 100_000), 500, 50) - 0.75) < 1e-9);
+    assert.ok(Math.abs(notaDoCandidato(cidade(1, 500, null, 0, 2, TOTAL, 20_000), 500, 50) - (0.4 + (0.35 * Math.log(4)) / Math.log(20))) < 1e-9);
+    // Vilarejo (menos de 5 mil) e população desconhecida: só a proximidade.
+    assert.ok(Math.abs(notaDoCandidato(cidade(1, 500, null, 0, 2, TOTAL, 4_000), 500, 50) - 0.4) < 1e-9);
+    assert.ok(Math.abs(notaDoCandidato(cidade(1, 500, null), 500, 50) - 0.4) < 1e-9);
+  });
+
+  it("cidade com hotéis contados não perde para uma maior sem contagem um pouco mais perto do alvo", () => {
+    const d = dividir([cidade(1, 510, 20, 3), cidade(2, 500, null, 0, 2, TOTAL, 120_000), cidade(3, 1000, 4)]);
+
+    assert.equal(d.noites[0].cidade?.codigoIbge, 1);
   });
 
   it("resumo undefined nas faixas avaliadas vai para semResumo", () => {
@@ -232,6 +284,24 @@ describe("dividirEmDias", () => {
     const kmDosDias = d.noites.map((n, i) => n.km - (i === 0 ? 0 : d.noites[i - 1].km));
 
     assert.ok(kmDosDias.every((km) => km >= 50), `dias de estrada: ${kmDosDias.join(", ")} km`);
+  });
+
+  it("a busca ampliada acompanha a faixa e nunca deixa o dia com menos de 40% do alvo", () => {
+    assert.deepEqual(faixasAmpliadas(50, 500), [100, 150, 200]);
+    assert.deepEqual(faixasAmpliadas(50, 300), [100, 150, 180]);
+    assert.deepEqual(faixasAmpliadas(24, 80), [48]);
+  });
+
+  it("dia curto sem hospedagem adiante: a busca ampliada não volta para a cidade onde se dormiu", () => {
+    // 80 km por dia: a cidade do km 240 é o pernoite da noite 3; a noite 4 (alvo no km 320) não tem
+    // nada perto e não pode cair de novo no km 240, o que daria um dia de 0 km.
+    const candidatos = [cidade(1, 80, 3, 0, 2, 400), cidade(2, 160, 3, 0, 2, 400), cidade(3, 240, 3, 0, 2, 400)];
+
+    const d = dividir(candidatos, { totalKm: 400, alvoKm: 500, horasPorDia: 2, kmPorHora: 40 });
+    const kmDosDias = d.noites.map((n, i) => n.km - (i === 0 ? 0 : d.noites[i - 1].km));
+
+    assert.deepEqual(codigos(d), [1, 2, 3, null]);
+    assert.ok(kmDosDias.every((km) => km >= 32), `dias de estrada: ${kmDosDias.join(", ")} km`);
   });
 
   it("alvo de 500 km continua com a faixa de ±50 km", () => {

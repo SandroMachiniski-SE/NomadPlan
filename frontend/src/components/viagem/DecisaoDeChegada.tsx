@@ -7,7 +7,7 @@ interface DecisaoDeChegadaProps {
   decidindo: boolean;
 }
 
-/** O fim da perna está perto: esticar e chegar hoje (o padrão) ou dormir antes. */
+/** O fim da perna está perto: dormir antes (o padrão, sem passar do limite) ou esticar e chegar hoje. */
 function DecisaoDeChegada({ perna, aoDecidir, decidindo }: DecisaoDeChegadaProps) {
   const decisao = perna.decisao!;
   const nome = `decisao-${perna.perna}`;

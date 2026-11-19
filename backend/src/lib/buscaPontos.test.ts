@@ -3,7 +3,7 @@ import assert from "node:assert/strict";
 import { criarBuscador, ErroTempoEsgotado, escaparLike, type FiltrosBusca, type ResultadoBusca } from "./buscaPontos";
 
 const FILTROS: FiltrosBusca = { cidade: "Joinville", raioKm: 10, limite: 20 };
-const RESULTADO: ResultadoBusca = { total: 1, dados: [] };
+const RESULTADO: ResultadoBusca = { total: 1, dados: [], temMais: false };
 
 describe("escaparLike", () => {
   it("transforma %, _ e \\ em caracteres comuns", () => {

@@ -23,8 +23,9 @@ export async function pontosDeUsuariosSemelhantes(idUsuario: number, limite: num
       UNION ALL
       SELECT r.id_usuario, i.id_ponto, 1
       FROM item_roteiro i JOIN roteiro r ON r.id = i.id_roteiro
-      -- Atividades livres não têm ponto (e um NULL no NOT IN abaixo anularia tudo).
-      WHERE i.id_ponto IS NOT NULL
+      -- Atividades livres não têm ponto (e um NULL no NOT IN abaixo anularia tudo). O hotel de
+      -- pernoite de uma viagem é onde a pessoa dormiu, não um lugar que ela escolheu visitar.
+      WHERE i.id_ponto IS NOT NULL AND NOT i.pernoite
     ),
     meus AS (
       SELECT p, SUM(w) AS w FROM sinais WHERE u = ${idUsuario} GROUP BY p

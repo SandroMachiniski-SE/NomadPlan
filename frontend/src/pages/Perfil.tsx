@@ -189,7 +189,7 @@ function Perfil() {
 
         <fieldset className="field">
           <legend className="field__legenda">
-            Interesses <span className="field__hint">usados para sugerir roteiros</span>
+            Interesses <span className="field__hint">usados para sugerir lugares e roteiros</span>
           </legend>
           <div className="chips">
             {CATEGORIAS_PONTOS.map((categoria) => (

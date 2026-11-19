@@ -40,6 +40,8 @@ export default defineConfig({
         JWT_SECRET: "segredo-de-e2e-apenas-para-testes-automatizados",
         JWT_EXPIRES_IN: "1d",
         RATE_LIMIT_OFF: "1",
+        // O Overpass do E2E é inalcançável: o preparo de cidade não espera minutos entre as tentativas.
+        PREPARO_NOVA_TENTATIVA_MS: "100",
         METRICAS_INTERVALO_MS: "500",
         SMTP_HOST: "",
         // Nenhum teste vai à internet: sem o Nominatim, a busca de cidades usa os municípios do banco.

@@ -77,7 +77,29 @@ docker compose -p nomadplan --env-file .env.prod -f docker-compose.prod.yml -f d
 docker compose -p nomadplan --env-file .env.prod -f docker-compose.prod.yml -f docker-compose.compartilhado.yml logs -f api
 ```
 
-Aguarde `NomadPlan API executando` e saia com Ctrl+C.
+Aguarde `NomadPlan API executando` e saia com Ctrl+C. A população dos municípios (IBGE), que a viagem de carro usa para escolher
+o pernoite enquanto os hotéis não foram contados, entra com um comando (pode repetir):
+
+```bash
+docker exec nomadplan-api npm run municipios:importar
+```
+
+De madrugada (levam horas, porque o servidor público de mapas é lento; podem ser interrompidos e rodados de novo, pulando o que
+já está pronto), deixe o servidor preparar o que mais vai ser usado. Rode com `nohup` para continuar mesmo se a conexão SSH cair:
+
+```bash
+# 1. Os lugares dos destinos da apresentação, das 27 capitais e dos principais destinos turísticos
+nohup docker exec nomadplan-api npm run destinos:preparar > ~/destinos.log 2>&1 &
+# 2. Depois que o 1 terminar: os hotéis das cidades de pernoite do Sul e do Sudeste
+nohup docker exec nomadplan-api npm run viagem:aquecer > ~/aquecer.log 2>&1 &
+```
+
+Acompanhe com `tail -f ~/destinos.log` (Ctrl+C sai sem parar o comando). A lista de destinos está em
+`backend/prisma/dados/destinos.json`.
+
+Os hotéis já guardados antes de o camping contar como hospedagem são buscados de novo (o resumo ganhou uma versão): na primeira
+noite depois de atualizar, o `viagem:aquecer` revisita também essas cidades e demora mais. Até lá, a viagem usa o resumo antigo
+como reserva quando o servidor de mapas não responde.
 
 ## Parte 4. Ligar o Caddy que já existe
 

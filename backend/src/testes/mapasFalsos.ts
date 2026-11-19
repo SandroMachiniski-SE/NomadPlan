@@ -1,4 +1,5 @@
 import { distanciaMetros } from "../lib/geo";
+import { esquecerConsultasDosResumos } from "../lib/resumoOsm";
 
 // Servidores de mapas de mentira para os testes: intercepta o Nominatim (busca de cidades),
 // o Overpass (lugares do OpenStreetMap), o OSRM (rotas de carro) e o Wikidata/Commons (fotos).
@@ -23,6 +24,7 @@ export interface MapasFalsos {
 }
 
 export function instalarMapasFalsos(respostas: MapasFalsos) {
+  esquecerConsultasDosResumos();
   const original = globalThis.fetch;
   const chamadas: ChamadaDeMapa[] = [];
 

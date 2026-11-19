@@ -18,6 +18,8 @@ export interface CidadeNaRota {
   /** Posição no traçado, de 0 (início) a 1 (fim): serve para recortar o pedaço de cada dia. */
   fracao: number;
   desvioKm: number;
+  /** Habitantes (IBGE): o porte da cidade enquanto os hotéis dela não foram contados. */
+  populacao: number | null;
 }
 
 export async function candidatosDaRota(idRota: number, excluir: number[]): Promise<CidadeNaRota[]> {
@@ -28,7 +30,7 @@ export async function candidatosDaRota(idRota: number, excluir: number[]): Promi
       WHERE id = ${idRota}
     ),
     perto AS (
-      SELECT m.codigo_ibge, m.nome, m.uf, m.latitude, m.longitude,
+      SELECT m.codigo_ibge, m.nome, m.uf, m.latitude, m.longitude, m.populacao,
              ST_LineLocatePoint(rota.tracado, m.geom::geometry) AS fracao,
              ST_Distance(m.geom, rota.tracado::geography) / 1000 AS desvio_km
       FROM municipio m, rota
@@ -36,7 +38,7 @@ export async function candidatosDaRota(idRota: number, excluir: number[]): Promi
         AND m.codigo_ibge <> ALL(${excluir}::int[])
     )
     SELECT perto.codigo_ibge AS "codigoIbge", perto.nome AS cidade, perto.uf, perto.latitude, perto.longitude,
-           perto.fracao, perto.desvio_km AS "desvioKm",
+           perto.fracao, perto.desvio_km AS "desvioKm", perto.populacao,
            ST_Length(ST_LineSubstring(rota.tracado, 0, perto.fracao)::geography)
              * (rota.metros / NULLIF(rota.comprimento, 0)) / 1000 AS km
     FROM perto, rota

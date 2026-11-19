@@ -1,0 +1,273 @@
+{
+ "descricao": "Destinos preparados de antemão por \"npm run destinos:preparar\": os da apresentação, as capitais e os principais destinos turísticos, nesta ordem.",
+ "destinos": [
+  {
+   "cidade": "Brasília",
+   "uf": "DF"
+  },
+  {
+   "cidade": "Goiânia",
+   "uf": "GO"
+  },
+  {
+   "cidade": "Rio de Janeiro",
+   "uf": "RJ"
+  },
+  {
+   "cidade": "Rio Branco",
+   "uf": "AC"
+  },
+  {
+   "cidade": "Maceió",
+   "uf": "AL"
+  },
+  {
+   "cidade": "Macapá",
+   "uf": "AP"
+  },
+  {
+   "cidade": "Manaus",
+   "uf": "AM"
+  },
+  {
+   "cidade": "Salvador",
+   "uf": "BA"
+  },
+  {
+   "cidade": "Fortaleza",
+   "uf": "CE"
+  },
+  {
+   "cidade": "Vitória",
+   "uf": "ES"
+  },
+  {
+   "cidade": "São Luís",
+   "uf": "MA"
+  },
+  {
+   "cidade": "Cuiabá",
+   "uf": "MT"
+  },
+  {
+   "cidade": "Campo Grande",
+   "uf": "MS"
+  },
+  {
+   "cidade": "Belo Horizonte",
+   "uf": "MG"
+  },
+  {
+   "cidade": "Belém",
+   "uf": "PA"
+  },
+  {
+   "cidade": "João Pessoa",
+   "uf": "PB"
+  },
+  {
+   "cidade": "Curitiba",
+   "uf": "PR"
+  },
+  {
+   "cidade": "Recife",
+   "uf": "PE"
+  },
+  {
+   "cidade": "Teresina",
+   "uf": "PI"
+  },
+  {
+   "cidade": "Natal",
+   "uf": "RN"
+  },
+  {
+   "cidade": "Porto Alegre",
+   "uf": "RS"
+  },
+  {
+   "cidade": "Porto Velho",
+   "uf": "RO"
+  },
+  {
+   "cidade": "Boa Vista",
+   "uf": "RR"
+  },
+  {
+   "cidade": "Florianópolis",
+   "uf": "SC"
+  },
+  {
+   "cidade": "São Paulo",
+   "uf": "SP"
+  },
+  {
+   "cidade": "Aracaju",
+   "uf": "SE"
+  },
+  {
+   "cidade": "Palmas",
+   "uf": "TO"
+  },
+  {
+   "cidade": "Gramado",
+   "uf": "RS"
+  },
+  {
+   "cidade": "Canela",
+   "uf": "RS"
+  },
+  {
+   "cidade": "Bento Gonçalves",
+   "uf": "RS"
+  },
+  {
+   "cidade": "Foz do Iguaçu",
+   "uf": "PR"
+  },
+  {
+   "cidade": "Bonito",
+   "uf": "MS"
+  },
+  {
+   "cidade": "Paraty",
+   "uf": "RJ"
+  },
+  {
+   "cidade": "Armação dos Búzios",
+   "uf": "RJ"
+  },
+  {
+   "cidade": "Petrópolis",
+   "uf": "RJ"
+  },
+  {
+   "cidade": "Angra dos Reis",
+   "uf": "RJ"
+  },
+  {
+   "cidade": "Arraial do Cabo",
+   "uf": "RJ"
+  },
+  {
+   "cidade": "Cabo Frio",
+   "uf": "RJ"
+  },
+  {
+   "cidade": "Ouro Preto",
+   "uf": "MG"
+  },
+  {
+   "cidade": "Tiradentes",
+   "uf": "MG"
+  },
+  {
+   "cidade": "Ilhabela",
+   "uf": "SP"
+  },
+  {
+   "cidade": "Ubatuba",
+   "uf": "SP"
+  },
+  {
+   "cidade": "Campos do Jordão",
+   "uf": "SP"
+  },
+  {
+   "cidade": "Santos",
+   "uf": "SP"
+  },
+  {
+   "cidade": "Brotas",
+   "uf": "SP"
+  },
+  {
+   "cidade": "Holambra",
+   "uf": "SP"
+  },
+  {
+   "cidade": "Balneário Camboriú",
+   "uf": "SC"
+  },
+  {
+   "cidade": "Bombinhas",
+   "uf": "SC"
+  },
+  {
+   "cidade": "Blumenau",
+   "uf": "SC"
+  },
+  {
+   "cidade": "Pomerode",
+   "uf": "SC"
+  },
+  {
+   "cidade": "Joinville",
+   "uf": "SC"
+  },
+  {
+   "cidade": "São Francisco do Sul",
+   "uf": "SC"
+  },
+  {
+   "cidade": "Urubici",
+   "uf": "SC"
+  },
+  {
+   "cidade": "Porto Seguro",
+   "uf": "BA"
+  },
+  {
+   "cidade": "Lençóis",
+   "uf": "BA"
+  },
+  {
+   "cidade": "Itacaré",
+   "uf": "BA"
+  },
+  {
+   "cidade": "Mata de São João",
+   "uf": "BA"
+  },
+  {
+   "cidade": "Ipojuca",
+   "uf": "PE"
+  },
+  {
+   "cidade": "Fernando de Noronha",
+   "uf": "PE"
+  },
+  {
+   "cidade": "Maragogi",
+   "uf": "AL"
+  },
+  {
+   "cidade": "Jijoca de Jericoacoara",
+   "uf": "CE"
+  },
+  {
+   "cidade": "Tibau do Sul",
+   "uf": "RN"
+  },
+  {
+   "cidade": "Alto Paraíso de Goiás",
+   "uf": "GO"
+  },
+  {
+   "cidade": "Pirenópolis",
+   "uf": "GO"
+  },
+  {
+   "cidade": "Caldas Novas",
+   "uf": "GO"
+  },
+  {
+   "cidade": "Barreirinhas",
+   "uf": "MA"
+  },
+  {
+   "cidade": "Chapada dos Guimarães",
+   "uf": "MT"
+  }
+ ]
+}

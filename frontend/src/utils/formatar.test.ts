@@ -62,4 +62,11 @@ describe("lerValorEmCentavos", () => {
   it("devolve NaN quando o texto não é um valor", () => {
     expect(lerValorEmCentavos("abc")).toBeNaN();
   });
+
+  it.each(["-25,90", "−25,90", "R$ -25,90", "- 25", "25,90-"])(
+    "valor negativo (%s) é inválido, não vira positivo",
+    (texto) => {
+      expect(lerValorEmCentavos(texto)).toBeNaN();
+    },
+  );
 });

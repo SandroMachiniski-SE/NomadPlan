@@ -10,12 +10,24 @@ import type { ElementoOsm } from "./osm";
 const OVERPASS_URL = process.env.OVERPASS_URL || "https://overpass-api.de/api/interpreter";
 export const RAIO_DA_CIDADE_KM = 8;
 const VALIDADE_DO_RESUMO_MS = 30 * 24 * 60 * 60 * 1000;
-const TEMPO_LIMITE_MS = 30_000;
+// Muda quando muda o que o resumo conta: o gravado numa versão anterior deixa de valer (é buscado de
+// novo), mas ainda serve de reserva se o Overpass falhar. 2: o camping conta como hospedagem.
+export const VERSAO_DO_RESUMO = 2;
+// A geração da viagem espera o Overpass por pouco tempo; a consulta continua depois disso e grava o
+// resumo para a próxima geração. O Overpass público às vezes leva quase um minuto.
+const ESPERA_PADRAO_MS = 10_000;
+const CONSULTA_EM_SEGUNDO_PLANO_MS = 90_000;
+// Depois de uma falha, a mesma cidade não volta a esperar o Overpass por um tempo.
+const PAUSA_DEPOIS_DE_FALHA_MS = 3 * 60 * 1000;
+// O aquecimento de madrugada espera o Overpass sem pressa e, quando ele recusa, tenta de novo.
+const ESPERA_DO_AQUECIMENTO_MS = 175_000;
+const PAUSA_DO_AQUECIMENTO_MS = 60_000;
+const TENTATIVAS_DO_AQUECIMENTO = 3;
 const INTERVALO_ENTRE_CONSULTAS_MS = 1000;
 const MAX_HOSPEDAGENS = 40;
 const MAX_ATRACOES = 10;
 
-const TIPOS_DE_HOSPEDAGEM = new Set(["hotel", "motel", "guest_house", "hostel", "chalet", "apartment"]);
+const TIPOS_DE_HOSPEDAGEM = new Set(["hotel", "motel", "guest_house", "hostel", "chalet", "apartment", "camp_site"]);
 const TURISMO_ATRACAO = new Set(["attraction", "museum", "viewpoint", "gallery", "zoo", "theme_park"]);
 
 export interface HospedagemDoResumo {
@@ -28,6 +40,8 @@ export interface HospedagemDoResumo {
 }
 
 export interface ResumoOsm {
+  /** Sem versão: gravado antes de o camping contar como hospedagem. */
+  versao?: number;
   hospedagens: HospedagemDoResumo[];
   atracoes: { idOsm: string; nome: string }[];
   totalHospedagens: number;
@@ -85,7 +99,7 @@ function completude(tags: Record<string, string>): number {
 }
 
 function resumoVazio(): ResumoOsm {
-  return { hospedagens: [], atracoes: [], totalHospedagens: 0, totalAtracoes: 0 };
+  return { versao: VERSAO_DO_RESUMO, hospedagens: [], atracoes: [], totalHospedagens: 0, totalAtracoes: 0 };
 }
 
 export function distribuirElementos(
@@ -193,6 +207,37 @@ interface MunicipioComResumo extends CidadeParaResumo {
   resumoEm: Date | null;
 }
 
+// Consultas em andamento (uma por cidade, mesmo com gerações simultâneas) e cidades em pausa.
+const emAndamento = new Map<number, Promise<void>>();
+const pausadasAte = new Map<number, number>();
+
+/** Para os testes: esquece as consultas em andamento e as pausas. */
+export function esquecerConsultasDosResumos(): void {
+  emAndamento.clear();
+  pausadasAte.clear();
+}
+
+async function buscarEGravar(cidades: MunicipioComResumo[], tempoLimiteMs: number, agora: Date): Promise<void> {
+  try {
+    const resumos = distribuirElementos(await consultarOverpass(cidades, tempoLimiteMs), cidades);
+
+    for (const [codigo, resumo] of resumos) {
+      await prisma.$executeRaw`
+        UPDATE municipio SET resumo_osm = ${JSON.stringify(resumo)}::jsonb, resumo_em = ${agora}
+        WHERE codigo_ibge = ${codigo}
+      `;
+    }
+  } catch (erro) {
+    console.error("Overpass indisponível para o resumo das cidades:", erro instanceof Error ? erro.message : erro);
+
+    const ate = Date.now() + PAUSA_DEPOIS_DE_FALHA_MS;
+
+    for (const c of cidades) pausadasAte.set(c.codigoIbge, ate);
+  } finally {
+    for (const c of cidades) emAndamento.delete(c.codigoIbge);
+  }
+}
+
 /** Trava compartilhada por várias chamadas (as pernas de uma viagem): depois de uma falha, não se consulta de novo. */
 export interface TravaDoOverpass {
   falhou: boolean;
@@ -200,28 +245,34 @@ export interface TravaDoOverpass {
 
 /**
  * Resumo de cada município pedido: do cache (30 dias) ou de uma consulta só ao Overpass para
- * todos os que faltam. Se o Overpass falhar, usa o resumo vencido; sem nenhum, `null`.
+ * todos os que faltam. Espera a consulta por até `esperaMs`; o que não chegou a tempo vem com o
+ * resumo vencido (ou `null`) e a consulta segue em segundo plano, gravando para a próxima vez.
  *
- * Com `trava`, a falha do Overpass arma a trava (mesmo que haja resumo vencido para usar no lugar) e,
- * com a trava armada, não há nova consulta: valem o cache válido e, na falta dele, o vencido.
+ * Com `trava`, o Overpass que falha ou não responde a tempo arma a trava (mesmo que haja resumo
+ * vencido para usar no lugar) e, com a trava armada, não há nova consulta nem nova espera: valem o
+ * cache válido e, na falta dele, o vencido.
  */
 export async function resumirCidades(
   codigos: number[],
   agora: Date = new Date(),
-  tempoLimiteMs = TEMPO_LIMITE_MS,
+  esperaMs = ESPERA_PADRAO_MS,
   trava?: TravaDoOverpass,
 ): Promise<Map<number, ResumoOsm | null>> {
   const resultado = new Map<number, ResumoOsm | null>();
 
   if (codigos.length === 0) return resultado;
 
-  const municipios = await prisma.$queryRaw<MunicipioComResumo[]>`
+  const ler = (lista: number[]) => prisma.$queryRaw<MunicipioComResumo[]>`
     SELECT codigo_ibge AS "codigoIbge", latitude, longitude, resumo_osm AS resumo, resumo_em AS "resumoEm"
     FROM municipio
-    WHERE codigo_ibge = ANY(${codigos}::int[])
+    WHERE codigo_ibge = ANY(${lista}::int[])
   `;
   const valido = (m: MunicipioComResumo) =>
-    m.resumo !== null && m.resumoEm !== null && agora.getTime() - m.resumoEm.getTime() < VALIDADE_DO_RESUMO_MS;
+    m.resumo !== null &&
+    m.resumo.versao === VERSAO_DO_RESUMO &&
+    m.resumoEm !== null &&
+    agora.getTime() - m.resumoEm.getTime() < VALIDADE_DO_RESUMO_MS;
+  const municipios = await ler(codigos);
   const faltando = municipios.filter((m) => !valido(m));
 
   for (const m of municipios) {
@@ -230,36 +281,105 @@ export async function resumirCidades(
 
   if (faltando.length === 0) return resultado;
 
-  const usarVencidos = () => {
-    for (const m of faltando) {
-      resultado.set(m.codigoIbge, m.resumo);
-    }
-  };
-
   if (trava?.falhou) {
-    usarVencidos();
+    for (const m of faltando) resultado.set(m.codigoIbge, m.resumo);
 
     return resultado;
   }
 
-  try {
-    const resumos = distribuirElementos(await consultarOverpass(faltando, tempoLimiteMs), faltando);
+  const novas = faltando.filter(
+    (m) => !emAndamento.has(m.codigoIbge) && (pausadasAte.get(m.codigoIbge) ?? 0) <= Date.now(),
+  );
 
-    for (const [codigo, resumo] of resumos) {
-      await prisma.$executeRaw`
-        UPDATE municipio SET resumo_osm = ${JSON.stringify(resumo)}::jsonb, resumo_em = ${agora}
-        WHERE codigo_ibge = ${codigo}
-      `;
-      resultado.set(codigo, resumo);
-    }
-  } catch (erro) {
-    console.error("Overpass indisponível para o resumo das cidades:", erro instanceof Error ? erro.message : erro);
+  if (novas.length > 0) {
+    const consulta = buscarEGravar(novas, Math.max(esperaMs, CONSULTA_EM_SEGUNDO_PLANO_MS), agora);
 
-    if (trava) trava.falhou = true;
+    for (const m of novas) emAndamento.set(m.codigoIbge, consulta);
+  }
 
-    usarVencidos();
+  const aguardando = [...new Set(faltando.flatMap((m) => emAndamento.get(m.codigoIbge) ?? []))];
+
+  if (aguardando.length > 0) {
+    let relogio: ReturnType<typeof setTimeout> | undefined;
+
+    await Promise.race([
+      Promise.all(aguardando),
+      new Promise((resolver) => {
+        relogio = setTimeout(resolver, esperaMs);
+      }),
+    ]);
+    clearTimeout(relogio);
+  }
+
+  // O que chegou a tempo já está no banco; o resto vem com o resumo vencido (ou nenhum).
+  const releitura = new Map((await ler(faltando.map((m) => m.codigoIbge))).map((m) => [m.codigoIbge, m]));
+
+  for (const m of faltando) {
+    const atual = releitura.get(m.codigoIbge) ?? m;
+    const novo = valido(atual);
+
+    resultado.set(m.codigoIbge, novo ? atual.resumo : m.resumo);
+    if (!novo && trava) trava.falhou = true;
   }
 
   return resultado;
 }
 
+/**
+ * Busca de antemão os resumos das cidades das UFs pedidas que ainda não têm um válido, as maiores
+ * primeiro (mais chance de virar pernoite), em lotes. Feito para rodar de madrugada, num processo
+ * próprio: um lote que falha (o Overpass público recusa com 429 quando está cheio) é tentado de novo
+ * depois de uma pausa.
+ */
+export async function aquecerResumos(
+  ufs: string[],
+  opcoes: { lote?: number; pausaDepoisDeFalhaMs?: number; aoAvancar?: (mensagem: string) => void } = {},
+): Promise<{ cidades: number; comResumo: number; falhas: number }> {
+  const lote = opcoes.lote ?? 8;
+  const pausa = opcoes.pausaDepoisDeFalhaMs ?? PAUSA_DO_AQUECIMENTO_MS;
+  const validoDesde = new Date(Date.now() - VALIDADE_DO_RESUMO_MS);
+  const pendentes = await prisma.$queryRaw<{ codigoIbge: number; nome: string; uf: string }[]>`
+    SELECT codigo_ibge AS "codigoIbge", nome, uf
+    FROM municipio
+    WHERE uf = ANY(${ufs}::text[])
+      AND (resumo_osm IS NULL OR resumo_em IS NULL OR resumo_em < ${validoDesde}
+        OR (resumo_osm->>'versao') IS DISTINCT FROM ${String(VERSAO_DO_RESUMO)})
+    ORDER BY populacao DESC NULLS LAST, codigo_ibge
+  `;
+  const totalDeLotes = Math.ceil(pendentes.length / lote);
+  let comResumo = 0;
+  let falhas = 0;
+
+  for (let i = 0; i < pendentes.length; i += lote) {
+    const grupo = pendentes.slice(i, i + lote);
+    let faltando = grupo.map((c) => c.codigoIbge);
+
+    for (let tentativa = 1; tentativa <= TENTATIVAS_DO_AQUECIMENTO && faltando.length > 0; tentativa += 1) {
+      if (tentativa > 1) {
+        await new Promise((resolver) => setTimeout(resolver, pausa));
+        esquecerConsultasDosResumos();
+      }
+
+      await resumirCidades(faltando, new Date(), ESPERA_DO_AQUECIMENTO_MS);
+
+      // Conta só o que foi gravado agora (um resumo vencido devolvido na falha não vale).
+      const gravados = await prisma.$queryRaw<{ codigoIbge: number }[]>`
+        SELECT codigo_ibge AS "codigoIbge" FROM municipio
+        WHERE codigo_ibge = ANY(${faltando}::int[]) AND resumo_em >= ${validoDesde}
+          AND resumo_osm->>'versao' = ${String(VERSAO_DO_RESUMO)}
+      `;
+      const prontos = new Set(gravados.map((g) => g.codigoIbge));
+
+      faltando = faltando.filter((codigo) => !prontos.has(codigo));
+    }
+
+    comResumo += grupo.length - faltando.length;
+    falhas += faltando.length;
+    opcoes.aoAvancar?.(
+      `lote ${i / lote + 1} de ${totalDeLotes}: ${grupo.map((c) => `${c.nome}/${c.uf}`).join(", ")}` +
+        (faltando.length > 0 ? ` (${faltando.length} sem resumo)` : ""),
+    );
+  }
+
+  return { cidades: pendentes.length, comResumo, falhas };
+}

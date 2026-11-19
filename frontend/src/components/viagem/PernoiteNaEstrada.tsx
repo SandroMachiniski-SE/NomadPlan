@@ -14,11 +14,18 @@ interface PernoiteNaEstradaProps {
 
 const nomeDaCidade = (c: CidadeDePernoite) => (c.uf ? `${c.cidade}/${c.uf}` : c.cidade);
 
+const formatarPopulacao = (habitantes: number) =>
+  habitantes >= 1000
+    ? `${Math.round(habitantes / 1000).toLocaleString("pt-BR")} mil habitantes`
+    : `${habitantes.toLocaleString("pt-BR")} habitantes`;
+
 function resumoDaCidade(c: CidadeDePernoite): string {
   const partes = [`km ${Math.round(c.km)}`, `${Math.round(c.distanciaDoAlvoKm)} km do alvo`];
 
   if (c.totalHospedagens !== null) partes.push(`${c.totalHospedagens} ${c.totalHospedagens === 1 ? "hospedagem" : "hospedagens"}`);
   if (c.totalAtracoes !== null) partes.push(`${c.totalAtracoes} ${c.totalAtracoes === 1 ? "atração" : "atrações"}`);
+  // Hotéis ainda não contados: o porte da cidade explica a sugestão.
+  if (c.totalHospedagens === null && c.populacao !== null) partes.push(formatarPopulacao(c.populacao));
 
   return partes.join(" · ");
 }

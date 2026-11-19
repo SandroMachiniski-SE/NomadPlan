@@ -1,4 +1,5 @@
 import prisma from "./prisma";
+import { horaLocal } from "./fuso";
 
 // RF28/RNF26: métricas de uso agregadas por dia. Os eventos são contados em memória e
 // gravados em lote (a cada poucos segundos): assim uma busca não vira uma escrita no
@@ -24,12 +25,18 @@ const INTERVALO_DESCARGA_MS = Number(process.env.METRICAS_INTERVALO_MS) || 5000;
 const pendentes = new Map<string, number>();
 let temporizador: NodeJS.Timeout | null = null;
 
+/** O dia (AAAA-MM-DD) no relógio de Brasília. */
 export function diaLocal(data: Date = new Date()): string {
-  const ano = data.getFullYear();
-  const mes = String(data.getMonth() + 1).padStart(2, "0");
-  const dia = String(data.getDate()).padStart(2, "0");
+  const local = horaLocal(data);
 
-  return `${ano}-${mes}-${dia}`;
+  return `${local.ano}-${String(local.mes).padStart(2, "0")}-${String(local.dia).padStart(2, "0")}`;
+}
+
+/** O dia `deslocamento` dias depois de `dia` (AAAA-MM-DD), só com a data, sem fuso. */
+function somarDias(dia: string, deslocamento: number): string {
+  const [ano, mes, numero] = dia.split("-").map(Number);
+
+  return new Date(Date.UTC(ano, mes - 1, numero + deslocamento)).toISOString().slice(0, 10);
 }
 
 async function persistirNoBanco(lote: { dia: string; tipo: string; total: number }[]): Promise<void> {
@@ -102,19 +109,18 @@ export interface PontoDaSerie {
 export async function serieDeUso(dias: number): Promise<PontoDaSerie[]> {
   await descarregarMetricas();
 
-  const hoje = new Date();
-  const inicio = new Date(hoje.getFullYear(), hoje.getMonth(), hoje.getDate() - (dias - 1));
+  const inicio = somarDias(diaLocal(), -(dias - 1));
 
   const registros = await prisma.$queryRaw<{ dia: string; tipo: string; total: number }[]>`
     SELECT to_char(dia, 'YYYY-MM-DD') AS dia, tipo, total
     FROM metrica_diaria
-    WHERE dia >= ${diaLocal(inicio)}::date
+    WHERE dia >= ${inicio}::date
   `;
 
   const porDia = new Map<string, Record<string, number>>();
 
   for (let i = 0; i < dias; i += 1) {
-    const dia = diaLocal(new Date(inicio.getFullYear(), inicio.getMonth(), inicio.getDate() + i));
+    const dia = somarDias(inicio, i);
     porDia.set(dia, Object.fromEntries(TIPOS_EVENTO.map((tipo) => [tipo, 0])));
   }
 

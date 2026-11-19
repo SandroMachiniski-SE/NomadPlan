@@ -230,6 +230,7 @@ const buscaSchema = z
     lng: z.coerce.number().min(-180).max(180).optional(),
     raioKm: z.coerce.number().positive().max(RAIO_BUSCA_KM_MAXIMO).default(RAIO_BUSCA_KM_PADRAO),
     limite: z.coerce.number().int().min(1).max(100).default(20),
+    deslocamento: z.coerce.number().int().min(0).max(10_000).default(0),
     notaMinima: z.coerce.number().min(1).max(5).optional(),
     abertoAgora: booleanoDeQuery.optional(),
     ordenar: z.enum(ORDENACOES).optional(),
@@ -239,7 +240,7 @@ const buscaSchema = z
     path: ["lat"],
   });
 
-pontosRouter.get("/", async (req: Request, res: Response) => {
+pontosRouter.get("/", autenticarOpcional, async (req: Request, res: Response) => {
   try {
     const resultado = buscaSchema.safeParse(req.query);
 
@@ -252,7 +253,11 @@ pontosRouter.get("/", async (req: Request, res: Response) => {
 
     registrarEvento("busca");
 
-    const busca = await buscarComFallback(resultado.data);
+    // Quem está logado vê primeiro os lugares do seu gosto (os interesses do perfil).
+    const interesses = req.usuario
+      ? ((await prisma.usuario.findUnique({ where: { id: req.usuario.id }, select: { interesses: true } }))?.interesses ?? [])
+      : [];
+    const busca = await buscarComFallback({ ...resultado.data, ...(interesses.length > 0 ? { preferir: interesses } : {}) });
 
     return res.json(busca);
   } catch (error) {
@@ -770,7 +775,15 @@ pontosRouter.get("/recomendados", autenticar, async (req: Request, res: Response
 
     const ordemSemelhantes = new Map(idsSemelhantes.map((id, indice) => [id, indice]));
 
+    // Quem marcou interesses recebe, das indicações de pessoas parecidas, só as das categorias do
+    // seu gosto (senão quem gosta de natureza e quem gosta de cultura recebiam a mesma lista).
+    // Sem interesses, hospedagem não entra: a recomendação é de lugares para visitar.
+    const meusInteresses = new Set(usuario.interesses.map((interesse) => interesse.trim().toLowerCase()));
+    const combinaComOGosto = (categoria: string) =>
+      meusInteresses.size > 0 ? meusInteresses.has(categoria.toLowerCase()) : categoria.toLowerCase() !== "hospedagem";
+
     const porSimilaridade = pontosSemelhantes
+      .filter((ponto) => combinaComOGosto(ponto.categoria))
       .sort((a, b) => (ordemSemelhantes.get(a.id) ?? 0) - (ordemSemelhantes.get(b.id) ?? 0))
       .map((ponto) => ({ ...ponto, motivoRecomendacao: "usuarios_semelhantes" as const }));
 

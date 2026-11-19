@@ -5,23 +5,34 @@ import { kmApos, type PerfilDaRota } from "./rotas";
 // Divide uma perna da viagem de carro em dias. Cada dia termina perto do alvo de km (ou de
 // horas ao volante, o que vier primeiro), numa cidade da faixa alvo ± 50 km contada a partir do
 // pernoite anterior. Entre as cidades da faixa, a nota pesa proximidade do alvo, quantidade de
-// hospedagens e de atrações. Quando o fim da perna está "perto" (até um dia curto além da faixa),
-// a pessoa decide entre esticar e chegar ou dormir antes; o padrão é esticar.
+// hospedagens e de atrações (sem a contagem de hotéis, o porte da cidade pela população do IBGE).
+// Quando o fim da perna está "perto" (até um dia curto além da faixa), a pessoa decide entre esticar
+// e chegar ou dormir antes; o padrão é dormir antes, para nenhum dia passar do limite.
 
 export const FAIXA_KM = 50;
-export const FAIXA_ALARGADA_KM = 100;
 export const FRACAO_DIA_CURTO = 0.3;
 // A faixa nunca passa de 30% do alvo do dia. Com 500 km por dia continua ±50 km; com um limite de
 // horas baixo (ou estrada lenta) o alvo do dia cai e uma faixa fixa de ±50 km deixaria uma cidade
 // a 30 km da saída ganhar de uma a 80 km, e o dia ficaria quase vazio.
 export const FRACAO_FAIXA = 0.3;
+// Sem hospedagem na faixa do alvo, a busca vai se ampliando (2, 3 e 4 vezes a faixa: ±100, 150 e
+// 200 km com 500 km por dia) antes de deixar o pernoite a definir; numa estrada com poucas cidades,
+// como a de Manaus a Boa Vista, ±100 km não bastava. A ampliação nunca passa de 60% do alvo do dia,
+// para nenhum dia encolher a menos de 40% do alvo.
+const MULTIPLOS_DA_FAIXA = [2, 3, 4];
+const FRACAO_MAXIMA_AMPLIADA = 0.6;
 export const MAX_ALTERNATIVAS = 3;
 // Cidades de cada faixa cujo resumo é buscado (as mais perto do alvo): numa região metropolitana a
 // faixa tem dezenas de municípios e a consulta ao Overpass ficaria pesada demais.
 export const MAX_RESUMOS_POR_FAIXA = 10;
 const PESOS = { proximidade: 0.4, hospedagens: 0.35, atracoes: 0.25 };
+// Sem a contagem de hotéis (o Overpass ainda não respondeu), o porte da cidade ocupa só o lugar das
+// hospedagens: cidade maior tem onde dormir; um vilarejo, quase nunca. Atrações, sem contagem, não
+// somam, para uma cidade com hotéis confirmados não perder para uma maior ainda sem contagem.
 const HOSPEDAGENS_PARA_NOTA_CHEIA = 20;
 const ATRACOES_PARA_NOTA_CHEIA = 10;
+const HABITANTES_SEM_PORTE = 5_000;
+const HABITANTES_PARA_PORTE_CHEIO = 100_000;
 // Trava contra laço infinito: nenhuma viagem válida chega perto disso (o limite é 21 dias).
 const MAX_NOITES = 100;
 
@@ -69,11 +80,18 @@ const temResumo = (c: CandidatoDePernoite): c is CandidatoDePernoite & { resumo:
 
 const escalaLog = (quantidade: number, cheia: number) => Math.min(1, Math.log(1 + quantidade) / Math.log(1 + cheia));
 
+/** De 0 (até 5 mil habitantes, ou sem população conhecida) a 1 (100 mil ou mais), em escala logarítmica. */
+function porteDaCidade(populacao: number | null | undefined): number {
+  if (!populacao || populacao <= HABITANTES_SEM_PORTE) return 0;
+
+  return Math.min(1, Math.log(populacao / HABITANTES_SEM_PORTE) / Math.log(HABITANTES_PARA_PORTE_CHEIO / HABITANTES_SEM_PORTE));
+}
+
 export function notaDoCandidato(c: CandidatoDePernoite, kmAlvo: number, largura: number): number {
   const proximidade = Math.max(0, 1 - Math.abs(c.km - kmAlvo) / largura);
 
   if (!temResumo(c)) {
-    return PESOS.proximidade * proximidade;
+    return PESOS.proximidade * proximidade + PESOS.hospedagens * porteDaCidade(c.populacao);
   }
 
   return (
@@ -84,6 +102,13 @@ export function notaDoCandidato(c: CandidatoDePernoite, kmAlvo: number, largura:
 }
 
 const km = (valor: number) => Math.round(valor);
+
+/** Larguras da busca ampliada, da menor para a maior, para a faixa e o alvo do dia. */
+export function faixasAmpliadas(faixa: number, alvoDoDia: number): number[] {
+  const teto = FRACAO_MAXIMA_AMPLIADA * alvoDoDia;
+
+  return [...new Set(MULTIPLOS_DA_FAIXA.map((multiplo) => Math.min(multiplo * faixa, teto)))].filter((largura) => largura > faixa);
+}
 
 export function dividirEmDias(entrada: EntradaDaDivisao): DivisaoDaPerna {
   const { totalKm, alvoKm, horasPorDia, perfil, candidatos, escolhas } = entrada;
@@ -108,10 +133,6 @@ export function dividirEmDias(entrada: EntradaDaDivisao): DivisaoDaPerna {
       .filter((c) => c.resumo === undefined)
       .forEach((c) => semResumo.add(c.codigoIbge));
 
-    if (lista.some((c) => !temResumo(c))) {
-      avisar("Não foi possível contar os hotéis agora; as cidades estão só pela distância.");
-    }
-
     return lista.filter((c) => !temResumo(c) || c.resumo.totalHospedagens >= 1);
   };
 
@@ -120,12 +141,13 @@ export function dividirEmDias(entrada: EntradaDaDivisao): DivisaoDaPerna {
     const alvoDoDia = horasPorDia ? Math.min(alvoKm, kmApos(perfil, pos, horasPorDia * 3600) - pos) : alvoKm;
 
     const faixa = Math.min(FAIXA_KM, alvoDoDia * FRACAO_FAIXA);
-    const faixaAlargada = Math.min(FAIXA_ALARGADA_KM, faixa * 2);
+    const ampliadas = faixasAmpliadas(faixa, alvoDoDia);
+    const faixaMaxima = ampliadas.length > 0 ? ampliadas[ampliadas.length - 1] : faixa;
 
     if (restante <= alvoDoDia + faixa) break;
 
     if (restante <= alvoDoDia + faixa + FRACAO_DIA_CURTO * alvoDoDia) {
-      const esticar = entrada.esticar ?? true;
+      const esticar = entrada.esticar ?? false;
       decisao = { esticar, kmEsticando: restante, kmNoDiaSeguinte: restante - alvoDoDia };
 
       if (esticar) break;
@@ -135,9 +157,11 @@ export function dividirEmDias(entrada: EntradaDaDivisao): DivisaoDaPerna {
     let largura = faixa;
     let opcoes = elegiveis(naFaixa(kmAlvo - faixa, kmAlvo + faixa), kmAlvo);
 
-    if (opcoes.length === 0) {
-      largura = faixaAlargada;
-      opcoes = elegiveis(naFaixa(kmAlvo - faixaAlargada, kmAlvo + faixaAlargada), kmAlvo);
+    for (const ampliada of ampliadas) {
+      if (opcoes.length > 0) break;
+
+      largura = ampliada;
+      opcoes = elegiveis(naFaixa(kmAlvo - ampliada, kmAlvo + ampliada), kmAlvo);
     }
 
     const ordenadas = [...opcoes].sort(
@@ -146,8 +170,8 @@ export function dividirEmDias(entrada: EntradaDaDivisao): DivisaoDaPerna {
     );
 
     if (ordenadas.length === 0) {
-      // Nenhuma hospedagem nem na faixa alargada: dorme "a definir" na cidade mais perto do alvo.
-      const maisPerto = naFaixa(kmAlvo - faixaAlargada, kmAlvo + faixaAlargada).sort(
+      // Nenhuma hospedagem nem na maior faixa ampliada: dorme "a definir" na cidade mais perto do alvo.
+      const maisPerto = naFaixa(kmAlvo - faixaMaxima, kmAlvo + faixaMaxima).sort(
         (a, b) => Math.abs(a.km - kmAlvo) - Math.abs(b.km - kmAlvo) || a.km - b.km,
       )[0];
 
@@ -171,7 +195,14 @@ export function dividirEmDias(entrada: EntradaDaDivisao): DivisaoDaPerna {
       else avisar(`A cidade escolhida para a noite ${noite} não está mais na faixa e foi trocada.`);
     }
 
-    if (largura === faixaAlargada) {
+    // Só a noite que ficou sem a contagem de hotéis avisa (outras cidades da faixa não importam).
+    if (!temResumo(escolhida)) {
+      avisar(
+        "Os hotéis de algumas cidades do caminho ainda estão sendo buscados; elas aparecem só pela distância. Gere de novo em instantes para ver os hotéis.",
+      );
+    }
+
+    if (largura > faixa) {
       avisar(
         `Nenhuma cidade com hospedagem entre ${km(kmAlvo - faixa)} e ${km(kmAlvo + faixa)} km; ` +
           `a mais próxima é ${escolhida.cidade}, no km ${km(escolhida.km)}.`,
