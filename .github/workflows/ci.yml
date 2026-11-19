@@ -51,7 +51,7 @@ jobs:
       # Prisma (riscos aceitos em docs/seguranca.md): o passo avisa sem derrubar o build.
       - run: npm audit --omit=dev --audit-level=high
         continue-on-error: true
-      # Testes unitários e de integração (banco real), com meta de 60% de linhas (RNF). Gera o lcov que o
+      # Testes unitários e de integração (banco real), com meta de 75% de linhas (RNF). Gera o lcov que o
       # SonarCloud lê no job "analise-estatica".
       - run: npm run test:cobertura
       - uses: actions/upload-artifact@v4
@@ -158,4 +158,4 @@ jobs:
           SONAR_HOST_URL: https://sonarcloud.io
       - name: Aviso
         if: ${{ env.SONAR_TOKEN == '' }}
-        run: echo "SONAR_TOKEN não configurado: análise do SonarCloud ignorada (docs/analise-estatica.md)."
+        run: echo "::notice::SONAR_TOKEN não configurado, então a análise do SonarCloud foi ignorada (ver docs/analise-estatica.md)."
