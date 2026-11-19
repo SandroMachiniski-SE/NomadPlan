@@ -97,6 +97,10 @@ nohup docker exec nomadplan-api npm run viagem:aquecer > ~/aquecer.log 2>&1 &
 Acompanhe com `tail -f ~/destinos.log` (Ctrl+C sai sem parar o comando). A lista de destinos está em
 `backend/prisma/dados/destinos.json`.
 
+Os hotéis já guardados antes de o camping contar como hospedagem são buscados de novo (o resumo ganhou uma versão): na primeira
+noite depois de atualizar, o `viagem:aquecer` revisita também essas cidades e demora mais. Até lá, a viagem usa o resumo antigo
+como reserva quando o servidor de mapas não responde.
+
 ## Parte 4. Ligar o Caddy que já existe
 
 Ainda na pasta `/opt/nomadplan`:
