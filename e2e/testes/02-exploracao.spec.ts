@@ -274,6 +274,61 @@ test.describe("explorar pelo mapa e escolher qualquer cidade", () => {
     expect(paginas).toEqual(["0", "20"]);
   });
 
+  test("a resposta atrasada de uma busca anterior não toma o lugar da busca mais nova", async ({ page }) => {
+    // A primeira busca (Joinville, sem categoria) fica presa até a segunda (Gastronomia) já estar na tela.
+    let soltarPrimeira = () => {};
+    const primeiraPresa = new Promise<void>((resolver) => {
+      soltarPrimeira = resolver;
+    });
+    const ehAPrimeira = (url: URL) =>
+      url.pathname === "/pontos" && url.searchParams.get("cidade") === "Joinville" && !url.searchParams.has("categoria");
+    await page.route(ehAPrimeira, async (rota) => {
+      const resposta = await rota.fetch();
+      await primeiraPresa;
+      await rota.fulfill({ response: resposta });
+    });
+
+    await page.goto("/");
+    await page.getByLabel("Cidade", { exact: true }).fill("Joinville");
+    await page.getByRole("button", { name: "Buscar", exact: true }).click();
+    await page.getByRole("button", { name: "Gastronomia" }).click();
+    await expect(page.getByRole("heading", { name: RESTAURANTE })).toBeVisible();
+
+    const chegouAAntiga = page.waitForResponse((resposta) => ehAPrimeira(new URL(resposta.url())));
+    soltarPrimeira();
+    await chegouAAntiga;
+    // Dá tempo de a tela reagir à resposta antiga, se fosse reagir.
+    await page.waitForTimeout(300);
+
+    await expect(page.getByRole("heading", { name: "1 resultado", exact: true })).toBeVisible();
+    await expect(page.getByRole("heading", { name: RESTAURANTE })).toBeVisible();
+    await expect(page.getByRole("heading", { name: MUSEU })).toHaveCount(0);
+  });
+
+  test("ao voltar dos detalhes de um lugar, a busca e os filtros continuam na tela", async ({ page }) => {
+    await page.goto("/");
+    await page.getByLabel("Cidade", { exact: true }).fill("Joinville");
+    await page.getByRole("button", { name: "Cultura" }).click();
+    await expect(page.getByRole("heading", { name: "1 resultado", exact: true })).toBeVisible();
+
+    await page.getByRole("link", { name: new RegExp(MUSEU) }).click();
+    await expect(page.getByRole("heading", { name: MUSEU, level: 1 })).toBeVisible();
+    await page.goBack();
+
+    await expect(page.getByLabel("Cidade", { exact: true })).toHaveValue("Joinville");
+    await expect(page.getByRole("button", { name: "Cultura" })).toHaveAttribute("aria-pressed", "true");
+    await expect(page.getByRole("heading", { name: MUSEU })).toBeVisible();
+    await expect(page.getByRole("heading", { name: PARQUE })).toHaveCount(0);
+
+    // O link "Voltar para a busca" dos detalhes também volta para a mesma busca.
+    await page.getByRole("link", { name: new RegExp(MUSEU) }).click();
+    await page.getByRole("link", { name: "Voltar para a busca" }).click();
+
+    await expect(page.getByLabel("Cidade", { exact: true })).toHaveValue("Joinville");
+    await expect(page.getByRole("heading", { name: MUSEU })).toBeVisible();
+    await expect(page.getByRole("heading", { name: PARQUE })).toHaveCount(0);
+  });
+
   test("logado, a busca traz primeiro os lugares do gosto marcado no perfil", async ({ page }) => {
     await cadastrar(page);
     await page.goto("/perfil");

@@ -1,7 +1,17 @@
 import { useEffect, useRef, useState, type FormEvent } from "react";
-import { Link } from "react-router-dom";
+import { Link, useSearchParams } from "react-router-dom";
 import api from "../services/api";
 import type { Ordenacao, Ponto, RespostaPontos } from "../types/ponto";
+import {
+  FILTROS_VAZIOS,
+  enderecoDaBusca,
+  guardarUltimaBusca,
+  lerEnderecoDaBusca,
+  parametrosDaBusca,
+  zoomDaArea,
+  type AreaBuscada,
+  type FiltrosDaBusca,
+} from "../utils/buscaNaUrl";
 import MapaCarregavel from "../components/MapaCarregavel";
 import type { AreaDoMapa } from "../components/MapaPontos";
 import EscolherCidade from "../components/EscolherCidade";
@@ -34,16 +44,23 @@ function Home() {
     buscarRecomendados();
   }, [autenticado]);
 
-  const [cidade, setCidade] = useState("");
-  const [categoria, setCategoria] = useState("");
-  const [busca, setBusca] = useState("");
-  const [acessibilidade, setAcessibilidade] = useState("");
-  const [faixaPreco, setFaixaPreco] = useState("");
-  const [raioKm, setRaioKm] = useState("10");
-  const [notaMinima, setNotaMinima] = useState("");
-  const [abertoAgora, setAbertoAgora] = useState(false);
-  const [ordenar, setOrdenar] = useState<Ordenacao | "">("");
-  const [localizacao, setLocalizacao] = useState<{ lat: number; lng: number } | null>(null);
+  // A busca fica no endereço da página: ao voltar dos detalhes de um lugar (ou recarregar), a tela
+  // nasce com os mesmos filtros e a busca é refeita.
+  const [enderecoDaPagina, setEnderecoDaPagina] = useSearchParams();
+  const [buscaSalva] = useState(() => lerEnderecoDaBusca(enderecoDaPagina));
+  const filtrosSalvos = buscaSalva?.filtros ?? FILTROS_VAZIOS;
+  const refazBuscaSalva = buscaSalva !== null && (!buscaSalva.pelaArea || buscaSalva.area !== null);
+
+  const [cidade, setCidade] = useState(filtrosSalvos.cidade);
+  const [categoria, setCategoria] = useState(filtrosSalvos.categoria);
+  const [busca, setBusca] = useState(filtrosSalvos.busca);
+  const [acessibilidade, setAcessibilidade] = useState(filtrosSalvos.acessibilidade);
+  const [faixaPreco, setFaixaPreco] = useState(filtrosSalvos.faixaPreco);
+  const [raioKm, setRaioKm] = useState(filtrosSalvos.raioKm);
+  const [notaMinima, setNotaMinima] = useState(filtrosSalvos.notaMinima);
+  const [abertoAgora, setAbertoAgora] = useState(filtrosSalvos.abertoAgora);
+  const [ordenar, setOrdenar] = useState<Ordenacao | "">(filtrosSalvos.ordenar);
+  const [localizacao, setLocalizacao] = useState<{ lat: number; lng: number } | null>(filtrosSalvos.localizacao);
   const [buscandoLocalizacao, setBuscandoLocalizacao] = useState(false);
 
   const [pontos, setPontos] = useState<Ponto[]>([]);
@@ -52,15 +69,18 @@ function Home() {
   const [temMais, setTemMais] = useState(false);
   const [pedidoDaBusca, setPedidoDaBusca] = useState<Record<string, string> | null>(null);
   const [carregandoMais, setCarregandoMais] = useState(false);
-  const [carregando, setCarregando] = useState(false);
+  const [carregando, setCarregando] = useState(refazBuscaSalva);
   const [erro, setErro] = useState<string | null>(null);
-  const [buscou, setBuscou] = useState(false);
+  const [buscou, setBuscou] = useState(buscaSalva !== null);
   const [desatualizado, setDesatualizado] = useState(false);
-  const [visualizacao, setVisualizacao] = useState<"lista" | "mapa">("lista");
+  const [visualizacao, setVisualizacao] = useState<"lista" | "mapa">(buscaSalva?.mapa ? "mapa" : "lista");
   const [escolhendoCidade, setEscolhendoCidade] = useState(false);
   // Busca pelo texto (cidade, nome...) ou pela região enquadrada no mapa.
-  const [buscaPelaArea, setBuscaPelaArea] = useState(false);
-  const [ultimaAreaBuscada, setUltimaAreaBuscada] = useState<AreaDoMapa | null>(null);
+  const [buscaPelaArea, setBuscaPelaArea] = useState(buscaSalva?.pelaArea ?? false);
+  const [ultimaAreaBuscada, setUltimaAreaBuscada] = useState<AreaDoMapa | null>(buscaSalva?.area ?? null);
+  // Cada busca ganha um número e só a mais recente mexe na tela: a resposta de uma busca anterior
+  // que chega atrasada (servidor lento, rede instável) é descartada em vez de tomar o lugar da nova.
+  const numeroDaBuscaRef = useRef(0);
   const [destacandoMapa, setDestacandoMapa] = useState(false);
   // Em tela larga, a lista e o mapa ficam lado a lado e um realça o outro.
   const telaLarga = useTelaLarga();
@@ -71,78 +91,16 @@ function Home() {
   // Sem resultados só divide quando a busca veio do mapa: ele precisa continuar na tela para a pessoa buscar de novo.
   const dividido = telaLarga && visualizacao === "lista" && !erro && (pontos.length > 0 || buscaPelaArea);
 
-  async function buscarPontos(event?: FormEvent, categoriaEscolhida?: string, cidadeEscolhida?: string) {
-    event?.preventDefault();
-
-    const categoriaFiltro = categoriaEscolhida ?? categoria;
-    const cidadeFiltro = cidadeEscolhida ?? cidade;
-
-    setCarregando(true);
-    setErro(null);
-    setDesatualizado(false);
-    setBuscou(true);
-    setBuscaPelaArea(false);
-
-    try {
-      const params: Record<string, string> = {};
-      if (cidadeFiltro.trim()) params.cidade = cidadeFiltro.trim();
-      if (categoriaFiltro.trim()) params.categoria = categoriaFiltro.trim();
-      if (busca.trim()) params.busca = busca.trim();
-      if (acessibilidade.trim()) params.acessibilidade = acessibilidade.trim();
-      if (faixaPreco.trim()) params.faixaPreco = faixaPreco.trim();
-      if (notaMinima) params.notaMinima = notaMinima;
-      if (abertoAgora) params.abertoAgora = "true";
-      if (ordenar && (ordenar !== "distancia" || localizacao)) params.ordenar = ordenar;
-
-      if (localizacao) {
-        params.lat = String(localizacao.lat);
-        params.lng = String(localizacao.lng);
-        params.raioKm = raioKm;
-      }
-
-      const resposta = await api.get<RespostaPontos>("/pontos", { params });
-      mostrarPrimeiraPagina(resposta.data, params);
-    } catch (error) {
-      console.error("Erro ao buscar pontos turísticos:", error);
-      setErro(extrairMensagemErro(error, "Não foi possível carregar os pontos turísticos. Tente novamente."));
-      limparResultados();
-    } finally {
-      setCarregando(false);
-    }
+  function filtrosAtuais(): FiltrosDaBusca {
+    return { cidade, categoria, busca, acessibilidade, faixaPreco, notaMinima, abertoAgora, ordenar, localizacao, raioKm };
   }
 
-  /** Busca o que está dentro da região enquadrada no mapa (os filtros valem; a cidade digitada não). */
-  async function buscarNaArea(area: AreaDoMapa) {
-    setCarregando(true);
-    setErro(null);
-    setDesatualizado(false);
-    setBuscou(true);
-    setBuscaPelaArea(true);
-    setUltimaAreaBuscada(area);
+  /** Guarda a busca no endereço (sem criar um passo a mais no histórico) e para o "Voltar para a busca". */
+  function guardarBusca(params: Record<string, string>, pelaArea: boolean, visao: "lista" | "mapa") {
+    const endereco = enderecoDaBusca(params, { pelaArea, mapa: visao === "mapa" });
 
-    try {
-      const params: Record<string, string> = {
-        lat: String(area.latitude),
-        lng: String(area.longitude),
-        raioKm: String(Math.min(200, Math.max(0.3, Number(area.raioKm.toFixed(2))))),
-        limite: "100",
-      };
-      if (categoria.trim()) params.categoria = categoria.trim();
-      if (busca.trim()) params.busca = busca.trim();
-      if (acessibilidade.trim()) params.acessibilidade = acessibilidade.trim();
-      if (faixaPreco.trim()) params.faixaPreco = faixaPreco.trim();
-      if (notaMinima) params.notaMinima = notaMinima;
-      if (abertoAgora) params.abertoAgora = "true";
-
-      const resposta = await api.get<RespostaPontos>("/pontos", { params });
-      mostrarPrimeiraPagina(resposta.data, params);
-    } catch (error) {
-      console.error("Erro ao buscar pontos na área do mapa:", error);
-      setErro(extrairMensagemErro(error, "Não foi possível carregar os pontos desta área. Tente novamente."));
-      limparResultados();
-    } finally {
-      setCarregando(false);
-    }
+    setEnderecoDaPagina(endereco, { replace: true });
+    guardarUltimaBusca(endereco);
   }
 
   function mostrarPrimeiraPagina(resposta: RespostaPontos, pedido: Record<string, string>) {
@@ -160,9 +118,78 @@ function Home() {
     setPedidoDaBusca(null);
   }
 
+  /** Busca a primeira página e mostra o resultado, se nenhuma busca mais nova tiver começado no meio. */
+  async function carregarPrimeiraPagina(params: Record<string, string>, mensagemDeErro: string) {
+    const numero = ++numeroDaBuscaRef.current;
+    const atual = () => numero === numeroDaBuscaRef.current;
+
+    try {
+      const resposta = await api.get<RespostaPontos>("/pontos", { params });
+      if (!atual()) return;
+      mostrarPrimeiraPagina(resposta.data, params);
+    } catch (error) {
+      if (!atual()) return;
+      console.error(mensagemDeErro, error);
+      setErro(extrairMensagemErro(error, mensagemDeErro));
+      limparResultados();
+    } finally {
+      if (atual()) setCarregando(false);
+    }
+  }
+
+  async function buscarPontos(event?: FormEvent, mudancas: Partial<FiltrosDaBusca> = {}, visao = visualizacao) {
+    event?.preventDefault();
+
+    const params = parametrosDaBusca({ ...filtrosAtuais(), ...mudancas });
+
+    setCarregando(true);
+    setErro(null);
+    setDesatualizado(false);
+    setBuscou(true);
+    setBuscaPelaArea(false);
+    guardarBusca(params, false, visao);
+
+    await carregarPrimeiraPagina(params, "Não foi possível carregar os pontos turísticos. Tente novamente.");
+  }
+
+  /** Busca o que está dentro da região enquadrada no mapa (os filtros valem; a cidade digitada não). */
+  async function buscarNaArea(area: AreaBuscada, mudancas: Partial<FiltrosDaBusca> = {}, visao = visualizacao) {
+    const params = parametrosDaBusca({ ...filtrosAtuais(), ...mudancas }, area);
+
+    setCarregando(true);
+    setErro(null);
+    setDesatualizado(false);
+    setBuscou(true);
+    setBuscaPelaArea(true);
+    setUltimaAreaBuscada(area);
+    guardarBusca(params, true, visao);
+
+    await carregarPrimeiraPagina(params, "Não foi possível carregar os pontos desta área. Tente novamente.");
+  }
+
+  // Ao voltar dos detalhes de um lugar (ou recarregar a página), refaz a busca guardada no endereço.
+  // Os filtros, a aba e o "Buscando..." já nasceram com ela: aqui só vai o pedido ao servidor.
+  useEffect(() => {
+    if (!buscaSalva || !refazBuscaSalva) return;
+
+    const area = buscaSalva.area ?? undefined;
+
+    // eslint-disable-next-line react-hooks/set-state-in-effect -- busca ao abrir a página: a tela só muda quando a resposta chega
+    void carregarPrimeiraPagina(
+      parametrosDaBusca(buscaSalva.filtros, area),
+      area
+        ? "Não foi possível carregar os pontos desta área. Tente novamente."
+        : "Não foi possível carregar os pontos turísticos. Tente novamente.",
+    );
+    // eslint-disable-next-line react-hooks/exhaustive-deps -- só ao abrir a página: depois, quem busca é a pessoa
+  }, []);
+
   /** Traz a página seguinte da mesma busca e junta aos resultados que já estão na tela. */
   async function mostrarMais() {
     if (!pedidoDaBusca) return;
+
+    // A página seguinte é da busca que está na tela: se outra busca começar no meio, ela é descartada.
+    const numero = numeroDaBuscaRef.current;
 
     setCarregandoMais(true);
 
@@ -170,12 +197,14 @@ function Home() {
       const resposta = await api.get<RespostaPontos>("/pontos", {
         params: { ...pedidoDaBusca, deslocamento: String(pontos.length) },
       });
+      if (numero !== numeroDaBuscaRef.current) return;
       const vistos = new Set(pontos.map((p) => p.id));
 
       setPontos([...pontos, ...resposta.data.dados.filter((p) => !vistos.has(p.id))]);
       setTotal(resposta.data.total);
       setTemMais(Boolean(resposta.data.temMais));
     } catch (error) {
+      if (numero !== numeroDaBuscaRef.current) return;
       console.error("Erro ao carregar mais resultados:", error);
       setErro(extrairMensagemErro(error, "Não foi possível carregar mais resultados. Tente novamente."));
     } finally {
@@ -189,12 +218,16 @@ function Home() {
    */
   function explorarPeloMapa() {
     if (!mapaAberto) {
+      // Uma busca que ainda estava a caminho não deve encher o mapa livre.
+      numeroDaBuscaRef.current += 1;
+      setCarregando(false);
       setBuscou(true);
       setVisualizacao("mapa");
       setBuscaPelaArea(true);
       setErro(null);
       limparResultados();
       setUltimaAreaBuscada(null);
+      setEnderecoDaPagina(enderecoDaBusca({}, { pelaArea: true, mapa: true }), { replace: true });
     }
 
     setDestacandoMapa(true);
@@ -213,14 +246,41 @@ function Home() {
     setCidade(nome);
     setEscolhendoCidade(false);
     setVisualizacao("lista");
-    void buscarPontos(undefined, undefined, nome);
+    void buscarPontos(undefined, { cidade: nome }, "lista");
   }
 
   function aoEscolherCategoria(nova: string) {
     const proxima = categoria === nova ? "" : nova;
     setCategoria(proxima);
-    buscarPontos(undefined, proxima);
+    void buscarPontos(undefined, { categoria: proxima });
   }
+
+  /** Troca entre lista e mapa e guarda a escolha junto com a busca no endereço. */
+  function trocarVisualizacao(nova: "lista" | "mapa") {
+    setVisualizacao(nova);
+
+    if (!pedidoDaBusca && !buscaPelaArea) return;
+
+    setEnderecoDaPagina(
+      (atual) => {
+        const endereco = new URLSearchParams(atual);
+
+        if (nova === "mapa") endereco.set("ver", "mapa");
+        else endereco.delete("ver");
+
+        guardarUltimaBusca(endereco);
+        return endereco;
+      },
+      { replace: true },
+    );
+  }
+
+  // Ao reabrir uma busca feita pelo mapa, ele volta enquadrando a mesma região.
+  const vistaDoMapa: { centro: [number, number]; zoom: number } = localizacao
+    ? { centro: [localizacao.lat, localizacao.lng], zoom: 12 }
+    : buscaPelaArea && ultimaAreaBuscada
+      ? { centro: [ultimaAreaBuscada.latitude, ultimaAreaBuscada.longitude], zoom: zoomDaArea(ultimaAreaBuscada) }
+      : { centro: [-14.2, -51.9], zoom: 4 };
 
   function aoUsarLocalizacao() {
     if (!navigator.geolocation) {
@@ -469,7 +529,7 @@ function Home() {
                   <button
                     type="button"
                     aria-pressed={visualizacao === "lista"}
-                    onClick={() => setVisualizacao("lista")}
+                    onClick={() => trocarVisualizacao("lista")}
                   >
                     <Icone nome="lista" />
                     Lista
@@ -477,7 +537,7 @@ function Home() {
                   <button
                     type="button"
                     aria-pressed={visualizacao === "mapa"}
-                    onClick={() => setVisualizacao("mapa")}
+                    onClick={() => trocarVisualizacao("mapa")}
                   >
                     <Icone nome="mapa" />
                     Mapa
@@ -534,11 +594,7 @@ function Home() {
                     autenticado={autenticado}
                     ajustarAosPontos={!buscaPelaArea}
                     carregando={carregando}
-                    vistaInicial={
-                      localizacao
-                        ? { centro: [localizacao.lat, localizacao.lng], zoom: 12 }
-                        : { centro: [-14.2, -51.9], zoom: 4 }
-                    }
+                    vistaInicial={vistaDoMapa}
                   />
                 </div>
 
@@ -592,11 +648,7 @@ function Home() {
                     carregando={carregando}
                     destacadoId={pontoDoCartao}
                     aoDestacarPonto={setPontoDoPino}
-                    vistaInicial={
-                      localizacao
-                        ? { centro: [localizacao.lat, localizacao.lng], zoom: 12 }
-                        : { centro: [-14.2, -51.9], zoom: 4 }
-                    }
+                    vistaInicial={vistaDoMapa}
                   />
                 </div>
               </div>

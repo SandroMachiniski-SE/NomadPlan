@@ -5,6 +5,7 @@ import type { InformacoesGoogle as DadosGoogle, Ponto, RespostaAvaliacoes, Suges
 import type { RespostaRoteiros } from "../types/roteiro";
 import { useAuth } from "../context/useAuth";
 import { extrairMensagemErro } from "../utils/erro";
+import { enderecoDaUltimaBusca } from "../utils/buscaNaUrl";
 import MapaCarregavel from "../components/MapaCarregavel";
 import Icone from "../components/Icone";
 import Estrelas from "../components/Estrelas";
@@ -286,7 +287,8 @@ function PontoDetalhes() {
 
   return (
     <div className="container page">
-      <Link to="/" className="back-link">
+      {/* Volta para a última busca desta aba, com os mesmos filtros e resultados. */}
+      <Link to={enderecoDaUltimaBusca()} className="back-link">
         <Icone nome="voltar" />
         Voltar para a busca
       </Link>
