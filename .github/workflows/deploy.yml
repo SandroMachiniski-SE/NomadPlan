@@ -38,7 +38,7 @@ jobs:
     env:
       COMMIT: ${{ inputs.commit || github.event.workflow_run.head_sha }}
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v7
         with:
           ref: ${{ env.COMMIT }}
       - name: Implantar

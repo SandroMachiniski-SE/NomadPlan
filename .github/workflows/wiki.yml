@@ -25,7 +25,7 @@ jobs:
     name: Publicar a Wiki
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v7
       - name: Montar as páginas
         run: python3 scripts/montar_wiki.py
       - name: Publicar
