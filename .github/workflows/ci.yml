@@ -51,8 +51,14 @@ jobs:
       # Prisma (riscos aceitos em docs/seguranca.md): o passo avisa sem derrubar o build.
       - run: npm audit --omit=dev --audit-level=high
         continue-on-error: true
-      # Testes unitários e de integração (banco real), com meta de 60% de linhas (RNF).
+      # Testes unitários e de integração (banco real), com meta de 60% de linhas (RNF). Gera o lcov que o
+      # SonarCloud lê no job "analise-estatica".
       - run: npm run test:cobertura
+      - uses: actions/upload-artifact@v4
+        with:
+          name: cobertura-backend
+          path: backend/coverage/lcov.info
+          retention-days: 3
 
   frontend:
     name: Frontend (lint, testes e build)
@@ -69,7 +75,13 @@ jobs:
           cache-dependency-path: frontend/package-lock.json
       - run: npm ci
       - run: npm run lint
-      - run: npm test
+      # Testes com relatório de cobertura (lcov, lido pelo SonarCloud).
+      - run: npm run test:cobertura
+      - uses: actions/upload-artifact@v4
+        with:
+          name: cobertura-frontend
+          path: frontend/coverage/lcov.info
+          retention-days: 3
       - run: npm run build
       # Só as dependências de produção: os alertas que restam são de ferramentas de desenvolvimento.
       - run: npm audit --omit=dev --audit-level=moderate
@@ -115,3 +127,35 @@ jobs:
             e2e/playwright-report/
             e2e/test-results/
           retention-days: 7
+
+  # Análise estática e de segurança (SonarCloud): bugs, vulnerabilidades, pontos de segurança e duplicação,
+  # com a cobertura dos dois lados. Só roda quando o segredo SONAR_TOKEN existe (não existe em pull requests
+  # do Dependabot nem de forks), para o CI não quebrar por falta de configuração.
+  analise-estatica:
+    name: Análise estática (SonarCloud)
+    runs-on: ubuntu-latest
+    needs: [backend, frontend]
+    env:
+      SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
+    steps:
+      - uses: actions/checkout@v4
+        if: ${{ env.SONAR_TOKEN != '' }}
+        with:
+          fetch-depth: 0
+      - uses: actions/download-artifact@v4
+        if: ${{ env.SONAR_TOKEN != '' }}
+        with:
+          pattern: cobertura-*
+      # Os lcov trazem caminhos relativos a cada pasta; o Sonar precisa deles a partir da raiz do projeto.
+      - name: Ajustar os caminhos da cobertura
+        if: ${{ env.SONAR_TOKEN != '' }}
+        run: |
+          sed -i 's|^SF:|SF:backend/|' cobertura-backend/lcov.info
+          sed -i 's|^SF:|SF:frontend/|' cobertura-frontend/lcov.info
+      - uses: SonarSource/sonarqube-scan-action@v5
+        if: ${{ env.SONAR_TOKEN != '' }}
+        env:
+          SONAR_HOST_URL: https://sonarcloud.io
+      - name: Aviso
+        if: ${{ env.SONAR_TOKEN == '' }}
+        run: echo "SONAR_TOKEN não configurado: análise do SonarCloud ignorada (docs/analise-estatica.md)."

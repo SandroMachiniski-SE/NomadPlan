@@ -1,0 +1,48 @@
+name: Deploy
+
+# Entrega contínua: depois que o CI passa na main, o runner instalado na VPS implanta o mesmo commit.
+# Não há SSH de fora para dentro: é a própria VPS que busca o trabalho. Passo a passo em docs/implantacao-automatica.md.
+#
+# Segurança: o runner roda numa máquina de produção, então este workflow só dispara de dois jeitos:
+# CI concluído de um *push* na própria main deste repositório (nunca de pull request nem de fork), ou
+# manualmente por quem tem permissão de escrita (workflow_dispatch), inclusive para voltar de versão.
+on:
+  workflow_run:
+    workflows: [CI]
+    types: [completed]
+    branches: [main]
+  workflow_dispatch:
+    inputs:
+      commit:
+        description: "Commit a implantar. Vazio = o mais recente da main. Para voltar de versão, informe um commit anterior."
+        required: false
+        type: string
+
+permissions:
+  contents: read
+
+concurrency:
+  group: deploy-producao
+  cancel-in-progress: false
+
+jobs:
+  implantar:
+    name: Implantar na VPS
+    if: >-
+      github.event_name == 'workflow_dispatch' ||
+      (github.event.workflow_run.conclusion == 'success' &&
+       github.event.workflow_run.event == 'push' &&
+       github.event.workflow_run.head_repository.full_name == github.repository)
+    runs-on: [self-hosted, nomadplan-vps]
+    environment: producao
+    env:
+      COMMIT: ${{ inputs.commit || github.event.workflow_run.head_sha }}
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ env.COMMIT }}
+      - name: Implantar
+        run: bash scripts/implantar.sh "$COMMIT"
+      - name: Conferir o endereço público
+        run: |
+          curl --fail --silent --show-error --retry 5 --retry-delay 5 --retry-all-errors https://api.nomadplan.blackyears.com.br/health
