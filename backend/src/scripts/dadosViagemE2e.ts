@@ -4,7 +4,7 @@ import { distanciaMetros } from "../lib/geo";
 import { municipioPorCodigo, type Municipio } from "../lib/municipios";
 import { gravarRotaEmCache } from "../lib/rotas";
 import { candidatosDaRota } from "../lib/corredor";
-import type { ResumoOsm } from "../lib/resumoOsm";
+import { VERSAO_DO_RESUMO, type ResumoOsm } from "../lib/resumoOsm";
 
 // Viagem de carro nos testes de ponta a ponta, sem internet: rotas retas entre as sedes, com a
 // distância "da estrada" informada, gravadas direto em rota_em_cache, e um resumo pronto para
@@ -39,9 +39,10 @@ async function gravarRota(origem: Municipio, destino: Municipio, metros: number)
 }
 
 function resumoSintetico(m: Municipio, comHoteis: boolean): ResumoOsm {
-  if (!comHoteis) return { hospedagens: [], atracoes: [], totalHospedagens: 0, totalAtracoes: 0 };
+  if (!comHoteis) return { versao: VERSAO_DO_RESUMO, hospedagens: [], atracoes: [], totalHospedagens: 0, totalAtracoes: 0 };
 
   return {
+    versao: VERSAO_DO_RESUMO,
     hospedagens: [1, 2, 3].map((n) => ({
       idOsm: `node/${m.codigoIbge}${n}`,
       nome: `Hotel ${m.cidade} ${n}`,

@@ -10,6 +10,9 @@ import type { ElementoOsm } from "./osm";
 const OVERPASS_URL = process.env.OVERPASS_URL || "https://overpass-api.de/api/interpreter";
 export const RAIO_DA_CIDADE_KM = 8;
 const VALIDADE_DO_RESUMO_MS = 30 * 24 * 60 * 60 * 1000;
+// Muda quando muda o que o resumo conta: o gravado numa versão anterior deixa de valer (é buscado de
+// novo), mas ainda serve de reserva se o Overpass falhar. 2: o camping conta como hospedagem.
+export const VERSAO_DO_RESUMO = 2;
 // A geração da viagem espera o Overpass por pouco tempo; a consulta continua depois disso e grava o
 // resumo para a próxima geração. O Overpass público às vezes leva quase um minuto.
 const ESPERA_PADRAO_MS = 10_000;
@@ -37,6 +40,8 @@ export interface HospedagemDoResumo {
 }
 
 export interface ResumoOsm {
+  /** Sem versão: gravado antes de o camping contar como hospedagem. */
+  versao?: number;
   hospedagens: HospedagemDoResumo[];
   atracoes: { idOsm: string; nome: string }[];
   totalHospedagens: number;
@@ -94,7 +99,7 @@ function completude(tags: Record<string, string>): number {
 }
 
 function resumoVazio(): ResumoOsm {
-  return { hospedagens: [], atracoes: [], totalHospedagens: 0, totalAtracoes: 0 };
+  return { versao: VERSAO_DO_RESUMO, hospedagens: [], atracoes: [], totalHospedagens: 0, totalAtracoes: 0 };
 }
 
 export function distribuirElementos(
@@ -263,7 +268,10 @@ export async function resumirCidades(
     WHERE codigo_ibge = ANY(${lista}::int[])
   `;
   const valido = (m: MunicipioComResumo) =>
-    m.resumo !== null && m.resumoEm !== null && agora.getTime() - m.resumoEm.getTime() < VALIDADE_DO_RESUMO_MS;
+    m.resumo !== null &&
+    m.resumo.versao === VERSAO_DO_RESUMO &&
+    m.resumoEm !== null &&
+    agora.getTime() - m.resumoEm.getTime() < VALIDADE_DO_RESUMO_MS;
   const municipios = await ler(codigos);
   const faltando = municipios.filter((m) => !valido(m));
 
@@ -334,7 +342,8 @@ export async function aquecerResumos(
     SELECT codigo_ibge AS "codigoIbge", nome, uf
     FROM municipio
     WHERE uf = ANY(${ufs}::text[])
-      AND (resumo_osm IS NULL OR resumo_em IS NULL OR resumo_em < ${validoDesde})
+      AND (resumo_osm IS NULL OR resumo_em IS NULL OR resumo_em < ${validoDesde}
+        OR (resumo_osm->>'versao') IS DISTINCT FROM ${String(VERSAO_DO_RESUMO)})
     ORDER BY populacao DESC NULLS LAST, codigo_ibge
   `;
   const totalDeLotes = Math.ceil(pendentes.length / lote);
@@ -357,6 +366,7 @@ export async function aquecerResumos(
       const gravados = await prisma.$queryRaw<{ codigoIbge: number }[]>`
         SELECT codigo_ibge AS "codigoIbge" FROM municipio
         WHERE codigo_ibge = ANY(${faltando}::int[]) AND resumo_em >= ${validoDesde}
+          AND resumo_osm->>'versao' = ${String(VERSAO_DO_RESUMO)}
       `;
       const prontos = new Set(gravados.map((g) => g.codigoIbge));
 

@@ -4,7 +4,7 @@ import assert from "node:assert/strict";
 import prisma from "../../lib/prisma";
 import { buscarRota, ErroRota, gravarRotaEmCache, lerRespostaOsrm } from "../../lib/rotas";
 import { candidatosDaRota, tracadoEntre } from "../../lib/corredor";
-import { aquecerResumos, resumirCidades, type ResumoOsm } from "../../lib/resumoOsm";
+import { VERSAO_DO_RESUMO, aquecerResumos, resumirCidades, type ResumoOsm } from "../../lib/resumoOsm";
 import { criarMunicipio, limparBanco } from "../suporte";
 import { instalarMapasFalsos, rotaOsrm } from "../mapasFalsos";
 
@@ -163,7 +163,7 @@ describe("resumos das cidades", () => {
   let mapas: ReturnType<typeof instalarMapasFalsos> | null = null;
   const A = { codigoIbge: 1000020, cidade: "Cidade A", uf: "GO", latitude: -20, longitude: -48 };
   const B = { codigoIbge: 1000021, cidade: "Cidade B", uf: "GO", latitude: -18, longitude: -48 };
-  const RESUMO_DE_A: ResumoOsm = { hospedagens: [], atracoes: [], totalHospedagens: 3, totalAtracoes: 1 };
+  const RESUMO_DE_A: ResumoOsm = { versao: VERSAO_DO_RESUMO, hospedagens: [], atracoes: [], totalHospedagens: 3, totalAtracoes: 1 };
 
   beforeEach(async () => {
     await limparBanco();
@@ -202,6 +202,25 @@ describe("resumos das cidades", () => {
     const gravado = await prisma.municipio.findUnique({ where: { codigoIbge: B.codigoIbge } });
     assert.equal((gravado!.resumoOsm as unknown as ResumoOsm).hospedagens[0].nome, "Hotel de B");
     assert.ok(gravado!.resumoEm);
+  });
+
+  it("resumo gravado antes de o camping contar como hospedagem é buscado de novo, mesmo recente", async () => {
+    const { versao: _versao, ...semVersao } = RESUMO_DE_A;
+    await prisma.$executeRaw`
+      UPDATE municipio SET resumo_osm = ${JSON.stringify({ ...semVersao, totalHospedagens: 0 })}::jsonb, resumo_em = ${new Date(Date.now() - DIA_MS)}
+      WHERE codigo_ibge = ${A.codigoIbge}
+    `;
+    mapas = instalarMapasFalsos({
+      overpass: () => ({
+        corpo: { elements: [{ type: "node", id: 7, lat: -20.01, lon: -48, tags: { name: "Camping de A", tourism: "camp_site" } }] },
+      }),
+    });
+
+    const resumos = await resumirCidades([A.codigoIbge]);
+
+    assert.equal(mapas.chamadas.filter((c) => c.servico === "overpass").length, 1);
+    assert.equal(resumos.get(A.codigoIbge)!.totalHospedagens, 1);
+    assert.equal(resumos.get(A.codigoIbge)!.versao, VERSAO_DO_RESUMO);
   });
 
   it("resumo vencido e Overpass fora do ar: usa o vencido", async () => {
@@ -405,6 +424,21 @@ describe("aquecer os resumos de uma região (de madrugada)", () => {
     assert.deepEqual(segunda, { cidades: 0, comResumo: 0, falhas: 0 });
     const carioca = await prisma.municipio.findUnique({ where: { codigoIbge: CARIOCA.codigoIbge } });
     assert.equal(carioca?.resumoEm, null, "RJ não foi pedida");
+  });
+
+  it("resumo recente de antes do camping entra na fila da madrugada", async () => {
+    const antigo = { hospedagens: [], atracoes: [], totalHospedagens: 0, totalAtracoes: 0 };
+    await prisma.$executeRaw`
+      UPDATE municipio SET resumo_osm = ${JSON.stringify(antigo)}::jsonb, resumo_em = now()
+      WHERE codigo_ibge = ${PEQUENA.codigoIbge}
+    `;
+    mapas = instalarMapasFalsos({ overpass: () => ({ corpo: { elements: [hotelPerto(GRANDE, 1), hotelPerto(PEQUENA, 2)] } }) });
+
+    const resultado = await aquecerResumos(["SC"], { lote: 2 });
+
+    assert.deepEqual(resultado, { cidades: 2, comResumo: 2, falhas: 0 });
+    const pequena = await prisma.municipio.findUnique({ where: { codigoIbge: PEQUENA.codigoIbge } });
+    assert.equal((pequena!.resumoOsm as unknown as ResumoOsm).versao, VERSAO_DO_RESUMO);
   });
 
   it("lote que falha é tentado de novo depois da pausa", async () => {
