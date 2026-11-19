@@ -339,8 +339,8 @@ describe("viagem de carro no gerador de roteiro", () => {
       const { token } = await comCasa(JOINVILLE);
       const etapas = [{ cidade: "Brasília, DF", dias: 14 }];
 
-      // 300 km por dia, com a busca do pernoite ampliada até ±200 km (as cidades da estrada estão nos
-      // km 500 e 1.000): 4 dias de estrada em cada sentido. Só a ida: 4 + 14 = 18; com a volta, 22.
+      // 300 km por dia, com as cidades da estrada nos km 500 e 1.000: só a ida cabe nos 21 dias
+      // (dias de estrada + 14 na cidade); com a volta a viagem passa de 21.
       const soIda = await gerar(token, { etapas, viagemDeCarro: { kmPorDia: 300 } });
       assert.equal(soIda.status, 200, JSON.stringify(soIda.corpo));
 

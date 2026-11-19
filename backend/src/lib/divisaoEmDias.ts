@@ -17,11 +17,12 @@ export const FRACAO_DIA_CURTO = 0.3;
 // horas baixo (ou estrada lenta) o alvo do dia cai e uma faixa fixa de ±50 km deixaria uma cidade
 // a 30 km da saída ganhar de uma a 80 km, e o dia ficaria quase vazio.
 export const FRACAO_FAIXA = 0.3;
-// Sem hospedagem na faixa do alvo, a busca vai se ampliando (2, 3 e 4 vezes a faixa: ±100, 150 e
-// 200 km com 500 km por dia) antes de deixar o pernoite a definir; numa estrada com poucas cidades,
-// como a de Manaus a Boa Vista, ±100 km não bastava. A ampliação nunca passa de 60% do alvo do dia,
-// para nenhum dia encolher a menos de 40% do alvo.
-const MULTIPLOS_DA_FAIXA = [2, 3, 4];
+// Sem hospedagem na faixa do alvo, a busca se amplia uma vez, para o dobro da faixa (±100 km com
+// 500 km por dia), antes de deixar o pernoite a definir. Mais longe que isso a divisão não decide
+// sozinha: propõe a próxima cidade com hospedagem adiante e a pessoa aceita ou recusa (um dia de
+// 640 km quando o alvo é 500 não pode aparecer sem ela saber). A ampliação nunca passa de 60% do
+// alvo do dia, para nenhum dia encolher a menos de 40% do alvo.
+const MULTIPLOS_DA_FAIXA = [2];
 const FRACAO_MAXIMA_AMPLIADA = 0.6;
 export const MAX_ALTERNATIVAS = 3;
 // Cidades de cada faixa cujo resumo é buscado (as mais perto do alvo): numa região metropolitana a
