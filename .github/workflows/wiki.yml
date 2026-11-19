@@ -27,7 +27,7 @@ jobs:
     steps:
       - uses: actions/checkout@v4
       - name: Montar as páginas
-        run: python3 scripts/montar_wiki.py wiki-saida
+        run: python3 scripts/montar_wiki.py
       - name: Publicar
         run: |
           git clone "https://x-access-token:${{ github.token }}@github.com/${{ github.repository }}.wiki.git" wiki || {

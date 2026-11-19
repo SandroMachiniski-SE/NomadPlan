@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """Monta as páginas da Wiki do GitHub a partir de docs/ (workflow .github/workflows/wiki.yml).
 
-Uso: python scripts/montar_wiki.py <pasta-de-saida>
+Uso: python scripts/montar_wiki.py   (gera as páginas em ./wiki-saida)
 
 A Wiki é gerada, nunca editada à mão: cada página é um arquivo do repositório, com os links entre eles trocados pelos
 nomes das páginas da Wiki e os links para o resto do repositório trocados por endereços absolutos.
@@ -9,7 +9,9 @@ nomes das páginas da Wiki e os links para o resto do repositório trocados por 
 import os
 import re
 import shutil
-import sys
+
+# Pasta de saída fixa (relativa ao diretório atual): nada vem da linha de comando.
+SAIDA = "wiki-saida"
 
 REPOSITORIO = os.environ.get("GITHUB_REPOSITORY", "SandroMachiniski-SE/NomadPlan")
 BLOB = f"https://github.com/{REPOSITORIO}/blob/main"
@@ -50,11 +52,7 @@ def reescrever(texto: str, origem: str) -> str:
 
 
 def main() -> None:
-    # A pasta de saída tem de ficar dentro do diretório atual: o argumento vem da linha de comando.
-    raiz = os.path.realpath(os.getcwd())
-    saida = os.path.realpath(os.path.join(raiz, sys.argv[1]))
-    if os.path.commonpath([raiz, saida]) != raiz:
-        sys.exit("A pasta de saída deve ficar dentro do diretório atual.")
+    saida = SAIDA
     os.makedirs(saida, exist_ok=True)
 
     for origem, pagina in PAGINAS.items():
