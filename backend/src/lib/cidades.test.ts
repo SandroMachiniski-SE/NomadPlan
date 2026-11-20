@@ -15,6 +15,12 @@ describe("normalizarCidade", () => {
     }
   });
 
+  it("aceita espaços ao redor do separador e o país depois da UF", () => {
+    assert.equal(normalizarCidade("Joinville , SC"), "joinville");
+    assert.equal(normalizarCidade("Joinville ( SC )"), "joinville");
+    assert.equal(normalizarCidade("Joinville / Brasil"), "joinville");
+  });
+
   it("não corta nomes de cidade que terminam em palavra curta de verdade", () => {
     assert.equal(normalizarCidade("Rio do Sul"), "rio do sul");
     assert.equal(normalizarCidade("São Bento do Sul"), "sao bento do sul");

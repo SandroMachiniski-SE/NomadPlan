@@ -5,8 +5,9 @@ import prisma from "./prisma";
 // "florianopolis", "Joinville, SC" ou "Blumenau - SC". Para buscar e gerar roteiros, o texto
 // digitado é comparado sem acentos, sem maiúsculas e sem a UF com as cidades que têm pontos.
 
-const SUFIXO_PAIS = /\s*[,\-/–]\s*brasil$/;
-const SUFIXO_UF = /\s*(?:[,\-/–]\s*|\(\s*|\s+)(?:[a-z]{2}|santa catarina)\s*\)?$/;
+// O texto já chega com os espaços reduzidos a um só, por isso basta um espaço opcional.
+const SUFIXO_PAIS = / ?[,\-/–] ?brasil$/;
+const SUFIXO_UF = /(?: ?[,\-/–] ?| ?\( ?| )(?:[a-z]{2}|santa catarina) ?\)?$/;
 
 export function normalizarCidade(texto: string): string {
   const simples = texto

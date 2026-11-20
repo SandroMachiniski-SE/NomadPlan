@@ -1,4 +1,4 @@
-import { useState, type FormEvent } from "react";
+import { useEffect, useRef, useState, type FormEvent } from "react";
 import { Link, useLocation, useNavigate } from "react-router-dom";
 import { useAuth } from "../context/useAuth";
 import { extrairMensagemErro } from "../utils/erro";
@@ -15,6 +15,14 @@ function Login() {
   const [pedirCodigo, setPedirCodigo] = useState(false);
   const [enviando, setEnviando] = useState(false);
   const [erro, setErro] = useState<string | null>(null);
+  const campoDoCodigo = useRef<HTMLInputElement>(null);
+
+  // Ao pedir o código do aplicativo, o cursor vai direto para o campo dele.
+  useEffect(() => {
+    if (pedirCodigo) {
+      campoDoCodigo.current?.focus();
+    }
+  }, [pedirCodigo]);
 
   const estadoNavegacao = location.state as { destino?: string; mensagem?: string } | null;
   const destino = estadoNavegacao?.destino ?? "/roteiros";
@@ -105,7 +113,7 @@ function Login() {
               pattern="\d{6}"
               maxLength={6}
               required
-              autoFocus
+              ref={campoDoCodigo}
               autoComplete="one-time-code"
               placeholder="000000"
               value={codigoMfa}

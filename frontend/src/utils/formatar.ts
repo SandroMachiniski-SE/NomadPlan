@@ -60,7 +60,7 @@ export function lerValorEmCentavos(texto: string): number | null {
 
   // Só o prefixo "R$" e espaços podem acompanhar os números: letras ou símbolos no meio ("abc25,90",
   // "25abc") não são descartados em silêncio, o texto inteiro deixa de ser um valor.
-  const correspondencia = /^\s*(?:R\$)?\s*([\d.,]+)\s*$/i.exec(texto);
+  const correspondencia = /^(?:R\$)?\s*([\d.,]+)$/i.exec(texto.trim());
 
   if (!correspondencia) return Number.NaN;
 

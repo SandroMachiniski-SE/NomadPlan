@@ -1,5 +1,5 @@
 import { Suspense, useState } from "react";
-import { Link, NavLink, Outlet, useNavigate } from "react-router-dom";
+import { Link, NavLink, Outlet, useLocation, useNavigate } from "react-router-dom";
 import { useAuth } from "../context/useAuth";
 import Icone from "./Icone";
 import NotificacoesSino from "./NotificacoesSino";
@@ -19,7 +19,17 @@ function Marca() {
 function Layout() {
   const { usuario, autenticado, logout } = useAuth();
   const navigate = useNavigate();
+  const { pathname } = useLocation();
   const [menuAberto, setMenuAberto] = useState(false);
+
+  // O menu do celular fecha sozinho quando a página muda ou a pessoa entra/sai da conta.
+  const situacao = `${pathname}|${autenticado}`;
+  const [situacaoDoMenu, setSituacaoDoMenu] = useState(situacao);
+
+  if (situacaoDoMenu !== situacao) {
+    setSituacaoDoMenu(situacao);
+    setMenuAberto(false);
+  }
 
   const tipoConta = usuario?.tipoConta;
   const podeModerar = tipoConta === "MODERADOR" || tipoConta === "ADMIN";
@@ -44,12 +54,7 @@ function Layout() {
             <Marca />
           </Link>
 
-          <div
-            id="menu-principal"
-            className="site-menu"
-            data-aberto={menuAberto}
-            onClick={() => setMenuAberto(false)}
-          >
+          <div id="menu-principal" className="site-menu" data-aberto={menuAberto}>
             <nav className="site-nav" aria-label="Principal">
               <NavLink to="/" end className="nav-link">
                 Explorar

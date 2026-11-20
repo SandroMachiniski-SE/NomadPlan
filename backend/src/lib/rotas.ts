@@ -1,4 +1,5 @@
 import prisma from "./prisma";
+import { semFinais } from "./texto";
 import { AGENTE } from "./baixarCidade";
 import type { Municipio } from "./municipios";
 
@@ -7,7 +8,7 @@ import type { Municipio } from "./municipios";
 // tempo: quantos segundos se leva até cada ponto da estrada, de 5 em 5 km. É o perfil que diz
 // onde terminam "7 horas ao volante" e quanto tempo leva cada dia de estrada.
 
-const OSRM_URL = (process.env.OSRM_URL || "https://router.project-osrm.org").replace(/\/+$/, "");
+const OSRM_URL = semFinais(process.env.OSRM_URL || "https://router.project-osrm.org", "/");
 const TEMPO_LIMITE_MS = 15_000;
 const INTERVALO_ENTRE_CONSULTAS_MS = 1000;
 const VALIDADE_DA_ROTA_MS = 90 * 24 * 60 * 60 * 1000;

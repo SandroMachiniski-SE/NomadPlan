@@ -21,6 +21,12 @@ describe("base32", () => {
     assert.deepEqual(decodificarBase32(SEGREDO_RFC), original);
   });
 
+  it("aceita o segredo em minúsculas, com espaços de agrupamento e com o preenchimento '='", () => {
+    const agrupado = "gezd gnbv gy3t qojq gezd gnbv gy3t qojq====";
+
+    assert.deepEqual(decodificarBase32(agrupado), decodificarBase32(SEGREDO_RFC));
+  });
+
   it("recusa caracteres fora do alfabeto", () => {
     assert.throws(() => decodificarBase32("ABC1!"), /inválido/);
   });

@@ -50,6 +50,8 @@ describe("lerValorEmCentavos", () => {
     ["1.234,56", 123456],
     ["R$ 20", 2000],
     ["1.500", 150000],
+    ["  R$   20,5  ", 2050],
+    ["r$20", 2000],
   ])("lê %s como %i centavos", (texto, centavos) => {
     expect(lerValorEmCentavos(texto)).toBe(centavos);
   });
