@@ -105,7 +105,14 @@ Antes de publicar, confirme no servidor que nenhum segredo do histórico foi rea
 grep -E 'dev-only-change-me|nomadplan_dev' .env.prod && echo "TROQUE ESTES VALORES" || echo "ok: nenhum valor do histórico em uso"
 ```
 
-Falta uma decisão do dono do repositório (Sandro), a registrar aqui com a data:
+## Decisão (20/11/2026)
 
-- [ ] **Aceitar o risco**, já que os valores do histórico são só de desenvolvimento e não serão usados em produção (o GitHub guarda os commits antigos em `refs/pull/*` mesmo depois de uma reescrita, então a limpeza não elimina a exposição), **ou**
-- [ ] **Limpar o histórico** com os passos 3 e 4 acima, avisando todos os colaboradores antes do `push --force`.
+**Risco aceito pelo dono do repositório (Sandro), sem reescrever o histórico.**
+
+- Em 20/11/2026 a verificação no servidor de produção (`grep -E 'dev-only-change-me|nomadplan_dev' .env.prod`) confirmou que **nenhum valor do histórico está em uso**: o `JWT_SECRET` e a senha do Postgres de produção são outros (a verificação procura os dois valores do histórico e não encontra nenhum).
+- Os valores que ficaram no histórico eram só do Docker local de desenvolvimento e não dão acesso a nada em produção.
+- A API recusa iniciar em produção com segredo curto ou igual ao de exemplo, o que impede o reaproveitamento por engano.
+- A limpeza do histórico não eliminaria a exposição (o GitHub mantém os commits antigos em `refs/pull/*`) e exigiria `push --force`, invalidando os clones e os PRs existentes, sem ganho de segurança real.
+
+- [x] **Aceitar o risco** (escolhido).
+- [ ] ~~Limpar o histórico com os passos 3 e 4~~ (descartado pelos motivos acima).
