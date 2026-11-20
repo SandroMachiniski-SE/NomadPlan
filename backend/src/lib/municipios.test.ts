@@ -36,4 +36,15 @@ describe("separarUf", () => {
   it("sigla que não é UF fica no nome", () => {
     assert.deepEqual(separarUf("Santa Cruz, XX"), { nome: "Santa Cruz, XX", uf: null });
   });
+
+  it("sem separador antes da sigla, ou sem nome antes do separador, não separa nada", () => {
+    assert.deepEqual(separarUf("Pedro II"), { nome: "Pedro II", uf: null });
+    assert.deepEqual(separarUf("Santa Fé DF"), { nome: "Santa Fé DF", uf: null });
+    assert.deepEqual(separarUf(", DF"), { nome: ", DF", uf: null });
+    assert.deepEqual(separarUf("DF"), { nome: "DF", uf: null });
+  });
+
+  it("usa só o último separador quando o nome também tem vírgula", () => {
+    assert.deepEqual(separarUf("Vila Nova, Centro, SP"), { nome: "Vila Nova, Centro", uf: "SP" });
+  });
 });

@@ -1,4 +1,5 @@
 import { createHmac, randomBytes, timingSafeEqual } from "crypto";
+import { semFinais } from "./texto";
 
 // TOTP (RFC 6238) para autenticação em dois fatores, compatível com Google
 // Authenticator, Microsoft Authenticator, Authy etc.
@@ -20,7 +21,7 @@ export function codificarBase32(dados: Buffer): string {
 }
 
 export function decodificarBase32(texto: string): Buffer {
-  const limpo = texto.replace(/=+$/, "").replace(/\s+/g, "").toUpperCase();
+  const limpo = semFinais(texto.replace(/\s+/g, "").toUpperCase(), "=");
 
   let bits = "";
   for (const caractere of limpo) {

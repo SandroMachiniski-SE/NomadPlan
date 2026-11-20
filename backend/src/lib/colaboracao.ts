@@ -1,4 +1,5 @@
 import prisma from "./prisma";
+import { semFinais } from "./texto";
 
 // Roteiro colaborativo: quem pode fazer o quê.
 //
@@ -23,7 +24,7 @@ export function papelPermite(papel: Papel, nivel: Nivel): boolean {
  * (o dono gerencia, e qualquer participante pode sair).
  */
 export function nivelExigido(metodo: string, resto: string): Nivel {
-  const rota = resto.replace(/\/+$/, "") || "/";
+  const rota = semFinais(resto, "/") || "/";
 
   if (metodo === "GET" || metodo === "HEAD") {
     return rota.startsWith("/convites") ? "dono" : "leitura";

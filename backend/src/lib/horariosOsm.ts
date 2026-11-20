@@ -37,7 +37,7 @@ function lerFaixas(texto: string): Faixa[] | null {
 
   const faixas: Faixa[] = [];
 
-  for (const parte of texto.split(/\s*,\s*/)) {
+  for (const parte of texto.split(",").map((p) => p.trim())) {
     const m = parte.match(FAIXA);
 
     if (!m) {
@@ -64,13 +64,13 @@ function lerDias(seletor: string): { dias: number[]; feriados: boolean } {
   const dias = new Set<number>();
   let feriados = false;
 
-  for (const item of seletor.toLowerCase().split(/\s*,\s*/)) {
+  for (const item of seletor.toLowerCase().split(",").map((i) => i.trim())) {
     if (item === "ph") {
       feriados = true;
       continue;
     }
 
-    const [inicio, fim = inicio] = item.split(/\s*-\s*/).map((d) => DIAS_OSM.indexOf(d));
+    const [inicio, fim = inicio] = item.split("-").map((d) => DIAS_OSM.indexOf(d.trim()));
 
     // Intervalos podem dar a volta na semana ("Fr-Mo").
     for (let dia = inicio; ; dia = (dia + 1) % 7) {
@@ -140,7 +140,7 @@ export function converterHorarioOsm(original: string): string | null {
   const semana: Faixa[][] = Array.from({ length: 7 }, () => []);
   let feriados: Faixa[] | null = null;
 
-  for (const bloco of texto.split(/\s*;\s*/)) {
+  for (const bloco of texto.split(";").map((p) => p.trim())) {
     // Dentro de um bloco, ", " seguido de outro dia começa uma regra adicional, que soma
     // horários em vez de substituir ("Mo-Fr 09:00-12:00, Sa 09:00-12:00").
     const partes = bloco.split(/(?<=\d|off|closed)\s*,\s*(?=(?:mo|tu|we|th|fr|sa|su|ph)\b)/i);

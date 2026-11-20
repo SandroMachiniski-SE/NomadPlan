@@ -87,6 +87,16 @@ describe("Login", () => {
     expect(await screen.findByText("Meus roteiros")).toBeTruthy();
   });
 
+  it("ao pedir o código, o cursor vai direto para o campo dele", async () => {
+    sessao.login.mockResolvedValue({ mfaNecessario: true });
+    abrir();
+    preencher();
+
+    const campo = await screen.findByLabelText("Código do aplicativo");
+
+    expect(document.activeElement).toBe(campo);
+  });
+
   it("voltar da etapa do código mostra o formulário de senha de novo", async () => {
     sessao.login.mockResolvedValue({ mfaNecessario: true });
     abrir();

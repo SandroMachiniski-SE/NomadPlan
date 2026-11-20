@@ -58,16 +58,17 @@ function normalizarNome(nome: string): string {
     .trim();
 }
 
-const UF_NO_FIM =/^(.*?)\s*[,/-]\s*([a-zA-Z]{2})\s*$/;
-
 /** "Brasília, DF", "Brasília/DF" ou "Brasília - DF" → nome e UF; sigla que não é UF fica no nome. */
 export function separarUf(texto: string): { nome: string; uf: string | null } {
   const limpo = texto.trim();
-  const partes = UF_NO_FIM.exec(limpo);
-  const uf = partes?.[2].toUpperCase();
+  // Termina em "<separador> <duas letras>": a sigla é o fim do texto e o separador vem logo antes dela.
+  const sigla = limpo.slice(-2);
+  const antes = limpo.slice(0, -2).trimEnd();
+  const nome = antes.slice(0, -1).trim();
+  const uf = sigla.toUpperCase();
 
-  if (partes && uf && (UFS as readonly string[]).includes(uf) && partes[1].trim()) {
-    return { nome: partes[1].trim(), uf };
+  if (/^[a-zA-Z]{2}$/.test(sigla) && /[,/-]$/.test(antes) && nome && (UFS as readonly string[]).includes(uf)) {
+    return { nome, uf };
   }
 
   return { nome: limpo, uf: null };

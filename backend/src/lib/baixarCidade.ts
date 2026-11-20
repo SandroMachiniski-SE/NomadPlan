@@ -89,7 +89,7 @@ async function dadosDoWikidata(ids: string[]) {
 
 function textoSemHtml(html: string): string {
   return html
-    .replace(/<[^>]*>/g, "")
+    .replace(/<[^<>]*>/g, "")
     .replace(/&amp;/g, "&")
     .replace(/&quot;/g, '"')
     .replace(/&#0?39;/g, "'")
