@@ -57,7 +57,7 @@ jobs:
       # Testes unitários e de integração (banco real), com meta de 75% de linhas (RNF). Gera o lcov que o
       # SonarCloud lê no job "analise-estatica".
       - run: npm run test:cobertura
-      - uses: actions/upload-artifact@v4
+      - uses: actions/upload-artifact@v7
         with:
           name: cobertura-backend
           path: backend/coverage/lcov.info
@@ -80,7 +80,7 @@ jobs:
       - run: npm run lint
       # Testes com relatório de cobertura (lcov, lido pelo SonarCloud).
       - run: npm run test:cobertura
-      - uses: actions/upload-artifact@v4
+      - uses: actions/upload-artifact@v7
         with:
           name: cobertura-frontend
           path: frontend/coverage/lcov.info
@@ -124,7 +124,7 @@ jobs:
         working-directory: e2e
       - run: npm test
         working-directory: e2e
-      - uses: actions/upload-artifact@v4
+      - uses: actions/upload-artifact@v7
         if: ${{ !cancelled() }}
         with:
           name: relatorio-playwright
