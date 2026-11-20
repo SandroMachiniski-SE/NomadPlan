@@ -11,6 +11,10 @@ const BASE = "https://places.googleapis.com/v1";
 /** "places/<id>/photos/<referência>": o formato que o Google devolve para uma foto. */
 const NOME_DE_FOTO = /^places\/[\w-]+\/photos\/[\w-]+$/;
 
+/** As três chamadas que o sistema faz: busca por texto, detalhes do lugar e mídia (foto) do lugar. */
+const CAMINHO_PERMITIDO =
+  /^(places:searchText|places\/[\w-]+\?languageCode=pt-BR|places\/[\w-]+\/photos\/[\w-]+\/media\?maxWidthPx=960&skipHttpRedirect=true)$/;
+
 /** Texto que vai para o log sem quebras de linha nem caracteres de controle (evita forjar linhas de log). */
 function paraLog(texto: string): string {
   return texto.replace(/[\u0000-\u001f\u007f]/g, " ");
@@ -29,6 +33,12 @@ async function chamar<T>(caminho: string, opcoes: { metodo?: "GET" | "POST"; cor
   const chave = chaveGoogle();
 
   if (!chave) {
+    return null;
+  }
+
+  // Só os endereços que o sistema usa: nada que venha de fora vira outro recurso do Google.
+  if (!CAMINHO_PERMITIDO.test(caminho)) {
+    console.warn("Google Places: caminho recusado.");
     return null;
   }
 

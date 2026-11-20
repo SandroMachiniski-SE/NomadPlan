@@ -1,5 +1,5 @@
 import { act, render, screen, waitFor } from "@testing-library/react";
-import { useContext, useEffect } from "react";
+import { useContext, useLayoutEffect } from "react";
 import { beforeEach, describe, expect, it, vi } from "vitest";
 import { SalvosProvider } from "./SalvosContext";
 import { SalvosContext } from "./salvos-context";
@@ -17,7 +17,7 @@ const espiao: { atual: Contexto | null } = { atual: null };
 function Espiao() {
   const valor = useContext(SalvosContext)!;
 
-  useEffect(() => {
+  useLayoutEffect(() => {
     espiao.atual = valor;
   });
 

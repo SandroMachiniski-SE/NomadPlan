@@ -94,6 +94,13 @@ describe("chamadas ao Google Places", () => {
     assert.ok(!google.chamadas[1].url.includes("chave-de-teste"));
   });
 
+  it("identificador de lugar com caracteres estranhos nem chega a chamar o Google", async () => {
+    google = instalarGoogleFalso(() => ({ corpo: {} }));
+
+    assert.equal(await detalhesDoGoogle("../../outro/recurso?x=1"), null);
+    assert.equal(google.chamadas.length, 0);
+  });
+
   it("nome de foto fora do formato do Google não vira endereço de chamada", async () => {
     google = instalarGoogleFalso(() => ({
       corpo: { photos: [{ name: "places/ChIJ-museu/photos/../../../outro/caminho" }] },

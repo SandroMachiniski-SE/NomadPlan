@@ -52,7 +52,7 @@ async function main() {
   console.log("Dados iniciais inseridos com sucesso.");
   console.log(`Municípios do IBGE: ${municipios}.`);
   console.log(
-    `Pontos do OpenStreetMap (${cidades.map((c) => c.cidade).join(", ")}): ${resumo.criados} novos, ` +
+    `Pontos do OpenStreetMap (${cidades.length} cidades): ${resumo.criados} novos, ` +
       `${resumo.complementados + resumo.vinculados + resumo.semMudanca} já existiam.`,
   );
   console.log(

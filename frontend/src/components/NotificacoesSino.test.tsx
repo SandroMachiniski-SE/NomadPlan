@@ -66,6 +66,18 @@ describe("NotificacoesSino", () => {
     expect(chamadas.patch).toHaveBeenCalledWith("/notificacoes/1/lida");
   });
 
+  it("aviso com identificador que não é número inteiro não gera chamada à API", async () => {
+    chamadas.get.mockResolvedValue({
+      data: { total: 1, naoLidas: 1, dados: [{ ...nota(1, false), id: "1/../admin" }] },
+    });
+    abrir();
+    fireEvent.click(await screen.findByLabelText("Notificações (1 não lidas)"));
+    fireEvent.click(await screen.findByText("Aviso 1"));
+
+    await waitFor(() => expect(screen.queryByText("Aviso 1")).toBeNull());
+    expect(chamadas.patch).not.toHaveBeenCalled();
+  });
+
   it("link para fora do site não é seguido", async () => {
     chamadas.get.mockResolvedValue({
       data: { total: 1, naoLidas: 0, dados: [nota(3, true, "//site-externo.example/pontos/9")] },
