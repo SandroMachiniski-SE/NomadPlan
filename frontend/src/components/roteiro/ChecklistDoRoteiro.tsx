@@ -76,7 +76,7 @@ function ChecklistDoRoteiro({ idRoteiro, itens, aoMudar, somenteLeitura = false 
                     const feito = e.target.checked;
                     setMarcados({ [item.id]: feito });
 
-                    executar(
+                    void executar(
                       () => api.patch(`/roteiros/${idRoteiro}/checklist/${item.id}`, { feito }),
                       "Não foi possível atualizar o item.",
                     );

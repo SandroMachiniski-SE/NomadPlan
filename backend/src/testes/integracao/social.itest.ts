@@ -208,7 +208,7 @@ describe("administração, notificações, pontos salvos e recomendações", () 
       assert.equal((await api("POST", `/salvos/${a.id}`, { token })).status, 201, "salvar de novo não dá erro");
       await api("POST", `/salvos/${b.id}`, { token });
 
-      assert.deepEqual((await api("GET", "/salvos/ids", { token })).corpo.ids.sort(), [a.id, b.id].sort());
+      assert.deepEqual((await api("GET", "/salvos/ids", { token })).corpo.ids.sort((x: number, y: number) => x - y), [a.id, b.id].sort((x: number, y: number) => x - y));
 
       const lista = await api("GET", "/salvos", { token });
       assert.equal(lista.corpo.total, 2);

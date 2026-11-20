@@ -17,16 +17,16 @@ ORIGINAL="${CADDYFILE_ORIGINAL:-/opt/elevare/deploy/vps/Caddyfile}"
 REDE="${REDE_NOMADPLAN:-nomadplan_default}"
 ENV_FILE="${ENV_FILE:-.env.prod}"
 
-[ -f "$ORIGINAL" ] || { echo "Caddyfile do outro projeto não encontrado: $ORIGINAL" >&2; exit 1; }
-[ -f "$ENV_FILE" ] || { echo "Arquivo de configuração não encontrado: $ENV_FILE" >&2; exit 1; }
+[[ -f "$ORIGINAL" ]] || { echo "Caddyfile do outro projeto não encontrado: $ORIGINAL" >&2; exit 1; }
+[[ -f "$ENV_FILE" ]] || { echo "Arquivo de configuração não encontrado: $ENV_FILE" >&2; exit 1; }
 
 DOMINIO_WEB="$(grep -E '^DOMINIO_WEB=' "$ENV_FILE" | head -1 | cut -d= -f2-)"
 DOMINIO_API="$(grep -E '^DOMINIO_API=' "$ENV_FILE" | head -1 | cut -d= -f2-)"
-[ -n "$DOMINIO_WEB" ] && [ -n "$DOMINIO_API" ] || { echo "Defina DOMINIO_WEB e DOMINIO_API em $ENV_FILE." >&2; exit 1; }
+[[ -n "$DOMINIO_WEB" ]] && [[ -n "$DOMINIO_API" ]] || { echo "Defina DOMINIO_WEB e DOMINIO_API em $ENV_FILE." >&2; exit 1; }
 # Opcional: o painel do Grafana (docs/monitoramento.md). Sem a variável, nada muda.
 DOMINIO_GRAFANA="$(grep -E '^DOMINIO_GRAFANA=' "$ENV_FILE" | head -1 | cut -d= -f2- || true)"
 
-if [ "${SEM_REDE:-0}" != "1" ]; then
+if [[ "${SEM_REDE:-0}" != "1" ]]; then
   docker network connect "$REDE" "$CADDY" 2>/dev/null || true   # já conectado também é sucesso
 fi
 
@@ -37,6 +37,10 @@ trap 'rm -f "$TEMP"' EXIT
   printf '\n# --- NomadPlan (acrescentado em memória por ligar-caddy-existente.sh; o arquivo original não é alterado) ---\n'
   printf '%s {\n\treverse_proxy nomadplan-web:80\n}\n\n' "$DOMINIO_WEB"
   printf '%s {\n\tencode zstd gzip\n\treverse_proxy nomadplan-api:3333\n}\n' "$DOMINIO_API"
+  # Painel do Grafana (só se DOMINIO_GRAFANA estiver no .env.prod): o contêiner fica na mesma rede do NomadPlan.
+  if [[ -n "$DOMINIO_GRAFANA" ]]; then
+    printf '\n%s {\n\tencode zstd gzip\n\treverse_proxy nomadplan-grafana:3000\n}\n' "$DOMINIO_GRAFANA"
+  fi
 } > "$TEMP"
 
 docker cp "$TEMP" "$CADDY":/tmp/Caddyfile.nomadplan

@@ -34,7 +34,7 @@ function Roteiros() {
       }
     }
 
-    buscarRoteiros();
+    void buscarRoteiros();
   }, []);
 
   return (

@@ -164,7 +164,7 @@ function RoteiroDetalhes() {
       }
     }
 
-    buscarPontos();
+    void buscarPontos();
   }, [roteiroCarregado, cidadeEscolhida, categoriaDaBusca]);
 
   useEffect(() => {
@@ -388,7 +388,7 @@ function RoteiroDetalhes() {
       (grupo.dia === dia ? trocado : grupo.itens).map((item) => ({ id: item.id, dia: grupo.dia })),
     );
 
-    organizar(lista, "Não foi possível reordenar os pontos.");
+    void organizar(lista, "Não foi possível reordenar os pontos.");
   }
 
   function aoMoverParaDia(item: ItemRoteiro, novoDia: number) {
@@ -400,7 +400,7 @@ function RoteiroDetalhes() {
       { id: item.id, dia: novoDia },
     ];
 
-    organizar(lista, "Não foi possível mover a parada de dia.");
+    void organizar(lista, "Não foi possível mover a parada de dia.");
   }
 
   async function aoOtimizar(dia: number | "todos") {

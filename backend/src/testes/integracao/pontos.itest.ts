@@ -410,7 +410,7 @@ describe("pontos turísticos: cadastro, publicação e moderação", () => {
         ),
       );
 
-      const status = respostas.map((r) => r.status).sort();
+      const status = respostas.map((r) => r.status).sort((x, y) => x - y);
       assert.deepEqual(status, [200, 409, 409, 409, 409, 409]);
       assert.equal((await prisma.pontoTuristico.findUnique({ where: { id: ponto.id } }))?.versao, 2);
       assert.equal(await prisma.versaoPonto.count({ where: { idPonto: ponto.id } }), 1);

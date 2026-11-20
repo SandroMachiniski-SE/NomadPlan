@@ -69,7 +69,7 @@ function Colaboradores({ roteiro, aoMudar, aoSair }: ColaboradoresProps) {
     const convidado = email.trim();
     if (!convidado) return;
 
-    executar(
+    void executar(
       () => api.post(`/roteiros/${roteiro.id}/convites`, { email: convidado, papel }),
       "Não foi possível enviar o convite.",
       () => {
@@ -82,7 +82,7 @@ function Colaboradores({ roteiro, aoMudar, aoSair }: ColaboradoresProps) {
   function aoSairDoRoteiro() {
     if (!usuario || !window.confirm("Sair deste roteiro? Você perde o acesso a ele.")) return;
 
-    executar(
+    void executar(
       () => api.delete(`/roteiros/${roteiro.id}/colaboradores/${usuario.id}`),
       "Não foi possível sair do roteiro.",
       aoSair,
