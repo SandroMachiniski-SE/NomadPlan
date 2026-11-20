@@ -8,10 +8,10 @@ RUN apt-get update \
 
 WORKDIR /app
 
-# O postinstall roda "prisma generate", que precisa do schema.
+# Instala sem scripts de pacotes e gera o cliente do Prisma à parte (precisa do schema).
 COPY backend/package.json backend/package-lock.json ./
 COPY backend/prisma ./prisma
-RUN npm ci
+RUN npm ci --ignore-scripts && npx prisma generate
 
 COPY backend/tsconfig.json ./
 COPY backend/src ./src

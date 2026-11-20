@@ -10,8 +10,9 @@ concurrency:
   cancel-in-progress: true
 
 env:
-  # Mesma conta e senha do docker-compose.yml; o banco só existe durante a execução.
-  DATABASE_URL: postgresql://nomadplan:nomadplan_dev@localhost:5432/nomadplan?schema=public
+  # O banco do CI só existe durante a execução e só é alcançável de dentro da própria máquina: entra sem senha
+  # (POSTGRES_HOST_AUTH_METHOD=trust nos serviços), então nenhuma senha fica gravada no repositório.
+  DATABASE_URL: postgresql://nomadplan@localhost:5432/nomadplan?schema=public
   JWT_SECRET: segredo-de-ci-apenas-para-testes-automatizados
   # Os testes montam datas na hora local ("segunda às 10h") e o sistema lê horários em Brasília.
   TZ: America/Sao_Paulo
@@ -25,7 +26,7 @@ jobs:
         image: postgis/postgis:16-3.4
         env:
           POSTGRES_USER: nomadplan
-          POSTGRES_PASSWORD: nomadplan_dev
+          POSTGRES_HOST_AUTH_METHOD: trust
           POSTGRES_DB: nomadplan
         ports:
           - 5432:5432
@@ -44,7 +45,9 @@ jobs:
           node-version: 22
           cache: npm
           cache-dependency-path: backend/package-lock.json
-      - run: npm ci
+      - run: npm ci --ignore-scripts
+      # Sem scripts de instalação (menos superfície de ataque): o cliente do Prisma é gerado à parte.
+      - run: npm run prisma:generate
       - run: npm run typecheck
       - run: npm run build
       # Auditoria das dependências de produção. Hoje restam 3 altas na ferramenta de linha de comando do
@@ -73,7 +76,7 @@ jobs:
           node-version: 22
           cache: npm
           cache-dependency-path: frontend/package-lock.json
-      - run: npm ci
+      - run: npm ci --ignore-scripts
       - run: npm run lint
       # Testes com relatório de cobertura (lcov, lido pelo SonarCloud).
       - run: npm run test:cobertura
@@ -95,7 +98,7 @@ jobs:
         image: postgis/postgis:16-3.4
         env:
           POSTGRES_USER: nomadplan
-          POSTGRES_PASSWORD: nomadplan_dev
+          POSTGRES_HOST_AUTH_METHOD: trust
           POSTGRES_DB: nomadplan
         ports:
           - 5432:5432
@@ -109,15 +112,17 @@ jobs:
       - uses: actions/setup-node@v4
         with:
           node-version: 22
-      - run: npm ci
+      - run: npm ci --ignore-scripts
         working-directory: backend
-      - run: npm ci
+      - run: npm run prisma:generate
+        working-directory: backend
+      - run: npm ci --ignore-scripts
         working-directory: frontend
-      - run: npm ci
+      - run: npm ci --ignore-scripts
         working-directory: e2e
-      - run: npx playwright install --with-deps chromium
+      - run: npm run navegador
         working-directory: e2e
-      - run: npx playwright test
+      - run: npm test
         working-directory: e2e
       - uses: actions/upload-artifact@v4
         if: ${{ !cancelled() }}

@@ -61,9 +61,10 @@ function NotificacoesSino() {
   }
 
   async function aoClicarNotificacao(notificacao: Notificacao) {
-    if (!notificacao.lida) {
+    // O identificador é sempre um número inteiro; qualquer outra coisa nem vira endereço de requisição.
+    if (!notificacao.lida && Number.isInteger(notificacao.id)) {
       try {
-        await api.patch(`/notificacoes/${encodeURIComponent(String(notificacao.id))}/lida`);
+        await api.patch(`/notificacoes/${Number(notificacao.id)}/lida`);
         setNaoLidas((atual) => Math.max(0, atual - 1));
         setNotificacoes((atual) =>
           atual.map((n) => (n.id === notificacao.id ? { ...n, lida: true } : n)),
