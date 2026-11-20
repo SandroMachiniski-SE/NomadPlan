@@ -304,7 +304,7 @@ describe("contribuições dos usuários", () => {
 
       const respostas = await Promise.all(Array.from({ length: 6 }, () => avaliar(token, ponto.id, { nota: 4 })));
 
-      assert.deepEqual(respostas.map((r) => r.status).sort(), [201, 409, 409, 409, 409, 409]);
+      assert.deepEqual(respostas.map((r) => r.status).sort((x, y) => x - y), [201, 409, 409, 409, 409, 409]);
       assert.equal(await prisma.avaliacao.count({ where: { idPonto: ponto.id } }), 1);
     });
 

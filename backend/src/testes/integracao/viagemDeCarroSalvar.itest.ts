@@ -136,7 +136,7 @@ describe("salvar e ler a viagem de carro", () => {
     const hoteis = await prisma.pontoTuristico.findMany({ where: { categoria: "Hospedagem" } });
     assert.equal(hoteis.length, 11);
     assert.ok(hoteis.every((h) => h.origem === "API" && h.idOsm && h.status === "PUBLICADO"));
-    assert.deepEqual([...new Set(hoteis.map((h) => h.cidade))].sort(), ["Cidade A", "Cidade B"]);
+    assert.deepEqual([...new Set(hoteis.map((h) => h.cidade))].sort((x, y) => x.localeCompare(y)), ["Cidade A", "Cidade B"]);
   });
 
   it("salvar com volta grava os trechos de todas as pernas", async () => {

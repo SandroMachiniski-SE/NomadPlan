@@ -137,7 +137,7 @@ function PontoDetalhes() {
       }
     }
 
-    buscarRoteiros();
+    void buscarRoteiros();
   }, [autenticado, ponto]);
 
   const buscarAvaliacoes = useCallback(async () => {

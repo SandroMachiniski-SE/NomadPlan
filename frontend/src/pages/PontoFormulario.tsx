@@ -143,7 +143,7 @@ function PontoFormulario() {
       }
     }
 
-    buscarPonto();
+    void buscarPonto();
   }, [id]);
 
   function aoMudarCampo<K extends keyof CamposPonto>(campo: K, valor: string) {

@@ -41,7 +41,7 @@ function Home() {
       }
     }
 
-    buscarRecomendados();
+    void buscarRecomendados();
   }, [autenticado]);
 
   // A busca fica no endereço da página: ao voltar dos detalhes de um lugar (ou recarregar), a tela

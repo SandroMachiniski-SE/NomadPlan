@@ -29,7 +29,7 @@ export function useCidadesDisponiveis(): CidadeDisponivel[] {
   useEffect(() => {
     let ativo = true;
 
-    carregarCidades().then((lista) => {
+    void carregarCidades().then((lista) => {
       if (ativo) setCidades(lista);
     });
 

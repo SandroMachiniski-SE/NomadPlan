@@ -23,7 +23,7 @@ function NotificacoesSino() {
 
   useEffect(() => {
     // eslint-disable-next-line react-hooks/set-state-in-effect -- fetch inicial ao montar o componente
-    buscar();
+    void buscar();
 
     // Novos avisos (moderação, confirmações...) chegam sem precisar recarregar a página.
     const temporizador = window.setInterval(buscar, 60_000);
@@ -63,7 +63,7 @@ function NotificacoesSino() {
   async function aoClicarNotificacao(notificacao: Notificacao) {
     if (!notificacao.lida) {
       try {
-        await api.patch(`/notificacoes/${notificacao.id}/lida`);
+        await api.patch(`/notificacoes/${encodeURIComponent(String(notificacao.id))}/lida`);
         setNaoLidas((atual) => Math.max(0, atual - 1));
         setNotificacoes((atual) =>
           atual.map((n) => (n.id === notificacao.id ? { ...n, lida: true } : n)),
@@ -75,7 +75,8 @@ function NotificacoesSino() {
 
     setAberto(false);
 
-    if (notificacao.link) {
+    // Só vai para dentro do próprio site: "/pontos/3" sim, "//outro.site" ou "https://..." não.
+    if (notificacao.link && /^\/(?!\/)/.test(notificacao.link)) {
       navigate(notificacao.link);
     }
   }

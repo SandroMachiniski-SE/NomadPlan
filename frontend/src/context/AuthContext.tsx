@@ -93,7 +93,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       }
     }
 
-    carregarSessao();
+    void carregarSessao();
 
     return () => {
       ativo = false;

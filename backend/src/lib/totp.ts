@@ -13,7 +13,7 @@ export function codificarBase32(dados: Buffer): string {
 
   let saida = "";
   for (let i = 0; i < bits.length; i += 5) {
-    saida += ALFABETO_BASE32[parseInt(bits.slice(i, i + 5).padEnd(5, "0"), 2)];
+    saida += ALFABETO_BASE32[Number.parseInt(bits.slice(i, i + 5).padEnd(5, "0"), 2)];
   }
 
   return saida;
@@ -30,7 +30,7 @@ export function decodificarBase32(texto: string): Buffer {
   }
 
   const bytes: number[] = [];
-  for (let i = 0; i + 8 <= bits.length; i += 8) bytes.push(parseInt(bits.slice(i, i + 8), 2));
+  for (let i = 0; i + 8 <= bits.length; i += 8) bytes.push(Number.parseInt(bits.slice(i, i + 8), 2));
 
   return Buffer.from(bytes);
 }

@@ -94,6 +94,17 @@ describe("chamadas ao Google Places", () => {
     assert.ok(!google.chamadas[1].url.includes("chave-de-teste"));
   });
 
+  it("nome de foto fora do formato do Google não vira endereço de chamada", async () => {
+    google = instalarGoogleFalso(() => ({
+      corpo: { photos: [{ name: "places/ChIJ-museu/photos/../../../outro/caminho" }] },
+    }));
+
+    const info = await detalhesDoGoogle("ChIJ-museu", { comFoto: true });
+
+    assert.equal(info?.foto, null);
+    assert.equal(google.chamadas.length, 1, "só a consulta dos detalhes; a foto suspeita não é buscada");
+  });
+
   it("devolve null sem chave configurada ou quando o Google falha", async () => {
     google = instalarGoogleFalso(() => ({ status: 500, corpo: {} }));
 

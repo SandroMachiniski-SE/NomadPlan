@@ -66,6 +66,19 @@ describe("NotificacoesSino", () => {
     expect(chamadas.patch).toHaveBeenCalledWith("/notificacoes/1/lida");
   });
 
+  it("link para fora do site não é seguido", async () => {
+    chamadas.get.mockResolvedValue({
+      data: { total: 1, naoLidas: 0, dados: [nota(3, true, "//site-externo.example/pontos/9")] },
+    });
+    abrir();
+    fireEvent.click(await screen.findByLabelText("Notificações"));
+    fireEvent.click(await screen.findByText("Aviso 3"));
+
+    await waitFor(() => expect(screen.queryByText("Aviso 3")).toBeNull());
+    expect(screen.queryByText("Ficha do ponto")).toBeNull();
+    expect(screen.getByLabelText("Notificações")).toBeTruthy();
+  });
+
   it("marcar todas como lidas zera o contador", async () => {
     abrir();
     fireEvent.click(await screen.findByLabelText("Notificações (1 não lidas)"));

@@ -23,7 +23,7 @@ docker exec "$CONTAINER" pg_dump -U "$USUARIO" -Fc "$BANCO" > "$ARQUIVO_DUMP.par
 mv "$ARQUIVO_DUMP.parcial" "$ARQUIVO_DUMP"
 echo "Banco salvo em $ARQUIVO_DUMP ($(du -h "$ARQUIVO_DUMP" | cut -f1))"
 
-if [ -d "$UPLOADS" ] && [ -n "$(ls -A "$UPLOADS" 2>/dev/null)" ]; then
+if [[ -d "$UPLOADS" ]] && [[ -n "$(ls -A "$UPLOADS" 2>/dev/null)" ]]; then
   ARQUIVO_UPLOADS="$DESTINO/uploads-$CARIMBO.tar.gz"
   tar -czf "$ARQUIVO_UPLOADS" -C "$UPLOADS" .
   echo "Imagens salvas em $ARQUIVO_UPLOADS ($(du -h "$ARQUIVO_UPLOADS" | cut -f1))"

@@ -17,8 +17,8 @@ function normalizarValor(valor: string): string {
 
 /** Duas propostas são "a mesma" se mexem nos mesmos campos com os mesmos valores. */
 export function mesmaProposta(a: Record<string, unknown>, b: Record<string, unknown>): boolean {
-  const chavesA = Object.keys(a).sort();
-  const chavesB = Object.keys(b).sort();
+  const chavesA = Object.keys(a).sort((x, y) => x.localeCompare(y));
+  const chavesB = Object.keys(b).sort((x, y) => x.localeCompare(y));
 
   if (chavesA.length !== chavesB.length || chavesA.some((chave, i) => chave !== chavesB[i])) {
     return false;

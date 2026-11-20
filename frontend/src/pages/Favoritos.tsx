@@ -25,7 +25,7 @@ function Favoritos() {
       }
     }
 
-    carregar();
+    void carregar();
   }, []);
 
   // Um ponto removido dos favoritos nesta tela some da lista na hora.

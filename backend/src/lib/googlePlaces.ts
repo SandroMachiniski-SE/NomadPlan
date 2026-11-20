@@ -7,6 +7,14 @@ import prisma from "./prisma";
 import { descreverSemana, type Faixa } from "./horariosOsm";
 
 const BASE = "https://places.googleapis.com/v1";
+
+/** "places/<id>/photos/<referência>": o formato que o Google devolve para uma foto. */
+const NOME_DE_FOTO = /^places\/[\w-]+\/photos\/[\w-]+$/;
+
+/** Texto que vai para o log sem quebras de linha nem caracteres de controle (evita forjar linhas de log). */
+function paraLog(texto: string): string {
+  return texto.replace(/[\u0000-\u001f\u007f]/g, " ");
+}
 const TEMPO_LIMITE_MS = 4000;
 // Lugar que o Google não achou só é procurado de novo depois disso (cada busca é cobrada).
 const DIAS_ENTRE_BUSCAS = 30;
@@ -37,13 +45,13 @@ async function chamar<T>(caminho: string, opcoes: { metodo?: "GET" | "POST"; cor
     });
 
     if (!resposta.ok) {
-      console.warn(`Google Places respondeu ${resposta.status} para ${caminho.split("?")[0]}.`);
+      console.warn(`Google Places respondeu ${resposta.status} para ${paraLog(caminho.split("?")[0])}.`);
       return null;
     }
 
     return (await resposta.json()) as T;
   } catch (erro) {
-    console.warn("Google Places indisponível:", erro instanceof Error ? erro.message : erro);
+    console.warn("Google Places indisponível:", paraLog(String(erro instanceof Error ? erro.message : erro)));
     return null;
   }
 }
@@ -200,7 +208,8 @@ export async function detalhesDoGoogle(idGoogle: string, opcoes: { comFoto?: boo
   let foto: InformacoesGoogle["foto"] = null;
   const primeira = detalhes.photos?.[0];
 
-  if (opcoes.comFoto && primeira) {
+  // O nome da foto vem da resposta do Google e entra no endereço da próxima chamada: só o formato esperado passa.
+  if (opcoes.comFoto && primeira && NOME_DE_FOTO.test(primeira.name)) {
     // skipHttpRedirect devolve o endereço da imagem sem expor a chave da API ao navegador.
     const midia = await chamar<{ photoUri?: string }>(`${primeira.name}/media?maxWidthPx=960&skipHttpRedirect=true`, {});
     const autor = primeira.authorAttributions?.[0];
