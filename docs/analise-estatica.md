@@ -24,7 +24,7 @@ frontend (`npm run lint`, que falha o CI).
 | Item | Configuração |
 | --- | --- |
 | Código | `backend/src` e `frontend/src`, sem testes, `scripts/` e `node_modules` (`sonar-project.properties`) |
-| Cobertura | lcov do backend (`npm run test:cobertura`) e do frontend (`npm run test:cobertura`), enviados como artefatos pelo CI |
+| Cobertura | lcov do backend (`npm run test:cobertura`) e do frontend (`npm run test:cobertura`), enviados como artefatos pelo CI. Ficam fora da conta `scripts/`, os testes de ponta a ponta e de carga (`e2e/`) e os pontos de entrada (`server.ts`, `main.tsx`) |
 | Portão de qualidade | O padrão do SonarCloud ("Sonar way") para código novo: sem bugs e vulnerabilidades novos, pontos de segurança revisados, duplicação baixa |
 
 ## Como ler o resultado
