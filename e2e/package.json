@@ -10,7 +10,7 @@
     "relatorio": "playwright show-report"
   },
   "devDependencies": {
-    "@playwright/test": "^1.65.0",
+    "@playwright/test": "^1.65.1",
     "@types/node": "^24.13.3",
     "typescript": "~6.0.2"
   }
